@@ -8,14 +8,8 @@
 
 package clusterless.model;
 
-import org.junit.jupiter.api.Test;
-
 /**
  *
  */
-public class DatasetTest {
-    @Test
-    void name() {
-
-    }
+public class Resource {
 }

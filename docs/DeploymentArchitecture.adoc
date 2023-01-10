@@ -1,0 +1,12 @@
+= Deployment Architecture
+
+After a substrate is initialized via bootstrapping, a "project" can be deployed into the substrate.
+
+A project is one or more related clusterless constructs.
+
+Projects have:
+
+- name
+- version
+- resources
+- one or more constructs

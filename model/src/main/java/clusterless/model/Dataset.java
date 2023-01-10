@@ -11,6 +11,5 @@ package clusterless.model;
 /**
  *
  */
-public class Dataset
-  {
-  }
+public class Dataset {
+}

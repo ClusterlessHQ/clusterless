@@ -6,16 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.managed.component;
 
-import org.junit.jupiter.api.Test;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  *
  */
-public class DatasetTest {
-    @Test
-    void name() {
-
-    }
+@Retention(RetentionPolicy.RUNTIME)
+public @interface BoundaryAnnotation {
 }

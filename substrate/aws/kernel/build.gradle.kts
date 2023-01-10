@@ -11,11 +11,13 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-text")
-    implementation(project(":substrate:aws:kernel"))
+    implementation(project(":substrate:aws:construct:common"))
+    implementation(project(":substrate:aws:construct:boundary"))
+    implementation(project(":substrate:aws:construct:arc"))
 }
 
 application {
-    // Define the main class for the application.
-    mainClass.set("clusterless.Main")
+    applicationName = "awsKernel"
+//    mainModule.set("clusterless.substrate.aws.kernel")
+    mainClass.set("clusterless.substrate.aws.Kernel")
 }

@@ -10,10 +10,8 @@ package clusterless;
 
 import org.junit.jupiter.api.Test;
 
-class CLITest
-  {
-  @Test
-  void testConstructor()
-    {
+class CLITest {
+    @Test
+    void testConstructor() {
     }
-  }
+}

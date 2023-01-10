@@ -6,16 +6,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.substrate.aws.boundary.s3put;
 
-import org.junit.jupiter.api.Test;
+import org.jetbrains.annotations.NotNull;
+import software.constructs.Construct;
 
 /**
  *
  */
-public class DatasetTest {
-    @Test
-    void name() {
-
+public class S3PutListenerConstruct extends Construct {
+    public S3PutListenerConstruct(@NotNull Construct scope, @NotNull String id) {
+        super(scope, id);
     }
 }

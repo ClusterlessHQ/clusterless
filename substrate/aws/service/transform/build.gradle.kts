@@ -6,16 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+plugins {
+    id("clusterless.java-library-conventions")
+}
 
-import org.junit.jupiter.api.Test;
-
-/**
- *
- */
-public class DatasetTest {
-    @Test
-    void name() {
-
-    }
+dependencies {
+    implementation(project(":model"))
 }

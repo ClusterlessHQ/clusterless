@@ -6,16 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
-
-import org.junit.jupiter.api.Test;
+package clusterless.managed.component;
 
 /**
  *
  */
-public class DatasetTest {
-    @Test
-    void name() {
+public interface ComponentService {
 
-    }
+    String name();
+
+    ComponentFactory<? extends ComponentProps> getFactory();
 }

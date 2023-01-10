@@ -6,16 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.substrate.aws.managed;
 
-import org.junit.jupiter.api.Test;
+import clusterless.managed.component.ComponentProps;
 
 /**
  *
  */
-public class DatasetTest {
-    @Test
-    void name() {
+public record ManagedComponentProps(ManagedProject project) implements ComponentProps {
 
-    }
 }

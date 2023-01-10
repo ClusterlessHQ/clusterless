@@ -11,6 +11,11 @@ plugins {
 }
 
 dependencies {
-// https://mvnrepository.com/artifact/com.google.guava/guava
-    implementation("com.google.guava:guava:31.1-jre")
+
+    api(project(":model"))
+
+    // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
+    api("software.amazon.awscdk:aws-cdk-lib:2.59.0")
+    // https://mvnrepository.com/artifact/software.constructs/constructs
+    api("software.constructs:constructs:10.1.215")
 }

@@ -1,0 +1,56 @@
+= Application
+
+== CLI
+
+Reads config and manages deployments of underlying providers.
+
+== Substrates
+
+A provider may be AWS, or Google, or k8s etc.
+
+The kernel, given a set of configuration files, will initialize any boundary, barrier, and arc deployments (in AWS these are individual stacks).
+Each deployment in turn may have code or images it must build and deploy as part of the deployment, these are managed as individual services.
+
+=== Bootstrap
+
+Deploys a global configuration for a given substrate.
+
+For example, a docker repository may be required and may only need to be setup once and used globally within the substrate.
+
+=== Resources
+
+Resources are shared static AWS resources like an Athena Database or compute configuration.
+
+Resources are not globally managed, but managed locally within a given project.
+
+=== Kernel
+
+The core code that interfaces with the underlying substrate deployment mechanism.
+
+In the case of the AWS CDK, the kernel would be run by the cdk cli to perform an deployment or update of the deployment configuration.
+
+The deploy would configure and push any boundary, barrier, and or arc stacks and related services (AWS Lambda etc).
+
+=== Constructs
+
+==== Boundary
+
+One or more ingress or egress boundary integrations.
+
+Ingress boundary accept data, create metadata, and fire events
+
+Egress boundary listen to events and make the data or metadata availble to the integration
+
+==== Barrier
+
+Listens for multiple events and fires a downstream event when arrival conditions are met.
+
+==== Arc
+
+An arc listens for events and runs its workload against the data or metadata.
+
+=== Services
+
+The code that implements necessary functionality.
+
+For AWS, a service may be a Lambda function converting S3 events into subscribable messages.
