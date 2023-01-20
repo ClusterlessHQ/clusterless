@@ -11,6 +11,7 @@ package clusterless.managed.component;
 /**
  *
  */
-public interface ComponentService<P extends ComponentProps> {
-    Component create(P componentProps);
+public enum ComponentType {
+    Boundary,
+    Arc
 }

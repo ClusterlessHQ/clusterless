@@ -13,14 +13,13 @@
  */
 
 plugins {
-    // Apply the java Plugin to add support for Java.
     java
+    idea
 }
 
 version = "1.0-wip"
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
@@ -33,8 +32,16 @@ java {
 
 dependencies {
     constraints {
-        // Define dependency versions as constraints
-        implementation("org.apache.commons:commons-text:1.9")
+        // manage dependency versions here
+        implementation("org.slf4j:slf4j-api:2.0.6")
+        implementation("org.slf4j:slf4j-simple:2.0.6")
+
+        implementation("com.google.guava:guava:31.1-jre")
+
+        implementation("com.fasterxml.jackson.core:jackson-core:2.14.1")
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.14.1")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda:2.14.1")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1")
     }
 }
 

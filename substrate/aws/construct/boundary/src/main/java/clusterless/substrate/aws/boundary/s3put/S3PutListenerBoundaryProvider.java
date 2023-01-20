@@ -8,22 +8,23 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
-import clusterless.managed.component.BoundaryAnnotation;
-import clusterless.managed.component.ComponentFactory;
+import clusterless.managed.component.Component;
 import clusterless.managed.component.ComponentService;
+import clusterless.managed.component.ComponentType;
+import clusterless.managed.component.ProvidesComponent;
+import clusterless.substrate.aws.managed.ManagedComponentProps;
+import software.amazon.awscdk.StackProps;
 
 /**
  *
  */
-@BoundaryAnnotation
-public class S3PutListenerBoundaryProvider implements ComponentService {
+@ProvidesComponent(type = ComponentType.Boundary, name = "S3PutListenerBoundary")
+public class S3PutListenerBoundaryProvider implements ComponentService<ManagedComponentProps> {
     @Override
-    public String name() {
-        return "S3PutListenerBoundary";
-    }
+    public Component create(ManagedComponentProps componentProps) {
+        StackProps stackProps = StackProps.builder()
+                .build();
 
-    @Override
-    public ComponentFactory getFactory() {
-        return new S3PutListenerBoundaryFactory();
+        return new S3PutListenerBoundaryStack(componentProps.project(), "", stackProps);
     }
 }

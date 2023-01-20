@@ -8,12 +8,15 @@
 
 package clusterless.managed.component;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  *
  */
-public interface ComponentFactory<P extends ComponentProps> {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ProvidesComponent {
+    String name();
 
-    Component create(P componentProps);
-
-
+    ComponentType type();
 }

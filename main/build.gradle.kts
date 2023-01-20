@@ -11,11 +11,12 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-text")
+    implementation(project(":model"))
     implementation(project(":substrate:aws:kernel"))
 }
 
 application {
     // Define the main class for the application.
+    applicationName = "cls"
     mainClass.set("clusterless.Main")
 }

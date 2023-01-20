@@ -6,14 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed.component;
+package clusterless.substrate.aws;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import picocli.CommandLine;
 
 /**
  *
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ArcAnnotation {
+@CommandLine.Command(
+        name = "report"
+)
+public class Report {
 }

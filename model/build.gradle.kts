@@ -11,6 +11,13 @@ plugins {
 }
 
 dependencies {
-// https://mvnrepository.com/artifact/com.google.guava/guava
-    implementation("com.google.guava:guava:31.1-jre")
+
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.slf4j:slf4j-simple")
+
+    implementation("com.google.guava:guava")
+    implementation("com.fasterxml.jackson.core:jackson-core")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }

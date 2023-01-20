@@ -6,11 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed.component;
+package clusterless.substrate;
 
 /**
  *
  */
-public interface ComponentService<P extends ComponentProps> {
-    Component create(P componentProps);
+public interface SubstrateProvider {
+    String name();
+
+    int execute(String[] args);
 }

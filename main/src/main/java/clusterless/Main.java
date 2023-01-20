@@ -12,7 +12,38 @@
 
 package clusterless;
 
-public class Main {
+import clusterless.substrate.SubstrateProviders;
+import picocli.CommandLine;
+
+import java.util.concurrent.Callable;
+
+@CommandLine.Command(name = "cls", mixinStandardHelpOptions = true)
+public class Main implements Callable<Integer> {
+
+    private final SubstrateProviders providers;
+
     public static void main(String[] args) {
+
+        SubstrateProviders providers = new SubstrateProviders();
+
+        CommandLine commandLine = new CommandLine(new Main(providers));
+        providers.substrates().forEach(commandLine::addSubcommand);
+
+        commandLine.execute(args);
+    }
+
+    public Main(SubstrateProviders providers) {
+        this.providers = providers;
+    }
+
+    @Override
+    public Integer call() throws Exception {
+        return 0;
+    }
+
+    @CommandLine.Command()
+    public Integer substrates() {
+        providers.names().forEach(System.out::println);
+        return 0;
     }
 }

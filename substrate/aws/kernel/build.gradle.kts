@@ -21,3 +21,10 @@ application {
 //    mainModule.set("clusterless.substrate.aws.kernel")
     mainClass.set("clusterless.substrate.aws.Kernel")
 }
+
+
+idea {
+    module {
+        sourceDirs.add(file("src/main/cdk"))
+    }
+}

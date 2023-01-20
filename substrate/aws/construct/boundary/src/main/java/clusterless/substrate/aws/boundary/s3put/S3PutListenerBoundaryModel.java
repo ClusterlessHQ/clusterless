@@ -6,14 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed.component;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package clusterless.substrate.aws.boundary.s3put;
 
 /**
  *
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface BoundaryAnnotation {
+public class S3PutListenerBoundaryModel {
 }

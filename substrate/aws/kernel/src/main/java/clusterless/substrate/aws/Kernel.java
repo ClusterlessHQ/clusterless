@@ -8,31 +8,40 @@
 
 package clusterless.substrate.aws;
 
-import clusterless.managed.component.BoundaryAnnotation;
-import clusterless.managed.component.ComponentService;
-import clusterless.substrate.aws.managed.ManagedComponentProps;
-import clusterless.substrate.aws.managed.ManagedProject;
+import clusterless.substrate.SubstrateProvider;
+import picocli.CommandLine;
 
-import java.util.ServiceLoader;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  *
  */
-public class Kernel {
+@CommandLine.Command(mixinStandardHelpOptions = true, subcommands = {
+        Manage.class,
+        Report.class
+})
+public class Kernel implements SubstrateProvider {
     public static void main(String[] args) {
-        ManagedProject project = new ManagedProject();
+        System.exit(new Kernel().execute(args));
+    }
 
-        ServiceLoader<ComponentService> componentServices = ServiceLoader.load(ComponentService.class);
+    @CommandLine.Option(names = "--direct", arity = "0..1")
+    public boolean direct = false;
 
-        componentServices.stream()
-                .filter(p -> p.type().isAnnotationPresent(BoundaryAnnotation.class))
-                .map(ServiceLoader.Provider::get)
-                .forEach(s -> System.out.println(s.name()));
+    public Kernel() {
+    }
 
-        ManagedComponentProps props = new ManagedComponentProps(project);
+    @Override
+    public String name() {
+        return "aws";
+    }
 
-        // create all the stacks within the current namespace
-
-//        project.synth();
+    @Override
+    public int execute(String[] args) {
+        List<Method> verify = CommandLine.getCommandMethods(Manage.class, "verify");
+        return new CommandLine(this)
+                .setCaseInsensitiveEnumValuesAllowed(true)
+                .execute(args);
     }
 }
