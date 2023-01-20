@@ -18,7 +18,9 @@ import java.util.List;
  *
  */
 @CommandLine.Command(mixinStandardHelpOptions = true, subcommands = {
-        Manage.class,
+        Info.class,
+        Verify.class,
+        Deploy.class,
         Report.class
 })
 public class Kernel implements SubstrateProvider {
@@ -28,6 +30,15 @@ public class Kernel implements SubstrateProvider {
 
     @CommandLine.Option(names = "--direct", arity = "0..1")
     public boolean direct = false;
+
+    @CommandLine.Option(names = "--cdk", description = "path to the cdk binary")
+    public String cdk = "cdk";
+
+    @CommandLine.Option(names = "--profile", description = "aws profile")
+    public String profile = System.getenv("AWS_PROFILE");
+
+    @CommandLine.Option(names = "--output", description = "cloud assembly file output")
+    public String output = "cdk.out";
 
     public Kernel() {
     }
@@ -39,7 +50,6 @@ public class Kernel implements SubstrateProvider {
 
     @Override
     public int execute(String[] args) {
-        List<Method> verify = CommandLine.getCommandMethods(Manage.class, "verify");
         return new CommandLine(this)
                 .setCaseInsensitiveEnumValuesAllowed(true)
                 .execute(args);

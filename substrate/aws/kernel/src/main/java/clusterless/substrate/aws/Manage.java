@@ -8,33 +8,46 @@
 
 package clusterless.substrate.aws;
 
+import com.google.common.collect.Lists;
 import picocli.CommandLine;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  *
  */
-//@CommandLine.Command(name="manage", hidden = true)
-public class Manage {
+public abstract class Manage {
     @CommandLine.ParentCommand
     Kernel kernel;
 
     public Manage() {
     }
 
-    @CommandLine.Command(
-            name = "verify"
-    )
-    public int verify() {
-        System.out.println("verify");
-        System.out.println("kernel.direct = " + kernel.direct);
-        return 0;
+    protected Integer executeCDK(String... cdkArgs) {
+        List<String> args = Lists.asList(kernel.cdk, cdkArgs);
+
+        return executeProcess(args);
     }
 
-    @CommandLine.Command(
-            name = "deploy"
-    )
-    public int deploy() {
-        System.out.println("deploy");
-        return 0;
+    protected int executeProcess(String... args) {
+        return executeProcess(List.of(args));
+    }
+
+    protected int executeProcess(List<String> args) {
+        try {
+            return process(args);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int process(List<String> args) throws IOException, InterruptedException {
+        Process process = new ProcessBuilder(args)
+                .inheritIO()
+                .start();
+
+        return process.waitFor();
     }
 }

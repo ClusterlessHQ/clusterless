@@ -14,6 +14,9 @@ dependencies {
     implementation(project(":substrate:aws:construct:common"))
     implementation(project(":substrate:aws:construct:boundary"))
     implementation(project(":substrate:aws:construct:arc"))
+
+    implementation("com.google.guava:guava")
+
 }
 
 application {
@@ -22,6 +25,15 @@ application {
     mainClass.set("clusterless.substrate.aws.Kernel")
 }
 
+distributions {
+    main {
+        contents {
+            from(file("src/main/cdk/")) {
+                into("bin/etc")
+            }
+        }
+    }
+}
 
 idea {
     module {

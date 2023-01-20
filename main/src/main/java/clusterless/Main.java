@@ -17,10 +17,16 @@ import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "cls", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "cls", mixinStandardHelpOptions = true, version="1.0-wip")
 public class Main implements Callable<Integer> {
 
     private final SubstrateProviders providers;
+
+    @CommandLine.Option(names = {"-V", "--version"}, versionHelp = true, description = "display version info")
+    boolean versionInfoRequested;
+
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
+    boolean usageHelpRequested;
 
     public static void main(String[] args) {
 
@@ -28,6 +34,16 @@ public class Main implements Callable<Integer> {
 
         CommandLine commandLine = new CommandLine(new Main(providers));
         providers.substrates().forEach(commandLine::addSubcommand);
+
+        commandLine.parseArgs(args);
+
+        if (commandLine.isUsageHelpRequested()) {
+            commandLine.usage(System.out);
+            return;
+        } else if (commandLine.isVersionHelpRequested()) {
+            commandLine.printVersionHelp(System.out);
+            return;
+        }
 
         commandLine.execute(args);
     }
