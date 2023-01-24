@@ -8,8 +8,11 @@
 
 package clusterless.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 /**
  *
  */
-public class Dataset extends Model {
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public class Model {
 }

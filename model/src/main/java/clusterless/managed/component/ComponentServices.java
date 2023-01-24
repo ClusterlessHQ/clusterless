@@ -8,34 +8,41 @@
 
 package clusterless.managed.component;
 
+import clusterless.model.Model;
+
 import java.util.*;
 
 /**
  *
  */
 public class ComponentServices {
+    public static final ComponentServices INSTANCE = new ComponentServices();
 
-    private final EnumMap<ComponentType, Map<String, ComponentService<ComponentProps>>> componentServices = new EnumMap<>(ComponentType.class);
+    private final EnumMap<ComponentType, Map<String, ComponentService<ComponentContext, Model>>> componentServices = new EnumMap<>(ComponentType.class);
 
-    public ComponentServices() {
-
+    protected ComponentServices() {
         ServiceLoader<ComponentService> serviceLoader = ServiceLoader.load(ComponentService.class);
 
         serviceLoader.stream().forEach(s -> {
             ProvidesComponent annotation = s.type().getAnnotation(ProvidesComponent.class);
             ComponentType type = annotation.type();
             String name = annotation.name();
-            ComponentService<ComponentProps> componentService = s.get();
+            ComponentService<ComponentContext, Model> componentService = s.get();
 
             componentServices.computeIfAbsent(type, k -> new HashMap<>()).put(name, componentService);
         });
+    }
+
+    public EnumMap<ComponentType, Map<String, ComponentService<ComponentContext, Model>>> componentServices() {
+        return componentServices;
     }
 
     public Collection<String> names(ComponentType type) {
         return componentServices.get(type).keySet();
     }
 
-    public Optional<ComponentService<ComponentProps>> get(ComponentType type, String name) {
-        return Optional.ofNullable(componentServices.get(type).get(name));
+    public <M extends Model> Optional<ComponentService<ComponentContext, M>> get(ComponentType type, String name) {
+        ComponentService<ComponentContext, M> componentContextModelComponentService = (ComponentService<ComponentContext, M>) componentServices.get(type).get(name);
+        return Optional.ofNullable(componentContextModelComponentService);
     }
 }

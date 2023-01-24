@@ -42,7 +42,6 @@ public class ManagedProject extends App {
     }
 
     protected void applyTags() {
-
         // apply tags to all constructs
         applyTags(OrderedMaps.of(
                 "tag:prefix:project", null,

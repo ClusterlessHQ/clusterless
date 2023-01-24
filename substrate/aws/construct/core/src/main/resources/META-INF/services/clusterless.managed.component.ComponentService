@@ -6,4 +6,5 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+clusterless.substrate.aws.resource.S3BucketResourceProvider
 clusterless.substrate.aws.boundary.s3put.S3PutListenerBoundaryProvider

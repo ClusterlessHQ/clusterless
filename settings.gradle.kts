@@ -19,7 +19,6 @@ include("main")
 include("substrate:aws:kernel")
 
 include("substrate:aws:construct:common")
-include("substrate:aws:construct:boundary")
-include("substrate:aws:construct:arc")
+include("substrate:aws:construct:core")
 
 include("substrate:aws:service:transform")

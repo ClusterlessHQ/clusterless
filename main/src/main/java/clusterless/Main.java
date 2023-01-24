@@ -17,7 +17,7 @@ import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "cls", mixinStandardHelpOptions = true, version="1.0-wip")
+@CommandLine.Command(name = "cls", mixinStandardHelpOptions = true, version = "1.0-wip")
 public class Main implements Callable<Integer> {
 
     private final SubstrateProviders providers;
@@ -50,6 +50,10 @@ public class Main implements Callable<Integer> {
 
     public Main(SubstrateProviders providers) {
         this.providers = providers;
+    }
+
+    public CommandLine.IExitCodeExceptionMapper getExitCodeExceptionMapper() {
+        return new ExitCodeExceptionMapper();
     }
 
     @Override

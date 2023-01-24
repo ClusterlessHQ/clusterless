@@ -29,7 +29,7 @@ The core code that interfaces with the underlying substrate deployment mechanism
 
 In the case of the AWS CDK, the kernel would be run by the cdk cli to perform an deployment or update of the deployment configuration.
 
-The deploy would configure and push any boundary, barrier, and or arc stacks and related services (AWS Lambda etc).
+The `deploy` would configure and push any boundary, barrier, and or arc stacks and related services (AWS Lambda etc).
 
 === Constructs
 

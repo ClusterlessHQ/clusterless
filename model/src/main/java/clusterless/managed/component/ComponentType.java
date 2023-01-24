@@ -8,10 +8,37 @@
 
 package clusterless.managed.component;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  *
  */
 public enum ComponentType {
-    Boundary,
-    Arc
+    Resource(clusterless.model.Resource.class),
+    Boundary(clusterless.model.Boundary.class),
+    Process(clusterless.model.Process.class),
+    Arc(clusterless.model.Arc.class);
+
+    static Map<Class, ComponentType> types = new LinkedHashMap<>();
+
+    static {
+        for (ComponentType value : ComponentType.values()) {
+            types.put(value.modelType(), value);
+        }
+    }
+
+    final Class modelType;
+
+    ComponentType(Class modelType) {
+        this.modelType = modelType;
+    }
+
+    public Class modelType() {
+        return modelType;
+    }
+
+    public static ComponentType find(Class type) {
+        return types.get(type);
+    }
 }

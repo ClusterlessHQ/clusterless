@@ -6,10 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.substrate.aws.cdk;
 
-/**
- *
- */
-public class Dataset extends Model {
+import picocli.CommandLine;
+
+@CommandLine.Command(
+        name = "verify"
+)
+public class Verify extends Lifecycle {
+    @Override
+    public Integer call() throws Exception {
+        renderProject();
+
+        return 0;
+    }
 }

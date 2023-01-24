@@ -6,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.boundary.s3put;
+package clusterless.managed.component;
 
 /**
  *
  */
-public class S3PutListenerBoundaryModel {
+public interface ComponentContext {
 }

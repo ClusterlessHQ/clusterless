@@ -8,9 +8,27 @@
 
 package clusterless.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  */
-public class Arc {
+public class Arc extends Model {
 
+    List<Dataset> sources = new ArrayList<>();
+    Process process;
+    List<Dataset> sinks = new ArrayList<>();
+
+    public List<Dataset> sources() {
+        return sources;
+    }
+
+    public Process process() {
+        return process;
+    }
+
+    public List<Dataset> sinks() {
+        return sinks;
+    }
 }

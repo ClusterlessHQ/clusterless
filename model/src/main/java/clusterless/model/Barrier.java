@@ -6,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed.component;
+package clusterless.model;
 
 /**
  *
  */
-public interface ComponentProps {
+public class Barrier extends Model {
 }

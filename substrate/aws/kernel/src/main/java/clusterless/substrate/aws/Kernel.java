@@ -9,10 +9,9 @@
 package clusterless.substrate.aws;
 
 import clusterless.substrate.SubstrateProvider;
+import clusterless.substrate.aws.cdk.Deploy;
+import clusterless.substrate.aws.cdk.Verify;
 import picocli.CommandLine;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  *

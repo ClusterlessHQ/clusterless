@@ -6,10 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.substrate.aws.managed;
+
+import clusterless.managed.component.ComponentContext;
 
 /**
  *
  */
-public class Dataset extends Model {
+public record ManagedComponentContext(ManagedProject project) implements ComponentContext {
+
 }

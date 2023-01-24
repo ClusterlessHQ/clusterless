@@ -12,11 +12,11 @@ plugins {
 
 dependencies {
     implementation(project(":substrate:aws:construct:common"))
-    implementation(project(":substrate:aws:construct:boundary"))
-    implementation(project(":substrate:aws:construct:arc"))
+    implementation(project(":substrate:aws:construct:core"))
 
     implementation("com.google.guava:guava")
 
+    testImplementation("org.junit-pioneer:junit-pioneer")
 }
 
 application {

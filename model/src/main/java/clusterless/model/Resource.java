@@ -8,8 +8,11 @@
 
 package clusterless.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 /**
  *
  */
-public class Resource {
+@JsonTypeName
+public class Resource extends Extensible {
 }

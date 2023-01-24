@@ -6,10 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-plugins {
-    id("clusterless.java-library-conventions")
-}
+package clusterless.substrate.aws.cdk;
 
-dependencies {
-    implementation(project(":model"))
+import picocli.CommandLine;
+
+@CommandLine.Command(
+        name = "deploy"
+)
+public class Deploy extends Lifecycle {
+    @Override
+    public Integer call() throws Exception {
+        renderProject();
+
+        return 0;
+    }
 }

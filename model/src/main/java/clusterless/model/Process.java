@@ -11,5 +11,5 @@ package clusterless.model;
 /**
  *
  */
-public class Dataset extends Model {
+public class Process extends Extensible {
 }

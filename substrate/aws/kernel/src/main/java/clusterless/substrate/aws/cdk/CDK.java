@@ -8,11 +8,9 @@
 
 package clusterless.substrate.aws.cdk;
 
-import clusterless.managed.component.ComponentProps;
-import clusterless.managed.component.ComponentService;
-import clusterless.managed.component.ComponentServices;
-import clusterless.managed.component.ComponentType;
-import clusterless.substrate.aws.managed.ManagedComponentProps;
+import clusterless.managed.component.*;
+import clusterless.model.Model;
+import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 
 import java.util.Optional;
@@ -22,18 +20,20 @@ import java.util.Optional;
  */
 public class CDK {
     public static void main(String[] args) {
-        ManagedProject project = new ManagedProject();
+        ManagedProject managedProject = new ManagedProject();
 
-        ComponentServices componentServices = new ComponentServices();
+        ComponentServices componentServices = ComponentServices.INSTANCE;
 
-        ManagedComponentProps props = new ManagedComponentProps(project);
+        ManagedComponentContext props = new ManagedComponentContext(managedProject);
 
         System.out.println("componentServices = " + componentServices.names(ComponentType.Boundary));
 
-        Optional<ComponentService<ComponentProps>> boundary = componentServices.get(ComponentType.Boundary, "S3PutListenerBoundary");
+        Optional<ComponentService<ComponentContext, Model>> boundary = componentServices.get(ComponentType.Boundary, "S3PutListenerBoundary");
+
+        Component component = boundary.orElseThrow().create(props, null);
 
         // create all the stacks within the current namespace
 
-//        project.synth();
+        managedProject.synth();
     }
 }

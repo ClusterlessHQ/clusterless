@@ -8,9 +8,13 @@
 
 package clusterless.managed.component;
 
+import clusterless.model.Model;
+
 /**
  *
  */
-public interface ComponentService<P extends ComponentProps> {
-    Component create(P componentProps);
+public interface ComponentService<C extends ComponentContext, M extends Model> {
+    Component create(C context, M model);
+
+    Class<M> modelType();
 }

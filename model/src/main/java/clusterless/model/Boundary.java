@@ -6,13 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.managed;
-
-import clusterless.managed.component.ComponentProps;
+package clusterless.model;
 
 /**
  *
  */
-public record ManagedComponentProps(ManagedProject project) implements ComponentProps {
+public class Boundary extends Extensible {
 
 }
