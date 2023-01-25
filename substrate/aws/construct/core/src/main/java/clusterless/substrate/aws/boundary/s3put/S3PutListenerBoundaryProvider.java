@@ -10,7 +10,7 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.managed.component.Component;
 import clusterless.managed.component.ComponentService;
-import clusterless.managed.component.ComponentType;
+import clusterless.managed.component.ExtensibleType;
 import clusterless.managed.component.ProvidesComponent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import software.amazon.awscdk.StackProps;
@@ -18,7 +18,7 @@ import software.amazon.awscdk.StackProps;
 /**
  *
  */
-@ProvidesComponent(type = ComponentType.Boundary, name = "S3PutListenerBoundary")
+@ProvidesComponent(type = ExtensibleType.Boundary, name = "S3PutListenerBoundary")
 public class S3PutListenerBoundaryProvider implements ComponentService<ManagedComponentContext, S3PutListenerBoundary> {
     @Override
     public Component create(ManagedComponentContext context, S3PutListenerBoundary boundary) {

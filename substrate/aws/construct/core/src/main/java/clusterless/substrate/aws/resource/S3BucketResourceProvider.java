@@ -10,14 +10,14 @@ package clusterless.substrate.aws.resource;
 
 import clusterless.managed.component.Component;
 import clusterless.managed.component.ComponentService;
-import clusterless.managed.component.ComponentType;
+import clusterless.managed.component.ExtensibleType;
 import clusterless.managed.component.ProvidesComponent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 
 /**
  *
  */
-@ProvidesComponent(type = ComponentType.Resource, name = "core:s3Bucket")
+@ProvidesComponent(type = ExtensibleType.Resource, name = "core:s3Bucket")
 public class S3BucketResourceProvider implements ComponentService<ManagedComponentContext, S3BucketResource> {
 
     @Override

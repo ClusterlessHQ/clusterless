@@ -18,5 +18,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface ProvidesComponent {
     String name();
 
-    ComponentType type();
+    ExtensibleType type();
 }

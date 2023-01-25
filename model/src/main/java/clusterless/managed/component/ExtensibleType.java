@@ -14,31 +14,30 @@ import java.util.Map;
 /**
  *
  */
-public enum ComponentType {
+public enum ExtensibleType {
     Resource(clusterless.model.Resource.class),
     Boundary(clusterless.model.Boundary.class),
-    Process(clusterless.model.Process.class),
-    Arc(clusterless.model.Arc.class);
+    Process(clusterless.model.Process.class);
 
-    static Map<Class, ComponentType> types = new LinkedHashMap<>();
+    static Map<Class, ExtensibleType> types = new LinkedHashMap<>();
 
     static {
-        for (ComponentType value : ComponentType.values()) {
-            types.put(value.modelType(), value);
+        for (ExtensibleType value : ExtensibleType.values()) {
+            types.put(value.modelClass(), value);
         }
     }
 
-    final Class modelType;
+    final Class modelClass;
 
-    ComponentType(Class modelType) {
-        this.modelType = modelType;
+    ExtensibleType(Class modelClass) {
+        this.modelClass = modelClass;
     }
 
-    public Class modelType() {
-        return modelType;
+    public Class modelClass() {
+        return modelClass;
     }
 
-    public static ComponentType find(Class type) {
+    public static ExtensibleType find(Class type) {
         return types.get(type);
     }
 }

@@ -31,10 +31,19 @@ java {
 }
 
 dependencies {
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.apache.logging.log4j:log4j-api")
+    implementation("org.apache.logging.log4j:log4j-core")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl")
+
+    testImplementation("org.junit-pioneer:junit-pioneer")
+
     constraints {
         // manage dependency versions here
         implementation("org.slf4j:slf4j-api:2.0.6")
-        implementation("org.slf4j:slf4j-simple:2.0.6")
+        implementation("org.apache.logging.log4j:log4j-api:2.19.0")
+        implementation("org.apache.logging.log4j:log4j-core:2.19.0")
+        implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.19.0")
 
         implementation("com.google.guava:guava:31.1-jre")
 

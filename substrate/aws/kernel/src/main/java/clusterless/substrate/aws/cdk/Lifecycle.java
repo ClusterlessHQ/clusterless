@@ -12,7 +12,7 @@ import clusterless.json.JSONUtil;
 import clusterless.managed.component.ComponentContext;
 import clusterless.managed.component.ComponentService;
 import clusterless.managed.component.ComponentServices;
-import clusterless.managed.component.ComponentType;
+import clusterless.managed.component.ExtensibleType;
 import clusterless.model.Project;
 import clusterless.model.Resource;
 import clusterless.substrate.aws.Manage;
@@ -72,7 +72,7 @@ public abstract class Lifecycle extends Manage implements Callable<Integer> {
 
         for (Resource resource : projectModel.resources()) {
             String type = resource.type();
-            Optional<ComponentService<ComponentContext, Resource>> service = componentServices.get(ComponentType.Resource, type);
+            Optional<ComponentService<ComponentContext, Resource>> service = componentServices.get(ExtensibleType.Resource, type);
 
             service.orElseThrow().create(context, resource);
         }

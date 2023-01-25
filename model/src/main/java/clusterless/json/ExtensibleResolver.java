@@ -11,7 +11,7 @@ package clusterless.json;
 import clusterless.managed.component.ComponentContext;
 import clusterless.managed.component.ComponentService;
 import clusterless.managed.component.ComponentServices;
-import clusterless.managed.component.ComponentType;
+import clusterless.managed.component.ExtensibleType;
 import clusterless.model.Model;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
@@ -35,13 +35,13 @@ public class ExtensibleResolver extends TypeIdResolverBase {
         ComponentServices componentServices = ComponentServices.INSTANCE;
 
         Class<?> rawClass = javaType.getRawClass();
-        ComponentType componentType = ComponentType.find(rawClass);
+        ExtensibleType extensibleType = ExtensibleType.find(rawClass);
 
-        if (componentType == null) {
+        if (extensibleType == null) {
             throw new IllegalStateException("unknown component type for: " + rawClass.getName());
         }
 
-        serviceMap = componentServices.componentServices().get(componentType);
+        serviceMap = componentServices.componentServices().get(extensibleType);
     }
 
     @Override
@@ -61,6 +61,12 @@ public class ExtensibleResolver extends TypeIdResolverBase {
 
     @Override
     public JavaType typeFromId(DatabindContext context, String id) {
-        return context.getTypeFactory().constructType(serviceMap.get(id).modelType());
+        ComponentService<ComponentContext, Model> service = serviceMap.get(id);
+
+        if (service == null) {
+            throw new IllegalStateException("no service found for: " + id);
+        }
+
+        return context.getTypeFactory().constructType(service.modelType());
     }
 }

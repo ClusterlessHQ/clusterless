@@ -11,10 +11,6 @@ plugins {
 }
 
 dependencies {
-
-    implementation("org.slf4j:slf4j-api")
-    implementation("org.slf4j:slf4j-simple")
-
     implementation("com.google.guava:guava")
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")

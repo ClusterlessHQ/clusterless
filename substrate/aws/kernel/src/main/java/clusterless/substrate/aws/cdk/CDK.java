@@ -26,9 +26,9 @@ public class CDK {
 
         ManagedComponentContext props = new ManagedComponentContext(managedProject);
 
-        System.out.println("componentServices = " + componentServices.names(ComponentType.Boundary));
+        System.out.println("componentServices = " + componentServices.names(ExtensibleType.Boundary));
 
-        Optional<ComponentService<ComponentContext, Model>> boundary = componentServices.get(ComponentType.Boundary, "S3PutListenerBoundary");
+        Optional<ComponentService<ComponentContext, Model>> boundary = componentServices.get(ExtensibleType.Boundary, "S3PutListenerBoundary");
 
         Component component = boundary.orElseThrow().create(props, null);
 
