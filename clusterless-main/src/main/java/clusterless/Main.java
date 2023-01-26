@@ -12,13 +12,14 @@
 
 package clusterless;
 
+import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProviders;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "cls", mixinStandardHelpOptions = true, version = "1.0-wip")
-public class Main implements Callable<Integer> {
+public class Main extends Startup implements Callable<Integer> {
 
     private final SubstrateProviders providers;
 
@@ -29,7 +30,6 @@ public class Main implements Callable<Integer> {
     boolean usageHelpRequested;
 
     public static void main(String[] args) {
-
         SubstrateProviders providers = new SubstrateProviders();
 
         CommandLine commandLine = new CommandLine(new Main(providers));

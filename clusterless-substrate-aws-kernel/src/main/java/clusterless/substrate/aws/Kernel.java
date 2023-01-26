@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.aws.cdk.Deploy;
 import clusterless.substrate.aws.cdk.Verify;
@@ -22,7 +23,7 @@ import picocli.CommandLine;
         Deploy.class,
         Report.class
 })
-public class Kernel implements SubstrateProvider {
+public class Kernel extends Startup implements SubstrateProvider {
     public static void main(String[] args) {
         System.exit(new Kernel().execute(args));
     }

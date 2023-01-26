@@ -13,12 +13,12 @@ pluginManagement {
 
 rootProject.name = "clusterless"
 
-include("model")
-include("main")
+include("clusterless-model")
+include("clusterless-main")
 
-include("substrate:aws:kernel")
+include("clusterless-substrate-aws-kernel")
 
-include("substrate:aws:construct:common")
-include("substrate:aws:construct:core")
+include("clusterless-substrate-aws-construct-common")
+include("clusterless-substrate-aws-construct-core")
 
-include("substrate:aws:service:transform")
+include("clusterless-substrate-aws-service-transform")

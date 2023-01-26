@@ -12,7 +12,7 @@ plugins {
 
 dependencies {
 
-    api(project(":model"))
+    api(project(":clusterless-model"))
 
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
     api("software.amazon.awscdk:aws-cdk-lib:2.59.0")

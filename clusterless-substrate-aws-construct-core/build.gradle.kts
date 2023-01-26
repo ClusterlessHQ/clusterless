@@ -7,16 +7,10 @@
  */
 
 plugins {
-    id("clusterless.java-application-conventions")
+    id("clusterless.java-library-conventions")
 }
 
 dependencies {
-    implementation(project(":model"))
-    implementation(project(":substrate:aws:kernel"))
-}
-
-application {
-    // Define the main class for the application.
-    applicationName = "cls"
-    mainClass.set("clusterless.Main")
+    implementation(project(":clusterless-model"))
+    implementation(project(":clusterless-substrate-aws-construct-common"))
 }

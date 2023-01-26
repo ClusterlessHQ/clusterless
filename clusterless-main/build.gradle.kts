@@ -11,30 +11,26 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":substrate:aws:construct:common"))
-    implementation(project(":substrate:aws:construct:core"))
-
-    implementation("com.google.guava:guava")
+    implementation(project(":clusterless-model"))
+    implementation(project(":clusterless-substrate-aws-kernel"))
 }
 
 application {
-    applicationName = "awsKernel"
-//    mainModule.set("clusterless.substrate.aws.kernel")
-    mainClass.set("clusterless.substrate.aws.Kernel")
+    // Define the main class for the application.
+    applicationName = "cls"
+    mainClass.set("clusterless.Main")
 }
+
+val awsInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:installDist")
+
+tasks.getAt("installDist").dependsOn(awsInstall)
 
 distributions {
     main {
         contents {
-            from(file("src/main/cdk/")) {
-                into("bin/etc")
+            from(awsInstall) {
+                include("bin/")
             }
         }
-    }
-}
-
-idea {
-    module {
-        sourceDirs.add(file("src/main/cdk"))
     }
 }
