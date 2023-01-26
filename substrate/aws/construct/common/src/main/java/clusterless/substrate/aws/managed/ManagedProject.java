@@ -8,52 +8,75 @@
 
 package clusterless.substrate.aws.managed;
 
+import clusterless.managed.Label;
+import clusterless.model.Project;
+import clusterless.substrate.aws.util.TagsUtil;
 import clusterless.util.OrderedMaps;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.TagProps;
-import software.amazon.awscdk.Tags;
 import software.constructs.Construct;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  */
-public class ManagedProject extends App {
-    String name;
-    String version;
+public class ManagedProject extends App implements Managed {
+    private final Label name;
+    private final String version;
+    private final Project projectModel;
 
 
     public static ManagedProject projectOf(Construct scope) {
         return (ManagedProject) scope.getNode().getRoot();
     }
 
-    public ManagedProject() {
+    public ManagedProject(Project projectModel) {
         super(AppProps.builder()
                 .context(OrderedMaps.of(
-                        "project", null,
-                        "version", null
+                        "project", Label.of(projectModel.name()).lowerHyphen(),
+                        "version", projectModel.version()
                 ))
                 .build());
 
-//        applyTags();
+        this.name = Label.of(projectModel.name());
+        this.version = projectModel.version();
+        this.projectModel = projectModel;
+
+        applyTags();
+    }
+
+    public Project projectModel() {
+        return projectModel;
+    }
+
+    @Override
+    public Label baseId() {
+        return name();
+    }
+
+    public Label name() {
+        return name;
+    }
+
+    public String version() {
+        return version;
     }
 
     protected void applyTags() {
         // apply tags to all constructs
-        applyTags(OrderedMaps.of(
-                "tag:prefix:project", null,
-                "tag:prefix:version", null
+        TagsUtil.applyTags(this, OrderedMaps.of(
+                "tag:prefix:project", name().lowerHyphen(),
+                "tag:prefix:version", version
         ), TagProps.builder()
                 .applyToLaunchedInstances(true)
                 .priority(100)
                 .build());
 
         // apply tags only to the stack constructs
-        applyTags(OrderedMaps.of(
-                "tag:prefix:commit", null
+        TagsUtil.applyTags(this, OrderedMaps.of(
+                "tag:prefix:commit", "none"
         ), TagProps.builder()
                 .includeResourceTypes(List.of(
                         "aws:ckd:stack",
@@ -62,11 +85,5 @@ public class ManagedProject extends App {
                 .applyToLaunchedInstances(true)
                 .priority(100)
                 .build());
-    }
-
-    private void applyTags(Map<String, String> tagMap, TagProps tagProps) {
-        Tags tags = Tags.of(this);
-
-        tagMap.forEach((key, value) -> tags.add(key, value, tagProps));
     }
 }

@@ -9,10 +9,31 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.managed.component.ComponentContext;
+import software.constructs.Construct;
 
 /**
  *
  */
-public record ManagedComponentContext(ManagedProject project) implements ComponentContext {
+public class ManagedComponentContext implements ComponentContext {
 
+    ManagedProject project;
+    Managed parent;
+
+    public ManagedComponentContext(ManagedProject project) {
+        this.project = project;
+        this.parent = project;
+    }
+
+    public ManagedComponentContext(ManagedProject project, Managed parent) {
+        this.project = project;
+        this.parent = parent;
+    }
+
+    public ManagedProject project() {
+        return project;
+    }
+
+    public Construct parent() {
+        return parent.asConstruct();
+    }
 }

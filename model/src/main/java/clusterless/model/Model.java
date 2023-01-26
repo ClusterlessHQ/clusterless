@@ -8,11 +8,22 @@
 
 package clusterless.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import clusterless.managed.Label;
 
 /**
- *
+ * Note {@link #equals(Object)} and {@link #hashCode()} are declared final. No two Model instances
+ * should ever be equal
  */
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class Model {
+public abstract class Model implements Struct {
+    public abstract Label label();
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }

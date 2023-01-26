@@ -8,16 +8,48 @@
 
 package clusterless.substrate.aws.managed;
 
-import org.jetbrains.annotations.Nullable;
+import clusterless.managed.Label;
+import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.constructs.Construct;
 
 /**
  *
  */
-public class ManagedStack extends Stack {
-    public ManagedStack(@Nullable Construct scope, @Nullable String id, @Nullable StackProps props) {
-        super(scope, id, props);
+public class ManagedStack extends Stack implements Managed {
+    private final ManagedProject project;
+    private final Label baseId;
+
+    public ManagedStack(@NotNull ManagedProject project, @NotNull Label baseId, @NotNull StackProps props) {
+        super(project, baseId.camelCase(), props);
+        this.project = project;
+        this.baseId = baseId;
+    }
+
+    public ManagedStack(@NotNull ManagedProject project, Label baseId) {
+        super(project, baseId.camelCase(), StackProps.builder()
+                .env(environment(project))
+                .stackName(baseId.lowerHyphen())
+                .build());
+
+        this.project = project;
+        this.baseId = baseId;
+    }
+
+    private static Environment environment(ManagedProject project) {
+        return Environment.builder()
+                .account(project.projectModel().target().account())
+                .region(project.projectModel().target().region())
+                .build();
+    }
+
+    public ManagedProject project() {
+        return project;
+    }
+
+    @Override
+    public Label baseId() {
+        return baseId;
     }
 }

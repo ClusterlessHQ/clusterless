@@ -8,14 +8,11 @@
 
 package clusterless.model;
 
-import clusterless.managed.Label;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  *
  */
-public class Barrier extends Model {
-    @Override
-    public Label label() {
-        return Label.of("Barrier");
-    }
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public interface Struct {
 }

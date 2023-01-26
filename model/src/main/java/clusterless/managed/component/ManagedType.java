@@ -6,16 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
-
-import clusterless.managed.Label;
+package clusterless.managed.component;
 
 /**
  *
  */
-public class Barrier extends Model {
-    @Override
-    public Label label() {
-        return Label.of("Barrier");
-    }
+public enum ManagedType {
+    container,
+    member
 }

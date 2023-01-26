@@ -15,8 +15,8 @@ import java.util.Objects;
 /**
  * Named simplifies creating complex names.
  */
-public interface Named {
-    interface EnumNamed extends Named {
+public interface Label {
+    interface EnumLabel extends Label {
         String name();
 
         default String camelCase() {
@@ -24,13 +24,13 @@ public interface Named {
         }
     }
 
-    Named NULL = () -> null;
+    Label NULL = () -> null;
 
-    static String nameOrNull(Named value) {
+    static String nameOrNull(Label value) {
         return value == null ? null : value.camelCase();
     }
 
-    static Named of(Named value) {
+    static Label of(Label value) {
         if (value == null) {
             return NULL;
         }
@@ -38,7 +38,7 @@ public interface Named {
         return value;
     }
 
-    static Named of(Named value, Named abbr) {
+    static Label of(Label value, Label abbr) {
         if (value == null) {
             return NULL;
         }
@@ -50,25 +50,25 @@ public interface Named {
         return value.abbreviated(abbr);
     }
 
-    static Named of(String full, String abbr) {
+    static Label of(String full, String abbr) {
         return of(of(full), of(abbr));
     }
 
-    default Named abbreviated(Named abbr) {
-        return new Named() {
+    default Label abbreviated(Label abbr) {
+        return new Label() {
             @Override
             public String camelCase() {
-                return Named.this.camelCase();
+                return Label.this.camelCase();
             }
 
             @Override
-            public Named abbreviated() {
+            public Label abbreviated() {
                 return abbr;
             }
         };
     }
 
-    static Named of(String value) {
+    static Label of(String value) {
         if (value == null) {
             return NULL;
         }
@@ -84,11 +84,11 @@ public interface Named {
         return () -> Strings.upperCamel(value);
     }
 
-    static Named fromLowerHyphen(String value) {
+    static Label fromLowerHyphen(String value) {
         return () -> Strings.lowerHyphenToUpperCamel(value);
     }
 
-    static Named fromLowerUnderscore(String value) {
+    static Label fromLowerUnderscore(String value) {
         return () -> Strings.lowerUnderscoreToCamelCase(value);
     }
 
@@ -96,61 +96,61 @@ public interface Named {
         return camelCase() == null;
     }
 
-    default Named with(Named named) {
-        if (named == null || named.isNull()) {
+    default Label with(Label label) {
+        if (label == null || label.isNull()) {
             return this;
         }
 
         // if first in chain in already null, return the next
         if (this.isNull()) {
-            return named;
+            return label;
         }
 
-        return new Named() {
+        return new Label() {
             @Override
             public String camelCase() {
-                return String.format("%s%s", Named.this.camelCase(), named.camelCase());
+                return String.format("%s%s", Label.this.camelCase(), label.camelCase());
             }
 
             @Override
             public String lowerHyphen() {
-                return String.format("%s-%s", Named.this.lowerHyphen(), named.lowerHyphen());
+                return String.format("%s-%s", Label.this.lowerHyphen(), label.lowerHyphen());
             }
 
             @Override
             public String lowerUnderscore() {
-                return String.format("%s_%s", Named.this.lowerUnderscore(), named.lowerUnderscore());
+                return String.format("%s_%s", Label.this.lowerUnderscore(), label.lowerUnderscore());
             }
 
             @Override
             public String shortCamelCase() {
-                return String.format("%s%s", Named.this.shortCamelCase(), named.shortCamelCase());
+                return String.format("%s%s", Label.this.shortCamelCase(), label.shortCamelCase());
             }
 
             @Override
             public String shortLowerHyphen() {
-                return String.format("%s-%s", Named.this.shortLowerHyphen(), named.shortLowerHyphen());
+                return String.format("%s-%s", Label.this.shortLowerHyphen(), label.shortLowerHyphen());
             }
 
             @Override
             public String shortLowerUnderscore() {
-                return String.format("%s_%s", Named.this.shortLowerUnderscore(), named.shortLowerUnderscore());
+                return String.format("%s_%s", Label.this.shortLowerUnderscore(), label.shortLowerUnderscore());
             }
         };
     }
 
-    default Named thisIfNull(Named named) {
-        if (named == null || named.isNull()) {
+    default Label thisIfNull(Label label) {
+        if (label == null || label.isNull()) {
             return this;
         }
 
-        return named;
+        return label;
     }
 
     String camelCase();
 
-    default Named abbreviated() {
-        return Named.this::camelCase;
+    default Label abbreviated() {
+        return Label.this::camelCase;
     }
 
     /**
@@ -178,7 +178,7 @@ public interface Named {
         return Strings.camelToLowerUnderscore(shortCamelCase());
     }
 
-    default int compareTo(Named o) {
+    default int compareTo(Label o) {
         return Objects.compare(camelCase(), o.camelCase(), String::compareTo);
     }
 }

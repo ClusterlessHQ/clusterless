@@ -9,8 +9,8 @@
 package clusterless.managed.component;
 
 import clusterless.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -18,36 +18,64 @@ import java.util.*;
  *
  */
 public class ComponentServices {
-    private static final Logger LOG = LoggerFactory.getLogger(ComponentServices.class);
+    private static final Logger LOG = LogManager.getLogger(ComponentServices.class);
 
     public static final ComponentServices INSTANCE = new ComponentServices();
 
-    private final EnumMap<ExtensibleType, Map<String, ComponentService<ComponentContext, Model>>> componentServices = new EnumMap<>(ExtensibleType.class);
+    private final EnumMap<ManagedType, EnumMap<ModelType, Map<String, ComponentService<ComponentContext, Model>>>> componentServices;
+
+    {
+        componentServices = new EnumMap<>(ManagedType.class);
+
+        Arrays.stream(ManagedType.values()).forEach(k -> componentServices.put(k, new EnumMap<>(ModelType.class)));
+
+    }
 
     protected ComponentServices() {
         ServiceLoader<ComponentService> serviceLoader = ServiceLoader.load(ComponentService.class);
 
         serviceLoader.stream().forEach(s -> {
             ProvidesComponent annotation = s.type().getAnnotation(ProvidesComponent.class);
-            ExtensibleType type = annotation.type();
+            ManagedType managedType = annotation.managedType();
+            ModelType model = annotation.modelType();
             String name = annotation.name();
-            LOG.info("loading provider: {} {}", type, name);
+
+            LOG.info("loading component service provider: {} {} {}", managedType, model, name);
+
             ComponentService<ComponentContext, Model> componentService = s.get();
 
-            componentServices.computeIfAbsent(type, k -> new HashMap<>()).put(name, componentService);
+            componentServices.get(managedType).computeIfAbsent(model, k -> new HashMap<>())
+                    .put(name, componentService);
         });
     }
 
-    public EnumMap<ExtensibleType, Map<String, ComponentService<ComponentContext, Model>>> componentServices() {
-        return componentServices;
+    public Map<String, ComponentService<ComponentContext, Model>> componentServicesFor(ModelType modelType) {
+        Map<String, ComponentService<ComponentContext, Model>> result = new HashMap<>();
+
+        for (ManagedType managedType : ManagedType.values()) {
+            if (componentServices.containsKey(managedType)) {
+                if (componentServices.get(managedType).containsKey(modelType)) {
+                    result.putAll(componentServices.get(managedType).get(modelType));
+                }
+            }
+        }
+
+        return result;
     }
 
-    public Collection<String> names(ExtensibleType type) {
-        return componentServices.get(type).keySet();
+    public EnumMap<ModelType, Map<String, ComponentService<ComponentContext, Model>>> componentServicesFor(ManagedType managedType) {
+        return componentServices.get(managedType);
     }
 
-    public <M extends Model> Optional<ComponentService<ComponentContext, M>> get(ExtensibleType type, String name) {
-        ComponentService<ComponentContext, M> componentContextModelComponentService = (ComponentService<ComponentContext, M>) componentServices.get(type).get(name);
+    public <M extends Model> Optional<ComponentService<ComponentContext, M>> get(ManagedType managedType, ModelType modelType, String name) {
+        Map<String, ComponentService<ComponentContext, Model>> serviceMap = componentServices.get(managedType).get(modelType);
+
+        if (serviceMap == null) {
+            throw new IllegalStateException("model map for " + managedType + " " + modelType + "  is missing");
+        }
+
+        ComponentService<ComponentContext, M> componentContextModelComponentService = (ComponentService<ComponentContext, M>) serviceMap.get(name);
         return Optional.ofNullable(componentContextModelComponentService);
     }
+
 }

@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
         visible = true // allows the type property to be set
 )
 @JsonTypeIdResolver(ExtensibleResolver.class)
-public class Extensible extends Model {
+public abstract class Extensible extends Model {
     String type;
 
     public String type() {

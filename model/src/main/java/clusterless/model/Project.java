@@ -8,12 +8,39 @@
 
 package clusterless.model;
 
+import clusterless.managed.Label;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Project extends Model {
+    public static class Target implements Struct {
+        String provider;
+        String stage;
+        String account;
+        String region;
+
+        public String provider() {
+            return provider;
+        }
+
+        public String stage() {
+            return stage;
+        }
+
+        public String account() {
+            return account;
+        }
+
+        public String region() {
+            return region;
+        }
+    }
+
+    Target target;
+    String name;
+    String version;
     @JsonProperty("resources")
     List<Resource> resources = new ArrayList<>();
     List<Boundary> boundaries = new ArrayList<>();
@@ -21,6 +48,18 @@ public class Project extends Model {
     List<Arc> arcs = new ArrayList<>();
 
     public Project() {
+    }
+
+    public Target target() {
+        return target;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String version() {
+        return version;
     }
 
     public List<Resource> resources() {
@@ -37,5 +76,10 @@ public class Project extends Model {
 
     public List<Arc> arcs() {
         return arcs;
+    }
+
+    @Override
+    public Label label() {
+        return Label.of("Project");
     }
 }

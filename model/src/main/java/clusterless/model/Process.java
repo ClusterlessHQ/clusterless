@@ -8,8 +8,14 @@
 
 package clusterless.model;
 
+import clusterless.managed.Label;
+
 /**
  *
  */
 public class Process extends Extensible {
+    @Override
+    public Label label() {
+        return Label.of("Process", "Prs");
+    }
 }

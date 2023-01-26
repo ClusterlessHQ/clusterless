@@ -6,17 +6,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource;
+package clusterless.substrate.aws.managed;
 
-import clusterless.managed.component.Component;
-import org.jetbrains.annotations.NotNull;
+import clusterless.managed.Label;
 import software.constructs.Construct;
 
 /**
  *
  */
-public class S3BucketConstruct extends Construct implements Component {
-    public S3BucketConstruct(@NotNull Construct scope, @NotNull String id) {
-        super(scope, id);
+public interface Managed {
+
+    Label baseId();
+
+    default Construct asConstruct() {
+        return (Construct) this;
     }
 }

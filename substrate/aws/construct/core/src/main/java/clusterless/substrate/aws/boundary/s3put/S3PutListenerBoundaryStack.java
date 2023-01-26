@@ -8,17 +8,18 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
+import clusterless.managed.Label;
 import clusterless.managed.component.Component;
 import clusterless.substrate.aws.boundary.BoundaryStack;
+import clusterless.substrate.aws.managed.ManagedProject;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.StackProps;
-import software.constructs.Construct;
 
 /**
  *
  */
 public class S3PutListenerBoundaryStack extends BoundaryStack implements Component {
-    public S3PutListenerBoundaryStack(@Nullable Construct scope, @Nullable String id, @Nullable StackProps props) {
+    public S3PutListenerBoundaryStack(@Nullable ManagedProject scope, Label id, @Nullable StackProps props) {
         super(scope, id, props);
 
         new S3PutListenerConstruct(this, "");

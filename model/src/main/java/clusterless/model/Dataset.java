@@ -8,8 +8,14 @@
 
 package clusterless.model;
 
+import clusterless.managed.Label;
+
 /**
  *
  */
 public class Dataset extends Model {
+    @Override
+    public Label label() {
+        return Label.of("Dataset");
+    }
 }

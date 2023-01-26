@@ -8,6 +8,8 @@
 
 package clusterless.model;
 
+import clusterless.managed.Label;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,5 +32,10 @@ public class Arc extends Model {
 
     public List<Dataset> sinks() {
         return sinks;
+    }
+
+    @Override
+    public Label label() {
+        return Label.of("Arc");
     }
 }

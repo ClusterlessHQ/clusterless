@@ -8,28 +8,30 @@
 
 package clusterless.managed.component;
 
+import clusterless.managed.Label;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  *
  */
-public enum ExtensibleType {
+public enum ModelType implements Label.EnumLabel {
     Resource(clusterless.model.Resource.class),
     Boundary(clusterless.model.Boundary.class),
     Process(clusterless.model.Process.class);
 
-    static Map<Class, ExtensibleType> types = new LinkedHashMap<>();
+    static Map<Class, ModelType> types = new LinkedHashMap<>();
 
     static {
-        for (ExtensibleType value : ExtensibleType.values()) {
+        for (ModelType value : ModelType.values()) {
             types.put(value.modelClass(), value);
         }
     }
 
     final Class modelClass;
 
-    ExtensibleType(Class modelClass) {
+    ModelType(Class modelClass) {
         this.modelClass = modelClass;
     }
 
@@ -37,7 +39,11 @@ public enum ExtensibleType {
         return modelClass;
     }
 
-    public static ExtensibleType find(Class type) {
+    public static ModelType find(Class type) {
         return types.get(type);
+    }
+
+    public static ModelType[] values(ModelType... modelTypes) {
+        return modelTypes;
     }
 }

@@ -16,5 +16,5 @@ import clusterless.model.Model;
 public interface ComponentService<C extends ComponentContext, M extends Model> {
     Component create(C context, M model);
 
-    Class<M> modelType();
+    Class<M> modelClass();
 }

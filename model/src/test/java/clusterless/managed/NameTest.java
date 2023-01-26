@@ -11,39 +11,39 @@ package clusterless.managed;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static clusterless.managed.NamedTest.Value.Case;
-import static clusterless.managed.NamedTest.Value.Lower;
+import static clusterless.managed.NameTest.Value.Case;
+import static clusterless.managed.NameTest.Value.Lower;
 
 /**
  *
  */
-public class NamedTest {
+public class NameTest {
     @Test
     void string() {
-        Assertions.assertEquals("Lower", Named.of("lower").camelCase());
-        Assertions.assertEquals("Lower", Named.fromLowerHyphen("lower").camelCase());
-        Assertions.assertEquals("lower", Named.fromLowerHyphen("lower").lowerHyphen());
-        Assertions.assertEquals("lower", Named.fromLowerHyphen("lower").lowerUnderscore());
+        Assertions.assertEquals("Lower", Label.of("lower").camelCase());
+        Assertions.assertEquals("Lower", Label.fromLowerHyphen("lower").camelCase());
+        Assertions.assertEquals("lower", Label.fromLowerHyphen("lower").lowerHyphen());
+        Assertions.assertEquals("lower", Label.fromLowerHyphen("lower").lowerUnderscore());
 
-        Named with = Named.of("lower").with(Named.of("case"));
+        Label with = Label.of("lower").with(Label.of("case"));
         Assertions.assertEquals("LowerCase", with.camelCase());
         Assertions.assertEquals("lower-case", with.lowerHyphen());
         Assertions.assertEquals("lower_case", with.lowerUnderscore());
 
-        Named abbr = Named.of("lower").abbreviated(Named.of("lwr")).with(Named.of("case").abbreviated(Named.of("cs")));
+        Label abbr = Label.of("lower").abbreviated(Label.of("lwr")).with(Label.of("case").abbreviated(Label.of("cs")));
         Assertions.assertEquals("LowerCase", abbr.camelCase());
         Assertions.assertEquals("LwrCs", abbr.shortCamelCase());
         Assertions.assertEquals("lwr-cs", abbr.shortLowerHyphen());
         Assertions.assertEquals("lwr_cs", abbr.shortLowerUnderscore());
 
-        Named abbr2 = Named.of("lower", "lwr").with(Named.of("case", "cs"));
+        Label abbr2 = Label.of("lower", "lwr").with(Label.of("case", "cs"));
         Assertions.assertEquals("LowerCase", abbr2.camelCase());
         Assertions.assertEquals("LwrCs", abbr2.shortCamelCase());
         Assertions.assertEquals("lwr-cs", abbr2.shortLowerHyphen());
         Assertions.assertEquals("lwr_cs", abbr2.shortLowerUnderscore());
     }
 
-    enum Value implements Named.EnumNamed {
+    enum Value implements Label.EnumLabel {
         Lower("Lwr"),
         Case("Cs");
 
@@ -54,17 +54,17 @@ public class NamedTest {
         }
 
         @Override
-        public Named abbreviated() {
-            return Named.of(abbr);
+        public Label abbreviated() {
+            return Label.of(abbr);
         }
     }
 
     @Test
     void enumeration() {
-        Assertions.assertEquals("Lower", Named.of(Lower).camelCase());
-        Assertions.assertEquals("Lwr", Named.of(Lower).shortCamelCase());
+        Assertions.assertEquals("Lower", Label.of(Lower).camelCase());
+        Assertions.assertEquals("Lwr", Label.of(Lower).shortCamelCase());
 
-        Assertions.assertEquals("LowerCase", Named.of(Lower).with(Case).camelCase());
-        Assertions.assertEquals("lwr-cs", Named.of(Lower).with(Case).shortLowerHyphen());
+        Assertions.assertEquals("LowerCase", Label.of(Lower).with(Case).camelCase());
+        Assertions.assertEquals("lwr-cs", Label.of(Lower).with(Case).shortLowerHyphen());
     }
 }

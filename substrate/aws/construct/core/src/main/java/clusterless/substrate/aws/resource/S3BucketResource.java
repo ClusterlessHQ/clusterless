@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public class S3BucketResource extends Resource {
     String bucketName;
+    boolean versioned = false;
     Map<String, String> tags = new LinkedHashMap<>();
 
     public S3BucketResource() {
@@ -25,6 +26,10 @@ public class S3BucketResource extends Resource {
 
     public String bucketName() {
         return bucketName;
+    }
+
+    public boolean versioned() {
+        return versioned;
     }
 
     public Map<String, String> tags() {

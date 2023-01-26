@@ -8,6 +8,7 @@
 
 package clusterless.model;
 
+import clusterless.managed.Label;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
@@ -15,4 +16,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName
 public class Resource extends Extensible {
+    @Override
+    public Label label() {
+        return Label.of("Resource", "Res");
+    }
 }

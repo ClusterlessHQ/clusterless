@@ -8,16 +8,17 @@
 
 package clusterless.substrate.aws.boundary;
 
+import clusterless.managed.Label;
+import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.StackProps;
-import software.constructs.Construct;
 
 /**
  *
  */
 public class BoundaryStack extends ManagedStack {
-    public BoundaryStack(@Nullable Construct scope, @Nullable String id, @Nullable StackProps props) {
+    public BoundaryStack(@NotNull ManagedProject scope, @NotNull Label id, @NotNull StackProps props) {
         super(scope, id, props);
     }
 }
