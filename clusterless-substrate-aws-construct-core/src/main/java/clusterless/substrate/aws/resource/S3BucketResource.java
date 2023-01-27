@@ -19,6 +19,11 @@ import java.util.Map;
 public class S3BucketResource extends Resource {
     String bucketName;
     boolean versioned = false;
+
+    /**
+     * When true (the default) the bucket and it's data will be removed when the project is destroyed.
+     */
+    boolean removeOnDestroy = true;
     Map<String, String> tags = new LinkedHashMap<>();
 
     public S3BucketResource() {
@@ -30,6 +35,10 @@ public class S3BucketResource extends Resource {
 
     public boolean versioned() {
         return versioned;
+    }
+
+    public boolean removeOnDestroy() {
+        return removeOnDestroy;
     }
 
     public Map<String, String> tags() {

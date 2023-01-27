@@ -15,9 +15,7 @@ import picocli.CommandLine;
 )
 public class Verify extends Lifecycle {
     @Override
-    public Integer call() throws Exception {
-        renderProject();
-
-        return 0;
+    public Integer call() {
+        return executeLifecycleProcess("synth");
     }
 }

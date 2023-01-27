@@ -10,13 +10,17 @@ package clusterless.substrate.aws.cdk;
 
 import picocli.CommandLine;
 
-@CommandLine.Command(
-        name = "deploy"
-)
-public class Deploy extends Lifecycle {
-    @Override
-    public Integer call() throws Exception {
+import java.io.IOException;
 
-        return executeLifecycleProcess("deploy");
+@CommandLine.Command(
+        name = "synth",
+        hidden = true
+)
+public class Synth extends Lifecycle {
+    @Override
+    public Integer call() throws IOException {
+        synthProject();
+
+        return 0;
     }
 }

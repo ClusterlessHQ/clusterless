@@ -28,10 +28,16 @@ public class ManagedStack extends Stack implements Managed {
     }
 
     public ManagedStack(@NotNull ManagedProject project, Label baseId) {
-        super(project, baseId.camelCase(), StackProps.builder()
-                .env(environment(project))
-                .stackName(baseId.lowerHyphen())
-                .build());
+        this(Names.stackName(project, baseId), project, baseId);
+    }
+
+    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject project, Label baseId) {
+        super(project, baseId.camelCase(),
+                StackProps.builder()
+                        .env(environment(project))
+                        .stackName(stackName.lowerHyphen())
+                        .build()
+        );
 
         this.project = project;
         this.baseId = baseId;

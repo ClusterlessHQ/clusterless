@@ -8,27 +8,63 @@
 
 package clusterless.substrate.aws;
 
-import com.google.common.collect.Lists;
+import clusterless.util.Lists;
+import clusterless.util.OrderedSafeMaps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
- *
+ * <pre>
+ *    -a, --app               REQUIRED WHEN RUNNING APP: command-line for executing
+ *                            your app or a cloud assembly directory (e.g. "node
+ *                            bin/my-app.js"). Can also be specified in context.json or
+ *                            ~/.context.json                                  [string]
+ *    --profile               Use the indicated AWS profile as the default
+ *                            environment                                  [string]
+ *    -o, --output            Emits the synthesized cloud assembly into a directory
+ *                            (default: cdk.out)                           [string] </pre>
  */
 public abstract class Manage {
+    private static final Logger LOG = LogManager.getLogger(Manage.class);
+
     @CommandLine.ParentCommand
     Kernel kernel;
 
     public Manage() {
     }
 
-    protected Integer executeCDK(String... cdkArgs) {
-        List<String> args = Lists.asList(kernel.cdk, cdkArgs);
+    protected Integer executeLifecycleProcess(String command) {
 
-        return executeProcess(args);
+        List<String> cdk = new LinkedList<>();
+        cdk.add(
+                kernel.cdk
+        );
+
+        String appCommand = "%s synth".formatted(kernel.cdkApp);
+
+        cdk.addAll(
+                Lists.list(OrderedSafeMaps.of(
+                        "--app",
+                        appCommand,
+                        "--profile",
+                        kernel.profile,
+                        "--output",
+                        kernel.output
+                ))
+        );
+
+        cdk.add(command);
+
+        return executeProcess(cdk);
+    }
+
+    protected Integer executeCDK(String... cdkArgs) {
+        return executeProcess(Lists.asList(kernel.cdk, cdkArgs));
     }
 
     protected int executeProcess(String... args) {
@@ -44,6 +80,8 @@ public abstract class Manage {
     }
 
     private int process(List<String> args) throws IOException, InterruptedException {
+        LOG.info("command args: {}", args);
+
         Process process = new ProcessBuilder(args)
                 .inheritIO()
                 .start();

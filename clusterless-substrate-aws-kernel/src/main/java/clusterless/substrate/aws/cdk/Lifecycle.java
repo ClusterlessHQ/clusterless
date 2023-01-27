@@ -48,6 +48,14 @@ public abstract class Lifecycle extends Manage implements Callable<Integer> {
 
     }
 
+    protected void synthProject() throws IOException {
+        Project projectModel = loadProjectModel();
+
+        ManagedProject managedProject = mapProject(projectModel);
+
+        managedProject.synth();
+    }
+
     protected Project loadProjectModel() throws IOException {
         if (projectFile.equals("-")) {
             return JSONUtil.OBJECT_MAPPER.readValue(System.in, Project.class);
@@ -60,14 +68,6 @@ public abstract class Lifecycle extends Manage implements Callable<Integer> {
         }
 
         return JSONUtil.OBJECT_MAPPER.readValue(file, Project.class);
-    }
-
-    protected void renderProject() throws IOException {
-        Project projectModel = loadProjectModel();
-
-        ManagedProject managedProject = mapProject(projectModel);
-
-        managedProject.synth();
     }
 
     public ManagedProject mapProject(Project projectModel) {

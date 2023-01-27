@@ -30,6 +30,7 @@ distributions {
         contents {
             from(awsInstall) {
                 include("bin/")
+                include("etc/")
             }
         }
     }

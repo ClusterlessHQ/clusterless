@@ -6,17 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.cdk;
+package clusterless.util;
 
-import picocli.CommandLine;
+import java.nio.file.Paths;
 
-@CommandLine.Command(
-        name = "deploy"
-)
-public class Deploy extends Lifecycle {
-    @Override
-    public Integer call() throws Exception {
-
-        return executeLifecycleProcess("deploy");
+/**
+ *
+ */
+public class URIUtil {
+    public static String normalize(String path) {
+        return Paths.get(path).normalize().toString();
     }
 }

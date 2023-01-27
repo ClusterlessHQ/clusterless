@@ -57,7 +57,7 @@ public class Main extends Startup implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         return 0;
     }
 

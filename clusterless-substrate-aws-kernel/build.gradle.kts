@@ -27,7 +27,7 @@ distributions {
     main {
         contents {
             from(file("src/main/cdk/")) {
-                into("bin/etc")
+                into("etc")
             }
         }
     }

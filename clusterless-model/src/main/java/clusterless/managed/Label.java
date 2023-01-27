@@ -10,10 +10,11 @@ package clusterless.managed;
 
 import clusterless.util.Strings;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Named simplifies creating complex names.
+ * Label simplifies creating complex strings used for naming and labeling.
  */
 public interface Label {
     interface EnumLabel extends Label {
@@ -30,7 +31,23 @@ public interface Label {
         return value == null ? null : value.camelCase();
     }
 
-    static Label of(Label value) {
+    static Label of(Object value) {
+        if (value == null) {
+            return NULL;
+        }
+
+        if (value instanceof String) {
+            return of((String) value);
+        }
+
+        if (value instanceof Label) {
+            return of((Label) value);
+        }
+
+        return of(value.toString());
+    }
+
+    private static Label of(Label value) {
         if (value == null) {
             return NULL;
         }
@@ -68,7 +85,36 @@ public interface Label {
         };
     }
 
-    static Label of(String value) {
+    default Label upperOnly() {
+        return new Label() {
+            @Override
+            public String camelCase() {
+                return Label.this.camelCase() != null ? Label.this.camelCase().toUpperCase(Locale.ROOT) : null;
+            }
+
+            @Override
+            public String lowerHyphen() {
+                return this.camelCase();
+            }
+
+            @Override
+            public String lowerUnderscore() {
+                return this.camelCase();
+            }
+
+            @Override
+            public String shortLowerHyphen() {
+                return this.camelCase();
+            }
+
+            @Override
+            public String shortLowerUnderscore() {
+                return this.camelCase();
+            }
+        };
+    }
+
+    private static Label of(String value) {
         if (value == null) {
             return NULL;
         }

@@ -15,6 +15,7 @@ import clusterless.substrate.aws.util.TagsUtil;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.CfnOutputProps;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.s3.BlockPublicAccess;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketEncryption;
@@ -37,6 +38,8 @@ public class S3BucketModelConstruct extends ModelConstruct<S3BucketResource> imp
                 .enforceSsl(true)
                 .versioned(model().versioned())
                 .bucketName(model().bucketName())
+                .removalPolicy(model.removeOnDestroy() ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
+                .autoDeleteObjects(model.removeOnDestroy())
                 .build());
 
         TagsUtil.applyTags(bucket, model().tags());

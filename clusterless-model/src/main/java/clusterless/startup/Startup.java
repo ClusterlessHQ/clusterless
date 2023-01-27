@@ -8,6 +8,8 @@
 
 package clusterless.startup;
 
+import org.apache.logging.log4j.core.tools.picocli.CommandLine;
+
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,6 +25,9 @@ public class Startup {
 
         setHome();
     }
+
+    @CommandLine.Option(names = {"-v", "--verbose"}, description = "verbose messages")
+    boolean verbose = false;
 
     protected static void setHome() {
         try {

@@ -11,12 +11,12 @@ package clusterless.substrate.aws.cdk;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-        name = "deploy"
+        name = "diff"
 )
-public class Deploy extends Lifecycle {
+public class Diff extends Lifecycle {
     @Override
     public Integer call() throws Exception {
 
-        return executeLifecycleProcess("deploy");
+        return executeLifecycleProcess("diff");
     }
 }

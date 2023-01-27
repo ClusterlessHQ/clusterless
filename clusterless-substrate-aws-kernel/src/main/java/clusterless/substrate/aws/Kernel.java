@@ -10,8 +10,8 @@ package clusterless.substrate.aws;
 
 import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProvider;
-import clusterless.substrate.aws.cdk.Deploy;
-import clusterless.substrate.aws.cdk.Verify;
+import clusterless.substrate.aws.cdk.*;
+import clusterless.util.URIUtil;
 import picocli.CommandLine;
 
 /**
@@ -20,7 +20,10 @@ import picocli.CommandLine;
 @CommandLine.Command(mixinStandardHelpOptions = true, subcommands = {
         Info.class,
         Verify.class,
+        Diff.class,
         Deploy.class,
+        Destroy.class,
+        Synth.class,
         Report.class
 })
 public class Kernel extends Startup implements SubstrateProvider {
@@ -28,11 +31,11 @@ public class Kernel extends Startup implements SubstrateProvider {
         System.exit(new Kernel().execute(args));
     }
 
-    @CommandLine.Option(names = "--direct", arity = "0..1")
-    public boolean direct = false;
-
     @CommandLine.Option(names = "--cdk", description = "path to the cdk binary")
     public String cdk = "cdk";
+
+    @CommandLine.Option(names = "--cdk-app", description = "path to the cdk json file")
+    public String cdkApp = URIUtil.normalize("%s/bin/cls-aws".formatted(System.getProperty(Startup.CLUSTERLESS_HOME)));
 
     @CommandLine.Option(names = "--profile", description = "aws profile")
     public String profile = System.getenv("AWS_PROFILE");
