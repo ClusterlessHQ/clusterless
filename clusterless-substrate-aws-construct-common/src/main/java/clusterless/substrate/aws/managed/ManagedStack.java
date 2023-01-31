@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.managed.Label;
+import clusterless.model.Project;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
@@ -18,39 +19,46 @@ import software.amazon.awscdk.StackProps;
  *
  */
 public class ManagedStack extends Stack implements Managed {
-    private final ManagedProject project;
+    private final ManagedProject managedProject;
+    private final Project project;
     private final Label baseId;
 
-    public ManagedStack(@NotNull ManagedProject project, @NotNull Label baseId, @NotNull StackProps props) {
-        super(project, baseId.camelCase(), props);
+    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId, @NotNull StackProps props) {
+        super(managedProject, baseId.camelCase(), props);
+        this.managedProject = managedProject;
         this.project = project;
         this.baseId = baseId;
     }
 
-    public ManagedStack(@NotNull ManagedProject project, Label baseId) {
-        this(Names.stackName(project, baseId), project, baseId);
+    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, Label baseId) {
+        this(Names.stackName(project, baseId), managedProject, project, baseId);
     }
 
-    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject project, Label baseId) {
-        super(project, baseId.camelCase(),
+    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Project project, Label baseId) {
+        super(managedProject, baseId.camelCase(),
                 StackProps.builder()
                         .env(environment(project))
                         .stackName(stackName.lowerHyphen())
                         .build()
         );
 
+        this.managedProject = managedProject;
         this.project = project;
         this.baseId = baseId;
     }
 
-    private static Environment environment(ManagedProject project) {
+    private static Environment environment(Project project) {
         return Environment.builder()
-                .account(project.projectModel().target().account())
-                .region(project.projectModel().target().region())
+                .account(project.target().account())
+                .region(project.target().region())
                 .build();
     }
 
-    public ManagedProject project() {
+    public ManagedProject managedProject() {
+        return managedProject;
+    }
+
+    public Project project() {
         return project;
     }
 

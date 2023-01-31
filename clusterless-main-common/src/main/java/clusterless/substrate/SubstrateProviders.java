@@ -25,7 +25,7 @@ public class SubstrateProviders {
 
         substrates = serviceLoader.stream()
                 .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toMap(SubstrateProvider::name, k -> k));
+                .collect(Collectors.toMap(SubstrateProvider::substrate, k -> k));
 
     }
 

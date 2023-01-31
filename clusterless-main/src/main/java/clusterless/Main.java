@@ -12,28 +12,43 @@
 
 package clusterless;
 
+import clusterless.command.*;
+import clusterless.json.JSONUtil;
 import clusterless.startup.Startup;
-import clusterless.substrate.SubstrateProviders;
+import clusterless.substrate.SubstrateProvider;
+import clusterless.substrate.SubstratesOptions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "cls", mixinStandardHelpOptions = true, version = "1.0-wip")
+@CommandLine.Command(
+        name = "cls",
+        mixinStandardHelpOptions = true,
+        version = "1.0-wip"
+)
 public class Main extends Startup implements Callable<Integer> {
-
-    private final SubstrateProviders providers;
-
+    private static final Logger LOG = LogManager.getLogger(Main.class);
     @CommandLine.Option(names = {"-V", "--version"}, versionHelp = true, description = "display version info")
     boolean versionInfoRequested;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
     boolean usageHelpRequested;
 
-    public static void main(String[] args) {
-        SubstrateProviders providers = new SubstrateProviders();
+    @CommandLine.Mixin
+    protected SubstratesOptions substratesOptions = new SubstratesOptions();
+    private String[] args;
 
-        CommandLine commandLine = new CommandLine(new Main(providers));
-        providers.substrates().forEach(commandLine::addSubcommand);
+    public static void main(String[] args) {
+        CommandLine commandLine = new CommandLine(new Main(args));
+
+        commandLine.addSubcommand("verify", new MainCommand(new VerifyCommandOptions()));
+        commandLine.addSubcommand("deploy", new MainCommand(new DeployCommandOptions()));
+        commandLine.addSubcommand("destroy", new MainCommand(new DestroyCommandOptions()));
+        commandLine.addSubcommand("diff", new MainCommand(new DiffCommandOptions()));
 
         commandLine.parseArgs(args);
 
@@ -48,8 +63,12 @@ public class Main extends Startup implements Callable<Integer> {
         commandLine.execute(args);
     }
 
-    public Main(SubstrateProviders providers) {
-        this.providers = providers;
+    public Main(String[] args) {
+        this.args = args;
+    }
+
+    public SubstratesOptions substratesOptions() {
+        return substratesOptions;
     }
 
     public CommandLine.IExitCodeExceptionMapper getExitCodeExceptionMapper() {
@@ -61,9 +80,39 @@ public class Main extends Startup implements Callable<Integer> {
         return 0;
     }
 
-    @CommandLine.Command()
-    public Integer substrates() {
-        providers.names().forEach(System.out::println);
+    public Integer run(CommandOptions command) {
+        if (command instanceof LifecycleCommandOptions) {
+            return run((LifecycleCommandOptions) command);
+        }
+
         return 0;
     }
+
+    public Integer run(LifecycleCommandOptions command) {
+        Map<String, SubstrateProvider> substrates = substratesOptions().requestedSubstrates();
+
+        List<String> declaredProviders = JSONUtil.readTreesWithPointer(command.projectFiles(), "/target/provider");
+
+        LOG.info("files: {}", command.projectFiles());
+        LOG.info("available: {}", substrates.keySet());
+        LOG.info("declared: {}", declaredProviders);
+
+        int result = 0;
+        for (String foundSubstrate : declaredProviders) {
+            SubstrateProvider substrateProvider = substrates.get(foundSubstrate);
+
+            if (substrateProvider == null) {
+                throw new IllegalStateException("substrate not found: " + foundSubstrate);
+            }
+
+            int execute = substrateProvider.execute(args);
+
+            if (execute != 0) {
+                return execute;
+            }
+        }
+
+        return result;
+    }
+
 }

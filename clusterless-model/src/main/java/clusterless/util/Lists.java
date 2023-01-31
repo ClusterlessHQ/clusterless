@@ -32,4 +32,8 @@ public class Lists {
     public static <E extends @Nullable Object> List<E> asList(E first, E[] rest) {
         return com.google.common.collect.Lists.asList(first, rest);
     }
+
+    public static <E extends @Nullable Object> E[] toArray(E first, E[] rest) {
+        return asList(first, rest).toArray(rest);
+    }
 }

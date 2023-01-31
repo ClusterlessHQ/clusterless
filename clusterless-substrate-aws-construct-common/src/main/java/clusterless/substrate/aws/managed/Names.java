@@ -9,16 +9,18 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.managed.Label;
+import clusterless.model.Project;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
  */
 public class Names {
-    public static Label stackName(ManagedProject project, Label baseId) {
-        String stage = project.projectModel().target().stage();
-        Label name = project.name();
+    public static Label stackName(@NotNull Project project, Label baseId) {
+        String stage = project.target().stage();
+        String name = project.name();
         String version = project.version();
-        String region = project.projectModel().target().region();
+        String region = project.target().region();
 
         return Label.of(stage).upperOnly()
                 .with(Label.of(name))

@@ -26,7 +26,7 @@ public class S3PutListenerBoundaryProvider implements ComponentService<ManagedCo
         StackProps stackProps = StackProps.builder()
                 .build();
 
-        return new S3PutListenerBoundaryStack(context.project(), Label.of("stack"), stackProps);
+        return new S3PutListenerBoundaryStack(context.managedProject(), context.project(), Label.of("stack"), stackProps);
     }
 
     @Override

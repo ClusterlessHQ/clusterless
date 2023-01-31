@@ -11,8 +11,11 @@ package clusterless.substrate.aws;
 import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.aws.cdk.*;
-import clusterless.util.URIUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
+
+import java.util.Arrays;
 
 /**
  *
@@ -27,32 +30,20 @@ import picocli.CommandLine;
         Report.class
 })
 public class Kernel extends Startup implements SubstrateProvider {
+    private static final Logger LOG = LogManager.getLogger(Kernel.class);
     public static void main(String[] args) {
         System.exit(new Kernel().execute(args));
     }
 
-    @CommandLine.Option(names = "--cdk", description = "path to the cdk binary")
-    public String cdk = "cdk";
-
-    @CommandLine.Option(names = "--cdk-app", description = "path to the cdk json file")
-    public String cdkApp = URIUtil.normalize("%s/bin/cls-aws".formatted(System.getProperty(Startup.CLUSTERLESS_HOME)));
-
-    @CommandLine.Option(names = "--profile", description = "aws profile")
-    public String profile = System.getenv("AWS_PROFILE");
-
-    @CommandLine.Option(names = "--output", description = "cloud assembly file output")
-    public String output = "cdk.out";
-
-    public Kernel() {
-    }
-
     @Override
-    public String name() {
+    public String substrate() {
         return "aws";
     }
 
     @Override
     public int execute(String[] args) {
+        LOG.info("kernel: {} ", Arrays.toString(args));
+
         return new CommandLine(this)
                 .setCaseInsensitiveEnumValuesAllowed(true)
                 .execute(args);

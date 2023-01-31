@@ -6,9 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws;
+package clusterless;
 
-import clusterless.command.ReportCommandOptions;
+import clusterless.command.CommandOptions;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -16,15 +16,20 @@ import java.util.concurrent.Callable;
 /**
  *
  */
-@CommandLine.Command(
-        name = "report"
-)
-public class Report implements Callable<Integer> {
+@CommandLine.Command()
+public class MainCommand implements Callable<Integer> {
+    @CommandLine.ParentCommand
+    Main main;
+
     @CommandLine.Mixin
-    ReportCommandOptions commandOptions = new ReportCommandOptions();
+    CommandOptions commandOptions;
+
+    public MainCommand(CommandOptions commandOptions) {
+        this.commandOptions = commandOptions;
+    }
 
     @Override
     public Integer call() throws Exception {
-        return null;
+        return main.run(this.commandOptions);
     }
 }

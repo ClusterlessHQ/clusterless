@@ -8,7 +8,7 @@
 
 package clusterless.startup;
 
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
+import picocli.CommandLine;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;

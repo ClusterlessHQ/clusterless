@@ -8,14 +8,27 @@
 
 package clusterless.substrate.aws.cdk;
 
+import clusterless.command.VerifyCommandOptions;
+import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
+
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "verify"
 )
-public class Verify extends Lifecycle {
+public class Verify implements Callable<Integer> {
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec();
+
+    @CommandLine.Mixin
+    VerifyCommandOptions commandOptions = new VerifyCommandOptions();
+
+    public Verify() {
+    }
+
     @Override
     public Integer call() {
-        return executeLifecycleProcess("synth");
+        return processExec.executeLifecycleProcess("synth", commandOptions);
     }
 }

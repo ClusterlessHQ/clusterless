@@ -8,18 +8,29 @@
 
 package clusterless.substrate.aws.cdk;
 
+import clusterless.command.LifecycleCommandOptions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "synth",
         hidden = true
 )
-public class Synth extends Lifecycle {
+public class Synth implements Callable<Integer> {
+    private static final Logger LOG = LogManager.getLogger(Synth.class);
+    @CommandLine.Mixin
+    LifecycleCommandOptions commandOptions = new LifecycleCommandOptions();
+    Lifecycle lifecycle = new Lifecycle();
+
     @Override
     public Integer call() throws IOException {
-        synthProject();
+        LOG.info("exec synth using: {}", commandOptions.projectFiles());
+
+        lifecycle.synthProject(commandOptions.projectFiles());
 
         return 0;
     }

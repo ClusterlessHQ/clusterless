@@ -38,8 +38,12 @@ public class KernelTest {
                 ]
             }
             """)
-    void verify() {
-        String[] args = {"--direct", "verify", "-p", "-"};
+    void synth() {
+        String[] args = {
+                "synth", // runs app.synth() in the current jvm
+                "-p",
+                "-"
+        };
 
         new Kernel().execute(args);
     }

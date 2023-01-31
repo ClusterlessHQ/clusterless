@@ -22,9 +22,4 @@ plugins {
 
 dependencies {
     implementation("info.picocli:picocli")
-
-    constraints {
-        // manage dependency versions here
-        implementation("info.picocli:picocli:4.7.0")
-    }
 }

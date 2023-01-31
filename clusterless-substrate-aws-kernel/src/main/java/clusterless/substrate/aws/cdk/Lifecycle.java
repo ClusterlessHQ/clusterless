@@ -13,83 +13,101 @@ import clusterless.managed.component.*;
 import clusterless.model.Extensible;
 import clusterless.model.Model;
 import clusterless.model.Project;
-import clusterless.substrate.aws.Manage;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import picocli.CommandLine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
  *
  */
-@CommandLine.Command(
-        mixinStandardHelpOptions = true
-)
-public abstract class Lifecycle extends Manage implements Callable<Integer> {
+public class Lifecycle {
     private static final Logger LOG = LogManager.getLogger(Lifecycle.class);
 
     ComponentServices componentServices = ComponentServices.INSTANCE;
-
-    @CommandLine.Option(names = {"-p", "--project"})
-    String projectFile = "project.json";
 
     public Lifecycle() {
 
     }
 
-    protected void synthProject() throws IOException {
-        Project projectModel = loadProjectModel();
+    protected void synthProject(List<File> projectFiles) throws IOException {
+        List<Project> projectModels = loadProjectModels(projectFiles);
 
-        ManagedProject managedProject = mapProject(projectModel);
+        ManagedProject managedProject = mapProject(projectModels);
 
         managedProject.synth();
     }
 
-    protected Project loadProjectModel() throws IOException {
-        if (projectFile.equals("-")) {
-            return JSONUtil.OBJECT_MAPPER.readValue(System.in, Project.class);
+    protected List<Project> loadProjectModels(List<File> projectFiles) throws IOException {
+        if (projectFiles.isEmpty()) {
+            throw new IllegalStateException("no project files declared");
         }
 
-        File file = Paths.get(projectFile).toFile();
-
-        if (!file.exists()) {
-            throw new FileNotFoundException("does not exist: " + projectFile);
+        if (projectFiles.get(0).toString().equals("-")) {
+            return List.of(JSONUtil.OBJECT_MAPPER.readValue(System.in, Project.class));
         }
 
-        return JSONUtil.OBJECT_MAPPER.readValue(file, Project.class);
+        List<Project> results = new LinkedList<>();
+
+        for (File projectFile : projectFiles) {
+            if (!projectFile.exists()) {
+                throw new FileNotFoundException("does not exist: " + projectFile);
+            }
+
+            Project project = JSONUtil.OBJECT_MAPPER.readValue(projectFile, Project.class);
+
+            project.setSourceFile(projectFile);
+
+            results.add(project);
+        }
+
+        return results;
     }
 
-    public ManagedProject mapProject(Project projectModel) {
-        ManagedProject managedProject = new ManagedProject(projectModel);
+    public ManagedProject mapProject(List<Project> projectModels) {
+        Set<String> names = projectModels.stream().map(Project::name).collect(Collectors.toSet());
+        Set<String> versions = projectModels.stream().map(Project::version).collect(Collectors.toSet());
 
-        verifyComponentsAreAvailable(projectModel);
-
-        // deploy provided stacks
-        Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), projectModel, new LinkedHashMap<>());
-
-        if (!containers.isEmpty()) {
-            construct(new ManagedComponentContext(managedProject), containers);
+        if (names.size() > 1) {
+            throw new IllegalStateException("all project files must have the same name, got: " + names);
         }
 
-        // create a stack for resource member constructs
-        construct(projectModel, managedProject, ModelType.Resource);
+        if (versions.size() > 1) {
+            throw new IllegalStateException("all project files must have the same version, got: " + versions);
+        }
 
-        // create a stack for boundary member constructs
-        construct(projectModel, managedProject, ModelType.Boundary);
+        String name = names.stream().findFirst().orElseThrow();
+        String version = versions.stream().findFirst().orElseThrow();
 
-        // create arcs with Process member constructs
-        // unsupported
+        ManagedProject managedProject = new ManagedProject(name, version, projectModels);
+
+        for (Project projectModel : projectModels) {
+            verifyComponentsAreAvailable(projectModel);
+
+            // deploy provided stacks
+            Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), projectModel, new LinkedHashMap<>());
+
+            if (!containers.isEmpty()) {
+                construct(new ManagedComponentContext(managedProject, projectModel), containers);
+            }
+
+            // create a stack for resource member constructs
+            construct(projectModel, managedProject, ModelType.Resource);
+
+            // create a stack for boundary member constructs
+            construct(projectModel, managedProject, ModelType.Boundary);
+
+            // create arcs with Process member constructs
+            // unsupported
+        }
 
         return managedProject;
     }
@@ -101,8 +119,8 @@ public abstract class Lifecycle extends Manage implements Callable<Integer> {
             return;
         }
 
-        ManagedStack resourceStack = new ManagedStack(managedProject, modelType);
-        ComponentContext resourceContext = new ManagedComponentContext(managedProject, resourceStack);
+        ManagedStack resourceStack = new ManagedStack(managedProject, projectModel, modelType);
+        ComponentContext resourceContext = new ManagedComponentContext(managedProject, projectModel, resourceStack);
 
         construct(resourceContext, memberResources);
     }

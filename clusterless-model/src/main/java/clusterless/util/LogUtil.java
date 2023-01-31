@@ -9,7 +9,7 @@
 package clusterless.util;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
 
 /**
  *
@@ -27,8 +27,11 @@ public class LogUtil {
         setLoggingLevel(Level.INFO);
     }
 
+
     public static void setLoggingLevel(Level level) {
-        // a hack, but works
-        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).setLevel(level);
+//    https://picocli.info/#_use_case_configure_log_level_with_a_global_option
+        Configurator.setRootLevel(level);
+//         a hack, but works
+//        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).setLevel(level);
     }
 }

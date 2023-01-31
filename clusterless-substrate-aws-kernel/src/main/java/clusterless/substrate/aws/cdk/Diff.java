@@ -8,15 +8,24 @@
 
 package clusterless.substrate.aws.cdk;
 
+import clusterless.command.DiffCommandOptions;
+import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
+
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "diff"
 )
-public class Diff extends Lifecycle {
+public class Diff implements Callable<Integer> {
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec();
+
+    @CommandLine.Mixin
+    DiffCommandOptions commandOptions = new DiffCommandOptions();
+
     @Override
     public Integer call() throws Exception {
-
-        return executeLifecycleProcess("diff");
+        return processExec.executeLifecycleProcess("diff", commandOptions);
     }
 }

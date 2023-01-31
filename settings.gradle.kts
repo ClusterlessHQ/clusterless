@@ -14,6 +14,7 @@ pluginManagement {
 rootProject.name = "clusterless"
 
 include("clusterless-model")
+include("clusterless-main-common")
 include("clusterless-main")
 
 include("clusterless-substrate-aws-kernel")

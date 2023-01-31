@@ -10,18 +10,32 @@ package clusterless.substrate.aws;
 
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(
         name = "info"
 )
-public class Info extends Manage {
+public class Info implements Callable<Integer> {
+
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec();
+
+    public Info() {
+
+    }
 
     @CommandLine.Command(name = "version")
     public Integer version() {
-        return executeCDK("--version");
+        return processExec.executeCDK("--version");
     }
 
     @CommandLine.Command(name = "which")
     public Integer which() {
-        return executeProcess("which", kernel.cdk);
+        return processExec.executeProcess("which", processExec.cdk);
+    }
+
+    @Override
+    public Integer call() throws Exception {
+        return 0;
     }
 }

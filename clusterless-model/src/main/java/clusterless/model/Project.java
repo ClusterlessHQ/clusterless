@@ -11,6 +11,7 @@ package clusterless.model;
 import clusterless.managed.Label;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +39,29 @@ public class Project extends Model {
         }
     }
 
+    File sourceFile;
+
     Target target;
     String name;
     String version;
     @JsonProperty("resources")
     List<Resource> resources = new ArrayList<>();
+    @JsonProperty("boundaries")
     List<Boundary> boundaries = new ArrayList<>();
+    @JsonProperty("barriers")
     List<Barrier> barriers = new ArrayList<>();
+    @JsonProperty("arcs")
     List<Arc> arcs = new ArrayList<>();
 
     public Project() {
+    }
+
+    public File sourceFile() {
+        return sourceFile;
+    }
+
+    public void setSourceFile(File sourceFile) {
+        this.sourceFile = sourceFile;
     }
 
     public Target target() {

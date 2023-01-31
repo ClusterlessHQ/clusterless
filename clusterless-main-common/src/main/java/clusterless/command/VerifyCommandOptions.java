@@ -6,13 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate;
+package clusterless.command;
+
+
+import picocli.CommandLine;
 
 /**
  *
  */
-public interface SubstrateProvider {
-    String name();
-
-    int execute(String[] args);
+@CommandLine.Command(description = "verify the given project files will render into the substrate declaration format")
+public class VerifyCommandOptions extends LifecycleCommandOptions {
 }

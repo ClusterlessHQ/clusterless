@@ -8,15 +8,25 @@
 
 package clusterless.substrate.aws.cdk;
 
+
+import clusterless.command.DestroyCommandOptions;
+import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
+
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "destroy"
 )
-public class Destroy extends Lifecycle {
+public class Destroy implements Callable<Integer> {
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec();
+    @CommandLine.Mixin
+    DestroyCommandOptions commandOptions = new DestroyCommandOptions();
+
     @Override
     public Integer call() throws Exception {
 
-        return executeLifecycleProcess("destroy");
+        return processExec.executeLifecycleProcess("destroy", commandOptions);
     }
 }

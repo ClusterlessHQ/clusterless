@@ -25,29 +25,29 @@ import java.util.List;
 public class ManagedProject extends App implements Managed {
     private final Label name;
     private final String version;
-    private final Project projectModel;
+    private final List<Project> projectModel;
 
 
     public static ManagedProject projectOf(Construct scope) {
         return (ManagedProject) scope.getNode().getRoot();
     }
 
-    public ManagedProject(Project projectModel) {
+    public ManagedProject(String name, String version, List<Project> projectModels) {
         super(AppProps.builder()
                 .context(OrderedMaps.of(
-                        "project", Label.of(projectModel.name()).lowerHyphen(),
-                        "version", projectModel.version()
+                        "project", Label.of(name).lowerHyphen(),
+                        "version", version
                 ))
                 .build());
 
-        this.name = Label.of(projectModel.name());
-        this.version = projectModel.version();
-        this.projectModel = projectModel;
+        this.name = Label.of(name);
+        this.version = version;
+        this.projectModel = projectModels;
 
         applyTags();
     }
 
-    public Project projectModel() {
+    public List<Project> projectModels() {
         return projectModel;
     }
 

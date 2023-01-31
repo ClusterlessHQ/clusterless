@@ -8,15 +8,24 @@
 
 package clusterless.substrate.aws.cdk;
 
+import clusterless.command.DeployCommandOptions;
+import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
+
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "deploy"
 )
-public class Deploy extends Lifecycle {
+public class Deploy implements Callable<Integer> {
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec();
+    @CommandLine.Mixin
+    DeployCommandOptions commandOptions = new DeployCommandOptions();
+
     @Override
     public Integer call() throws Exception {
 
-        return executeLifecycleProcess("deploy");
+        return processExec.executeLifecycleProcess("deploy", commandOptions);
     }
 }
