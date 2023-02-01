@@ -72,9 +72,9 @@ public class Lifecycle {
         return results;
     }
 
-    public ManagedProject mapProject(List<Project> projectModels) {
-        Set<String> names = projectModels.stream().map(Project::name).collect(Collectors.toSet());
-        Set<String> versions = projectModels.stream().map(Project::version).collect(Collectors.toSet());
+    public ManagedProject mapProject(List<Project> projects) {
+        Set<String> names = projects.stream().map(Project::name).collect(Collectors.toSet());
+        Set<String> versions = projects.stream().map(Project::version).collect(Collectors.toSet());
 
         if (names.size() > 1) {
             throw new IllegalStateException("all project files must have the same name, got: " + names);
@@ -87,23 +87,23 @@ public class Lifecycle {
         String name = names.stream().findFirst().orElseThrow();
         String version = versions.stream().findFirst().orElseThrow();
 
-        ManagedProject managedProject = new ManagedProject(name, version, projectModels);
+        ManagedProject managedProject = new ManagedProject(name, version, projects);
 
-        for (Project projectModel : projectModels) {
-            verifyComponentsAreAvailable(projectModel);
+        for (Project project : projects) {
+            verifyComponentsAreAvailable(project);
 
             // deploy provided stacks
-            Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), projectModel, new LinkedHashMap<>());
+            Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), project, new LinkedHashMap<>());
 
             if (!containers.isEmpty()) {
-                construct(new ManagedComponentContext(managedProject, projectModel), containers);
+                construct(new ManagedComponentContext(managedProject, project), containers);
             }
 
             // create a stack for resource member constructs
-            construct(projectModel, managedProject, ModelType.Resource);
+            construct(managedProject, project, ModelType.Resource);
 
             // create a stack for boundary member constructs
-            construct(projectModel, managedProject, ModelType.Boundary);
+            construct(managedProject, project, ModelType.Boundary);
 
             // create arcs with Process member constructs
             // unsupported
@@ -112,15 +112,15 @@ public class Lifecycle {
         return managedProject;
     }
 
-    private void construct(Project projectModel, ManagedProject managedProject, ModelType modelType) {
-        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelType), projectModel, new LinkedHashMap<>());
+    private void construct(ManagedProject managedProject, Project project, ModelType modelType) {
+        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelType), project, new LinkedHashMap<>());
 
         if (memberResources.isEmpty()) {
             return;
         }
 
-        ManagedStack resourceStack = new ManagedStack(managedProject, projectModel, modelType);
-        ComponentContext resourceContext = new ManagedComponentContext(managedProject, projectModel, resourceStack);
+        ManagedStack resourceStack = new ManagedStack(managedProject, project, modelType);
+        ComponentContext resourceContext = new ManagedComponentContext(managedProject, project, resourceStack);
 
         construct(resourceContext, memberResources);
     }

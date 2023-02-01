@@ -8,14 +8,22 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
+import clusterless.managed.component.Component;
+import clusterless.substrate.aws.managed.ManagedComponentContext;
+import clusterless.substrate.aws.model.ModelConstruct;
 import org.jetbrains.annotations.NotNull;
-import software.constructs.Construct;
 
 /**
  *
  */
-public class S3PutListenerConstruct extends Construct {
-    public S3PutListenerConstruct(@NotNull Construct scope, @NotNull String id) {
-        super(scope, id);
+public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary> implements Component {
+    public S3PutListenerConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
+        super(context, model, model.bucketName());
+
+        // declare listen bucket
+        // declare manifest bucket
+        // declare event bridge
+        // declare lambda to convert put event into arc event
+
     }
 }

@@ -23,18 +23,18 @@ public class ManagedStack extends Stack implements Managed {
     private final Project project;
     private final Label baseId;
 
-    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId, @NotNull StackProps props) {
+    private ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId, @NotNull StackProps props) {
         super(managedProject, baseId.camelCase(), props);
         this.managedProject = managedProject;
         this.project = project;
         this.baseId = baseId;
     }
 
-    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, Label baseId) {
+    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId) {
         this(Names.stackName(project, baseId), managedProject, project, baseId);
     }
 
-    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Project project, Label baseId) {
+    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId) {
         super(managedProject, baseId.camelCase(),
                 StackProps.builder()
                         .env(environment(project))

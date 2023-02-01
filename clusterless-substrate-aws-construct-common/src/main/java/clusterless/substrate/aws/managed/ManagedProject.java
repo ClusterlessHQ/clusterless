@@ -27,7 +27,6 @@ public class ManagedProject extends App implements Managed {
     private final String version;
     private final List<Project> projectModel;
 
-
     public static ManagedProject projectOf(Construct scope) {
         return (ManagedProject) scope.getNode().getRoot();
     }

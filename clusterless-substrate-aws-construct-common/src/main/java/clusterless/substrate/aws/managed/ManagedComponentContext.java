@@ -17,9 +17,9 @@ import software.constructs.Construct;
  */
 public class ManagedComponentContext implements ComponentContext {
 
-    ManagedProject managedProject;
-    Managed parent;
-    private Project project;
+    final ManagedProject managedProject;
+    final Project project;
+    final Managed parent;
 
     public ManagedComponentContext(ManagedProject managedProject, Project project) {
         this.managedProject = managedProject;

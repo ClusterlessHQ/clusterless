@@ -56,16 +56,17 @@ public class ProcessExec {
     }
 
     public Integer executeLifecycleProcess(String command, LifecycleCommandOptions commandOptions) {
-
         List<String> cdkCommand = new LinkedList<>();
+
         cdkCommand.add(
                 cdk
         );
 
-        List<File> files = commandOptions.projectFiles();
-        String filesArg = files.stream().map(Object::toString).collect(Collectors.joining(","));
+        // execute the aws-cli app with the synth command
+        String filesArg = filesAsArg(commandOptions.projectFiles());
         String appCommand = "%s synth --project %s".formatted(cdkApp, filesArg);
 
+        // options only added if value is not null
         cdkCommand.addAll(
                 Lists.list(OrderedSafeMaps.of(
                         "--app",
@@ -111,5 +112,9 @@ public class ProcessExec {
                 .start();
 
         return process.waitFor();
+    }
+
+    private String filesAsArg(List<File> files) {
+        return files.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 }

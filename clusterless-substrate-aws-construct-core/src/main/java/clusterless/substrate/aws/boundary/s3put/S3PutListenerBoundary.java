@@ -14,4 +14,18 @@ import clusterless.model.IngressBoundary;
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
+    String bucketName;
+
+    String eventBridgeName;
+
+    public S3PutListenerBoundary() {
+    }
+
+    public String bucketName() {
+        return bucketName;
+    }
+
+    public String eventBridgeName() {
+        return eventBridgeName;
+    }
 }
