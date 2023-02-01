@@ -9,6 +9,7 @@
 package clusterless.model;
 
 import clusterless.managed.Label;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.File;
@@ -39,6 +40,7 @@ public class Project extends Model {
         }
     }
 
+    @JsonIgnore
     File sourceFile;
 
     Target target;

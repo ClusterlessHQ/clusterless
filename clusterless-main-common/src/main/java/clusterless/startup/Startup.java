@@ -8,6 +8,7 @@
 
 package clusterless.startup;
 
+import clusterless.printer.Printer;
 import picocli.CommandLine;
 
 import java.net.URISyntaxException;
@@ -25,9 +26,6 @@ public class Startup {
 
         setHome();
     }
-
-    @CommandLine.Option(names = {"-v", "--verbose"}, description = "verbose messages")
-    boolean verbose = false;
 
     protected static void setHome() {
         try {
@@ -48,5 +46,15 @@ public class Startup {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @CommandLine.Option(names = {"-v", "--verbose"}, description = "verbose messages")
+    boolean verbose = false;
+
+    @CommandLine.Mixin
+    Printer printer = new Printer();
+
+    public Printer printer() {
+        return printer;
     }
 }

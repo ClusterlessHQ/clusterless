@@ -12,8 +12,8 @@ global commands:
 
 * `bootstrap` - initializes the cloud env for a given substrate, account, and region
 * `show`  - show the available model types and print schemas
+** `providers`  - show the available substrates
 ** `models`  - show the available model types and print schemas
-** `substrates`  - show the available substrates
 
 project scope commands:
 

@@ -28,7 +28,10 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "cls",
         mixinStandardHelpOptions = true,
-        version = "1.0-wip"
+        version = "1.0-wip",
+        subcommands = {
+                Show.class
+        }
 )
 public class Main extends Startup implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Main.class);
@@ -114,5 +117,4 @@ public class Main extends Startup implements Callable<Integer> {
 
         return result;
     }
-
 }

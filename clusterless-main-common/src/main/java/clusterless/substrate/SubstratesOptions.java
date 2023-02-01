@@ -21,9 +21,6 @@ import java.util.Set;
 public class SubstratesOptions {
     protected final SubstrateProviders providers = new SubstrateProviders();
 
-    @CommandLine.Parameters
-    protected String[] allArgs = new String[0];
-
     @CommandLine.Option(names = {"-s", "--substrates"}, description = "substrates to target", scope = CommandLine.ScopeType.INHERIT)
     protected Set<String> substrates = new LinkedHashSet<>();
 
@@ -31,8 +28,8 @@ public class SubstratesOptions {
         this.substrates.addAll(providers.names());
     }
 
-    public String[] allArgs() {
-        return allArgs;
+    public Set<String> available() {
+        return providers.names();
     }
 
     public Set<String> substrates() {
