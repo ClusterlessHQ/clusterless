@@ -13,9 +13,9 @@ import clusterless.model.Extensible;
 import clusterless.model.Model;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
+import clusterless.substrate.aws.util.ErrorsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import software.constructs.IConstruct;
 
@@ -53,24 +53,9 @@ public class ModelConstruct<M extends Model> extends ManagedConstruct {
 
     protected <R extends IConstruct> R construct(Supplier<R> supplier) {
         if (model() instanceof Extensible) {
-            return construct(((Extensible) model()).type(), supplier);
+            return ErrorsUtil.construct(((Extensible) model()).type(), supplier, LOG);
         }
-        return construct(null, supplier);
-    }
 
-    protected <R extends IConstruct> R construct(String expectedType, Supplier<R> supplier) {
-        try {
-            return supplier.get();
-        } catch (software.amazon.jsii.JsiiException error) {
-            String errorMessage = error.getMessage();
-
-            if (Strings.isEmpty(expectedType)) {
-                LOG.error("failed constructing object with: {}", errorMessage);
-            } else {
-                LOG.error("failed constructing: {}, with: {}", expectedType, errorMessage);
-            }
-
-            throw new IllegalStateException(errorMessage, error);
-        }
+        return ErrorsUtil.construct(null, supplier, LOG);
     }
 }

@@ -11,6 +11,9 @@ package clusterless.substrate.aws.managed;
 import clusterless.managed.Label;
 import clusterless.model.Project;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.Environment;
+
+import java.util.Objects;
 
 /**
  *
@@ -27,5 +30,15 @@ public class Names {
                 .with(baseId)
                 .with(Label.of(version))
                 .with(Label.of(region));
+    }
+
+    public static String bootstrapMetadataBucketName(@NotNull Environment env) {
+        Objects.requireNonNull(env, "Environment may not be null");
+
+        return Label.of("Clusterless")
+                .with(Label.of("Metadata"))
+                .with(Label.of(env.getAccount()))
+                .with(Label.of(env.getRegion()))
+                .lowerHyphen();
     }
 }

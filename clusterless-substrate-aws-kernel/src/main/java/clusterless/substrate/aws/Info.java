@@ -31,7 +31,7 @@ public class Info implements Callable<Integer> {
 
     @CommandLine.Command(name = "which")
     public Integer which() {
-        return processExec.executeProcess("which", processExec.cdk);
+        return processExec.executeProcess("which", processExec.cdk());
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -48,6 +49,7 @@ public class Main extends Startup implements Callable<Integer> {
     public static void main(String[] args) {
         CommandLine commandLine = new CommandLine(new Main(args));
 
+        commandLine.addSubcommand("bootstrap", new MainCommand(new BootstrapCommandOptions()));
         commandLine.addSubcommand("verify", new MainCommand(new VerifyCommandOptions()));
         commandLine.addSubcommand("deploy", new MainCommand(new DeployCommandOptions()));
         commandLine.addSubcommand("destroy", new MainCommand(new DestroyCommandOptions()));
@@ -88,24 +90,30 @@ public class Main extends Startup implements Callable<Integer> {
             return run((LifecycleCommandOptions) command);
         }
 
-        return 0;
+        return run(substratesOptions().substrates());
     }
 
     public Integer run(LifecycleCommandOptions command) {
-        Map<String, SubstrateProvider> substrates = substratesOptions().requestedSubstrates();
 
         List<String> declaredProviders = JSONUtil.readTreesWithPointer(command.projectFiles(), "/target/provider");
 
         LOG.info("files: {}", command.projectFiles());
-        LOG.info("available: {}", substrates.keySet());
         LOG.info("declared: {}", declaredProviders);
 
+        return run(declaredProviders);
+    }
+
+    public int run(Collection<String> declaredProviders) {
+        Map<String, SubstrateProvider> substrates = substratesOptions().requestedSubstrates();
+
+        LOG.info("available: {}", substrates.keySet());
+
         int result = 0;
-        for (String foundSubstrate : declaredProviders) {
-            SubstrateProvider substrateProvider = substrates.get(foundSubstrate);
+        for (String declaredProvider : declaredProviders) {
+            SubstrateProvider substrateProvider = substrates.get(declaredProvider);
 
             if (substrateProvider == null) {
-                throw new IllegalStateException("substrate not found: " + foundSubstrate);
+                throw new IllegalStateException("substrate not found: " + declaredProvider);
             }
 
             int execute = substrateProvider.execute(args);

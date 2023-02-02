@@ -19,7 +19,6 @@ import java.util.List;
  *
  */
 public class LifecycleCommandOptions extends CommandOptions {
-
     @CommandLine.Option(
             names = {"-p", "--project"},
             description = "the project files"

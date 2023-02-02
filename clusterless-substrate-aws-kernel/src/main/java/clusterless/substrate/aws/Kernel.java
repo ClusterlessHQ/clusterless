@@ -10,6 +10,7 @@ package clusterless.substrate.aws;
 
 import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProvider;
+import clusterless.substrate.aws.bootstrap.Bootstrap;
 import clusterless.substrate.aws.cdk.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ import java.util.Arrays;
  *
  */
 @CommandLine.Command(mixinStandardHelpOptions = true, subcommands = {
+        Bootstrap.class,
         Info.class,
         Verify.class,
         Diff.class,
@@ -31,6 +33,7 @@ import java.util.Arrays;
 })
 public class Kernel extends Startup implements SubstrateProvider {
     private static final Logger LOG = LogManager.getLogger(Kernel.class);
+
     public static void main(String[] args) {
         System.exit(new Kernel().execute(args));
     }
