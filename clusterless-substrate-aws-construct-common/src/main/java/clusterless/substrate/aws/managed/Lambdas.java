@@ -6,15 +6,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.util;
+package clusterless.substrate.aws.managed;
 
-import java.nio.file.Paths;
+import software.amazon.awscdk.services.lambda.Code;
 
 /**
  *
  */
-public class URIUtil {
-    public static String normalize(String path) {
-        return Paths.get(path).normalize().toString();
+public class Lambdas {
+    public static Code find() {
+
+        return null;
     }
 }

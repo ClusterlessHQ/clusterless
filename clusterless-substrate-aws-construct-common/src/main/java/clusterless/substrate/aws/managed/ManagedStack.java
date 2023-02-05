@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.managed.Label;
 import clusterless.model.Project;
+import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;

@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.managed.Label;
+import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.constructs.Construct;
 
@@ -19,7 +19,7 @@ public class ManagedConstruct extends Construct implements Managed {
     private final ManagedComponentContext context;
     private final Label baseId;
 
-    public ManagedConstruct(@NotNull ManagedComponentContext context, @NotNull Label baseId) {
+    public ManagedConstruct(@NotNull ManagedComponentContext context, Label baseId) {
         super(context.parent(), baseId.camelCase());
         this.context = context;
         this.baseId = baseId;

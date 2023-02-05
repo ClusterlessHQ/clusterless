@@ -8,12 +8,12 @@
 
 package clusterless.substrate.aws.model;
 
-import clusterless.managed.Label;
 import clusterless.model.Extensible;
 import clusterless.model.Model;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.util.ErrorsUtil;
+import clusterless.util.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

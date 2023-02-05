@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource;
+package clusterless.substrate.aws.resource.s3;
 
 import clusterless.managed.component.Component;
 import clusterless.substrate.aws.managed.ManagedComponentContext;

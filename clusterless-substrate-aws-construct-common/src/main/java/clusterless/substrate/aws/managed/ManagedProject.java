@@ -8,9 +8,9 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.managed.Label;
 import clusterless.model.Project;
 import clusterless.substrate.aws.util.TagsUtil;
+import clusterless.util.Label;
 import clusterless.util.OrderedMaps;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.AppProps;

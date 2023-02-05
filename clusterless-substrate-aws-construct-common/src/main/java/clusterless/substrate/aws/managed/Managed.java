@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.managed.Label;
+import clusterless.util.Label;
 import software.constructs.Construct;
 
 /**

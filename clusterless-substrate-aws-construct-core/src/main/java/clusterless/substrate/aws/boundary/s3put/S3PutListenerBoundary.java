@@ -10,22 +10,51 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.model.IngressBoundary;
 
+import java.net.URI;
+
 /**
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
-    String bucketName;
+    private URI listenBucketURI;
+    private URI manifestBucketURI;
+    private String eventBusName;
+    private String listenerRuleName;
 
-    String eventBridgeName;
+    int memorySizeMB = 256 * 3;
+
+    int retryAttempts = 3;
+
+    int timeoutMin = 15;
 
     public S3PutListenerBoundary() {
     }
 
-    public String bucketName() {
-        return bucketName;
+    public URI listenBucketURI() {
+        return listenBucketURI;
     }
 
-    public String eventBridgeName() {
-        return eventBridgeName;
+    public URI manifestBucketURI() {
+        return manifestBucketURI;
+    }
+
+    public String eventBusName() {
+        return eventBusName;
+    }
+
+    public String listenerRuleName() {
+        return listenerRuleName;
+    }
+
+    public int memorySizeMB() {
+        return memorySizeMB;
+    }
+
+    public int retryAttempts() {
+        return retryAttempts;
+    }
+
+    public int timeoutMin() {
+        return timeoutMin;
     }
 }

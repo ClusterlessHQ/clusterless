@@ -8,6 +8,7 @@
 
 package clusterless.managed;
 
+import clusterless.util.Label;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

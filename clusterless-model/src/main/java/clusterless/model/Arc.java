@@ -8,7 +8,7 @@
 
 package clusterless.model;
 
-import clusterless.managed.Label;
+import clusterless.util.Label;
 
 import java.util.ArrayList;
 import java.util.List;

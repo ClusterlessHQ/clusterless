@@ -12,7 +12,7 @@ import clusterless.command.LifecycleCommandOptions;
 import clusterless.startup.Startup;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
-import clusterless.util.URIUtil;
+import clusterless.util.URIs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -47,7 +47,7 @@ public class ProcessExec {
     private String cdk = "cdk";
 
     @CommandLine.Option(names = "--cdk-app", description = "path to the cdk json file")
-    private String cdkApp = URIUtil.normalize("%s/bin/cls-aws".formatted(System.getProperty(Startup.CLUSTERLESS_HOME)));
+    private String cdkApp = URIs.normalize("%s/bin/cls-aws".formatted(System.getProperty(Startup.CLUSTERLESS_HOME)));
 
     @CommandLine.Option(names = "--profile", description = "aws profile")
     private String profile = System.getenv("AWS_PROFILE");

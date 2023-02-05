@@ -8,7 +8,7 @@
 
 package clusterless.model;
 
-import clusterless.managed.Label;
+import clusterless.util.Label;
 
 /**
  * Note {@link #equals(Object)} and {@link #hashCode()} are declared final. No two Model instances

@@ -11,6 +11,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-construct-common"))
 }

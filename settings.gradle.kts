@@ -13,6 +13,7 @@ pluginManagement {
 
 rootProject.name = "clusterless"
 
+include("clusterless-common")
 include("clusterless-model")
 include("clusterless-main-common")
 include("clusterless-main")

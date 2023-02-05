@@ -6,9 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed;
-
-import clusterless.util.Strings;
+package clusterless.util;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -103,6 +101,11 @@ public interface Label {
             }
 
             @Override
+            public String upperUnderscore() {
+                return this.camelCase();
+            }
+
+            @Override
             public String shortLowerHyphen() {
                 return this.camelCase();
             }
@@ -142,8 +145,15 @@ public interface Label {
         return camelCase() == null;
     }
 
-    default Label with(Label label) {
-        if (label == null || label.isNull()) {
+    default Label with(Object object) {
+        if (object == null) {
+            return this;
+        }
+        if (!(object instanceof Label label)) {
+            return with(Label.of(object.toString()));
+        }
+
+        if (label.isNull()) {
             return this;
         }
 
@@ -166,6 +176,11 @@ public interface Label {
             @Override
             public String lowerUnderscore() {
                 return String.format("%s_%s", Label.this.lowerUnderscore(), label.lowerUnderscore());
+            }
+
+            @Override
+            public String upperUnderscore() {
+                return String.format("%s_%s", Label.this.upperUnderscore(), label.upperUnderscore());
             }
 
             @Override
@@ -214,6 +229,10 @@ public interface Label {
 
     default String lowerUnderscore() {
         return Strings.camelToLowerUnderscore(camelCase());
+    }
+
+    default String upperUnderscore() {
+        return Strings.camelToUpperUnderscore(camelCase());
     }
 
     default String shortLowerHyphen() {

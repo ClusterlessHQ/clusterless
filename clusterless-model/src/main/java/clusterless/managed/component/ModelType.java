@@ -8,7 +8,7 @@
 
 package clusterless.managed.component;
 
-import clusterless.managed.Label;
+import clusterless.util.Label;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

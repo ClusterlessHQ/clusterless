@@ -8,6 +8,7 @@
 
 package clusterless.util;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +28,19 @@ public class OrderedSafeMaps {
     }
 
     private static <K, V> void safePut(Map<K, V> map, K k, V v) {
-        Optional.ofNullable(v).ifPresent(p -> map.put(k, p));
+        Optional.ofNullable(v).map(OrderedSafeMaps::nullIfEmpty).ifPresent(p -> map.put(k, p));
+    }
+
+    static <V> V nullIfEmpty(V v) {
+        if (v instanceof Collection<?>) {
+            return ((Collection<?>) v).isEmpty() ? null : v;
+        }
+
+        if (v instanceof Map<?, ?>) {
+            return ((Map<?, ?>) v).isEmpty() ? null : v;
+        }
+
+        return v;
     }
 
     public static <K, V> Map<K, V> of(K k1, V v1) {

@@ -11,6 +11,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
 
     implementation("info.picocli:picocli")

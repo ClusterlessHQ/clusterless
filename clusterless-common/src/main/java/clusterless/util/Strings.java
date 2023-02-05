@@ -92,6 +92,14 @@ public class Strings {
         return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, string);
     }
 
+    public static String camelToUpperUnderscore(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, string);
+    }
+
     public static String lowerHyphenToUpperCamel(String string) {
         if (string == null) {
             return null;

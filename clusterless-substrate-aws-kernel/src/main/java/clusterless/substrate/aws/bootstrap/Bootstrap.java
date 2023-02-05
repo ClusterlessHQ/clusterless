@@ -9,8 +9,8 @@
 package clusterless.substrate.aws.bootstrap;
 
 import clusterless.command.BootstrapCommandOptions;
-import clusterless.managed.Label;
 import clusterless.substrate.aws.ProcessExec;
+import clusterless.util.Label;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import picocli.CommandLine;

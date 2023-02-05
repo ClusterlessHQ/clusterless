@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource;
+package clusterless.substrate.aws.resource.s3;
 
 import clusterless.model.Resource;
 
@@ -17,8 +17,8 @@ import java.util.Map;
  * Creates and maintains an S3 bucket and any associated metadata.
  */
 public class S3BucketResource extends Resource {
-    String bucketName;
-    boolean versioned = false;
+    private String bucketName;
+    private boolean versioned = false;
 
     /**
      * When true (the default) the bucket and it's data will be removed when the project is destroyed.
