@@ -10,9 +10,9 @@ package clusterless.substrate.aws.cdk;
 
 import clusterless.json.JSONUtil;
 import clusterless.managed.component.*;
+import clusterless.model.Deploy;
 import clusterless.model.Extensible;
 import clusterless.model.Model;
-import clusterless.model.Project;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
@@ -39,42 +39,42 @@ public class Lifecycle {
     }
 
     protected void synthProject(List<File> projectFiles) throws IOException {
-        List<Project> projectModels = loadProjectModels(projectFiles);
+        List<Deploy> deployModels = loadProjectModels(projectFiles);
 
-        ManagedProject managedProject = mapProject(projectModels);
+        ManagedProject managedProject = mapProject(deployModels);
 
         managedProject.synth();
     }
 
-    protected List<Project> loadProjectModels(List<File> projectFiles) throws IOException {
+    protected List<Deploy> loadProjectModels(List<File> projectFiles) throws IOException {
         if (projectFiles.isEmpty()) {
             throw new IllegalStateException("no project files declared");
         }
 
         if (projectFiles.get(0).toString().equals("-")) {
-            return List.of(JSONUtil.OBJECT_MAPPER.readValue(System.in, Project.class));
+            return List.of(JSONUtil.OBJECT_MAPPER.readValue(System.in, Deploy.class));
         }
 
-        List<Project> results = new LinkedList<>();
+        List<Deploy> results = new LinkedList<>();
 
         for (File projectFile : projectFiles) {
             if (!projectFile.exists()) {
                 throw new FileNotFoundException("does not exist: " + projectFile);
             }
 
-            Project project = JSONUtil.OBJECT_MAPPER.readValue(projectFile, Project.class);
+            Deploy deploy = JSONUtil.OBJECT_MAPPER.readValue(projectFile, Deploy.class);
 
-            project.setSourceFile(projectFile);
+            deploy.setSourceFile(projectFile);
 
-            results.add(project);
+            results.add(deploy);
         }
 
         return results;
     }
 
-    public ManagedProject mapProject(List<Project> projects) {
-        Set<String> names = projects.stream().map(Project::name).collect(Collectors.toSet());
-        Set<String> versions = projects.stream().map(Project::version).collect(Collectors.toSet());
+    public ManagedProject mapProject(List<Deploy> deploys) {
+        Set<String> names = deploys.stream().map(d -> d.project().name()).collect(Collectors.toSet());
+        Set<String> versions = deploys.stream().map(d -> d.project().version()).collect(Collectors.toSet());
 
         if (names.size() > 1) {
             throw new IllegalStateException("all project files must have the same name, got: " + names);
@@ -87,23 +87,23 @@ public class Lifecycle {
         String name = names.stream().findFirst().orElseThrow();
         String version = versions.stream().findFirst().orElseThrow();
 
-        ManagedProject managedProject = new ManagedProject(name, version, projects);
+        ManagedProject managedProject = new ManagedProject(name, version, deploys);
 
-        for (Project project : projects) {
-            verifyComponentsAreAvailable(project);
+        for (Deploy deploy : deploys) {
+            verifyComponentsAreAvailable(deploy);
 
             // deploy provided stacks
-            Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), project, new LinkedHashMap<>());
+            Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), deploy, new LinkedHashMap<>());
 
             if (!containers.isEmpty()) {
-                construct(new ManagedComponentContext(managedProject, project), containers);
+                construct(new ManagedComponentContext(managedProject, deploy), containers);
             }
 
             // create a stack for resource member constructs
-            construct(managedProject, project, ModelType.Resource);
+            construct(managedProject, deploy, ModelType.Resource);
 
             // create a stack for boundary member constructs
-            construct(managedProject, project, ModelType.Boundary);
+            construct(managedProject, deploy, ModelType.Boundary);
 
             // create arcs with Process member constructs
             // unsupported
@@ -112,15 +112,15 @@ public class Lifecycle {
         return managedProject;
     }
 
-    private void construct(ManagedProject managedProject, Project project, ModelType modelType) {
-        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelType), project, new LinkedHashMap<>());
+    private void construct(ManagedProject managedProject, Deploy deploy, ModelType modelType) {
+        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelType), deploy, new LinkedHashMap<>());
 
         if (memberResources.isEmpty()) {
             return;
         }
 
-        ManagedStack resourceStack = new ManagedStack(managedProject, project, modelType);
-        ComponentContext resourceContext = new ManagedComponentContext(managedProject, project, resourceStack);
+        ManagedStack resourceStack = new ManagedStack(managedProject, deploy, modelType);
+        ComponentContext resourceContext = new ManagedComponentContext(managedProject, deploy, resourceStack);
 
         construct(resourceContext, memberResources);
     }
@@ -133,12 +133,12 @@ public class Lifecycle {
         });
     }
 
-    private void verifyComponentsAreAvailable(Project projectModel) {
+    private void verifyComponentsAreAvailable(Deploy deployModel) {
         // accumulate all providers for all declared model types
         Map<Extensible, ComponentService<ComponentContext, Model>> map = new LinkedHashMap<>();
 
         for (ManagedType managedType : ManagedType.values()) {
-            getMangedTypesFor(managedType, ModelType.values(), projectModel, map);
+            getMangedTypesFor(managedType, ModelType.values(), deployModel, map);
         }
 
         Set<String> missing = map.entrySet()
@@ -153,7 +153,7 @@ public class Lifecycle {
         }
     }
 
-    private Map<Extensible, ComponentService<ComponentContext, Model>> getMangedTypesFor(ManagedType managedType, ModelType[] modelTypes, Project projectModel, Map<Extensible, ComponentService<ComponentContext, Model>> map) {
+    private Map<Extensible, ComponentService<ComponentContext, Model>> getMangedTypesFor(ManagedType managedType, ModelType[] modelTypes, Deploy deployModel, Map<Extensible, ComponentService<ComponentContext, Model>> map) {
         EnumMap<ModelType, Map<String, ComponentService<ComponentContext, Model>>> containerMap = componentServices.componentServicesFor(managedType);
 
         for (ModelType modelType : modelTypes) {
@@ -161,7 +161,7 @@ public class Lifecycle {
                 continue;
             }
 
-            for (Extensible extensible : getExtensiblesFor(modelType, projectModel)) {
+            for (Extensible extensible : getExtensiblesFor(modelType, deployModel)) {
                 // put a null if not available
                 map.put(extensible, containerMap.get(modelType).get(extensible.type()));
             }
@@ -171,11 +171,11 @@ public class Lifecycle {
     }
 
     @NotNull
-    private static List<Extensible> getExtensiblesFor(ModelType modelType, Project projectModel) {
+    private static List<Extensible> getExtensiblesFor(ModelType modelType, Deploy deployModel) {
         List<Extensible> extensibles = Collections.emptyList();
         switch (modelType) {
-            case Resource -> extensibles = new ArrayList<>(projectModel.resources());
-            case Boundary -> extensibles = new ArrayList<>(projectModel.boundaries());
+            case Resource -> extensibles = new ArrayList<>(deployModel.resources());
+            case Boundary -> extensibles = new ArrayList<>(deployModel.boundaries());
             case Process -> throw new UnsupportedOperationException();
         }
         return extensibles;

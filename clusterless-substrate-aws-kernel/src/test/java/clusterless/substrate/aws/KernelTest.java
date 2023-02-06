@@ -18,14 +18,16 @@ public class KernelTest {
     @Test
     @StdIo("""
             {
-            "target": {
-                "provider": "aws",
+            "project": {
+                "name" : "TestProject",
+                "version": "20230101-00"
+            },
+            "placement": {
                 "stage": "prod",
+                "provider": "aws",
                 "account": "abc123",
                 "region": "us-east-2"
             },
-            "name" : "TestProject",
-            "version": "20230101-00",
             "resources" : [
                 {
                     "type" : "core:s3Bucket",

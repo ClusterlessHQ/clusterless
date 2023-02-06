@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.managed.component.ComponentContext;
-import clusterless.model.Project;
+import clusterless.model.Deploy;
 import software.constructs.Construct;
 
 /**
@@ -18,18 +18,18 @@ import software.constructs.Construct;
 public class ManagedComponentContext implements ComponentContext {
 
     final ManagedProject managedProject;
-    final Project project;
+    final Deploy deploy;
     final Managed parent;
 
-    public ManagedComponentContext(ManagedProject managedProject, Project project) {
+    public ManagedComponentContext(ManagedProject managedProject, Deploy deploy) {
         this.managedProject = managedProject;
         this.parent = managedProject;
-        this.project = project;
+        this.deploy = deploy;
     }
 
-    public ManagedComponentContext(ManagedProject managedProject, Project project, Managed parent) {
+    public ManagedComponentContext(ManagedProject managedProject, Deploy deploy, Managed parent) {
         this.managedProject = managedProject;
-        this.project = project;
+        this.deploy = deploy;
         this.parent = parent;
     }
 
@@ -37,8 +37,8 @@ public class ManagedComponentContext implements ComponentContext {
         return managedProject;
     }
 
-    public Project project() {
-        return project;
+    public Deploy project() {
+        return deploy;
     }
 
     public Construct parent() {

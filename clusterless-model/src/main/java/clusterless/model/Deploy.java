@@ -8,16 +8,43 @@
 
 package clusterless.model;
 
-import clusterless.util.Label;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Project extends Model {
-    public static class Target implements Struct {
+public class Deploy extends Model {
+
+    public static class Project implements Struct {
+        String name;
+        String version;
+
+        public String name() {
+            return name;
+        }
+
+        public String version() {
+            return version;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Project project = (Project) o;
+            return Objects.equals(name, project.name) && Objects.equals(version, project.version);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, version);
+        }
+    }
+
+    public static class Placement implements Struct {
         String provider;
         String stage;
         String account;
@@ -43,9 +70,8 @@ public class Project extends Model {
     @JsonIgnore
     File sourceFile;
 
-    Target target;
-    String name;
-    String version;
+    Project project;
+    Placement placement;
     @JsonProperty("resources")
     List<Resource> resources = new ArrayList<>();
     @JsonProperty("boundaries")
@@ -55,7 +81,7 @@ public class Project extends Model {
     @JsonProperty("arcs")
     List<Arc> arcs = new ArrayList<>();
 
-    public Project() {
+    public Deploy() {
     }
 
     public File sourceFile() {
@@ -66,16 +92,12 @@ public class Project extends Model {
         this.sourceFile = sourceFile;
     }
 
-    public Target target() {
-        return target;
+    public Project project() {
+        return project;
     }
 
-    public String name() {
-        return name;
-    }
-
-    public String version() {
-        return version;
+    public Placement placement() {
+        return placement;
     }
 
     public List<Resource> resources() {
@@ -92,10 +114,5 @@ public class Project extends Model {
 
     public List<Arc> arcs() {
         return arcs;
-    }
-
-    @Override
-    public Label label() {
-        return Label.of("Project");
     }
 }

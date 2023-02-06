@@ -21,7 +21,7 @@ import java.util.List;
 public class LifecycleCommandOptions extends CommandOptions {
     @CommandLine.Option(
             names = {"-p", "--project"},
-            description = "the project files"
+            description = "the files that declare the project to be deployed"
     )
     List<File> projectFiles = new ArrayList<>();
 

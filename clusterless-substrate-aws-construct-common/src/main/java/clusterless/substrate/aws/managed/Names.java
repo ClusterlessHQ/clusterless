@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.model.Project;
+import clusterless.model.Deploy;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
@@ -19,11 +19,11 @@ import java.util.Objects;
  *
  */
 public class Names {
-    public static Label stackName(@NotNull Project project, @NotNull Label baseId) {
-        String stage = project.target().stage();
-        String name = project.name();
-        String version = project.version();
-        String region = project.target().region();
+    public static Label stackName(@NotNull Deploy deploy, @NotNull Label baseId) {
+        String stage = deploy.placement().stage();
+        String name = deploy.project().name();
+        String version = deploy.project().version();
+        String region = deploy.placement().region();
 
         return Label.of(stage).upperOnly()
                 .with(Label.of(name))

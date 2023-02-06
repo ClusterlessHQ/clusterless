@@ -8,15 +8,8 @@
 
 package clusterless.model;
 
-import clusterless.util.Label;
-
 /**
  *
  */
 public class Boundary extends Extensible {
-
-    @Override
-    public Label label() {
-        return Label.of("Boundary", "Bndry");
-    }
 }

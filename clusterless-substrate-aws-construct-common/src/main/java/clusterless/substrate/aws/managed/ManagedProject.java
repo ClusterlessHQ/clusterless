@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.model.Project;
+import clusterless.model.Deploy;
 import clusterless.substrate.aws.util.TagsUtil;
 import clusterless.util.Label;
 import clusterless.util.OrderedMaps;
@@ -25,13 +25,13 @@ import java.util.List;
 public class ManagedProject extends App implements Managed {
     private final Label name;
     private final String version;
-    private final List<Project> projectModel;
+    private final List<Deploy> deployModel;
 
     public static ManagedProject projectOf(Construct scope) {
         return (ManagedProject) scope.getNode().getRoot();
     }
 
-    public ManagedProject(String name, String version, List<Project> projectModels) {
+    public ManagedProject(String name, String version, List<Deploy> deployModels) {
         super(AppProps.builder()
                 .context(OrderedMaps.of(
                         "project", Label.of(name).lowerHyphen(),
@@ -41,13 +41,13 @@ public class ManagedProject extends App implements Managed {
 
         this.name = Label.of(name);
         this.version = version;
-        this.projectModel = projectModels;
+        this.deployModel = deployModels;
 
         applyTags();
     }
 
-    public List<Project> projectModels() {
-        return projectModel;
+    public List<Deploy> projectModels() {
+        return deployModel;
     }
 
     @Override

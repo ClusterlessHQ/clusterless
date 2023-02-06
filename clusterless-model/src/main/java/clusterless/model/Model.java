@@ -15,7 +15,9 @@ import clusterless.util.Label;
  * should ever be equal
  */
 public abstract class Model implements Struct {
-    public abstract Label label();
+    public final Label label() {
+        return Label.of(getClass().getSimpleName());
+    }
 
     @Override
     public final int hashCode() {

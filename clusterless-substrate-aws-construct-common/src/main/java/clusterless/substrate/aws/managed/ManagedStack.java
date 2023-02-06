@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.model.Project;
+import clusterless.model.Deploy;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
@@ -20,37 +20,37 @@ import software.amazon.awscdk.StackProps;
  */
 public class ManagedStack extends Stack implements Managed {
     private final ManagedProject managedProject;
-    private final Project project;
+    private final Deploy deploy;
     private final Label baseId;
 
-    private ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId, @NotNull StackProps props) {
+    private ManagedStack(@NotNull ManagedProject managedProject, @NotNull Deploy deploy, @NotNull Label baseId, @NotNull StackProps props) {
         super(managedProject, baseId.camelCase(), props);
         this.managedProject = managedProject;
-        this.project = project;
+        this.deploy = deploy;
         this.baseId = baseId;
     }
 
-    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId) {
-        this(Names.stackName(project, baseId), managedProject, project, baseId);
+    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Deploy deploy, @NotNull Label baseId) {
+        this(Names.stackName(deploy, baseId), managedProject, deploy, baseId);
     }
 
-    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Project project, @NotNull Label baseId) {
+    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Deploy deploy, @NotNull Label baseId) {
         super(managedProject, baseId.camelCase(),
                 StackProps.builder()
-                        .env(environment(project))
+                        .env(environment(deploy))
                         .stackName(stackName.lowerHyphen())
                         .build()
         );
 
         this.managedProject = managedProject;
-        this.project = project;
+        this.deploy = deploy;
         this.baseId = baseId;
     }
 
-    private static Environment environment(Project project) {
+    private static Environment environment(Deploy deploy) {
         return Environment.builder()
-                .account(project.target().account())
-                .region(project.target().region())
+                .account(deploy.placement().account())
+                .region(deploy.placement().region())
                 .build();
     }
 
@@ -58,8 +58,8 @@ public class ManagedStack extends Stack implements Managed {
         return managedProject;
     }
 
-    public Project project() {
-        return project;
+    public Deploy project() {
+        return deploy;
     }
 
     @Override
