@@ -38,17 +38,17 @@ project scope commands:
 
 The `cls` client will process all given 'project' files.
 
-Each file is a single or array of `project` deployments, where a deployment has a single target and declaration.
+Each file is a single or array of deployments, where a deployment has a single placement and declaration.
 
-A target is the substrate, account id, and region, where applicable.
+A placement is the substrate, account id, region, and stage, where a deployment declaration will be deployed.
 
 The declaration consists of the construct that will be managed as a single versioned project unit.
 
 That is, if a project as a declaration for each of two regions (in AWS), us-west-1 and us-west-2, there will need to be two files, one for each region.
 
-If identical region deployments are expected, each file should be identical, except where a declared resource could collide with a resource in another region (like an S3 bucket).
+If identical deployments are expected, except for the region, each file should be identical, except where a declared resource could collide with a resource in another region (like an S3 bucket).
 
-It is recommended all the project files have the same project name and version.
+It is required all the deployment files have the same project name and version in a given deploy.
 
 See link:adr/0002-static-json-as-configuration.md[Static JSON as configuration].
 
