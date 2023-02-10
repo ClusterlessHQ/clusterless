@@ -16,9 +16,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,16 +42,16 @@ public class JSONUtil {
                 .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
     }
 
-    public static List<String> readTreesWithPointer(List<File> files, String pointer) {
+    public static List<String> getAt(ArrayNode jsonNodes, String pointer) {
         List<String> results = new LinkedList<>();
 
-        readTrees(files).forEach(n -> results.add(n.at(pointer).asText()));
+        jsonNodes.forEach(n -> results.add(n.at(pointer).asText()));
 
         return results;
     }
 
-    public static ArrayNode readTrees(List<File> files) {
-        ArrayNode arrayNode = OBJECT_MAPPER.getNodeFactory().arrayNode();
+    public static ArrayNode readTrees(List<File> files) throws IOException {
+        ArrayNode arrayNode = createArrayNode();
 
         for (File file : files) {
             arrayNode.add(readTree(file));
@@ -62,15 +60,23 @@ public class JSONUtil {
         return arrayNode;
     }
 
-    public static JsonNode readTree(File file) {
-        try {
-            return OBJECT_MAPPER.readTree(file);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    public static ArrayNode createArrayNode() {
+        return OBJECT_MAPPER.getNodeFactory().arrayNode();
     }
 
-    public static <T> T readObject(String json, Class<T> type) {
+    public static JsonNode readTree(InputStream inputStream) throws IOException {
+        return OBJECT_MAPPER.readTree(inputStream);
+    }
+
+    public static JsonNode readTree(File file) throws IOException {
+        if (!file.exists()) {
+            throw new FileNotFoundException("does not exist: " + file);
+        }
+
+        return OBJECT_MAPPER.readTree(file);
+    }
+
+    public static <T> T readObjectSafe(String json, Class<T> type) {
         try {
             return OBJECT_MAPPER.readValue(json, type);
         } catch (IOException e) {
@@ -78,9 +84,17 @@ public class JSONUtil {
         }
     }
 
-    public static String writeAsString(Object object) {
+    public static String writeAsStringSafe(Object object) {
         try {
             return OBJECT_WRITER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T treeToValueSafe(JsonNode n, Class<T> type) {
+        try {
+            return OBJECT_MAPPER.treeToValue(n, type);
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }

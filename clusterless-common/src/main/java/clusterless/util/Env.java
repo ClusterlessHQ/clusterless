@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 public class Env {
     public static Map<String, String> toEnv(Object object) {
         return OrderedSafeMaps.of(
-                Label.of(object.getClass().getSimpleName()).upperUnderscore(), JSONUtil.writeAsString(object)
+                Label.of(object.getClass().getSimpleName()).upperUnderscore(), JSONUtil.writeAsStringSafe(object)
         );
     }
 
@@ -40,6 +40,6 @@ public class Env {
             return defaultValue.get();
         }
 
-        return JSONUtil.readObject(value, type);
+        return JSONUtil.readObjectSafe(value, type);
     }
 }

@@ -29,7 +29,4 @@ public class ManagedConstruct extends Construct implements Managed {
         return context;
     }
 
-    public Label baseId() {
-        return baseId;
-    }
 }

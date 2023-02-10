@@ -18,9 +18,16 @@ include("clusterless-model")
 include("clusterless-main-common")
 include("clusterless-main")
 
+// AWS Substrate
+// shared aws sdk functionality
+include("clusterless-substrate-aws-common")
+
 include("clusterless-substrate-aws-kernel")
 
+// shared aws cdk functionality
 include("clusterless-substrate-aws-construct-common")
+// core provided deploy constructs
 include("clusterless-substrate-aws-construct-core")
 
+// service lambdas
 include("clusterless-substrate-aws-service-transform")

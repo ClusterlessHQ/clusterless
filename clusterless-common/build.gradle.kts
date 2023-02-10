@@ -11,9 +11,9 @@ plugins {
 }
 
 dependencies {
-    implementation("com.google.guava:guava")
-    implementation("com.fasterxml.jackson.core:jackson-core")
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    api("com.google.guava:guava")
+    api("com.fasterxml.jackson.core:jackson-core")
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }

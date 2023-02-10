@@ -17,6 +17,8 @@ import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  *
@@ -33,6 +35,12 @@ import java.util.Arrays;
 })
 public class Kernel extends Startup implements SubstrateProvider {
     private static final Logger LOG = LogManager.getLogger(Kernel.class);
+
+    /**
+     * put here as a placeholder, unused
+     */
+    @CommandLine.Option(names = {"-s", "--substrate"}, description = "substrates to target", scope = CommandLine.ScopeType.INHERIT)
+    protected Set<String> substrates = new LinkedHashSet<>();
 
     public static void main(String[] args) {
         System.exit(new Kernel().execute(args));

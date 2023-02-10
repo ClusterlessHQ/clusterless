@@ -15,6 +15,7 @@ import clusterless.substrate.aws.resources.Stacks;
 import clusterless.util.Label;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
+import clusterless.util.Strings;
 import picocli.CommandLine;
 import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.Environment;
@@ -99,9 +100,9 @@ public class Bootstrap implements Callable<Integer> {
         return 0;
     }
 
-    private String prompt(String value, String fmt) {
+    protected String prompt(String value, String prompt) {
         if (value == null && System.console() != null) {
-            return System.console().readLine(fmt);
+            return Strings.emptyToNull(System.console().readLine(prompt));
         }
 
         return value;

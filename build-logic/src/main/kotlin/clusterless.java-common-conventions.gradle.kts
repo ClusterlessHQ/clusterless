@@ -35,14 +35,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core")
     implementation("org.apache.logging.log4j:log4j-jul")
 
-//    testImplementation("org.junit-pioneer:junit-pioneer") {
-//        capabilities {
-//            requireCapability("org.junit-pioneer:junit-pioneer-jackson")
-//        }
-//    }
-//
-//    testImplementation("io.hosuaby:inject-resources-core")
-//    testImplementation("io.hosuaby:inject-resources-junit-jupiter")
+    compileOnly("javax.annotation:javax.annotation-api")
 
     constraints {
         // manage dependency versions here
@@ -51,6 +44,7 @@ dependencies {
         implementation("org.apache.logging.log4j:log4j-api:2.19.0")
         implementation("org.apache.logging.log4j:log4j-core:2.19.0")
         implementation("org.apache.logging.log4j:log4j-jul:2.19.0")
+        implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
 
         implementation("com.google.guava:guava:31.1-jre")
 
@@ -71,9 +65,9 @@ dependencies {
 
         implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-        testImplementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
-
         implementation("io.github.resilience4j:resilience4j-retry:2.0.2")
+
+        testImplementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
 
         testImplementation("org.junit-pioneer:junit-pioneer:2.0.0-RC1")
         testImplementation("org.junit-pioneer:junit-pioneer-jackson:2.0.0-RC1")
@@ -99,7 +93,7 @@ testing {
                 implementation("org.junit.platform:junit-platform-launcher")
                 implementation("io.hosuaby:inject-resources-core")
                 implementation("io.hosuaby:inject-resources-junit-jupiter")
-                implementation("org.apache.logging.log4j:log4j-slf4j-impl") // used by inject-resoures
+                implementation("org.apache.logging.log4j:log4j-slf4j-impl") // used by inject-resources
             }
         }
     }

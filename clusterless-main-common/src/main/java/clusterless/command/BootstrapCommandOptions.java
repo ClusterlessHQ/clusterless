@@ -24,12 +24,10 @@ public class BootstrapCommandOptions extends CommandOptions {
             names = {"--region"}
     )
     String region;
-
     @CommandLine.Option(
             names = {"--stage"}
     )
     String stage;
-
     @CommandLine.Option(
             names = {"--synth"},
             hidden = true

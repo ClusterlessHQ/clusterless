@@ -35,8 +35,6 @@ dependencies {
 
     implementation("com.google.guava:guava")
 
-    implementation("javax.annotation:javax.annotation-api")
-
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")

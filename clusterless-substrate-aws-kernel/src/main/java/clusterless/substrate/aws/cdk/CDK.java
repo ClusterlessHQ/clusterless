@@ -6,13 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-plugins {
-    id("clusterless.java-library-conventions")
-}
+package clusterless.substrate.aws.cdk;
 
-dependencies {
-    implementation(project(":clusterless-common"))
-    implementation(project(":clusterless-model"))
-
-    implementation("info.picocli:picocli")
+/**
+ *
+ */
+public class CDK {
+    public static final String PROVIDER = "aws";
 }

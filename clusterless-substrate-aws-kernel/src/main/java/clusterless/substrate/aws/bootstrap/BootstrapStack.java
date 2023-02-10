@@ -86,7 +86,7 @@ public class BootstrapStack extends Stack {
 
         Metadata metadata = new Metadata(stage.upperOnly().camelCase(), BOOTSTRAP_VERSION, arcStateBucketName, manifestBucketName);
 
-        ISource metadataJson = Source.jsonData(Buckets.METADATA_JSON, JSONUtil.writeAsString(metadata));
+        ISource metadataJson = Source.jsonData(Buckets.METADATA_JSON, JSONUtil.writeAsStringSafe(metadata));
 
         deployment = BucketDeployment.Builder.create(this, "MetadataDeployment")
                 .destinationBucket(metadataBucket)

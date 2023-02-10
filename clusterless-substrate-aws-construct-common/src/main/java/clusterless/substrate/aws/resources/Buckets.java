@@ -18,11 +18,31 @@ import software.constructs.Construct;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
+
+import static clusterless.substrate.aws.resources.Buckets.BootstrapBucket.*;
 
 /**
  *
  */
 public class Buckets {
+    public enum BootstrapBucket implements Label {
+        METADATA("Metadata"),
+        ARC_STATE("ArcState"),
+        MANIFEST("Manifest");
+
+        final String value;
+
+        BootstrapBucket(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String camelCase() {
+            return value;
+        }
+    }
+
     public static final String METADATA_JSON = "metadata.json";
 
     public static URI bootstrapManifestURI(@NotNull ManagedConstruct managedConstruct, String... names) {
@@ -41,26 +61,37 @@ public class Buckets {
     }
 
     public static String bootstrapMetadataBucketName(@NotNull Construct scope) {
-        return bucketName(scope, "Metadata");
+        return bootstrapBucketName(scope, METADATA);
     }
 
     public static String bootstrapArcStateBucketName(@NotNull Construct scope) {
-        return bucketName(scope, "ArcState");
+        return bootstrapBucketName(scope, ARC_STATE);
     }
 
     public static String bootstrapManifestBucketName(@NotNull Construct scope) {
-        return bucketName(scope, "Manifest");
+        return bootstrapBucketName(scope, MANIFEST);
     }
 
-    private static String bucketName(@NotNull Construct scope, String name) {
+    private static String bootstrapBucketName(@NotNull Construct scope, BootstrapBucket name) {
         String account = Stack.of(scope).getAccount();
         String region = Stack.of(scope).getRegion();
         Label stage = StagedApp.stagedOf(scope).stage();
-        return stage.upperOnly().with("Clusterless")
+        return bootstrapBucketName(name, account, region, stage);
+    }
+
+    public static String bootstrapBucketName(BootstrapBucket name, String account, String region, String stage) {
+        return bootstrapBucketName(name, account, region, Label.of(stage));
+    }
+
+    protected static String bootstrapBucketName(BootstrapBucket name, String account, String region, Label stage) {
+        Objects.requireNonNull(name, "bucket meta-name");
+        Objects.requireNonNull(account, "account");
+        Objects.requireNonNull(region, "region");
+
+        return stage.with("Clusterless")
                 .with(name)
                 .with(account)
                 .with(region)
                 .lowerHyphen();
     }
-
 }

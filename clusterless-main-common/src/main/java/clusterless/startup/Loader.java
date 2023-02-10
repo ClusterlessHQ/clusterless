@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2023 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package clusterless.startup;
+
+import clusterless.json.JSONUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+
+/**
+ *
+ */
+public class Loader {
+    private final ArrayNode arrayNode;
+    private final List<File> projectFiles;
+
+    public Loader(List<File> projectFiles) throws IOException {
+        this.projectFiles = projectFiles;
+        if (projectFiles.isEmpty()) {
+            throw new IllegalArgumentException("no project deploy files declared");
+        }
+
+        if (projectFiles.size() == 1 && projectFiles.get(0).toString().equals("-")) {
+            arrayNode = JSONUtil.createArrayNode().add(JSONUtil.readTree(System.in));
+        } else {
+            arrayNode = JSONUtil.readTrees(projectFiles);
+        }
+    }
+
+    public List<String> getStringsAt(String pointer) {
+        return JSONUtil.getAt(arrayNode, pointer);
+    }
+
+    public <T> List<T> readObjects(String provider, String providerPointer, Class<T> type, BiConsumer<T, File> consumer) {
+        return readObjects(
+                n -> provider.equals(n.at(providerPointer).textValue()),
+                type,
+                (deploy, integer) -> {
+                    if (!projectFiles.isEmpty()) {
+                        consumer.accept(deploy, projectFiles.get(integer));
+                    }
+                    return deploy;
+                });
+    }
+
+    public <T> List<T> readObjects(Predicate<JsonNode> retainFilter, Class<T> type, BiFunction<T, Integer, T> function) {
+        List<T> results = new LinkedList<>();
+
+        int count = 0;
+        for (JsonNode jsonNode : arrayNode) {
+            if (retainFilter.test(jsonNode)) {
+                results.add(function.apply(JSONUtil.treeToValueSafe(jsonNode, type), count++));
+            }
+        }
+
+        return results;
+    }
+}

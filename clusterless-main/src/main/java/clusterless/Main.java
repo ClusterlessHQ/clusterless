@@ -13,7 +13,8 @@
 package clusterless;
 
 import clusterless.command.*;
-import clusterless.json.JSONUtil;
+import clusterless.model.deploy.Deployable;
+import clusterless.startup.Loader;
 import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.SubstratesOptions;
@@ -21,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +87,7 @@ public class Main extends Startup implements Callable<Integer> {
         return 0;
     }
 
-    public Integer run(CommandOptions command) {
+    public Integer run(CommandOptions command) throws IOException {
         if (command instanceof LifecycleCommandOptions) {
             return run((LifecycleCommandOptions) command);
         }
@@ -93,9 +95,11 @@ public class Main extends Startup implements Callable<Integer> {
         return run(substratesOptions().substrates());
     }
 
-    public Integer run(LifecycleCommandOptions command) {
+    public Integer run(LifecycleCommandOptions command) throws IOException {
 
-        List<String> declaredProviders = JSONUtil.readTreesWithPointer(command.projectFiles(), "/target/provider");
+        Loader loader = new Loader(command.projectFiles());
+
+        List<String> declaredProviders = loader.getStringsAt(Deployable.PROVIDER_POINTER);
 
         LOG.info("files: {}", command.projectFiles());
         LOG.info("declared: {}", declaredProviders);

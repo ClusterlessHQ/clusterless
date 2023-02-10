@@ -173,5 +173,4 @@ public class ProcessExec {
     private String filesAsArg(List<File> files) {
         return files.stream().map(Object::toString).collect(Collectors.joining(","));
     }
-
 }

@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Deploy extends Model {
+public class Deployable extends Model {
+
+    public static final String PROVIDER_POINTER = "/placement/provider";
 
     public static class Project implements Struct {
         String name;
@@ -67,6 +69,32 @@ public class Deploy extends Model {
         public String region() {
             return region;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Placement placement = (Placement) o;
+            return Objects.equals(provider, placement.provider) && Objects.equals(stage, placement.stage) && Objects.equals(account, placement.account) && Objects.equals(region, placement.region);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(provider, stage, account, region);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("Placement{");
+            sb.append("provider='").append(provider).append('\'');
+            sb.append(", stage='").append(stage).append('\'');
+            sb.append(", account='").append(account).append('\'');
+            sb.append(", region='").append(region).append('\'');
+            sb.append('}');
+            return sb.toString();
+        }
+
+
     }
 
     @JsonIgnore
@@ -83,7 +111,7 @@ public class Deploy extends Model {
     @JsonProperty("arcs")
     List<Arc> arcs = new ArrayList<>();
 
-    public Deploy() {
+    public Deployable() {
     }
 
     public File sourceFile() {

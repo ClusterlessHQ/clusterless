@@ -8,16 +8,12 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.util.Label;
 import software.constructs.Construct;
 
 /**
  *
  */
 public interface Managed {
-
-    Label baseId();
-
     default Construct asConstruct() {
         return (Construct) this;
     }

@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.model.deploy.Deploy;
+import clusterless.model.deploy.Deployable;
 import clusterless.substrate.aws.util.TagsUtil;
 import clusterless.util.Label;
 import clusterless.util.OrderedMaps;
@@ -24,13 +24,13 @@ import java.util.List;
 public class ManagedProject extends StagedApp implements Managed {
     private final Label name;
     private final String version;
-    private final List<Deploy> deployModel;
+    private final List<Deployable> deployableModel;
 
     public static ManagedProject projectOf(Construct scope) {
         return (ManagedProject) scope.getNode().getRoot();
     }
 
-    public ManagedProject(String name, String version, String stage, List<Deploy> deployModels) {
+    public ManagedProject(String name, String version, String stage, List<Deployable> deployableModels) {
         super(AppProps.builder()
                         .context(OrderedMaps.of(
                                 "project", Label.of(name).lowerHyphen(),
@@ -43,18 +43,13 @@ public class ManagedProject extends StagedApp implements Managed {
 
         this.name = Label.of(name);
         this.version = version;
-        this.deployModel = deployModels;
+        this.deployableModel = deployableModels;
 
         applyTags();
     }
 
-    public List<Deploy> projectModels() {
-        return deployModel;
-    }
-
-    @Override
-    public Label baseId() {
-        return name();
+    public List<Deployable> projectModels() {
+        return deployableModel;
     }
 
     public Label name() {
@@ -69,7 +64,7 @@ public class ManagedProject extends StagedApp implements Managed {
         // apply tags to all constructs
         TagsUtil.applyTags(this, OrderedMaps.of(
                 "tag:prefix:project", name().lowerHyphen(),
-                "tag:prefix:version", version
+                "tag:prefix:version", version()
         ), TagProps.builder()
                 .applyToLaunchedInstances(true)
                 .priority(100)

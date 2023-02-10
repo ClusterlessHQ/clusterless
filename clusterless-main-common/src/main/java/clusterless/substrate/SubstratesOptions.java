@@ -21,7 +21,7 @@ import java.util.Set;
 public class SubstratesOptions {
     protected final SubstrateProviders providers = new SubstrateProviders();
 
-    @CommandLine.Option(names = {"-s", "--substrates"}, description = "substrates to target", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"-s", "--substrate"}, description = "substrates to target", scope = CommandLine.ScopeType.INHERIT)
     protected Set<String> substrates = new LinkedHashSet<>();
 
     public SubstratesOptions() {
