@@ -6,17 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource.eventbridge;
+package clusterless.model.state;
 
-import clusterless.model.deploy.Resource;
+import clusterless.model.Model;
 
 /**
  *
  */
-public class EventBridgeResource extends Resource {
-    private String eventBusName;
-
-    public String eventBusName() {
-        return eventBusName;
+public class Status extends Model {
+    public enum State {
+        running,
+        completed,
+        rollback,
+        empty
     }
 }

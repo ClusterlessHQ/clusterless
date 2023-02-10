@@ -6,16 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.managed;
+package clusterless.model.deploy;
 
-import software.amazon.awscdk.services.lambda.Code;
+import clusterless.model.Model;
 
 /**
  *
  */
-public class Lambdas {
-    public static Code find() {
-
-        return null;
-    }
+public class Barrier extends Model {
 }

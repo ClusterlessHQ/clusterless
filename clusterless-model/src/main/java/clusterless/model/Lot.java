@@ -11,5 +11,5 @@ package clusterless.model;
 /**
  *
  */
-public class IngressBoundary extends Boundary {
+public class Lot {
 }

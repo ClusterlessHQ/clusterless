@@ -15,7 +15,9 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Contains duplicates of Map.of but the order is retained so that any cdk diff is not thwarted
+ * Is a duplicate of {@link Map#of()} but the order is retained.
+ * <p>
+ * Also an entry will not be added if the value is null.
  */
 public class OrderedSafeMaps {
 

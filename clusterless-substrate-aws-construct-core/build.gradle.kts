@@ -14,4 +14,9 @@ dependencies {
     implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-construct-common"))
+
+    // this is the lambda code added as a convenience
+    // final packaging will likely depend on a shared library of structs
+    // and a meta-data file referencing the deployable asset
+    implementation(project(":clusterless-substrate-aws-service-transform"))
 }

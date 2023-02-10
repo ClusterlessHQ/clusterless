@@ -3,7 +3,7 @@
 ## CLI
 
 - https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-    - https://awscli.amazonaws.com/AWSCLIV2.pkg
+  - https://awscli.amazonaws.com/AWSCLIV2.pkg
 
 ## CDK
 

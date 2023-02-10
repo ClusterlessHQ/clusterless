@@ -10,9 +10,9 @@ package clusterless.substrate.aws.cdk;
 
 import clusterless.json.JSONUtil;
 import clusterless.managed.component.*;
-import clusterless.model.Deploy;
-import clusterless.model.Extensible;
 import clusterless.model.Model;
+import clusterless.model.deploy.Deploy;
+import clusterless.model.deploy.Extensible;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
@@ -86,8 +86,9 @@ public class Lifecycle {
 
         String name = names.stream().findFirst().orElseThrow();
         String version = versions.stream().findFirst().orElseThrow();
+        String stage = versions.stream().findFirst().orElse(null);
 
-        ManagedProject managedProject = new ManagedProject(name, version, deploys);
+        ManagedProject managedProject = new ManagedProject(name, version, stage, deploys);
 
         for (Deploy deploy : deploys) {
             verifyComponentsAreAvailable(deploy);

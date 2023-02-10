@@ -28,15 +28,27 @@ public class URIsTest {
     }
 
     @Test
+    void normalizeURI() {
+        Assertions.assertEquals(URI.create("s3://bucket/"), URIs.normalizeURI(URI.create("s3://bucket/")));
+        Assertions.assertEquals(URI.create("s3://bucket/"), URIs.normalizeURI(URI.create("s3://bucket//")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/"), URIs.normalizeURI(URI.create("s3://bucket/foo//")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/"), URIs.normalizeURI(URI.create("s3://bucket/foo/")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/bar"), URIs.normalizeURI(URI.create("s3://bucket/foo//bar")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/bar"), URIs.normalizeURI(URI.create("s3://bucket/foo/bar")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/bar/"), URIs.normalizeURI(URI.create("s3://bucket/foo//bar//")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/bar/"), URIs.normalizeURI(URI.create("s3://bucket/foo/bar/")));
+    }
+
+    @Test
     void prefix() {
-        Assertions.assertEquals("foo", URIs.asPrefix(URI.create("/foo")));
-        Assertions.assertEquals("foo/", URIs.asPrefix(URI.create("/foo/")));
-        Assertions.assertEquals("foo/", URIs.asPrefix(URI.create("/foo//")));
-        Assertions.assertEquals("foo/", URIs.asPrefix(URI.create("s3://bucket/foo//")));
-        Assertions.assertEquals("foo/", URIs.asPrefix(URI.create("s3://bucket//foo//")));
-        Assertions.assertNull(URIs.asPrefix(URI.create("/")));
-        Assertions.assertNull(URIs.asPrefix(URI.create("/")));
-        Assertions.assertNull(URIs.asPrefix(URI.create("s3://bucket")));
-        Assertions.assertNull(URIs.asPrefix(URI.create("s3://bucket/")));
+        Assertions.assertEquals("foo", URIs.asPathPrefix(URI.create("/foo")));
+        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("/foo/")));
+        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("/foo//")));
+        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("s3://bucket/foo//")));
+        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("s3://bucket//foo//")));
+        Assertions.assertNull(URIs.asPathPrefix(URI.create("/")));
+        Assertions.assertNull(URIs.asPathPrefix(URI.create("/")));
+        Assertions.assertNull(URIs.asPathPrefix(URI.create("s3://bucket")));
+        Assertions.assertNull(URIs.asPathPrefix(URI.create("s3://bucket/")));
     }
 }

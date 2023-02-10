@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Contains duplicates of Map.of but the order is retained so that any cdk diff is not thwarted
+ * Is a duplicate of {@link Map#of()} but the order is retained.
  */
 public class OrderedMaps {
     public static <K, V> Map<K, V> of(K k1, V v1) {

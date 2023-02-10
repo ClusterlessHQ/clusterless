@@ -6,17 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource.eventbridge;
-
-import clusterless.model.deploy.Resource;
+package clusterless.lambda.transform;
 
 /**
  *
  */
-public class EventBridgeResource extends Resource {
-    private String eventBusName;
-
-    public String eventBusName() {
-        return eventBusName;
-    }
+public enum LotSource {
+    eventTime,
+    objectCreateTime,
+    keyRegex
 }

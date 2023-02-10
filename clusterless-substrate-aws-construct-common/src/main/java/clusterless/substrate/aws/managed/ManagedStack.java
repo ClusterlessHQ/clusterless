@@ -8,7 +8,8 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.model.Deploy;
+import clusterless.model.deploy.Deploy;
+import clusterless.substrate.aws.resources.Stacks;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
@@ -31,7 +32,7 @@ public class ManagedStack extends Stack implements Managed {
     }
 
     public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Deploy deploy, @NotNull Label baseId) {
-        this(Names.stackName(deploy, baseId), managedProject, deploy, baseId);
+        this(Stacks.stackName(deploy, baseId), managedProject, deploy, baseId);
     }
 
     public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Deploy deploy, @NotNull Label baseId) {

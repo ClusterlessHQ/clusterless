@@ -8,53 +8,52 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
-import clusterless.model.IngressBoundary;
-
-import java.net.URI;
+import clusterless.lambda.transform.LotSource;
+import clusterless.model.deploy.IngressBoundary;
 
 /**
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
-    private URI listenBucketURI;
-    private URI manifestBucketURI;
-    private String eventBusName;
-    private String listenerRuleName;
+    public static class RuntimeProps {
+        int memorySizeMB = 256 * 3;
 
-    int memorySizeMB = 256 * 3;
+        int retryAttempts = 3;
 
-    int retryAttempts = 3;
+        int timeoutMin = 15;
 
-    int timeoutMin = 15;
+        public int memorySizeMB() {
+            return memorySizeMB;
+        }
+
+        public int retryAttempts() {
+            return retryAttempts;
+        }
+
+        public int timeoutMin() {
+            return timeoutMin;
+        }
+
+    }
+
+    RuntimeProps runtimeProps = new RuntimeProps();
+
+    LotSource lotSource = LotSource.objectCreateTime;
+
+    String keyRegex;
 
     public S3PutListenerBoundary() {
     }
 
-    public URI listenBucketURI() {
-        return listenBucketURI;
+    public RuntimeProps runtimeProps() {
+        return runtimeProps;
     }
 
-    public URI manifestBucketURI() {
-        return manifestBucketURI;
+    public LotSource lotSource() {
+        return lotSource;
     }
 
-    public String eventBusName() {
-        return eventBusName;
-    }
-
-    public String listenerRuleName() {
-        return listenerRuleName;
-    }
-
-    public int memorySizeMB() {
-        return memorySizeMB;
-    }
-
-    public int retryAttempts() {
-        return retryAttempts;
-    }
-
-    public int timeoutMin() {
-        return timeoutMin;
+    public String keyRegex() {
+        return keyRegex;
     }
 }

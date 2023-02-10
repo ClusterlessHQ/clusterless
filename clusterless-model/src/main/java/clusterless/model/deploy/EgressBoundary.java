@@ -6,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.model.deploy;
 
 /**
  *
  */
-public class Boundary extends Extensible {
+public class EgressBoundary extends Boundary {
 }

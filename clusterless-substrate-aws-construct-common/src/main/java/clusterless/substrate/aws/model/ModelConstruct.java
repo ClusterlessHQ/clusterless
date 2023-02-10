@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.model;
 
-import clusterless.model.Extensible;
 import clusterless.model.Model;
+import clusterless.model.deploy.Extensible;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.util.ErrorsUtil;

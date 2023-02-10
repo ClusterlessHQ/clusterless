@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
+ * Is a duplicate of {@link List#of()} but no null values will be added.
  */
 public class SafeList {
     private static <V> void safePut(List<V> list, V v) {

@@ -8,6 +8,7 @@
 
 package clusterless.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +66,23 @@ public class JSONUtil {
         try {
             return OBJECT_MAPPER.readTree(file);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T readObject(String json, Class<T> type) {
+        try {
+            return OBJECT_MAPPER.readValue(json, type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static String writeAsString(Object object) {
+        try {
+            return OBJECT_WRITER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

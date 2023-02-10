@@ -16,11 +16,23 @@ import java.time.temporal.TemporalUnit;
  * Utility class for looking up a formatter given a unit, or a unit given a name.
  */
 public class IntervalUnits {
+
+    /**
+     * Finds an appropriate DateTimeFormatter for the given unit
+     *
+     * @param unit a TemporalUnit instance to lookup
+     * @throws IllegalArgumentException if the given unit does not have an associated formatter
+     */
+    public static void verifyHasFormatter(TemporalUnit unit) {
+        formatter(unit);
+    }
+
     /**
      * Finds an appropriate DateTimeFormatter for the given unit
      *
      * @param unit a TemporalUnit instance to lookup
      * @return DateTimeFormatter
+     * @throws IllegalArgumentException if the given unit does not have an associated formatter
      */
     public static DateTimeFormatter formatter(TemporalUnit unit) {
         if (unit == IntervalUnit.FOURTHS) {
@@ -41,6 +53,7 @@ public class IntervalUnits {
      *
      * @param name of a TemporaUnit
      * @return TemporalUnit
+     * @throws IllegalArgumentException if the named unit is not found
      */
     public static TemporalUnit find(String name) {
         Enum<?> unit;

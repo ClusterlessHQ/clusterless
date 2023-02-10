@@ -6,10 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.lambda.common;
 
 /**
  *
  */
-public class Dataset extends Model {
+public class BaseHandler {
+
 }

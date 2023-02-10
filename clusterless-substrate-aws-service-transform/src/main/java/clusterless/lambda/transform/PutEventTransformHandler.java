@@ -8,16 +8,32 @@
 
 package clusterless.lambda.transform;
 
+import clusterless.lambda.common.BaseHandler;
 import clusterless.lambda.transform.json.AWSEvent;
+import clusterless.util.Env;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 /**
  *
  */
-public class PutEventTransformHandler implements RequestHandler<AWSEvent, ArcNotifyEvent> {
+public class PutEventTransformHandler extends BaseHandler implements RequestHandler<AWSEvent, ArcNotifyEvent> {
+
+    static TransformProps transformProps = Env.fromEnv(
+            TransformProps.class,
+            () -> TransformProps.Builder.builder()
+                    .build()
+    );
+
     @Override
     public ArcNotifyEvent handleRequest(AWSEvent input, Context context) {
+
+        // read puteven
+        // parse lot
+        // create manifest file
+        // write manifest file
+        // publish notification on event-bus
+
 
         return null;
     }

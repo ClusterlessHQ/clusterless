@@ -24,26 +24,50 @@ public class LabelTest {
         Assertions.assertEquals("Lower", Label.of("lower").camelCase());
         Assertions.assertEquals("Lower", Label.fromLowerHyphen("lower").camelCase());
         Assertions.assertEquals("lower", Label.fromLowerHyphen("lower").lowerHyphen());
+        Assertions.assertEquals("lower", Label.fromLowerHyphen("lower").lowerHyphenPath());
+        Assertions.assertEquals("lower/", Label.fromLowerHyphen("lower").lowerHyphenPath(true));
         Assertions.assertEquals("lower", Label.fromLowerHyphen("lower").lowerUnderscore());
 
         Label with = Label.of("lower").with(Label.of("case"));
         Assertions.assertEquals("LowerCase", with.camelCase());
         Assertions.assertEquals("lower-case", with.lowerHyphen());
+        Assertions.assertEquals("lower/case", with.lowerHyphenPath());
+        Assertions.assertEquals("lower/case/", with.lowerHyphenPath(true));
         Assertions.assertEquals("lower_case", with.lowerUnderscore());
+
+        Label withCamel = Label.of("LowerCase").with(Label.of("Word"));
+        Assertions.assertEquals("LowerCaseWord", withCamel.camelCase());
+        Assertions.assertEquals("lower-case-word", withCamel.lowerHyphen());
+        Assertions.assertEquals("lower-case/word", withCamel.lowerHyphenPath());
+        Assertions.assertEquals("lower-case/word/", withCamel.lowerHyphenPath(true));
+        Assertions.assertEquals("lower_case_word", withCamel.lowerUnderscore());
+
+        Label withLongCamel = Label.of("Lower").with("Case").with(Label.of("Word"));
+        Assertions.assertEquals("LowerCaseWord", withLongCamel.camelCase());
+        Assertions.assertEquals("lower-case-word", withLongCamel.lowerHyphen());
+        Assertions.assertEquals("lower/case/word", withLongCamel.lowerHyphenPath());
+        Assertions.assertEquals("lower/case/word/", withLongCamel.lowerHyphenPath(true));
+        Assertions.assertEquals("lower_case_word", withLongCamel.lowerUnderscore());
 
         Label withNull = Label.of(null).with(Label.of("lower")).with(Label.of("case"));
         Assertions.assertEquals("LowerCase", withNull.camelCase());
         Assertions.assertEquals("lower-case", withNull.lowerHyphen());
+        Assertions.assertEquals("lower/case", withNull.lowerHyphenPath());
+        Assertions.assertEquals("lower/case/", withNull.lowerHyphenPath(true));
         Assertions.assertEquals("lower_case", withNull.lowerUnderscore());
 
         Label withMidNull = Label.of("lower").with(Label.of(null)).with(Label.of("case"));
         Assertions.assertEquals("LowerCase", withMidNull.camelCase());
         Assertions.assertEquals("lower-case", withMidNull.lowerHyphen());
+        Assertions.assertEquals("lower/case", withMidNull.lowerHyphenPath());
+        Assertions.assertEquals("lower/case/", withMidNull.lowerHyphenPath(true));
         Assertions.assertEquals("lower_case", withMidNull.lowerUnderscore());
 
         Label withEndNull = Label.of("lower").with(Label.of("case")).with(Label.of(null));
         Assertions.assertEquals("LowerCase", withEndNull.camelCase());
         Assertions.assertEquals("lower-case", withEndNull.lowerHyphen());
+        Assertions.assertEquals("lower/case", withEndNull.lowerHyphenPath());
+        Assertions.assertEquals("lower/case/", withEndNull.lowerHyphenPath(true));
         Assertions.assertEquals("lower_case", withEndNull.lowerUnderscore());
 
         Label abbr = Label.of("lower").abbreviated(Label.of("lwr")).with(Label.of("case").abbreviated(Label.of("cs")));
@@ -57,6 +81,29 @@ public class LabelTest {
         Assertions.assertEquals("LwrCs", abbr2.shortCamelCase());
         Assertions.assertEquals("lwr-cs", abbr2.shortLowerHyphen());
         Assertions.assertEquals("lwr_cs", abbr2.shortLowerUnderscore());
+    }
+
+    @Test
+    void stringWithUpper() {
+        Assertions.assertEquals("LOWER", Label.of("lower").upperOnly().camelCase());
+
+        Label with = Label.of("lower").upperOnly().with(Label.of("case"));
+        Assertions.assertEquals("LOWERCase", with.camelCase());
+        Assertions.assertEquals("LOWER-case", with.lowerHyphen());
+        Assertions.assertEquals("LOWER/case", with.lowerHyphenPath());
+        Assertions.assertEquals("LOWER/case/", with.lowerHyphenPath(true));
+        Assertions.assertEquals("LOWER_case", with.lowerUnderscore());
+    }
+
+    @Test
+    void having() {
+        Label with = Label.of("lower").having("one", "two", "three");
+
+        Assertions.assertEquals("LowerOneTwoThree", with.camelCase());
+        Assertions.assertEquals("lower-one-two-three", with.lowerHyphen());
+        Assertions.assertEquals("lower/one/two/three", with.lowerHyphenPath());
+        Assertions.assertEquals("lower/one/two/three/", with.lowerHyphenPath(true));
+        Assertions.assertEquals("lower_one_two_three", with.lowerUnderscore());
     }
 
     enum Value implements Label.EnumLabel {
@@ -73,17 +120,9 @@ public class LabelTest {
         public Label abbreviated() {
             return Label.of(abbr);
         }
+
     }
 
-    @Test
-    void stringWithUpper() {
-        Assertions.assertEquals("LOWER", Label.of("lower").upperOnly().camelCase());
-
-        Label with = Label.of("lower").upperOnly().with(Label.of("case"));
-        Assertions.assertEquals("LOWERCase", with.camelCase());
-        Assertions.assertEquals("LOWER-case", with.lowerHyphen());
-        Assertions.assertEquals("LOWER_case", with.lowerUnderscore());
-    }
 
     @Test
     void enumeration() {

@@ -6,19 +6,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.managed;
+package clusterless.substrate.aws.resources;
 
-import clusterless.model.Deploy;
+import clusterless.model.deploy.Deploy;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.Environment;
-
-import java.util.Objects;
 
 /**
  *
  */
-public class Names {
+public class Stacks {
     public static Label stackName(@NotNull Deploy deploy, @NotNull Label baseId) {
         String stage = deploy.placement().stage();
         String name = deploy.project().name();
@@ -32,13 +29,7 @@ public class Names {
                 .with(Label.of(region));
     }
 
-    public static String bootstrapMetadataBucketName(@NotNull Environment env) {
-        Objects.requireNonNull(env, "Environment may not be null");
-
-        return Label.of("Clusterless")
-                .with(Label.of("Metadata"))
-                .with(Label.of(env.getAccount()))
-                .with(Label.of(env.getRegion()))
-                .lowerHyphen();
+    public static String bootstrapStackName(@NotNull Label stage) {
+        return stage.upperOnly().with("ClusterlessBootstrap").lowerHyphen();
     }
 }

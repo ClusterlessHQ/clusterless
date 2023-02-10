@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.resource.s3;
 
-import clusterless.model.Resource;
+import clusterless.model.deploy.Resource;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -10,11 +10,13 @@ package clusterless.substrate.aws.bootstrap;
 
 import clusterless.command.BootstrapCommandOptions;
 import clusterless.substrate.aws.ProcessExec;
+import clusterless.substrate.aws.managed.StagedApp;
+import clusterless.substrate.aws.resources.Stacks;
 import clusterless.util.Label;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import picocli.CommandLine;
-import software.amazon.awscdk.App;
+import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
 
@@ -51,12 +53,15 @@ public class Bootstrap implements Callable<Integer> {
     private Integer exec() {
         String account = prompt(commandOptions.account(), "Enter AWS account id to bootstrap: ");
         String region = prompt(commandOptions.region(), "Enter region to bootstrap: ");
+        String stage = prompt(commandOptions.stage(), "Enter stage to bootstrap (hit enter for none): ");
 
         List<String> args = Lists.list(OrderedSafeMaps.of(
                 "--account",
                 account,
                 "--region",
-                region
+                region,
+                "--stage",
+                stage
         ));
 
         String appArgs = "--synth %s".formatted(String.join(" ", args));
@@ -68,9 +73,15 @@ public class Bootstrap implements Callable<Integer> {
     }
 
     private Integer synth() {
-        App app = new App();
 
-        String stackName = Label.of("ClusterlessBootstrap").lowerHyphen();
+        Label stage = Label.of(commandOptions.stage());
+
+        AppProps props = AppProps.builder()
+                .build();
+
+        StagedApp app = new StagedApp(props, stage);
+
+        String stackName = Stacks.bootstrapStackName(stage);
 
         StackProps stackProps = StackProps.builder()
                 .stackName(stackName)
@@ -81,7 +92,7 @@ public class Bootstrap implements Callable<Integer> {
                         .build())
                 .build();
 
-        new BootstrapStack(app, "ClusterlessBootstrapStack", stackProps);
+        new BootstrapStack(app, stackProps);
 
         app.synth();
 

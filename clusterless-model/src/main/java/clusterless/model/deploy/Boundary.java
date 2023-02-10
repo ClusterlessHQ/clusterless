@@ -6,17 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource.eventbridge;
+package clusterless.model.deploy;
 
-import clusterless.model.deploy.Resource;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
  */
-public class EventBridgeResource extends Resource {
-    private String eventBusName;
+public class Boundary extends Extensible {
+    @JsonProperty(required = true)
+    String boundaryName;
 
-    public String eventBusName() {
-        return eventBusName;
+    public String boundaryName() {
+        return boundaryName;
     }
 }

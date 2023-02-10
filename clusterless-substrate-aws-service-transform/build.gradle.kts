@@ -31,6 +31,7 @@ idea {
 
 dependencies {
     implementation(project(":clusterless-common"))
+    implementation(project(":clusterless-model"))
 
     implementation("com.google.guava:guava")
 

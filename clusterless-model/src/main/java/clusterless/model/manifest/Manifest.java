@@ -6,17 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource.eventbridge;
+package clusterless.model.manifest;
 
-import clusterless.model.deploy.Resource;
+import clusterless.model.Struct;
+
+import java.util.List;
 
 /**
  *
  */
-public class EventBridgeResource extends Resource {
-    private String eventBusName;
-
-    public String eventBusName() {
-        return eventBusName;
-    }
+public class Manifest implements Struct {
+    String lot;
+    String prefix;
+    List<String> contents;
 }

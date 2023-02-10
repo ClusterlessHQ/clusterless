@@ -17,9 +17,9 @@ import java.util.Map;
  *
  */
 public enum ModelType implements Label.EnumLabel {
-    Resource(clusterless.model.Resource.class),
-    Boundary(clusterless.model.Boundary.class),
-    Process(clusterless.model.Process.class);
+    Resource(clusterless.model.deploy.Resource.class),
+    Boundary(clusterless.model.deploy.Boundary.class),
+    Process(clusterless.model.deploy.Process.class);
 
     static Map<Class, ModelType> types = new LinkedHashMap<>();
 

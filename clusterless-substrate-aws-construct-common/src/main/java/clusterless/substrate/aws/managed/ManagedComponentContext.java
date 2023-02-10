@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.managed.component.ComponentContext;
-import clusterless.model.Deploy;
+import clusterless.model.deploy.Deploy;
 import software.constructs.Construct;
 
 /**
@@ -37,7 +37,7 @@ public class ManagedComponentContext implements ComponentContext {
         return managedProject;
     }
 
-    public Deploy project() {
+    public Deploy deploy() {
         return deploy;
     }
 

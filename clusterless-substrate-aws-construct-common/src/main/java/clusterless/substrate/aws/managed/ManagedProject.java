@@ -8,11 +8,10 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.model.Deploy;
+import clusterless.model.deploy.Deploy;
 import clusterless.substrate.aws.util.TagsUtil;
 import clusterless.util.Label;
 import clusterless.util.OrderedMaps;
-import software.amazon.awscdk.App;
 import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.TagProps;
 import software.constructs.Construct;
@@ -22,7 +21,7 @@ import java.util.List;
 /**
  *
  */
-public class ManagedProject extends App implements Managed {
+public class ManagedProject extends StagedApp implements Managed {
     private final Label name;
     private final String version;
     private final List<Deploy> deployModel;
@@ -31,13 +30,16 @@ public class ManagedProject extends App implements Managed {
         return (ManagedProject) scope.getNode().getRoot();
     }
 
-    public ManagedProject(String name, String version, List<Deploy> deployModels) {
+    public ManagedProject(String name, String version, String stage, List<Deploy> deployModels) {
         super(AppProps.builder()
-                .context(OrderedMaps.of(
-                        "project", Label.of(name).lowerHyphen(),
-                        "version", version
-                ))
-                .build());
+                        .context(OrderedMaps.of(
+                                "project", Label.of(name).lowerHyphen(),
+                                "version", version,
+                                "stage", Label.of(stage).upperOnly()
+                        ))
+                        .build(),
+                Label.of(stage)
+        );
 
         this.name = Label.of(name);
         this.version = version;

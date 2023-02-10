@@ -8,16 +8,27 @@
 
 package clusterless.substrate.aws.bootstrap;
 
-import clusterless.substrate.aws.managed.Names;
+import clusterless.json.JSONUtil;
+import clusterless.model.bootstrap.Metadata;
+import clusterless.substrate.aws.managed.StagedApp;
+import clusterless.substrate.aws.resources.Buckets;
+import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.util.ErrorsUtil;
+import clusterless.util.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.*;
+import software.amazon.awscdk.services.events.EventBus;
 import software.amazon.awscdk.services.s3.BlockPublicAccess;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketEncryption;
-import software.constructs.Construct;
+import software.amazon.awscdk.services.s3.deployment.BucketDeployment;
+import software.amazon.awscdk.services.s3.deployment.ISource;
+import software.amazon.awscdk.services.s3.deployment.Source;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * keys to consider exporting
@@ -29,13 +40,64 @@ import software.constructs.Construct;
 public class BootstrapStack extends Stack {
     private static final Logger LOG = LogManager.getLogger(BootstrapStack.class);
     public static final String BOOTSTRAP_VERSION = "1";
+    private BucketDeployment deployment;
+    private EventBus eventBus;
 
-    public BootstrapStack(@NotNull Construct scope, @NotNull String id, @NotNull StackProps props) {
-        super(scope, id, props);
+    public BootstrapStack(@NotNull StagedApp app, @NotNull StackProps props) {
+        super(app, "ClusterlessBootstrapStack", props);
 
+        constructStack(app, props);
+    }
+
+    public BucketDeployment deployment() {
+        return deployment;
+    }
+
+    public EventBus eventBus() {
+        return eventBus;
+    }
+
+    protected void constructStack(@NotNull StagedApp app, @NotNull StackProps props) {
         Environment env = props.getEnv();
 
-        String bucketName = Names.bootstrapMetadataBucketName(env);
+        Objects.requireNonNull(env);
+
+        Label stage = app.stage();
+        String bootstrapVersion = stage.with("BootstrapVersion").camelCase();
+        new CfnOutput(this, bootstrapVersion, new CfnOutputProps.Builder()
+                .exportName(bootstrapVersion)
+                .value(BOOTSTRAP_VERSION)
+                .description("bootstrap version")
+                .build());
+
+        String metadataBucketName = Buckets.bootstrapMetadataBucketName(this);
+        String arcStateBucketName = Buckets.bootstrapArcStateBucketName(this);
+        String manifestBucketName = Buckets.bootstrapManifestBucketName(this);
+
+        String arcEventBusName = Events.arcEventBusName(this);
+
+        eventBus = EventBus.Builder.create(this, "ArcEventBus")
+                .eventBusName(arcEventBusName)
+                .build();
+
+        Bucket metadataBucket = constructSharedBucket(metadataBucketName, stage.with("Metadata"));
+        constructSharedBucket(arcStateBucketName, stage.with("ArcState"));
+        constructSharedBucket(manifestBucketName, stage.with("Manifest"));
+
+        Metadata metadata = new Metadata(stage.upperOnly().camelCase(), BOOTSTRAP_VERSION, arcStateBucketName, manifestBucketName);
+
+        ISource metadataJson = Source.jsonData(Buckets.METADATA_JSON, JSONUtil.writeAsString(metadata));
+
+        deployment = BucketDeployment.Builder.create(this, "MetadataDeployment")
+                .destinationBucket(metadataBucket)
+                .prune(false)
+                .retainOnDelete(false)
+                .sources(List.of(metadataJson))
+                .build();
+    }
+
+    private Bucket constructSharedBucket(String bucketName, Label prefix) {
+        LOG.info("initializing {} bucket: {}", prefix.lowerHyphen(), bucketName);
 
         Bucket bucket = ErrorsUtil.construct(() -> Bucket.Builder.create(this, bucketName)
                 .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)
@@ -47,23 +109,20 @@ public class BootstrapStack extends Stack {
                 .autoDeleteObjects(true)
                 .build(), LOG);
 
-        new CfnOutput(this, "BootstrapVersion", new CfnOutputProps.Builder()
-                .exportName("BootstrapVersion")
-                .value(BOOTSTRAP_VERSION)
-                .description("bootstrap version")
-                .build());
-
-        new CfnOutput(this, "BucketName", new CfnOutputProps.Builder()
-                .exportName("BucketName")
+        String nameLabel = prefix.with("BucketName").camelCase();
+        new CfnOutput(this, nameLabel, new CfnOutputProps.Builder()
+                .exportName(nameLabel)
                 .value(bucket.getBucketArn())
-                .description("bootstrap bucket name")
+                .description("bootstrap %s bucket name".formatted(prefix))
                 .build());
 
-        new CfnOutput(this, "BucketDomainName", new CfnOutputProps.Builder()
-                .exportName("BucketDomainName")
+        String domainLabel = prefix.with("BucketDomainName").camelCase();
+        new CfnOutput(this, domainLabel, new CfnOutputProps.Builder()
+                .exportName(domainLabel)
                 .value(bucket.getBucketDomainName())
-                .description("bootstrap bucket domain name")
+                .description("bootstrap %s bucket domain name".formatted(prefix))
                 .build());
-    }
 
+        return bucket;
+    }
 }

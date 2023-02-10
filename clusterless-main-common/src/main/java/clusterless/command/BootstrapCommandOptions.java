@@ -26,6 +26,11 @@ public class BootstrapCommandOptions extends CommandOptions {
     String region;
 
     @CommandLine.Option(
+            names = {"--stage"}
+    )
+    String stage;
+
+    @CommandLine.Option(
             names = {"--synth"},
             hidden = true
     )
@@ -37,6 +42,10 @@ public class BootstrapCommandOptions extends CommandOptions {
 
     public String region() {
         return region;
+    }
+
+    public String stage() {
+        return stage;
     }
 
     public boolean synth() {

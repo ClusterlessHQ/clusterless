@@ -8,11 +8,14 @@
 
 package clusterless.util;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Label simplifies creating complex strings used for naming and labeling.
+ * Label simplifies creating complex strings used for naming, displays, and paths.
+ * <p>
+ * An Enum can be a Label by implementing {@link EnumLabel}.
  */
 public interface Label {
     interface EnumLabel extends Label {
@@ -96,6 +99,11 @@ public interface Label {
             }
 
             @Override
+            public String lowerHyphenPath() {
+                return this.camelCase();
+            }
+
+            @Override
             public String lowerUnderscore() {
                 return this.camelCase();
             }
@@ -145,10 +153,17 @@ public interface Label {
         return camelCase() == null;
     }
 
+    default Label having(String... values) {
+        return Arrays.stream(values)
+                .map(Label::of)
+                .reduce(this, Label::with);
+    }
+
     default Label with(Object object) {
         if (object == null) {
             return this;
         }
+
         if (!(object instanceof Label label)) {
             return with(Label.of(object.toString()));
         }
@@ -171,6 +186,11 @@ public interface Label {
             @Override
             public String lowerHyphen() {
                 return String.format("%s-%s", Label.this.lowerHyphen(), label.lowerHyphen());
+            }
+
+            @Override
+            public String lowerHyphenPath() {
+                return String.format("%s/%s", Label.this.lowerHyphenPath(), label.lowerHyphenPath());
             }
 
             @Override
@@ -225,6 +245,14 @@ public interface Label {
 
     default String lowerHyphen() {
         return Strings.camelToLowerHyphen(camelCase());
+    }
+
+    default String lowerHyphenPath() {
+        return Strings.camelToLowerHyphen(camelCase());
+    }
+
+    default String lowerHyphenPath(boolean trailingSlash) {
+        return trailingSlash ? lowerHyphenPath().concat("/") : lowerHyphenPath();
     }
 
     default String lowerUnderscore() {
