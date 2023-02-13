@@ -74,9 +74,40 @@ dependencies {
 
         testImplementation("io.hosuaby:inject-resources-core:0.3.2")
         testImplementation("io.hosuaby:inject-resources-junit-jupiter:0.3.2")
+
+        testImplementation("uk.org.webcompere:system-stubs-core:2.0.2")
+        testImplementation("uk.org.webcompere:system-stubs-jupiter:2.0.2")
+        testImplementation("org.mockito:mockito-inline:5.1.1")
+
+        testImplementation("org.testcontainers:testcontainers:1.17.6")
+        testImplementation("org.testcontainers:junit-jupiter:1.17.6")
+        testImplementation("org.testcontainers:localstack:1.17.6")
+        // https://github.com/testcontainers/testcontainers-java/issues/1442#issuecomment-694342883
+        testImplementation("com.amazonaws:aws-java-sdk-s3:1.11.860")
+
         testImplementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
     }
 }
+
+tasks.test {
+    useJUnitPlatform()
+    filter {
+        isFailOnNoMatchingTests = false
+        excludeTestsMatching("*HandlerTest")
+    }
+}
+
+tasks.register<Test>("integrationTest") {
+    useJUnitPlatform()
+    filter {
+        isFailOnNoMatchingTests = false
+        includeTestsMatching("*HandlerTest")
+    }
+}
+
+tasks.named("check").get()
+    .dependsOn("integrationTest")
+
 
 testing {
     suites {
@@ -93,6 +124,14 @@ testing {
                 implementation("org.junit.platform:junit-platform-launcher")
                 implementation("io.hosuaby:inject-resources-core")
                 implementation("io.hosuaby:inject-resources-junit-jupiter")
+                implementation("uk.org.webcompere:system-stubs-core")
+                implementation("uk.org.webcompere:system-stubs-jupiter")
+                implementation("org.mockito:mockito-inline")
+                implementation("org.testcontainers:testcontainers")
+                implementation("org.testcontainers:junit-jupiter")
+                implementation("org.testcontainers:localstack")
+                implementation("com.amazonaws:aws-java-sdk-s3")
+
                 implementation("org.apache.logging.log4j:log4j-slf4j-impl") // used by inject-resources
             }
         }

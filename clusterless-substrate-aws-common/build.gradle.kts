@@ -11,8 +11,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":clusterless-common"))
     implementation("com.google.guava:guava")
-
 
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")

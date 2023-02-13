@@ -29,6 +29,7 @@ public class PutEventTransformHandler extends BaseHandler implements RequestHand
     public ArcNotifyEvent handleRequest(AWSEvent input, Context context) {
 
         // read puteven
+        System.out.println("transformProps = " + transformProps);
         // parse lot
         // create manifest file
         // write manifest file

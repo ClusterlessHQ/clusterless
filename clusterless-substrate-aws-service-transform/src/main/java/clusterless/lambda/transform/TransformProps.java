@@ -28,6 +28,9 @@ public class TransformProps implements Struct {
     @JsonProperty(required = true)
     URI manifestPrefix;
 
+    public TransformProps() {
+    }
+
     public TransformProps(String lotUnit, LotSource lotSource, String keyRegex, URI manifestPrefix) {
         this.lotUnit = lotUnit;
         this.lotSource = lotSource;
@@ -126,5 +129,16 @@ public class TransformProps implements Struct {
         public TransformProps build() {
             return new TransformProps(this);
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("TransformProps{");
+        sb.append("lotUnit='").append(lotUnit).append('\'');
+        sb.append(", lotSource=").append(lotSource);
+        sb.append(", keyRegex='").append(keyRegex).append('\'');
+        sb.append(", manifestPrefix=").append(manifestPrefix);
+        sb.append('}');
+        return sb.toString();
     }
 }

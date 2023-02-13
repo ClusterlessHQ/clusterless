@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.sdk;
 
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -17,12 +17,16 @@ import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
+import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  *
  */
 public class S3 {
+
+    private Optional<String> awsS3Endpoint;
 
     public class Response {
 
@@ -38,22 +42,38 @@ public class S3 {
         }
     }
 
-    private String profile;
+    private String defaultRegion = System.getenv("AWS_DEFAULT_REGION");
+    private String profile = System.getenv("AWS_PROFILE");
 
     public S3(String profile) {
-
         this.profile = profile;
+    }
+
+    public S3() {
+    }
+
+    public Response exists(String bucketName) {
+        return exists(defaultRegion, bucketName);
     }
 
     public Response exists(String region, String bucketName) {
         Objects.requireNonNull(region, "region");
         Objects.requireNonNull(bucketName, "bucketName");
 
+        DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.builder()
+                .profileName(profile)
+                .build();
+
         HeadBucketResponse response;
 
+        awsS3Endpoint = Optional.ofNullable(System.getenv().get("AWS_S3_ENDPOINT"));
         try (S3Client client = S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(ProfileCredentialsProvider.create(profile))
+                .credentialsProvider(credentialsProvider)
+                .endpointOverride(
+                        awsS3Endpoint
+                                .map(URI::create).orElse(null)
+                )
                 .build()) {
 
             HeadBucketRequest request = HeadBucketRequest.builder()
