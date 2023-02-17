@@ -13,6 +13,6 @@ package clusterless.lambda.transform;
  */
 public enum LotSource {
     eventTime,
-    objectCreateTime,
-    keyRegex
+    objectModifiedTime,
+    keyTimestampRegex
 }

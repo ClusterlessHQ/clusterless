@@ -28,14 +28,17 @@ public class TransformProps implements Struct {
     @JsonProperty(required = true)
     URI manifestPrefix;
 
-    public TransformProps() {
-    }
+    @JsonProperty(required = true)
+    URI datasetPrefix;
 
-    public TransformProps(String lotUnit, LotSource lotSource, String keyRegex, URI manifestPrefix) {
-        this.lotUnit = lotUnit;
-        this.lotSource = lotSource;
-        this.keyRegex = keyRegex;
-        this.manifestPrefix = manifestPrefix;
+    @JsonProperty(required = true)
+    String datasetName;
+
+    String datasetVersion;
+
+    String eventBusName;
+
+    public TransformProps() {
     }
 
     private TransformProps(Builder builder) {
@@ -43,6 +46,10 @@ public class TransformProps implements Struct {
         lotSource = builder.lotSource;
         keyRegex = builder.keyRegex;
         manifestPrefix = builder.manifestPrefix;
+        datasetPrefix = builder.datasetPrefix;
+        datasetName = builder.datasetName;
+        datasetVersion = builder.datasetVersion;
+        eventBusName = builder.eventBusName;
     }
 
     public String lotUnit() {
@@ -61,6 +68,22 @@ public class TransformProps implements Struct {
         return manifestPrefix;
     }
 
+    public URI datasetPrefix() {
+        return datasetPrefix;
+    }
+
+    public String datasetName() {
+        return datasetName;
+    }
+
+    public String datasetVersion() {
+        return datasetVersion;
+    }
+
+    public String eventBusName() {
+        return eventBusName;
+    }
+
     /**
      * {@code Context} builder static inner class.
      */
@@ -69,6 +92,10 @@ public class TransformProps implements Struct {
         private LotSource lotSource;
         private String keyRegex;
         private URI manifestPrefix;
+        private URI datasetPrefix;
+        private String datasetName;
+        private String datasetVersion;
+        private String eventBusName;
 
         private Builder() {
         }
@@ -122,6 +149,51 @@ public class TransformProps implements Struct {
         }
 
         /**
+         * Sets the {@code datasetPrefix} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param datasetPrefix the {@code datasetPrefix} to set
+         * @return a reference to this Builder
+         */
+        public Builder withDatasetPrefix(URI datasetPrefix) {
+            this.datasetPrefix = datasetPrefix;
+            return this;
+        }
+
+        /**
+         * Sets the {@code datasetName} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param datasetName the {@code datasetName} to set
+         * @return a reference to this Builder
+         */
+        public Builder withDatasetName(String datasetName) {
+            this.datasetName = datasetName;
+            return this;
+        }
+
+        /**
+         * Sets the {@code datasetVersion} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param datasetVersion the {@code datasetVersion} to set
+         * @return a reference to this Builder
+         */
+        public Builder withDatasetVersion(String datasetVersion) {
+            this.datasetVersion = datasetVersion;
+            return this;
+        }
+
+
+        /**
+         * Sets the {@code eventBusName} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param eventBusName the {@code eventBusName} to set
+         * @return a reference to this Builder
+         */
+        public Builder withEventBusName(String eventBusName) {
+            this.eventBusName = eventBusName;
+            return this;
+        }
+
+        /**
          * Returns a {@code Context} built from the parameters previously set.
          *
          * @return a {@code Context} built with parameters of this {@code Context.Builder}
@@ -138,6 +210,10 @@ public class TransformProps implements Struct {
         sb.append(", lotSource=").append(lotSource);
         sb.append(", keyRegex='").append(keyRegex).append('\'');
         sb.append(", manifestPrefix=").append(manifestPrefix);
+        sb.append(", datasetPrefix=").append(datasetPrefix);
+        sb.append(", datasetName='").append(datasetName).append('\'');
+        sb.append(", datasetVersion='").append(datasetVersion).append('\'');
+        sb.append(", eventBusName='").append(eventBusName).append('\'');
         sb.append('}');
         return sb.toString();
     }

@@ -6,11 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda.common;
+package clusterless.model;
 
 /**
  *
  */
-public class BaseHandler {
+public interface Content {
+    String extension();
 
+    String contentType();
 }

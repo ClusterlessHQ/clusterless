@@ -12,6 +12,7 @@ import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.util.Label;
+import clusterless.util.URIs;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
@@ -54,9 +55,9 @@ public class Buckets {
                 .lowerHyphenPath(true);
 
         try {
-            return new URI("s3", bootstrapManifestBucketName(managedConstruct), path, null);
+            return new URI("s3", bootstrapManifestBucketName(managedConstruct), URIs.normalize("/", path), null);
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("unable to create uri");
+            throw new IllegalArgumentException("unable to create uri", e);
         }
     }
 

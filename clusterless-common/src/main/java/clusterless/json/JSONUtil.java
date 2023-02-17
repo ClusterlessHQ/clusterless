@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -28,19 +29,19 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATION
  */
 public class JSONUtil {
 
+    public static final List<SimpleModule> modules = List.of(new JodaModule(), new JavaTimeModule());
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    static {
+        OBJECT_MAPPER
+                .registerModules(modules)
+                .configure(WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
+    }
 
     public static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer();
 
     public static final ObjectWriter OBJECT_WRITER_PRETTY = OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
-
-    static {
-        OBJECT_MAPPER
-                .registerModule(new JodaModule())
-                .registerModule(new JavaTimeModule())
-                .configure(WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
-    }
 
     public static List<String> getAt(ArrayNode jsonNodes, String pointer) {
         List<String> results = new LinkedList<>();

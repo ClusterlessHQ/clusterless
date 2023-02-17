@@ -17,6 +17,9 @@ import java.net.URI;
  *
  */
 public class URIsTest {
+
+    public static final String IS_NULL = null;
+
     @Test
     void normalize() {
         Assertions.assertEquals("/", URIs.normalize("/"));
@@ -24,7 +27,24 @@ public class URIsTest {
         Assertions.assertEquals("foo/", URIs.normalize("foo//"));
         Assertions.assertEquals("/foo/", URIs.normalize("/foo//"));
         Assertions.assertEquals("/foo/", URIs.normalize("/foo/"));
-        Assertions.assertEquals("", URIs.normalize(null));
+        Assertions.assertEquals("", URIs.normalize(IS_NULL));
+    }
+
+    @Test
+    void normalizeAppend() {
+        Assertions.assertEquals("/", URIs.normalize("/", IS_NULL));
+        Assertions.assertEquals("/", URIs.normalize("//", IS_NULL));
+
+        // this form is safe for requiring a root slash when generating a URI path
+        Assertions.assertEquals("/foo/", URIs.normalize("/", "foo//"));
+        Assertions.assertEquals("/foo/", URIs.normalize("/", "/foo//"));
+
+        Assertions.assertEquals("foo/", URIs.normalize("foo//", ""));
+        Assertions.assertEquals("foo/bar", URIs.normalize("foo//", "bar"));
+        Assertions.assertEquals("foo/bar/", URIs.normalize("foo//", "bar/"));
+        Assertions.assertEquals("/foo/", URIs.normalize("/foo//"));
+        Assertions.assertEquals("/foo/bar/", URIs.normalize("/foo/", "bar//"));
+        Assertions.assertEquals("", URIs.normalize(IS_NULL, IS_NULL));
     }
 
     @Test
@@ -41,14 +61,14 @@ public class URIsTest {
 
     @Test
     void prefix() {
-        Assertions.assertEquals("foo", URIs.asPathPrefix(URI.create("/foo")));
-        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("/foo/")));
-        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("/foo//")));
-        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("s3://bucket/foo//")));
-        Assertions.assertEquals("foo/", URIs.asPathPrefix(URI.create("s3://bucket//foo//")));
-        Assertions.assertNull(URIs.asPathPrefix(URI.create("/")));
-        Assertions.assertNull(URIs.asPathPrefix(URI.create("/")));
-        Assertions.assertNull(URIs.asPathPrefix(URI.create("s3://bucket")));
-        Assertions.assertNull(URIs.asPathPrefix(URI.create("s3://bucket/")));
+        Assertions.assertEquals("foo", URIs.asKeyPath(URI.create("/foo")));
+        Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("/foo/")));
+        Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("/foo//")));
+        Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket/foo//")));
+        Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket//foo//")));
+        Assertions.assertNull(URIs.asKeyPath(URI.create("/")));
+        Assertions.assertNull(URIs.asKeyPath(URI.create("/")));
+        Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket")));
+        Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket/")));
     }
 }

@@ -8,34 +8,61 @@
 
 package clusterless.lambda.transform;
 
-import clusterless.lambda.common.BaseHandler;
+import clusterless.lambda.manifest.ManifestHandler;
+import clusterless.lambda.manifest.ManifestRequest;
 import clusterless.lambda.transform.json.AWSEvent;
-import clusterless.util.Env;
+import clusterless.substrate.aws.PathFormats;
+import clusterless.substrate.aws.sdk.S3;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  *
  */
-public class PutEventTransformHandler extends BaseHandler implements RequestHandler<AWSEvent, ArcNotifyEvent> {
+public class PutEventTransformHandler extends ManifestHandler<AWSEvent> {
 
-    static TransformProps transformProps = Env.fromEnv(
-            TransformProps.class,
-            () -> TransformProps.Builder.builder()
-                    .build()
-    );
+    public PutEventTransformHandler() {
+        super(AWSEvent.class);
+    }
 
     @Override
-    public ArcNotifyEvent handleRequest(AWSEvent input, Context context) {
+    public void handleEvent(AWSEvent event, Context context, ManifestRequest request) {
+        OffsetDateTime time = event.getTime();
+        String bucket = event.getDetail().getBucket().getName();
+        String key = event.getDetail().getObject().getKey();
 
-        // read puteven
-        System.out.println("transformProps = " + transformProps);
-        // parse lot
-        // create manifest file
-        // write manifest file
-        // publish notification on event-bus
+        logMessage("received, time: {}, bucket: {}, key: {}", time, bucket, key);
 
+        URI objectPath = PathFormats.createS3URI(bucket, key);
 
-        return null;
+        String lotId = null;
+
+        switch (transformProps.lotSource()) {
+            case eventTime:
+                lotId = intervalBuilder.truncateAndFormat(time);
+                break;
+            case objectModifiedTime:
+                S3.Response response = s3.exists(objectPath);
+
+                if (!s3.exists(response)) {
+                    throw new IllegalStateException("object not found: " + objectPath, response.exception());
+                }
+
+                lotId = intervalBuilder.truncateAndFormat(s3.lastModified(response));
+                break;
+            case keyTimestampRegex:
+                lotId = null;
+                break;
+        }
+
+        request.setLotId(lotId);
+
+        URI manifestURI = putManifest(lotId, List.of(objectPath), request);
+
+        publishEvent(lotId, manifestURI, request);
     }
+
 }

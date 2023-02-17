@@ -8,48 +8,27 @@
 
 package clusterless.substrate.aws.sdk;
 
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.http.SdkHttpResponse;
+import clusterless.json.JSONUtil;
+import clusterless.util.URIs;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
-import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  *
  */
-public class S3 {
-
-    private Optional<String> awsS3Endpoint;
-
-    public class Response {
-
-        SdkHttpResponse response;
-        S3Exception exception;
-
-        public Response(SdkHttpResponse response) {
-            this.response = response;
-        }
-
-        public Response(S3Exception exception) {
-            this.exception = exception;
-        }
-    }
-
-    private String defaultRegion = System.getenv("AWS_DEFAULT_REGION");
-    private String profile = System.getenv("AWS_PROFILE");
-
-    public S3(String profile) {
-        this.profile = profile;
-    }
+public class S3 extends ClientBase<S3Client> {
 
     public S3() {
+    }
+
+    public S3(String profile) {
+        super(profile);
     }
 
     public Response exists(String bucketName) {
@@ -60,42 +39,100 @@ public class S3 {
         Objects.requireNonNull(region, "region");
         Objects.requireNonNull(bucketName, "bucketName");
 
-        DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.builder()
-                .profileName(profile)
+        HeadBucketRequest request = HeadBucketRequest.builder()
+                .bucket(bucketName)
                 .build();
 
-        HeadBucketResponse response;
-
-        awsS3Endpoint = Optional.ofNullable(System.getenv().get("AWS_S3_ENDPOINT"));
-        try (S3Client client = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(credentialsProvider)
-                .endpointOverride(
-                        awsS3Endpoint
-                                .map(URI::create).orElse(null)
-                )
-                .build()) {
-
-            HeadBucketRequest request = HeadBucketRequest.builder()
-                    .bucket(bucketName)
-                    .build();
-
-            response = client.headBucket(request);
-        } catch (NoSuchBucketException exception) {
+        try (S3Client client = createClient(region)) {
+            return new Response(client.headBucket(request));
+        } catch (Exception exception) {
             return new Response(exception);
         }
-
-        return new Response(response.sdkHttpResponse());
     }
 
-    public boolean isSuccess(Response response) {
-        return response.exception == null && response.response.isSuccessful();
+    public Response exists(URI location) {
+        return exists(defaultRegion, location);
     }
 
-    public String error(Response response) {
-        if (response.exception != null) {
-            return response.exception.getLocalizedMessage();
+    public Response exists(String region, URI location) {
+        Objects.requireNonNull(region, "region");
+        Objects.requireNonNull(location, "location");
+
+        HeadObjectRequest request = HeadObjectRequest.builder()
+                .bucket(location.getHost())
+                .key(URIs.asKeyPath(location))
+                .build();
+
+        try (S3Client client = createClient(region)) {
+            return new Response(client.headObject(request));
+        } catch (Exception exception) {
+            return new Response(exception);
         }
-        return response.response.statusText().orElse("code: %d".formatted(response.response.statusCode()));
+    }
+
+    public Response create(String bucketName) {
+        return create(defaultRegion, bucketName);
+    }
+
+    public Response create(String region, String bucketName) {
+        Objects.requireNonNull(region, "region");
+        Objects.requireNonNull(bucketName, "bucketName");
+
+        CreateBucketRequest request = CreateBucketRequest.builder()
+                .bucket(bucketName)
+                .build();
+
+        try (S3Client client = createClient(region)) {
+            return new Response(client.createBucket(request));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    public Response put(URI location, String contentType, Object manifest) {
+        Objects.requireNonNull(location, "location");
+        Objects.requireNonNull(contentType, "contentType");
+        Objects.requireNonNull(manifest, "manifest");
+
+        String bucketName = location.getHost();
+        String key = URIs.asKeyPath(location);
+        String body = JSONUtil.writeAsStringSafe(manifest);
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(contentType)
+                .build();
+
+        try (S3Client client = createClient()) {
+            return new Response(client.putObject(putObjectRequest, RequestBody.fromString(body)));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    public boolean exists(Response response) {
+        if (response.exception instanceof NoSuchBucketException || response.exception instanceof NoSuchKeyException) {
+            return false;
+        }
+
+        if (response.exception != null) {
+            return false;
+        }
+
+        return response.sdkHttpResponse.isSuccessful();
+    }
+
+    public Instant lastModified(Response response) {
+        return ((HeadObjectResponse) response.awsResponse).lastModified();
+    }
+
+    @Override
+    protected S3Client createClient(String region) {
+        return S3Client.builder()
+                .region(Region.of(region))
+                .credentialsProvider(credentialsProvider)
+                .endpointOverride(endpointOverride)
+                .build();
     }
 }

@@ -55,8 +55,15 @@ public class ProcessExec {
     @CommandLine.Option(names = "--output", description = "cloud assembly output directory")
     private String output = "cdk.out";
 
-    @CommandLine.Option(names = "--use-temp-output", description = "place cloud assembly output into a temp directory", hidden = true)
-    private boolean useTempOutput = false;
+    @CommandLine.Option(
+            names = "--use-temp-output",
+            description = "place cloud assembly output into a temp directory",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1",
+            hidden = true
+    )
+    private Boolean useTempOutput;
 
     public ProcessExec() {
     }
@@ -81,18 +88,20 @@ public class ProcessExec {
         return output;
     }
 
-    public boolean useTempOutput() {
+    public Boolean useTempOutput() {
         return useTempOutput;
     }
 
     public void setUseTempOutput(boolean useTempOutput) {
-        this.useTempOutput = useTempOutput;
+        if (this.useTempOutput == null) {
+            this.useTempOutput = useTempOutput;
+        }
     }
 
-    public Integer executeLifecycleProcess(String command, LifecycleCommandOptions commandOptions) {
+    public Integer executeLifecycleProcess(String cdkCommand, LifecycleCommandOptions commandOptions) {
         String projectAgs = "--project %s".formatted(filesAsArg(commandOptions.projectFiles()));
 
-        return executeCDKApp(command, "synth", projectAgs);
+        return executeCDKApp(cdkCommand, "synth", projectAgs);
     }
 
     public Integer executeCDKApp(String cdkCommand, String kernelCommand, String kernelArgs) {
@@ -117,8 +126,11 @@ public class ProcessExec {
                 ))
         );
 
-        cdkCommands.add(
-                cdkCommand
+        cdkCommands.addAll(
+                List.of(
+                        cdkCommand,
+                        "--all" // deploy all stacks
+                )
         );
 
         return executeProcess(cdkCommands);

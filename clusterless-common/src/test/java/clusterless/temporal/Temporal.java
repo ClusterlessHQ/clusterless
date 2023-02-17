@@ -60,7 +60,7 @@ public class Temporal {
 
         String format = formatter.format(instant);
 
-        assertEquals("20230206%s%03d".formatted(durationFragment, i), format);
+        assertEquals(String.format("20230206%s%03d", durationFragment, i), format);
 
         TemporalAccessor temporalAccessor = formatter.parse(format);
 

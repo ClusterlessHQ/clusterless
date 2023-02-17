@@ -65,6 +65,11 @@ public class Bootstrap implements Callable<Integer> {
                 stage
         ));
 
+        if (System.getenv("CLS_SYNTH_ONLY") != null) {
+            synth();
+            return 0;
+        }
+
         String appArgs = "--synth %s".formatted(String.join(" ", args));
 
         processExec.setUseTempOutput(true);

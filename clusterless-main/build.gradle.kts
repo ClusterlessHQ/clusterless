@@ -33,6 +33,7 @@ distributions {
             from(awsInstall) {
                 include("bin/")
                 include("etc/")
+                include("assets/")
             }
         }
     }

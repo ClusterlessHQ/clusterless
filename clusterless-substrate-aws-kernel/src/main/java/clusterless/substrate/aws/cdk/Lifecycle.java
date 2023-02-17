@@ -51,20 +51,13 @@ public class Lifecycle {
     }
 
     public ManagedProject mapProject(List<Deployable> deployables) {
-        Set<String> names = deployables.stream().map(d -> d.project().name()).collect(Collectors.toSet());
-        Set<String> versions = deployables.stream().map(d -> d.project().version()).collect(Collectors.toSet());
-
-        if (names.size() > 1) {
-            throw new IllegalStateException("all project files must have the same name, got: " + names);
-        }
-
-        if (versions.size() > 1) {
-            throw new IllegalStateException("all project files must have the same version, got: " + versions);
-        }
+        Set<String> names = verifyNonNull("name", deployables.stream().map(d -> d.project().name()).collect(Collectors.toSet()));
+        Set<String> versions = verifyNonNull("version", deployables.stream().map(d -> d.project().version()).collect(Collectors.toSet()));
+        Set<String> stages = verify("stage", deployables.stream().map(d -> d.placement().stage()).collect(Collectors.toSet()));
 
         String name = names.stream().findFirst().orElseThrow();
         String version = versions.stream().findFirst().orElseThrow();
-        String stage = versions.stream().findFirst().orElse(null);
+        String stage = stages.isEmpty() ? null : stages.stream().findFirst().orElseThrow();
 
         ManagedProject managedProject = new ManagedProject(name, version, stage, deployables);
 
@@ -91,6 +84,24 @@ public class Lifecycle {
         return managedProject;
     }
 
+    private static Set<String> verifyNonNull(String propertyName, Set<String> values) {
+        if (values.contains(null)) {
+            throw new IllegalStateException("all project files must have non-null " + propertyName);
+        }
+
+        return verify(propertyName, values);
+    }
+
+    private static Set<String> verify(String propertyName, Set<String> values) {
+        if (values.size() != 1) {
+            throw new IllegalStateException("all project files must have the same " + propertyName + ", got: " + values);
+        }
+
+        values.remove(null);
+
+        return values;
+    }
+
     private void construct(ManagedProject managedProject, Deployable deployable, ModelType modelType) {
         Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelType), deployable, new LinkedHashMap<>());
 
@@ -98,10 +109,14 @@ public class Lifecycle {
             return;
         }
 
-        ManagedStack resourceStack = new ManagedStack(managedProject, deployable, modelType);
-        ComponentContext resourceContext = new ManagedComponentContext(managedProject, deployable, resourceStack);
+        ManagedStack stack = new ManagedStack(managedProject, deployable, modelType);
 
-        construct(resourceContext, memberResources);
+        managedProject.stacks().forEach(stack::addDependency);
+
+        ComponentContext context = new ManagedComponentContext(managedProject, deployable, stack);
+
+        construct(context, memberResources);
+
     }
 
     private static void construct(ComponentContext containerContext, Map<Extensible, ComponentService<ComponentContext, Model>> containers) {

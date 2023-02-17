@@ -11,6 +11,7 @@ package clusterless.temporal;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.Locale;
 
 /**
  * Utility class for looking up a formatter given a unit, or a unit given a name.
@@ -58,9 +59,9 @@ public class IntervalUnits {
     public static TemporalUnit find(String name) {
         Enum<?> unit;
         try {
-            unit = ChronoUnit.valueOf(name);
+            unit = ChronoUnit.valueOf(name.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            unit = IntervalUnit.valueOf(name);
+            unit = IntervalUnit.valueOf(name.toUpperCase(Locale.ROOT));
         }
 
         return (TemporalUnit) unit;

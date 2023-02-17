@@ -6,10 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model;
+package clusterless.substrate.aws.sdk;
 
 /**
  *
  */
-public class Lot {
+public interface NotifyEvent {
+    String eventSource();
+
+    String eventDetail();
 }

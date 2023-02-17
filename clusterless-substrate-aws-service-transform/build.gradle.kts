@@ -8,6 +8,7 @@
 
 plugins {
     id("clusterless.java-library-conventions")
+    id("clusterless.java-override-conventions-jdk11")
     id("org.openapi.generator") version "6.3.0"
 }
 
@@ -32,6 +33,7 @@ idea {
 dependencies {
     implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
+    implementation(project(":clusterless-substrate-aws-common"))
 
     implementation("com.google.guava:guava")
 
@@ -45,11 +47,11 @@ dependencies {
     implementation("software.amazon.awssdk:eventbridge")
 
     implementation("com.amazonaws:aws-lambda-java-core")
-    implementation("com.amazonaws:aws-lambda-java-events")
-    implementation("com.amazonaws:aws-lambda-java-serialization")
+//    implementation("com.amazonaws:aws-lambda-java-events")
+//    implementation("com.amazonaws:aws-lambda-java-serialization")
     implementation("com.amazonaws:aws-lambda-java-log4j2")
 
-    implementation("io.github.resilience4j:resilience4j-retry")
+//    implementation("io.github.resilience4j:resilience4j-retry")
 }
 
 openApiGenerate {

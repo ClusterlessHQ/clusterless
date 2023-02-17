@@ -10,6 +10,7 @@ package clusterless.substrate.aws.bootstrap;
 
 import clusterless.json.JSONUtil;
 import clusterless.model.bootstrap.Metadata;
+import clusterless.substrate.aws.managed.BaseStack;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Buckets;
 import clusterless.substrate.aws.resources.Events;
@@ -37,7 +38,7 @@ import java.util.Objects;
  * - BucketName
  * - ImageRepositoryName
  */
-public class BootstrapStack extends Stack {
+public class BootstrapStack extends BaseStack {
     private static final Logger LOG = LogManager.getLogger(BootstrapStack.class);
     public static final String BOOTSTRAP_VERSION = "1";
     private BucketDeployment deployment;

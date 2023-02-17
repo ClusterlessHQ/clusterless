@@ -38,7 +38,7 @@ public class S3PutListenerBoundary extends IngressBoundary {
 
     RuntimeProps runtimeProps = new RuntimeProps();
 
-    LotSource lotSource = LotSource.objectCreateTime;
+    LotSource lotSource = LotSource.objectModifiedTime;
 
     String keyRegex;
 

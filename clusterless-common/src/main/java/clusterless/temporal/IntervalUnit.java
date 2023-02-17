@@ -65,11 +65,16 @@ public enum IntervalUnit implements TemporalUnit {
     @SuppressWarnings("unchecked")
     @Override
     public <R extends Temporal> R addTo(R temporal, long amount) {
-        return switch (this) {
-            case FOURTHS -> (R) temporal.plus(15 * amount, MINUTES);
-            case SIXTHS -> (R) temporal.plus(10 * amount, MINUTES);
-            case TWELFTHS -> (R) temporal.plus(5 * amount, MINUTES);
-        };
+        switch (this) {
+            case FOURTHS:
+                return (R) temporal.plus(15 * amount, MINUTES);
+            case SIXTHS:
+                return (R) temporal.plus(10 * amount, MINUTES);
+            case TWELFTHS:
+                return (R) temporal.plus(5 * amount, MINUTES);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -77,11 +82,16 @@ public enum IntervalUnit implements TemporalUnit {
         if (temporal1Inclusive.getClass() != temporal2Exclusive.getClass()) {
             return temporal1Inclusive.until(temporal2Exclusive, this);
         }
-        return switch (this) {
-            case FOURTHS -> temporal1Inclusive.until(temporal2Exclusive, MINUTES) / 15;
-            case SIXTHS -> temporal1Inclusive.until(temporal2Exclusive, MINUTES) / 10;
-            case TWELFTHS -> temporal1Inclusive.until(temporal2Exclusive, MINUTES) / 5;
-        };
+        switch (this) {
+            case FOURTHS:
+                return temporal1Inclusive.until(temporal2Exclusive, MINUTES) / 15;
+            case SIXTHS:
+                return temporal1Inclusive.until(temporal2Exclusive, MINUTES) / 10;
+            case TWELFTHS:
+                return temporal1Inclusive.until(temporal2Exclusive, MINUTES) / 5;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     @Override

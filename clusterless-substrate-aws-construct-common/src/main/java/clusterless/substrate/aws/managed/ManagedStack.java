@@ -12,6 +12,7 @@ import clusterless.model.deploy.Deployable;
 import clusterless.substrate.aws.resources.Stacks;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
@@ -19,7 +20,7 @@ import software.amazon.awscdk.StackProps;
 /**
  *
  */
-public class ManagedStack extends Stack implements Managed {
+public class ManagedStack extends BaseStack implements Managed {
     private final ManagedProject managedProject;
     private final Deployable deployable;
 
@@ -35,7 +36,7 @@ public class ManagedStack extends Stack implements Managed {
                         .build()
         );
 
-        this.managedProject = managedProject;
+        this.managedProject = managedProject.addStack(this);
         this.deployable = deployable;
     }
 
@@ -54,4 +55,17 @@ public class ManagedStack extends Stack implements Managed {
         return deployable;
     }
 
+    @Override
+    public void addDependency(@NotNull Stack target, @Nullable String reason) {
+        if (target != this) {
+            super.addDependency(target, reason);
+        }
+    }
+
+    @Override
+    public void addDependency(@NotNull Stack target) {
+        if (target != this) {
+            super.addDependency(target);
+        }
+    }
 }

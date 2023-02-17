@@ -53,7 +53,7 @@ public class Deploy implements Callable<Integer> {
 
             S3.Response response = s3.exists(placement.region(), bucketName);
 
-            if (s3.isSuccess(response)) {
+            if (s3.exists(response)) {
                 continue;
             }
 

@@ -17,7 +17,20 @@ public class Boundary extends Extensible {
     @JsonProperty(required = true)
     String boundaryName;
 
+    @JsonProperty(required = true)
+    String datasetName;
+
+    String datasetVersion;
+
     public String boundaryName() {
         return boundaryName;
+    }
+
+    public String datasetName() {
+        return datasetName;
+    }
+
+    public String datasetVersion() {
+        return datasetVersion;
     }
 }

@@ -16,6 +16,7 @@ import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.TagProps;
 import software.constructs.Construct;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,6 +26,8 @@ public class ManagedProject extends StagedApp implements Managed {
     private final Label name;
     private final String version;
     private final List<Deployable> deployableModel;
+
+    private final List<ManagedStack> stacks = new LinkedList<>();
 
     public static ManagedProject projectOf(Construct scope) {
         return (ManagedProject) scope.getNode().getRoot();
@@ -58,6 +61,15 @@ public class ManagedProject extends StagedApp implements Managed {
 
     public String version() {
         return version;
+    }
+
+    public List<ManagedStack> stacks() {
+        return stacks;
+    }
+
+    public ManagedProject addStack(ManagedStack managedStack) {
+        stacks.add(managedStack);
+        return this;
     }
 
     protected void applyTags() {

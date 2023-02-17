@@ -164,9 +164,11 @@ public interface Label {
             return this;
         }
 
-        if (!(object instanceof Label label)) {
+        if (!(object instanceof Label)) {
             return with(Label.of(object.toString()));
         }
+
+        Label label = (Label) object;
 
         if (label.isNull()) {
             return this;
