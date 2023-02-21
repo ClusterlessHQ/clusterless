@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
+import clusterless.util.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,6 @@ import software.amazon.awscdk.*;
 import software.amazon.awscdk.services.lambda.CfnFunction;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.logs.RetentionDays;
-import software.constructs.Construct;
 import software.constructs.IConstruct;
 
 /**
@@ -54,21 +54,31 @@ public class BaseStack extends Stack {
         }
     }
 
-    public BaseStack(@Nullable Construct scope, @Nullable String id, @Nullable StackProps props) {
-        super(scope, id, props);
+    private final Label stage;
+
+    public BaseStack(@NotNull StagedApp app, @Nullable String id, @Nullable StackProps props) {
+        super(app, id, props);
+
+        stage = app.stage();
 
 //        Aspects.of(this).add(new LogGroupAspect());
     }
 
-    public BaseStack(@Nullable Construct scope, @Nullable String id) {
-        super(scope, id);
+    public BaseStack(@NotNull StagedApp app, @Nullable String id) {
+        super(app, id);
 
+        stage = app.stage();
 //        Aspects.of(this).add(new LogGroupAspect());
     }
 
-    public BaseStack(@Nullable Construct scope) {
-        super(scope);
+    public BaseStack(@NotNull StagedApp app) {
+        super(app);
 
+        stage = app.stage();
 //        Aspects.of(this).add(new LogGroupAspect());
+    }
+
+    public Label stage() {
+        return stage;
     }
 }

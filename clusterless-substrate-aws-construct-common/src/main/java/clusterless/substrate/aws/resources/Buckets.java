@@ -44,8 +44,6 @@ public class Buckets {
         }
     }
 
-    public static final String METADATA_JSON = "metadata.json";
-
     public static URI bootstrapManifestURI(@NotNull ManagedConstruct managedConstruct, String... names) {
         ManagedProject managedProject = ManagedProject.projectOf(managedConstruct);
 
