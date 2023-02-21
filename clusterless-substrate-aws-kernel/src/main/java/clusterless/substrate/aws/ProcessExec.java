@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -63,7 +64,7 @@ public class ProcessExec {
             arity = "0..1",
             hidden = true
     )
-    private Boolean useTempOutput;
+    private Optional<Boolean> useTempOutput;
 
     public ProcessExec() {
     }
@@ -88,13 +89,13 @@ public class ProcessExec {
         return output;
     }
 
-    public Boolean useTempOutput() {
+    public Optional<Boolean> useTempOutput() {
         return useTempOutput;
     }
 
     public void setUseTempOutput(boolean useTempOutput) {
-        if (this.useTempOutput == null) {
-            this.useTempOutput = useTempOutput;
+        if (this.useTempOutput.isEmpty()) {
+            this.useTempOutput = Optional.of(useTempOutput);
         }
     }
 
@@ -137,7 +138,7 @@ public class ProcessExec {
     }
 
     private String createOutputPath() {
-        if (useTempOutput()) {
+        if (useTempOutput().orElse(false)) {
             try {
                 Path clusterless = Files.createTempDirectory("clusterless");
 
