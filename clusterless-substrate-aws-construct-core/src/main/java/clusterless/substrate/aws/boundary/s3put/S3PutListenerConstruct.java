@@ -56,8 +56,8 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
 
         String listenBucketName = listenURI.getHost();
         String listenPathPrefix = URIs.asKeyPath(listenURI);
-        String manifestBucketName = Buckets.bootstrapManifestBucketName(this);
-        String eventBusName = Events.arcEventBusName(this);
+        String manifestBucketName = Buckets.bootstrapManifestBucketNameRef(this);
+        String eventBusName = Events.arcEventBusNameRef(this);
         String listenerRuleName = Rules.ruleName(this, model.boundaryName());
 
         IBucket listenBucket = Bucket.fromBucketName(this, "ListenBucket", listenBucketName);
@@ -122,12 +122,5 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
                 .eventPattern(pattern)
                 .targets(List.of(lambdaFunction))
                 .build();
-
-//        new CfnOutput(this, id("ListenBucketURI"), new CfnOutputProps.Builder()
-//                .exportName("s3:%s:name".formatted(Label.of(model().boundaryName()).lowerHyphen()))
-//                .value(listenPathPrefix)
-//                .description("listener bucket uri")
-//                .build());
-
     }
 }

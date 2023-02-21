@@ -17,12 +17,10 @@ import software.constructs.Construct;
  */
 public class ManagedConstruct extends Construct implements Managed {
     private final ManagedComponentContext context;
-    private final Label baseId;
 
     public ManagedConstruct(@NotNull ManagedComponentContext context, Label baseId) {
         super(context.parent(), baseId.camelCase());
         this.context = context;
-        this.baseId = baseId;
     }
 
     public ManagedComponentContext context() {

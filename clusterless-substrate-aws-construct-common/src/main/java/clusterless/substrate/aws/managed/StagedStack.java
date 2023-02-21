@@ -22,8 +22,8 @@ import software.constructs.IConstruct;
 /**
  *
  */
-public class BaseStack extends Stack {
-    private static final Logger LOG = LogManager.getLogger(BaseStack.class);
+public class StagedStack extends Stack {
+    private static final Logger LOG = LogManager.getLogger(StagedStack.class);
 
     class LogGroupAspect implements IAspect {
 
@@ -56,7 +56,7 @@ public class BaseStack extends Stack {
 
     private final Label stage;
 
-    public BaseStack(@NotNull StagedApp app, @Nullable String id, @Nullable StackProps props) {
+    public StagedStack(@NotNull StagedApp app, @Nullable String id, @Nullable StackProps props) {
         super(app, id, props);
 
         stage = app.stage();
@@ -64,14 +64,14 @@ public class BaseStack extends Stack {
 //        Aspects.of(this).add(new LogGroupAspect());
     }
 
-    public BaseStack(@NotNull StagedApp app, @Nullable String id) {
+    public StagedStack(@NotNull StagedApp app, @Nullable String id) {
         super(app, id);
 
         stage = app.stage();
 //        Aspects.of(this).add(new LogGroupAspect());
     }
 
-    public BaseStack(@NotNull StagedApp app) {
+    public StagedStack(@NotNull StagedApp app) {
         super(app);
 
         stage = app.stage();

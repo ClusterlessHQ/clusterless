@@ -11,6 +11,7 @@ package clusterless.substrate.aws.resources;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
 
@@ -18,8 +19,15 @@ import software.constructs.Construct;
  *
  */
 public class Events {
+    public static final Label ARC_EVENT_BUS_NAME = Label.of("ArcEventBusName");
+
     public static String arcEventBusName(@NotNull Construct scope) {
         return eventBusName(scope, "ArcEvents");
+    }
+
+    public static String arcEventBusNameRef(@NotNull Construct scope) {
+        Label stage = StagedApp.stagedOf(scope).stage();
+        return Fn.importValue(stage.with(ARC_EVENT_BUS_NAME).lowerHyphen());
     }
 
     private static String eventBusName(@NotNull Construct scope, String name) {

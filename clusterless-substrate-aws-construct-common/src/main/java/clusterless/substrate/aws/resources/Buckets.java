@@ -14,6 +14,7 @@ import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.util.Label;
 import clusterless.util.URIs;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
 
@@ -42,7 +43,15 @@ public class Buckets {
         public String camelCase() {
             return value;
         }
+
+        Label bucketNameKey() {
+            return this.with("BucketName");
+        }
     }
+
+    public static final Label ARC_STATE_BUCKET_NAME = ARC_STATE.bucketNameKey();
+    public static final Label MANIFEST_BUCKET_NAME = MANIFEST.bucketNameKey();
+
 
     public static URI bootstrapManifestURI(@NotNull ManagedConstruct managedConstruct, String... names) {
         ManagedProject managedProject = ManagedProject.projectOf(managedConstruct);
@@ -67,8 +76,16 @@ public class Buckets {
         return bootstrapBucketName(scope, ARC_STATE);
     }
 
+    public static String bootstrapArcStateBucketNameRef(@NotNull Construct scope) {
+        return bootstrapBucketNameRef(scope, ARC_STATE);
+    }
+
     public static String bootstrapManifestBucketName(@NotNull Construct scope) {
         return bootstrapBucketName(scope, MANIFEST);
+    }
+
+    public static String bootstrapManifestBucketNameRef(@NotNull Construct scope) {
+        return bootstrapBucketNameRef(scope, MANIFEST);
     }
 
     private static String bootstrapBucketName(@NotNull Construct scope, BootstrapBucket name) {
@@ -76,6 +93,11 @@ public class Buckets {
         String region = Stack.of(scope).getRegion();
         Label stage = StagedApp.stagedOf(scope).stage();
         return bootstrapBucketName(name, account, region, stage);
+    }
+
+    private static String bootstrapBucketNameRef(@NotNull Construct scope, BootstrapBucket name) {
+        Label stage = StagedApp.stagedOf(scope).stage();
+        return Fn.importValue(stage.with(name.bucketNameKey()).lowerHyphen());
     }
 
     public static String bootstrapBucketName(BootstrapBucket name, String account, String region, String stage) {

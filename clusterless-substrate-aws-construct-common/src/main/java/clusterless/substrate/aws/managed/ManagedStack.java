@@ -20,7 +20,7 @@ import software.amazon.awscdk.StackProps;
 /**
  *
  */
-public class ManagedStack extends BaseStack implements Managed {
+public class ManagedStack extends StagedStack implements Managed {
     private final ManagedProject managedProject;
     private final Deployable deployable;
 

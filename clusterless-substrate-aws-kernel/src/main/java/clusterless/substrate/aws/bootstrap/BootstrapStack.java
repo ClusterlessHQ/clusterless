@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.bootstrap;
 
-import clusterless.substrate.aws.managed.BaseStack;
 import clusterless.substrate.aws.managed.StagedApp;
+import clusterless.substrate.aws.managed.StagedStack;
 import clusterless.substrate.aws.resources.Buckets;
 import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.util.ErrorsUtil;
@@ -32,7 +32,7 @@ import java.util.Objects;
  * - BucketName
  * - ImageRepositoryName
  */
-public class BootstrapStack extends BaseStack {
+public class BootstrapStack extends StagedStack {
     private static final Logger LOG = LogManager.getLogger(BootstrapStack.class);
     public static final String BOOTSTRAP_VERSION = "1";
     private EventBus eventBus;
@@ -67,9 +67,9 @@ public class BootstrapStack extends BaseStack {
         constructSharedBucket(manifestBucketName, stage().with("Manifest"));
 
         createOutputFor(stage().with("BootstrapVersion"), BOOTSTRAP_VERSION, "clusterless bootstrap version");
-        createOutputFor(stage().with("ArcEventBusName"), arcEventBusName, "clusterless arc event bus name");
-        createOutputFor(stage().with("ArcStateBucketName"), arcStateBucketName, "clusterless arc state bucket name");
-        createOutputFor(stage().with("ManifestBucketName"), manifestBucketName, "clusterless manifest bucket name");
+        createOutputFor(stage().with(Events.ARC_EVENT_BUS_NAME), arcEventBusName, "clusterless arc event bus name");
+        createOutputFor(stage().with(Buckets.ARC_STATE_BUCKET_NAME), arcStateBucketName, "clusterless arc state bucket name");
+        createOutputFor(stage().with(Buckets.MANIFEST_BUCKET_NAME), manifestBucketName, "clusterless manifest bucket name");
     }
 
     protected void createOutputFor(Label name, String value, String description) {
