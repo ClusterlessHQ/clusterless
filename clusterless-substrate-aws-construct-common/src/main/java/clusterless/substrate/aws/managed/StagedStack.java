@@ -9,73 +9,33 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.util.Label;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.amazon.awscdk.*;
-import software.amazon.awscdk.services.lambda.CfnFunction;
-import software.amazon.awscdk.services.logs.LogGroup;
-import software.amazon.awscdk.services.logs.RetentionDays;
-import software.constructs.IConstruct;
+import software.amazon.awscdk.Stack;
+import software.amazon.awscdk.StackProps;
 
 /**
  *
  */
 public class StagedStack extends Stack {
-    private static final Logger LOG = LogManager.getLogger(StagedStack.class);
-
-    class LogGroupAspect implements IAspect {
-
-        @Override
-        public void visit(@NotNull IConstruct node) {
-            System.out.println("node.getClass().getName() = " + node.getClass().getName());
-
-            if (CfnResource.isCfnResource(node)) {
-                CfnResource resource = (CfnResource) node;
-                System.out.println("resource.getCfnResourceType() = " + resource.getCfnResourceType());
-                System.out.println("resource.getNode().getDefaultChild() = " + resource.getNode().getDefaultChild());
-            }
-
-            if (node instanceof CfnFunction) {
-                CfnFunction function = (CfnFunction) node;
-                RetentionDays retentionDays = RetentionDays.ONE_DAY;
-                RemovalPolicy removalPolicy = RemovalPolicy.DESTROY;
-                String nodeId = function.getNode().getId();
-                LOG.info("adding log group for: {}, with retention: {}, policy: {}", nodeId, retentionDays, removalPolicy);
-
-
-                LogGroup.Builder.create(Stack.of(function), "LogGroup-" + nodeId)
-                        .logGroupName("/aws/lambda/" + function.getFunctionName())
-                        .removalPolicy(removalPolicy)
-                        .retention(retentionDays)
-                        .build();
-            }
-        }
-    }
-
     private final Label stage;
 
     public StagedStack(@NotNull StagedApp app, @Nullable String id, @Nullable StackProps props) {
         super(app, id, props);
 
         stage = app.stage();
-
-//        Aspects.of(this).add(new LogGroupAspect());
     }
 
     public StagedStack(@NotNull StagedApp app, @Nullable String id) {
         super(app, id);
 
         stage = app.stage();
-//        Aspects.of(this).add(new LogGroupAspect());
     }
 
     public StagedStack(@NotNull StagedApp app) {
         super(app);
 
         stage = app.stage();
-//        Aspects.of(this).add(new LogGroupAspect());
     }
 
     public Label stage() {

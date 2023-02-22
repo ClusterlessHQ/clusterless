@@ -21,6 +21,7 @@ import clusterless.temporal.IntervalUnits;
 import clusterless.util.*;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.events.EventBus;
 import software.amazon.awscdk.services.events.EventPattern;
 import software.amazon.awscdk.services.events.IEventBus;
@@ -28,6 +29,7 @@ import software.amazon.awscdk.services.events.Rule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
@@ -42,6 +44,9 @@ import java.util.regex.Pattern;
  *
  */
 public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary> implements Component {
+
+    RetentionDays retentionDays = RetentionDays.ONE_DAY;
+    RemovalPolicy removalPolicy = RemovalPolicy.DESTROY;
 
     private final Rule rule;
 
@@ -89,7 +94,12 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
                 .runtime(Runtime.JAVA_11)
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
-                .logRetention(RetentionDays.ONE_DAY)
+                .build();
+
+        LogGroup.Builder.create(this, Label.of("LogGroup").with(functionLabel).camelCase())
+                .logGroupName("/aws/lambda/" + transformEventFunction.getFunctionName())
+                .removalPolicy(removalPolicy)
+                .retention(retentionDays)
                 .build();
 
         // todo: allow access to cloudwatch
@@ -98,7 +108,15 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
         manifestBucket.grantReadWrite(transformEventFunction);
         listenBucket.grantRead(transformEventFunction);
         // as of 2.64.0 a lambda is installed -> https://github.com/aws/aws-cdk/issues/24086
-        listenBucket.enableEventBridgeNotification(); // places put events into default event bus
+        // note that multiple boundaries can share the same bucket, if they all enable eventbridge, there can be
+        // a type of race condition in cloudformation.
+        // it's best this is enabled once during a deploy
+        if (model().enableEventBridge()) {
+            // todo: inject warning about
+            //  Custom::S3BucketNotifications
+            // Received response status [FAILED] from custom resource. Message returned: Error: An error occurred (OperationAborted) when calling the PutBucketNotificationConfiguration operation: A conflicting conditional operation is currently in progress against this resource. Please try again.. See the details in CloudWatch Log
+            listenBucket.enableEventBridgeNotification(); // places put events into default event bus
+        }
 
         EventPattern pattern = EventPattern.builder()
                 .source(List.of("aws.s3"))

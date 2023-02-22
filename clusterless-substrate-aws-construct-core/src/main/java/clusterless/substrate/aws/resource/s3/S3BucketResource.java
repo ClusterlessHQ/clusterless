@@ -20,7 +20,7 @@ public class S3BucketResource extends Resource {
     private String bucketName;
     private boolean versioned = false;
 
-    private boolean eventBridgeEnabled = false;
+    private boolean enableEventBridge = true;
 
     /**
      * When true (the default) the bucket and it's data will be removed when the project is destroyed.
@@ -39,8 +39,8 @@ public class S3BucketResource extends Resource {
         return versioned;
     }
 
-    public boolean eventBridgeEnabled() {
-        return eventBridgeEnabled;
+    public boolean enableEventBridge() {
+        return enableEventBridge;
     }
 
     public boolean removeOnDestroy() {

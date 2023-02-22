@@ -40,7 +40,8 @@ public class S3BucketModelConstruct extends ModelConstruct<S3BucketResource> imp
                 .bucketName(model().bucketName())
                 .removalPolicy(model().removeOnDestroy() ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
                 .autoDeleteObjects(model().removeOnDestroy()) // adds a lambda
-                .eventBridgeEnabled(model().eventBridgeEnabled())
+                // as of 2.64.0 a lambda is installed -> https://github.com/aws/aws-cdk/issues/24086
+                .eventBridgeEnabled(model().enableEventBridge())
                 .build());
 
         TagsUtil.applyTags(bucket, model().tags());
