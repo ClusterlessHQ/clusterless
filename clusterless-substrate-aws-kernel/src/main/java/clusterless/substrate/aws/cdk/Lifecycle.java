@@ -16,6 +16,7 @@ import clusterless.startup.Loader;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
+import clusterless.util.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,16 @@ public class Lifecycle {
 
     public Lifecycle() {
 
+    }
+
+    @NotNull
+    protected static List<ModelType[]> stackGroups() {
+        List<ModelType[]> stackGroups = new LinkedList<>();
+
+        stackGroups.add(ModelType.values(ModelType.Resource, ModelType.Boundary));
+        stackGroups.add(ModelType.values(ModelType.Process));
+
+        return stackGroups;
     }
 
     protected void synthProject(List<File> projectFiles) throws IOException {
@@ -61,55 +72,39 @@ public class Lifecycle {
 
         ManagedProject managedProject = new ManagedProject(name, version, stage, deployables);
 
+        List<ModelType[]> stackGroups = stackGroups();
+
         for (Deployable deployable : deployables) {
             verifyComponentsAreAvailable(deployable);
 
-            // deploy provided stacks
-            Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), deployable, new LinkedHashMap<>());
+            // create a stack for each container construct
+            constructContainersStacks(managedProject, deployable);
 
-            if (!containers.isEmpty()) {
-                construct(new ManagedComponentContext(managedProject, deployable), containers);
+            // create a stack for member constructs
+            for (ModelType[] stackGroup : stackGroups) {
+                constructElementsStack(managedProject, deployable, stackGroup);
             }
-
-            // create a stack for resource member constructs
-            construct(managedProject, deployable, ModelType.Resource);
-
-            // create a stack for boundary member constructs
-            construct(managedProject, deployable, ModelType.Boundary);
-
-            // create arcs with Process member constructs
-            // unsupported
         }
 
         return managedProject;
     }
 
-    private static Set<String> verifyNonNull(String propertyName, Set<String> values) {
-        if (values.contains(null)) {
-            throw new IllegalStateException("all project files must have non-null " + propertyName);
-        }
+    private void constructContainersStacks(ManagedProject managedProject, Deployable deployable) {
+        Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), deployable, new LinkedHashMap<>());
 
-        return verify(propertyName, values);
+        if (!containers.isEmpty()) {
+            construct(new ManagedComponentContext(managedProject, deployable), containers);
+        }
     }
 
-    private static Set<String> verify(String propertyName, Set<String> values) {
-        if (values.size() != 1) {
-            throw new IllegalStateException("all project files must have the same " + propertyName + ", got: " + values);
-        }
-
-        values.remove(null);
-
-        return values;
-    }
-
-    private void construct(ManagedProject managedProject, Deployable deployable, ModelType modelType) {
-        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelType), deployable, new LinkedHashMap<>());
+    private void constructElementsStack(ManagedProject managedProject, Deployable deployable, ModelType[] modelTypes) {
+        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelTypes), deployable, new LinkedHashMap<>());
 
         if (memberResources.isEmpty()) {
             return;
         }
 
-        ManagedStack stack = new ManagedStack(managedProject, deployable, modelType);
+        ManagedStack stack = new ManagedStack(managedProject, deployable, Label.concat(modelTypes));
 
         managedProject.stacks().forEach(stack::addDependency);
 
@@ -173,5 +168,23 @@ public class Lifecycle {
             case Process -> throw new UnsupportedOperationException();
         }
         return extensibles;
+    }
+
+    private static Set<String> verifyNonNull(String propertyName, Set<String> values) {
+        if (values.contains(null)) {
+            throw new IllegalStateException("all project files must have non-null " + propertyName);
+        }
+
+        return verify(propertyName, values);
+    }
+
+    private static Set<String> verify(String propertyName, Set<String> values) {
+        if (values.size() != 1) {
+            throw new IllegalStateException("all project files must have the same " + propertyName + ", got: " + values);
+        }
+
+        values.remove(null);
+
+        return values;
     }
 }

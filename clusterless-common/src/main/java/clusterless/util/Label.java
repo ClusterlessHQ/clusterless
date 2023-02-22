@@ -18,6 +18,16 @@ import java.util.Objects;
  * An Enum can be a Label by implementing {@link EnumLabel}.
  */
 public interface Label {
+    /**
+     * Concatenate all the given labels .
+     *
+     * @param labels the labels to concatenate
+     * @return a concatenated Label instance
+     */
+    static Label concat(Label... labels) {
+        return Arrays.stream(labels).reduce(Label.NULL, Label::with);
+    }
+
     interface EnumLabel extends Label {
         String name();
 

@@ -20,11 +20,13 @@ public class S3BucketResource extends Resource {
     private String bucketName;
     private boolean versioned = false;
 
+    private boolean eventBridgeEnabled = false;
+
     /**
      * When true (the default) the bucket and it's data will be removed when the project is destroyed.
      */
-    boolean removeOnDestroy = true;
-    Map<String, String> tags = new LinkedHashMap<>();
+    private boolean removeOnDestroy = true;
+    private Map<String, String> tags = new LinkedHashMap<>();
 
     public S3BucketResource() {
     }
@@ -35,6 +37,10 @@ public class S3BucketResource extends Resource {
 
     public boolean versioned() {
         return versioned;
+    }
+
+    public boolean eventBridgeEnabled() {
+        return eventBridgeEnabled;
     }
 
     public boolean removeOnDestroy() {

@@ -97,6 +97,7 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
         arcEventBus.grantPutEventsTo(transformEventFunction);
         manifestBucket.grantReadWrite(transformEventFunction);
         listenBucket.grantRead(transformEventFunction);
+        // as of 2.64.0 a lambda is installed -> https://github.com/aws/aws-cdk/issues/24086
         listenBucket.enableEventBridgeNotification(); // places put events into default event bus
 
         EventPattern pattern = EventPattern.builder()

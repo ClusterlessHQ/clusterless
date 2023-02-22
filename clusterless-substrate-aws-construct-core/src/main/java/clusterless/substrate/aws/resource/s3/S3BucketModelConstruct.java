@@ -38,8 +38,9 @@ public class S3BucketModelConstruct extends ModelConstruct<S3BucketResource> imp
                 .enforceSsl(true)
                 .versioned(model().versioned())
                 .bucketName(model().bucketName())
-                .removalPolicy(model.removeOnDestroy() ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
-                .autoDeleteObjects(model.removeOnDestroy())
+                .removalPolicy(model().removeOnDestroy() ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
+                .autoDeleteObjects(model().removeOnDestroy()) // adds a lambda
+                .eventBridgeEnabled(model().eventBridgeEnabled())
                 .build());
 
         TagsUtil.applyTags(bucket, model().tags());
