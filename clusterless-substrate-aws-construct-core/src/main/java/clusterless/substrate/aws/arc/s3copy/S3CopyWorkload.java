@@ -6,13 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model.deploy;
+package clusterless.substrate.aws.arc.s3copy;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import clusterless.model.deploy.Workload;
 
 /**
  *
  */
-@JsonTypeName
-public class Resource extends Extensible{
+public class S3CopyWorkload extends Workload {
 }

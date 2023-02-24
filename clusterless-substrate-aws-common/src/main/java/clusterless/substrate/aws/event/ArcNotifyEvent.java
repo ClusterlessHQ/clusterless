@@ -6,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda.transform;
+package clusterless.substrate.aws.event;
 
 import clusterless.model.Struct;
-import clusterless.substrate.aws.sdk.NotifyEvent;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
 
@@ -19,6 +19,8 @@ import java.net.URI;
 public class ArcNotifyEvent implements NotifyEvent, Struct {
     public static final String SOURCE = "clusterless.arc";
     public static final String DETAIL = "Clusterless Arc Notification";
+
+    public static final String DATASET_ID = "datasetId";
 
     String datasetName;
     String datasetVersion;
@@ -55,6 +57,22 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
 
     public URI datasetPrefix() {
         return datasetPrefix;
+    }
+
+    /**
+     * This is a fabricated value for use with pattern matching.
+     * <p>
+     * We are attempting to bypass any complexity if a listener is listening for two or more datasets.
+     *
+     * @return a single string for pattern matching
+     */
+    @JsonProperty()
+    public String datasetId() {
+        return createDatasetId(datasetName(), datasetVersion());
+    }
+
+    public static String createDatasetId(String datasetName, String datasetVersion) {
+        return String.format("%s/%s", datasetName, datasetVersion);
     }
 
     @Override

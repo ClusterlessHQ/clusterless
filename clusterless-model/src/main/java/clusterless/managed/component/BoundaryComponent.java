@@ -6,13 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.sdk;
+package clusterless.managed.component;
 
 /**
  *
  */
-public interface NotifyEvent {
-    String eventSource();
-
-    String eventDetail();
+public interface BoundaryComponent extends Component {
 }

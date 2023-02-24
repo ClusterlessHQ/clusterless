@@ -15,22 +15,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Boundary extends Extensible {
     @JsonProperty(required = true)
-    String boundaryName;
+    String name;
 
     @JsonProperty(required = true)
-    String datasetName;
+    Dataset dataset;
 
-    String datasetVersion;
-
-    public String boundaryName() {
-        return boundaryName;
+    public String name() {
+        return name;
     }
 
-    public String datasetName() {
-        return datasetName;
-    }
-
-    public String datasetVersion() {
-        return datasetVersion;
+    public Dataset dataset() {
+        return dataset;
     }
 }

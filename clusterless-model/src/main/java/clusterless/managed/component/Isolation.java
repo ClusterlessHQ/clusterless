@@ -11,7 +11,14 @@ package clusterless.managed.component;
 /**
  *
  */
-public enum ManagedType {
-    container,
-    member
+public enum Isolation {
+    /**
+     * A container provider returns a resource that creates a new stack
+     */
+    isolated,
+    /**
+     * A member provider returns a resource included in a managed stack
+     */
+    included,
+    embedded
 }

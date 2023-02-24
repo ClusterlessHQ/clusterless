@@ -13,6 +13,7 @@ plugins {
 
 dependencies {
     implementation(project(":clusterless-common"))
+    implementation(project(":clusterless-model"))
     implementation("com.google.guava:guava")
 
     implementation("com.fasterxml.jackson.core:jackson-core")

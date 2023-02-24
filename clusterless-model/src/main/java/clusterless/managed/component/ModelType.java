@@ -8,6 +8,7 @@
 
 package clusterless.managed.component;
 
+import clusterless.model.Model;
 import clusterless.util.Label;
 
 import java.util.LinkedHashMap;
@@ -17,11 +18,20 @@ import java.util.Map;
  *
  */
 public enum ModelType implements Label.EnumLabel {
-    Resource(clusterless.model.deploy.Resource.class),
-    Boundary(clusterless.model.deploy.Boundary.class),
-    Process(clusterless.model.deploy.Process.class);
+    Resource(
+            clusterless.model.deploy.Resource.class,
+            ResourceComponent.class
+    ),
+    Boundary(
+            clusterless.model.deploy.Boundary.class,
+            BoundaryComponent.class
+    ),
+    Workload(
+            clusterless.model.deploy.Workload.class,
+            WorkloadComponent.class
+    );
 
-    static Map<Class, ModelType> types = new LinkedHashMap<>();
+    static final Map<Class<?>, ModelType> types = new LinkedHashMap<>();
 
     static {
         for (ModelType value : ModelType.values()) {
@@ -29,17 +39,23 @@ public enum ModelType implements Label.EnumLabel {
         }
     }
 
-    final Class modelClass;
+    final Class<? extends Model> modelClass;
+    final Class<? extends Component> componentClass;
 
-    ModelType(Class modelClass) {
+    ModelType(Class<? extends Model> modelClass, Class<? extends Component> componentClass) {
         this.modelClass = modelClass;
+        this.componentClass = componentClass;
     }
 
-    public Class modelClass() {
+    public Class<? extends Model> modelClass() {
         return modelClass;
     }
 
-    public static ModelType find(Class type) {
+    public Class<? extends Component> componentClass() {
+        return componentClass;
+    }
+
+    public static ModelType findFromModel(Class<?> type) {
         return types.get(type);
     }
 

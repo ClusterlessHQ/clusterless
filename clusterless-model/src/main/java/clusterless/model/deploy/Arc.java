@@ -9,6 +9,7 @@
 package clusterless.model.deploy;
 
 import clusterless.model.Model;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,20 +18,22 @@ import java.util.List;
  *
  */
 public class Arc extends Model {
+    @JsonProperty(required = true)
+    String name;
+    List<SourceDataset> sources = new ArrayList<>();
+    @JsonProperty(required = true)
+    Workload workload;
+    List<SinkDataset> sinks = new ArrayList<>();
 
-    List<Dataset> sources = new ArrayList<>();
-    Process process;
-    List<Dataset> sinks = new ArrayList<>();
-
-    public List<Dataset> sources() {
+    public List<SourceDataset> sources() {
         return sources;
     }
 
-    public Process process() {
-        return process;
+    public Workload workload() {
+        return workload;
     }
 
-    public List<Dataset> sinks() {
+    public List<SinkDataset> sinks() {
         return sinks;
     }
 }

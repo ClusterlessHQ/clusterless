@@ -37,7 +37,7 @@ public class ManagedComponentContext implements ComponentContext {
         return managedProject;
     }
 
-    public Deployable deploy() {
+    public Deployable deployable() {
         return deployable;
     }
 

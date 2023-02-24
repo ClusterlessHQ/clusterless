@@ -8,9 +8,9 @@
 
 package clusterless.substrate.aws.resource.eventbridge;
 
-import clusterless.managed.component.Component;
+import clusterless.managed.component.ResourceComponent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.model.ModelConstruct;
+import clusterless.substrate.aws.construct.ModelConstruct;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
@@ -22,7 +22,7 @@ import java.util.Locale;
 /**
  *
  */
-public class EventBridgeModelConstruct extends ModelConstruct<EventBridgeResource> implements Component {
+public class EventBridgeModelConstruct extends ModelConstruct<EventBridgeResource> implements ResourceComponent {
 
     private final EventBus eventBus;
 

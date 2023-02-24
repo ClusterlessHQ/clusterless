@@ -8,11 +8,13 @@
 
 package clusterless.model.deploy;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 /**
  *
  */
-@JsonTypeName
-public class Resource extends Extensible{
+public class Workload extends Extensible {
+    String name;
+
+    public String name() {
+        return name;
+    }
 }

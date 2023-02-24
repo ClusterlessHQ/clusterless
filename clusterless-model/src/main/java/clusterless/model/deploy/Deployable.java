@@ -9,93 +9,16 @@
 package clusterless.model.deploy;
 
 import clusterless.model.Model;
-import clusterless.model.Struct;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Deployable extends Model {
 
     public static final String PROVIDER_POINTER = "/placement/provider";
-
-    public static class Project implements Struct {
-        String name;
-        String version;
-
-        public String name() {
-            return name;
-        }
-
-        public String version() {
-            return version;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Project project = (Project) o;
-            return Objects.equals(name, project.name) && Objects.equals(version, project.version);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, version);
-        }
-    }
-
-    public static class Placement implements Struct {
-        String provider;
-        String stage;
-        String account;
-        String region;
-
-        public String provider() {
-            return provider;
-        }
-
-        public String stage() {
-            return stage;
-        }
-
-        public String account() {
-            return account;
-        }
-
-        public String region() {
-            return region;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Placement placement = (Placement) o;
-            return Objects.equals(provider, placement.provider) && Objects.equals(stage, placement.stage) && Objects.equals(account, placement.account) && Objects.equals(region, placement.region);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(provider, stage, account, region);
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder("Placement{");
-            sb.append("provider='").append(provider).append('\'');
-            sb.append(", stage='").append(stage).append('\'');
-            sb.append(", account='").append(account).append('\'');
-            sb.append(", region='").append(region).append('\'');
-            sb.append('}');
-            return sb.toString();
-        }
-
-
-    }
 
     @JsonIgnore
     File sourceFile;

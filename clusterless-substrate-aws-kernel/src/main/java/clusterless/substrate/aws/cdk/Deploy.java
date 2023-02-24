@@ -10,6 +10,7 @@ package clusterless.substrate.aws.cdk;
 
 import clusterless.command.DeployCommandOptions;
 import clusterless.model.deploy.Deployable;
+import clusterless.model.deploy.Placement;
 import clusterless.startup.Loader;
 import clusterless.substrate.aws.ProcessExec;
 import clusterless.substrate.aws.resources.Buckets;
@@ -35,7 +36,7 @@ public class Deploy implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-        Set<Deployable.Placement> placements = new Loader(commandOptions.projectFiles())
+        Set<Placement> placements = new Loader(commandOptions.projectFiles())
                 .readObjects(CDK.PROVIDER, Deployable.PROVIDER_POINTER, Deployable.class, Deployable::setSourceFile)
                 .stream()
                 .map(Deployable::placement)
@@ -43,7 +44,7 @@ public class Deploy implements Callable<Integer> {
 
         S3 s3 = new S3(processExec.profile());
 
-        for (Deployable.Placement placement : placements) {
+        for (Placement placement : placements) {
             String account = placement.account();
             String region = placement.region();
             String stage = placement.stage();

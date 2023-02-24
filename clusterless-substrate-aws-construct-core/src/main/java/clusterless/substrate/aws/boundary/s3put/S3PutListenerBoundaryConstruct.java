@@ -10,9 +10,10 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
-import clusterless.managed.component.Component;
+import clusterless.managed.component.BoundaryComponent;
+import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.model.ModelConstruct;
+import clusterless.substrate.aws.construct.ModelConstruct;
 import clusterless.substrate.aws.resources.Assets;
 import clusterless.substrate.aws.resources.Buckets;
 import clusterless.substrate.aws.resources.Events;
@@ -43,15 +44,15 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary> implements Component {
+public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3PutListenerBoundary> {
 
     RetentionDays retentionDays = RetentionDays.ONE_DAY;
     RemovalPolicy removalPolicy = RemovalPolicy.DESTROY;
 
     private final Rule rule;
 
-    public S3PutListenerConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
-        super(context, model, model.boundaryName());
+    public S3PutListenerBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
+        super(context, model);
 
         // confirm unit exits
         TemporalUnit temporalUnit = IntervalUnits.find(model().lotUnit());
@@ -63,20 +64,20 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
         String listenPathPrefix = URIs.asKeyPath(listenURI);
         String manifestBucketName = Buckets.bootstrapManifestBucketNameRef(this);
         String eventBusName = Events.arcEventBusNameRef(this);
-        String listenerRuleName = Rules.ruleName(this, model.boundaryName());
+        String listenerRuleName = Rules.ruleName(this, model.name());
 
         IBucket listenBucket = Bucket.fromBucketName(this, "ListenBucket", listenBucketName);
         IBucket manifestBucket = Bucket.fromBucketName(this, "ManifestBucket", manifestBucketName);
         IEventBus arcEventBus = EventBus.fromEventBusName(this, "EventBus", eventBusName);
 
         // declare lambda to convert put event into arc event
-        URI manifestPrefix = Buckets.bootstrapManifestURI(this, model().datasetName(), model().datasetVersion());
+        URI manifestPrefix = Buckets.bootstrapManifestURI(this, model().dataset().name(), model().dataset().version());
 
         TransformProps transformProps = TransformProps.Builder.builder()
                 .withEventBusName(eventBusName)
                 .withDatasetPrefix(listenURI)
-                .withDatasetName(model().datasetName())
-                .withDatasetVersion(model().datasetVersion())
+                .withDatasetName(model().dataset().name())
+                .withDatasetVersion(model().dataset().version())
                 .withManifestPrefix(manifestPrefix)
                 .withLotUnit(model.lotUnit())
                 .withLotSource(model().lotSource())
@@ -85,7 +86,7 @@ public class S3PutListenerConstruct extends ModelConstruct<S3PutListenerBoundary
 
         Map<String, String> environment = Env.toEnv(transformProps);
 
-        Label functionLabel = Label.of(model().boundaryName()).with("TransformPutEvent");
+        Label functionLabel = Label.of(model().name()).with("TransformPutEvent");
         Function transformEventFunction = Function.Builder.create(this, functionLabel.camelCase())
                 .functionName(functionLabel.lowerHyphen())
                 .code(Assets.find(Pattern.compile("^.*-aws-service-transform-.*\\.zip$"))) // get packaged code

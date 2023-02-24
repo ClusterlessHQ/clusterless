@@ -13,9 +13,11 @@ import clusterless.substrate.aws.resources.Stacks;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+
+import static clusterless.substrate.aws.resources.Stacks.environmentFor;
+
 
 /**
  *
@@ -31,7 +33,7 @@ public class ManagedStack extends StagedStack implements Managed {
     public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Deployable deployable, @NotNull Label baseId) {
         super(managedProject, baseId.camelCase(),
                 StackProps.builder()
-                        .env(environment(deployable))
+                        .env(environmentFor(deployable))
                         .stackName(stackName.lowerHyphen())
                         .build()
         );
@@ -40,18 +42,11 @@ public class ManagedStack extends StagedStack implements Managed {
         this.deployable = deployable;
     }
 
-    private static Environment environment(Deployable deployable) {
-        return Environment.builder()
-                .account(deployable.placement().account())
-                .region(deployable.placement().region())
-                .build();
-    }
-
     public ManagedProject managedProject() {
         return managedProject;
     }
 
-    public Deployable project() {
+    public Deployable deployable() {
         return deployable;
     }
 

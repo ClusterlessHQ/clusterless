@@ -64,5 +64,4 @@ public class PutEventTransformHandler extends ManifestHandler<AWSEvent> {
 
         publishEvent(lotId, manifestURI, request);
     }
-
 }

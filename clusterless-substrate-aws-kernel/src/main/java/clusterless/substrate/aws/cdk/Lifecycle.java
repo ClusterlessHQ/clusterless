@@ -10,9 +10,13 @@ package clusterless.substrate.aws.cdk;
 
 import clusterless.managed.component.*;
 import clusterless.model.Model;
+import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Extensible;
+import clusterless.model.deploy.Workload;
 import clusterless.startup.Loader;
+import clusterless.substrate.aws.arc.ArcStack;
+import clusterless.substrate.aws.cdk.lifecycle.StackGroups;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
@@ -34,18 +38,10 @@ public class Lifecycle {
 
     ComponentServices componentServices = ComponentServices.INSTANCE;
 
+    StackGroups stackGroups = new StackGroups();
+
     public Lifecycle() {
 
-    }
-
-    @NotNull
-    protected static List<ModelType[]> stackGroups() {
-        List<ModelType[]> stackGroups = new LinkedList<>();
-
-        stackGroups.add(ModelType.values(ModelType.Resource, ModelType.Boundary));
-        stackGroups.add(ModelType.values(ModelType.Process));
-
-        return stackGroups;
     }
 
     protected void synthProject(List<File> projectFiles) throws IOException {
@@ -72,62 +68,116 @@ public class Lifecycle {
 
         ManagedProject managedProject = new ManagedProject(name, version, stage, deployables);
 
-        List<ModelType[]> stackGroups = stackGroups();
-
         for (Deployable deployable : deployables) {
             verifyComponentsAreAvailable(deployable);
 
-            // create a stack for each container construct
-            constructContainersStacks(managedProject, deployable);
+            // create a stack for each isolatable construct
+            for (ModelType[] stackGroup : stackGroups.includableStackGroups()) {
+                constructIsolatedStacks(managedProject, deployable, stackGroup);
+            }
 
-            // create a stack for member constructs
-            for (ModelType[] stackGroup : stackGroups) {
-                constructElementsStack(managedProject, deployable, stackGroup);
+            // create a stack for includable constructs
+            for (ModelType[] stackGroup : stackGroups.isolatableStackGroups()) {
+                constructIncludedStack(managedProject, deployable, stackGroup);
+            }
+
+            // create a stack for includable constructs
+            for (ModelType[] stackGroup : stackGroups.embeddedStackGroups()) {
+                constructEmbeddedStacks(managedProject, deployable, stackGroup);
             }
         }
 
         return managedProject;
     }
 
-    private void constructContainersStacks(ManagedProject managedProject, Deployable deployable) {
-        Map<Extensible, ComponentService<ComponentContext, Model>> containers = getMangedTypesFor(ManagedType.container, ModelType.values(), deployable, new LinkedHashMap<>());
+    private void constructEmbeddedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] embeddable) {
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> embedded = getMangedTypesFor(Isolation.embedded, embeddable, deployable, new LinkedHashMap<>());
 
-        if (!containers.isEmpty()) {
-            construct(new ManagedComponentContext(managedProject, deployable), containers);
-        }
-    }
-
-    private void constructElementsStack(ManagedProject managedProject, Deployable deployable, ModelType[] modelTypes) {
-        Map<Extensible, ComponentService<ComponentContext, Model>> memberResources = getMangedTypesFor(ManagedType.member, ModelType.values(modelTypes), deployable, new LinkedHashMap<>());
-
-        if (memberResources.isEmpty()) {
+        if (embedded.isEmpty()) {
+            LOG.info("found no embeddable models");
             return;
         }
 
-        ManagedStack stack = new ManagedStack(managedProject, deployable, Label.concat(modelTypes));
+        List<ManagedStack> priorStacks = new ArrayList<>(managedProject.stacks());
 
+        for (Arc arc : deployable.arcs()) {
+            Workload workload = arc.workload();
+
+            if (workload == null) {
+                throw new IllegalStateException("workload may not be null");
+            }
+
+            ComponentService<ComponentContext, Model, Component> modelComponentService = embedded.get(workload);
+
+            if (modelComponentService == null) {
+                String message = "component service not found for: %s, type: %s".formatted(workload.name(), workload.type());
+                LOG.error(message);
+                throw new IllegalStateException(message);
+            }
+
+            // construct a stack for every embeddable type, currently only have Process that embeds in an Arc
+            ArcStack stack = new ArcStack(managedProject, deployable, arc);
+
+            // force dependency on prior stacks, but not prior arcs
+            priorStacks.forEach(stack::addDependency);
+
+            ManagedComponentContext context = new ManagedComponentContext(managedProject, deployable, stack);
+            WorkloadComponent construct = createConstructWith(context, modelComponentService, workload);
+
+            stack.applyWorkloadComponent(construct);
+        }
+    }
+
+    private void constructIsolatedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> isolated = getMangedTypesFor(Isolation.isolated, isolatable, deployable, new LinkedHashMap<>());
+
+        if (isolated.isEmpty()) {
+            LOG.info("found no isolatable models");
+            return;
+        }
+
+        // constructs a stack for every isolated declared model
+        construct(new ManagedComponentContext(managedProject, deployable), isolated);
+    }
+
+    private void constructIncludedStack(ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> included = getMangedTypesFor(Isolation.included, includable, deployable, new LinkedHashMap<>());
+
+        if (included.isEmpty()) {
+            LOG.info("found no includable models");
+            return;
+        }
+
+        // constructs one stack for all included models types in this grouping
+        ManagedStack stack = new ManagedStack(managedProject, deployable, Label.concat(includable));
+
+        // make the new stack dependent on the prior stacks so order is retained during deployment
         managedProject.stacks().forEach(stack::addDependency);
 
         ComponentContext context = new ManagedComponentContext(managedProject, deployable, stack);
 
-        construct(context, memberResources);
-
+        construct(context, included);
     }
 
-    private static void construct(ComponentContext containerContext, Map<Extensible, ComponentService<ComponentContext, Model>> containers) {
+    private static void construct(ComponentContext context, Map<Extensible, ComponentService<ComponentContext, Model, Component>> containers) {
         containers.entrySet().stream().filter(e -> e.getValue() != null).forEach(e -> {
-            Extensible key = e.getKey();
-            LOG.info("creating %s construct: %s".formatted(key.getClass().getSimpleName(), key.type()));
-            e.getValue().create(containerContext, key);
+            Extensible extensible = e.getKey();
+            ComponentService<ComponentContext, Model, Component> modelComponentService = e.getValue();
+            createConstructWith(context, modelComponentService, extensible);
         });
+    }
+
+    private static <C extends Component> C createConstructWith(ComponentContext context, ComponentService<ComponentContext, Model, Component> modelComponentService, Extensible extensible) {
+        LOG.info("creating %s construct: %s".formatted(extensible.getClass().getSimpleName(), extensible.type()));
+        return (C) modelComponentService.create(context, extensible);
     }
 
     private void verifyComponentsAreAvailable(Deployable deployableModel) {
         // accumulate all providers for all declared model types
-        Map<Extensible, ComponentService<ComponentContext, Model>> map = new LinkedHashMap<>();
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> map = new LinkedHashMap<>();
 
-        for (ManagedType managedType : ManagedType.values()) {
-            getMangedTypesFor(managedType, ModelType.values(), deployableModel, map);
+        for (Isolation isolation : Isolation.values()) {
+            getMangedTypesFor(isolation, ModelType.values(), deployableModel, map);
         }
 
         Set<String> missing = map.entrySet()
@@ -142,8 +192,8 @@ public class Lifecycle {
         }
     }
 
-    private Map<Extensible, ComponentService<ComponentContext, Model>> getMangedTypesFor(ManagedType managedType, ModelType[] modelTypes, Deployable deployableModel, Map<Extensible, ComponentService<ComponentContext, Model>> map) {
-        EnumMap<ModelType, Map<String, ComponentService<ComponentContext, Model>>> containerMap = componentServices.componentServicesFor(managedType);
+    private Map<Extensible, ComponentService<ComponentContext, Model, Component>> getMangedTypesFor(Isolation isolation, ModelType[] modelTypes, Deployable deployableModel, Map<Extensible, ComponentService<ComponentContext, Model, Component>> map) {
+        EnumMap<ModelType, Map<String, ComponentService<ComponentContext, Model, Component>>> containerMap = componentServices.componentServicesFor(isolation);
 
         for (ModelType modelType : modelTypes) {
             if (!containerMap.containsKey(modelType)) {
@@ -165,7 +215,8 @@ public class Lifecycle {
         switch (modelType) {
             case Resource -> extensibles = new ArrayList<>(deployableModel.resources());
             case Boundary -> extensibles = new ArrayList<>(deployableModel.boundaries());
-            case Process -> throw new UnsupportedOperationException();
+            case Workload ->
+                    extensibles = deployableModel.arcs().stream().map(Arc::workload).collect(Collectors.toList());
         }
         return extensibles;
     }

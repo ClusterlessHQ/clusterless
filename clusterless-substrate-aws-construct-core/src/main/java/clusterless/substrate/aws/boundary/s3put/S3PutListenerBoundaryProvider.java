@@ -14,11 +14,11 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent(modelType = ModelType.Boundary, name = "core:s3PutListenerBoundary", managedType = ManagedType.member)
-public class S3PutListenerBoundaryProvider implements ComponentService<ManagedComponentContext, S3PutListenerBoundary> {
+@ProvidesComponent(provides = ModelType.Boundary, name = "core:s3PutListenerBoundary", isolation = Isolation.included)
+public class S3PutListenerBoundaryProvider implements ComponentService<ManagedComponentContext, S3PutListenerBoundary, S3PutListenerBoundaryConstruct> {
     @Override
-    public Component create(ManagedComponentContext context, S3PutListenerBoundary boundary) {
-        return new S3PutListenerConstruct(context, boundary);
+    public S3PutListenerBoundaryConstruct create(ManagedComponentContext context, S3PutListenerBoundary boundary) {
+        return new S3PutListenerBoundaryConstruct(context, boundary);
     }
 
     @Override

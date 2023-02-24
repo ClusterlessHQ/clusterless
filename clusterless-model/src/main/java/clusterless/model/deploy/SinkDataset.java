@@ -8,11 +8,14 @@
 
 package clusterless.model.deploy;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 /**
  *
  */
-@JsonTypeName
-public class Resource extends Extensible{
+public class SinkDataset extends Dataset {
+
+    boolean publish = true;
+
+    public boolean publish() {
+        return publish;
+    }
 }

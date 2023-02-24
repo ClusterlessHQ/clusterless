@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 public @interface ProvidesComponent {
     String name();
 
-    ModelType modelType();
+    ModelType provides();
 
-    ManagedType managedType() default ManagedType.member;
+    Isolation isolation() default Isolation.included;
 }

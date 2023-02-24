@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource.eventbridge;
+package clusterless.substrate.aws.arc.s3copy;
 
 import clusterless.managed.component.ComponentService;
 import clusterless.managed.component.ModelType;
@@ -16,16 +16,16 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent(provides = ModelType.Resource, name = "core:eventBus")
-public class EventBridgeResourceProvider implements ComponentService<ManagedComponentContext, EventBridgeResource, EventBridgeModelConstruct> {
+@ProvidesComponent(provides = ModelType.Workload, name = "core:s3Copy")
+public class S3CopyWorkloadProvider implements ComponentService<ManagedComponentContext, S3CopyWorkload, S3CopyWorkloadConstruct> {
 
     @Override
-    public EventBridgeModelConstruct create(ManagedComponentContext context, EventBridgeResource model) {
-        return new EventBridgeModelConstruct(context, model);
+    public S3CopyWorkloadConstruct create(ManagedComponentContext context, S3CopyWorkload model) {
+        return null;
     }
 
     @Override
-    public Class<EventBridgeResource> modelClass() {
-        return EventBridgeResource.class;
+    public Class<S3CopyWorkload> modelClass() {
+        return S3CopyWorkload.class;
     }
 }

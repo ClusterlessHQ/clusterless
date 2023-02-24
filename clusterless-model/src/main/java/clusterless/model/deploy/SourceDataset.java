@@ -11,5 +11,11 @@ package clusterless.model.deploy;
 /**
  *
  */
-public class Process extends Extensible {
+public class SourceDataset extends Dataset {
+
+    boolean subscribe = true;
+
+    public boolean subscribe() {
+        return subscribe;
+    }
 }

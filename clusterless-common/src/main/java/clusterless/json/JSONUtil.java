@@ -65,6 +65,10 @@ public class JSONUtil {
         return OBJECT_MAPPER.getNodeFactory().arrayNode();
     }
 
+    public static JsonNode readTree(String json) throws IOException {
+        return OBJECT_MAPPER.readTree(json);
+    }
+
     public static JsonNode readTree(InputStream inputStream) throws IOException {
         return OBJECT_MAPPER.readTree(inputStream);
     }

@@ -8,10 +8,10 @@
 
 package clusterless.lambda.manifest;
 
-import clusterless.lambda.transform.ArcNotifyEvent;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.manifest.Manifest;
 import clusterless.substrate.aws.PathFormats;
+import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.sdk.EventBus;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.temporal.IntervalBuilder;

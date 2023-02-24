@@ -8,22 +8,16 @@
 
 package clusterless.model.deploy;
 
-import clusterless.model.Model;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import clusterless.model.Struct;
 
-import java.net.URI;
+import java.util.Objects;
 
 /**
  *
  */
-public class Dataset extends Model {
-    @JsonProperty(required = true)
+public class Project implements Struct {
     String name;
-    @JsonProperty(required = true)
     String version;
-    String role;
-    @JsonProperty(required = true)
-    URI locationURI;
 
     public String name() {
         return name;
@@ -33,11 +27,16 @@ public class Dataset extends Model {
         return version;
     }
 
-    public String role() {
-        return role;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project project = (Project) o;
+        return Objects.equals(name, project.name) && Objects.equals(version, project.version);
     }
 
-    public URI locationURI() {
-        return locationURI;
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, version);
     }
 }

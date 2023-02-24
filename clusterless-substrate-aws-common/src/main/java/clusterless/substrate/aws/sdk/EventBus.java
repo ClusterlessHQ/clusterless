@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.sdk;
 
 import clusterless.json.JSONUtil;
+import clusterless.substrate.aws.event.NotifyEvent;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.CreateEventBusRequest;

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.model;
+package clusterless.substrate.aws.construct;
 
 import clusterless.model.Model;
 import clusterless.model.deploy.Extensible;
@@ -35,9 +35,9 @@ public class ModelConstruct<M extends Model> extends ManagedConstruct {
     }
 
     private static Label uniqueId(@NotNull Model model, @NotNull String id) {
-        return model.label()
-                .with(Label.of(model.getClass().getSimpleName()))
-                .with(Label.of(id));
+        return model
+                .label()
+                .with(id);
     }
 
     public M model() {
@@ -51,7 +51,7 @@ public class ModelConstruct<M extends Model> extends ManagedConstruct {
                 .camelCase();
     }
 
-    protected <R extends IConstruct> R construct(Supplier<R> supplier) {
+    protected <R extends IConstruct> R constructWithinHandler(Supplier<R> supplier) {
         if (model() instanceof Extensible) {
             return ErrorsUtil.construct(((Extensible) model()).type(), supplier, LOG);
         }

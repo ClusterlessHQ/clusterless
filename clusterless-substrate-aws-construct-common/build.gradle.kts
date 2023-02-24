@@ -14,6 +14,7 @@ dependencies {
 
     api(project(":clusterless-common"))
     api(project(":clusterless-model"))
+    api(project(":clusterless-substrate-aws-common"))
 
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
     api("software.amazon.awscdk:aws-cdk-lib:2.65.0")
