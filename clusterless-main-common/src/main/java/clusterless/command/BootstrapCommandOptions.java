@@ -14,7 +14,7 @@ import picocli.CommandLine;
  *
  */
 @CommandLine.Command(description = "initialize the given environment")
-public class BootstrapCommandOptions extends CommandOptions {
+public class BootstrapCommandOptions extends CommonCommandOptions {
 
     @CommandLine.Option(
             names = {"--account"}

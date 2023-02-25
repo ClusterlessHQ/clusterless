@@ -16,7 +16,7 @@ import java.util.Map;
  *
  */
 public interface SubstrateProvider {
-    String substrate();
+    String providerName();
 
     int execute(String[] args);
 

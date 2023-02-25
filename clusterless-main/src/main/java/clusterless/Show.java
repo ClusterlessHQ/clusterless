@@ -8,6 +8,7 @@
 
 package clusterless;
 
+import clusterless.command.CommonCommandOptions;
 import clusterless.json.JSONUtil;
 import clusterless.model.Struct;
 import clusterless.model.deploy.Models;
@@ -22,33 +23,31 @@ import java.util.concurrent.Callable;
 /**
  *
  */
-@CommandLine.Command(name = "show", subcommands = Show.ShowModel.class)
+@CommandLine.Command(
+        name = "show",
+        description = "display details about providers and models",
+        subcommands = {
+                Show.ShowProviders.class,
+                Show.ShowModel.class
+        }
+)
 public class Show {
     @CommandLine.ParentCommand
     Main main;
 
+    @CommandLine.Mixin
+    CommonCommandOptions commandOptions = new CommonCommandOptions();
+
     public Show() {
     }
 
-    @CommandLine.Command(name = "providers", description = "show all available providers")
-    public int providers() {
-
-        main.printer().println(main.substratesOptions().available());
-
-        return 0;
-    }
-
-    @CommandLine.Command(
-            name = "model"
-    )
-    public static class ShowModel implements Callable<Integer> {
-
+    public static class BaseShow implements Callable<Integer> {
         static class Exclusive {
             @CommandLine.Option(names = "--list", arity = "0")
             Optional<Boolean> list;
 
             @CommandLine.Option(names = "--print", arity = "1")
-            Optional<String> modelName;
+            Optional<String> name;
 
             public Exclusive() {
             }
@@ -60,36 +59,70 @@ public class Show {
         @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
         Exclusive exclusive;
 
-        public ShowModel() {
-        }
-
         @Override
         public Integer call() throws Exception {
             if (exclusive.list.isPresent() && exclusive.list.get()) {
-                show.main.printer().println(Models.names());
+                return handleList();
+            } else if (exclusive.name.isPresent()) {
+                return handleName();
+            }
 
-                Map<String, SubstrateProvider> providers = show.main.substratesOptions().requestedSubstrates();
+            return 0;
+        }
 
-                for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-                    show.main.printer().println(entry.getValue().models().keySet());
-                }
-            } else if (exclusive.modelName.isPresent()) {
-                Class<? extends Struct> modelClass = Models.get(exclusive.modelName.get());
+        protected Integer handleName() throws Exception {
+            return 0;
+        }
+
+        protected Integer handleList() throws Exception {
+            return 0;
+        }
+    }
+
+    @CommandLine.Command(name = "provider", description = "show all available providers")
+    public static class ShowProviders extends BaseShow implements Callable<Integer> {
+
+        @Override
+        public Integer handleList() throws Exception {
+            show.main.printer().println(show.main.substratesOptions().available());
+            return 0;
+        }
+    }
+
+    @CommandLine.Command(
+            name = "model"
+    )
+    public static class ShowModel extends BaseShow {
+
+        public ShowModel() {
+        }
+
+        protected Integer handleName() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+            Class<? extends Struct> modelClass = Models.get(exclusive.name.get());
+
+            if (modelClass != null) {
+                return printModel(modelClass);
+            }
+
+            Map<String, SubstrateProvider> providers = show.main.substratesOptions().requestedSubstrates();
+            for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
+                modelClass = entry.getValue().models().get(exclusive.name.get());
 
                 if (modelClass != null) {
                     return printModel(modelClass);
                 }
+            }
 
-                Map<String, SubstrateProvider> providers = show.main.substratesOptions().requestedSubstrates();
-                for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-                    modelClass = entry.getValue().models().get(exclusive.modelName.get());
+            throw new IllegalArgumentException("no model found for: " + exclusive.name.get());
+        }
 
-                    if (modelClass != null) {
-                        return printModel(modelClass);
-                    }
-                }
+        protected Integer handleList() {
+            show.main.printer().println(Models.names());
 
-                throw new IllegalArgumentException("no model found for: " + exclusive.modelName.get());
+            Map<String, SubstrateProvider> providers = show.main.substratesOptions().requestedSubstrates();
+
+            for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
+                show.main.printer().println(entry.getValue().models().keySet());
             }
 
             return 0;

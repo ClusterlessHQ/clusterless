@@ -16,8 +16,8 @@ import clusterless.command.*;
 import clusterless.model.deploy.Deployable;
 import clusterless.startup.Loader;
 import clusterless.startup.Startup;
+import clusterless.substrate.ProviderSubstratesOptions;
 import clusterless.substrate.SubstrateProvider;
-import clusterless.substrate.SubstratesOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -30,6 +30,7 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "cls",
+//        scope = CommandLine.ScopeType.INHERIT,
         mixinStandardHelpOptions = true,
         version = "1.0-wip",
         subcommands = {
@@ -45,17 +46,17 @@ public class Main extends Startup implements Callable<Integer> {
     boolean usageHelpRequested;
 
     @CommandLine.Mixin
-    protected SubstratesOptions substratesOptions = new SubstratesOptions();
+    protected ProviderSubstratesOptions providerSubstratesOptions = new ProviderSubstratesOptions();
     private String[] args;
 
     public static void main(String[] args) {
         CommandLine commandLine = new CommandLine(new Main(args));
 
-        commandLine.addSubcommand("bootstrap", new MainCommand(new BootstrapCommandOptions()));
-        commandLine.addSubcommand("verify", new MainCommand(new VerifyCommandOptions()));
-        commandLine.addSubcommand("deploy", new MainCommand(new DeployCommandOptions()));
-        commandLine.addSubcommand("destroy", new MainCommand(new DestroyCommandOptions()));
-        commandLine.addSubcommand("diff", new MainCommand(new DiffCommandOptions()));
+        commandLine.addSubcommand("bootstrap", new CommandWrapper(new BootstrapCommandOptions()));
+        commandLine.addSubcommand("verify", new CommandWrapper(new VerifyCommandOptions()));
+        commandLine.addSubcommand("deploy", new CommandWrapper(new DeployCommandOptions()));
+        commandLine.addSubcommand("destroy", new CommandWrapper(new DestroyCommandOptions()));
+        commandLine.addSubcommand("diff", new CommandWrapper(new DiffCommandOptions()));
 
         commandLine.parseArgs(args);
 
@@ -74,8 +75,8 @@ public class Main extends Startup implements Callable<Integer> {
         this.args = args;
     }
 
-    public SubstratesOptions substratesOptions() {
-        return substratesOptions;
+    public ProviderSubstratesOptions substratesOptions() {
+        return providerSubstratesOptions;
     }
 
     public CommandLine.IExitCodeExceptionMapper getExitCodeExceptionMapper() {
@@ -87,7 +88,7 @@ public class Main extends Startup implements Callable<Integer> {
         return 0;
     }
 
-    public Integer run(CommandOptions command) throws IOException {
+    public Integer run(CommonCommandOptions command) throws IOException {
         if (command instanceof LifecycleCommandOptions) {
             return run((LifecycleCommandOptions) command);
         }

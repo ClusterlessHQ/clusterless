@@ -48,8 +48,8 @@ public class Startup {
         }
     }
 
-    @CommandLine.Option(names = {"-v", "--verbose"}, description = "verbose messages")
-    boolean verbose = false;
+    @CommandLine.Mixin
+    Verbosity verbosity = new Verbosity();
 
     @CommandLine.Mixin
     Printer printer = new Printer();

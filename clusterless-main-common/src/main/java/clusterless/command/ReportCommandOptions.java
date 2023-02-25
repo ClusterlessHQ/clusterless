@@ -8,8 +8,11 @@
 
 package clusterless.command;
 
+import picocli.CommandLine;
+
 /**
  *
  */
-public class ReportCommandOptions extends CommandOptions {
+@CommandLine.Command(description = "")
+public class ReportCommandOptions extends CommonCommandOptions {
 }

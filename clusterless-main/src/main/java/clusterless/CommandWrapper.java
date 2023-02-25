@@ -8,7 +8,7 @@
 
 package clusterless;
 
-import clusterless.command.CommandOptions;
+import clusterless.command.CommonCommandOptions;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -17,14 +17,14 @@ import java.util.concurrent.Callable;
  *
  */
 @CommandLine.Command()
-public class MainCommand implements Callable<Integer> {
+public class CommandWrapper implements Callable<Integer> {
     @CommandLine.ParentCommand
     Main main;
 
     @CommandLine.Mixin
-    CommandOptions commandOptions;
+    CommonCommandOptions commandOptions;
 
-    public MainCommand(CommandOptions commandOptions) {
+    public CommandWrapper(CommonCommandOptions commandOptions) {
         this.commandOptions = commandOptions;
     }
 

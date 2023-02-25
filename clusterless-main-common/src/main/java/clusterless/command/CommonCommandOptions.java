@@ -15,5 +15,5 @@ import picocli.CommandLine;
  *
  */
 @CommandLine.Command(subcommands = {CommandLine.HelpCommand.class})
-public abstract class CommandOptions {
+public class CommonCommandOptions {
 }

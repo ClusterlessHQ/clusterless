@@ -18,13 +18,17 @@ import java.util.Set;
 /**
  *
  */
-public class SubstratesOptions {
+public class ProviderSubstratesOptions {
     protected final SubstrateProviders providers = new SubstrateProviders();
 
-    @CommandLine.Option(names = {"-s", "--substrate"}, description = "substrates to target", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(
+            names = {"-P", "--provider"},
+            description = "provider substrates to target",
+            scope = CommandLine.ScopeType.INHERIT
+    )
     protected Set<String> substrates = new LinkedHashSet<>();
 
-    public SubstratesOptions() {
+    public ProviderSubstratesOptions() {
         this.substrates.addAll(providers.names());
     }
 
