@@ -23,8 +23,8 @@ public class Deployable extends Model {
     @JsonIgnore
     File sourceFile;
 
-    Project project;
-    Placement placement;
+    Project project = new Project();
+    Placement placement = new Placement();
     @JsonProperty("resources")
     List<Resource> resources = new ArrayList<>();
     @JsonProperty("boundaries")

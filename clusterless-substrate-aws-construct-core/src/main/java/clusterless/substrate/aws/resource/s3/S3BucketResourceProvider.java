@@ -16,7 +16,7 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent(provides = ModelType.Resource, name = "core:s3Bucket")
+@ProvidesComponent(provides = ModelType.Resource, name = "aws:core:s3Bucket")
 public class S3BucketResourceProvider implements ComponentService<ManagedComponentContext, S3BucketResource, S3BucketResourceConstruct> {
 
     @Override

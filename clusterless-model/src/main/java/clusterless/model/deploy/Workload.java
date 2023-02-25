@@ -11,7 +11,7 @@ package clusterless.model.deploy;
 /**
  *
  */
-public class Workload extends Extensible {
+public abstract class Workload extends Extensible {
     String name;
 
     public String name() {

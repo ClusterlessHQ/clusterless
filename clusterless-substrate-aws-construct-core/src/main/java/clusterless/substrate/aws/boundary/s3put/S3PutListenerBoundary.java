@@ -9,13 +9,14 @@
 package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.LotSource;
+import clusterless.model.Struct;
 import clusterless.model.deploy.IngressBoundary;
 
 /**
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
-    public static class RuntimeProps {
+    public static class RuntimeProps implements Struct {
         int memorySizeMB = 256 * 3;
 
         int retryAttempts = 3;

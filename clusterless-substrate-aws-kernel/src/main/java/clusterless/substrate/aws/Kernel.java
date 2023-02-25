@@ -8,6 +8,8 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.managed.component.ComponentServices;
+import clusterless.model.Struct;
 import clusterless.startup.Startup;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.aws.bootstrap.Bootstrap;
@@ -18,7 +20,9 @@ import picocli.CommandLine;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -49,6 +53,13 @@ public class Kernel extends Startup implements SubstrateProvider {
     @Override
     public String substrate() {
         return "aws";
+    }
+
+    @Override
+    public Map<String, Class<? extends Struct>> models() {
+        return ComponentServices.INSTANCE.componentServices().entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().modelClass()));
     }
 
     @Override

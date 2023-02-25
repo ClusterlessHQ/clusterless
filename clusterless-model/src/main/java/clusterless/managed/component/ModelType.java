@@ -56,7 +56,17 @@ public enum ModelType implements Label.EnumLabel {
     }
 
     public static ModelType findFromModel(Class<?> type) {
-        return types.get(type);
+        if (types.containsKey(type)) {
+            return types.get(type);
+        }
+
+        for (Map.Entry<Class<?>, ModelType> entry : types.entrySet()) {
+            if (entry.getKey().isAssignableFrom(type)) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
     }
 
     public static ModelType[] values(ModelType... modelTypes) {

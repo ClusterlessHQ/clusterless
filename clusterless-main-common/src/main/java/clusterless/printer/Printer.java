@@ -11,7 +11,7 @@ package clusterless.printer;
 import picocli.CommandLine;
 
 import java.io.PrintStream;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  *
@@ -24,7 +24,11 @@ public class Printer {
     public Printer() {
     }
 
-    public void print(Set<String> strings) {
-        out.println(strings);
+    public void println(Collection<String> strings) {
+        strings.forEach(this::println);
+    }
+
+    public void println(String string) {
+        out.println(string);
     }
 }

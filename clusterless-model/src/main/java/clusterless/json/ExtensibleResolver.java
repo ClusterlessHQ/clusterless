@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -23,6 +24,7 @@ import java.util.Map;
 public class ExtensibleResolver extends TypeIdResolverBase {
 
     private Map<String, ComponentService<ComponentContext, Model, Component>> serviceMap;
+    private Map<Class<? extends Model>, String> reverseMap;
 
     public ExtensibleResolver() {
     }
@@ -39,11 +41,15 @@ public class ExtensibleResolver extends TypeIdResolverBase {
         }
 
         serviceMap = componentServices.componentServicesFor(modelType);
+
+        reverseMap = serviceMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getValue().modelClass(), Map.Entry::getKey));
     }
 
     @Override
     public String idFromValue(Object value) {
-        return null;
+        return reverseMap.get(value.getClass());
     }
 
     @Override
@@ -58,12 +64,17 @@ public class ExtensibleResolver extends TypeIdResolverBase {
 
     @Override
     public JavaType typeFromId(DatabindContext context, String id) {
-        ComponentService<ComponentContext, Model,Component> service = serviceMap.get(id);
+        Class<Model> modelClass = modelClass(id);
+        return context.getTypeFactory().constructType(modelClass);
+    }
+
+    public Class<Model> modelClass(String id) {
+        ComponentService<ComponentContext, Model, Component> service = serviceMap.get(id);
 
         if (service == null) {
             throw new IllegalStateException("no service found for: " + id);
         }
 
-        return context.getTypeFactory().constructType(service.modelClass());
+        return service.modelClass();
     }
 }

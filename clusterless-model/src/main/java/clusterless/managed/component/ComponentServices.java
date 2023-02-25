@@ -47,6 +47,16 @@ public class ComponentServices {
         });
     }
 
+    public Map<String, ComponentService<ComponentContext, Model, Component>> componentServices() {
+        Map<String, ComponentService<ComponentContext, Model, Component>> result = new LinkedHashMap<>();
+
+        for (ModelType modelType : ModelType.values()) {
+            result.putAll(componentServicesFor(modelType));
+        }
+
+        return result;
+    }
+
     public Map<String, ComponentService<ComponentContext, Model, Component>> componentServicesFor(ModelType modelType) {
         Map<String, ComponentService<ComponentContext, Model, Component>> result = new HashMap<>();
 

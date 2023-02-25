@@ -13,18 +13,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  *
  */
-public class Boundary extends Extensible {
+public abstract class Boundary extends Extensible {
     @JsonProperty(required = true)
     String name;
 
     @JsonProperty(required = true)
-    Dataset dataset;
+    SinkDataset dataset = new SinkDataset();
 
     public String name() {
         return name;
     }
 
-    public Dataset dataset() {
+    public SinkDataset dataset() {
         return dataset;
     }
 }

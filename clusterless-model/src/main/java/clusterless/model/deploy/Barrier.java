@@ -13,5 +13,5 @@ import clusterless.model.Model;
 /**
  *
  */
-public class Barrier extends Model {
+public abstract class Barrier extends Model {
 }

@@ -16,7 +16,7 @@ import java.net.URI;
 /**
  *
  */
-public class Dataset extends Model {
+public abstract class Dataset extends Model {
     @JsonProperty(required = true)
     String name;
     @JsonProperty(required = true)

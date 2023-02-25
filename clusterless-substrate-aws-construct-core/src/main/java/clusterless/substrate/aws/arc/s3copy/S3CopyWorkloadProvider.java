@@ -16,7 +16,7 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent(provides = ModelType.Workload, name = "core:s3Copy")
+@ProvidesComponent(provides = ModelType.Workload, name = "aws:core:s3CopyWorkload")
 public class S3CopyWorkloadProvider implements ComponentService<ManagedComponentContext, S3CopyWorkload, S3CopyWorkloadConstruct> {
 
     @Override

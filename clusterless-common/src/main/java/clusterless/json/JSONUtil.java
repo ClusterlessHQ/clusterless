@@ -8,9 +8,11 @@
 
 package clusterless.json;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -43,6 +45,11 @@ public class JSONUtil {
 
     public static final ObjectWriter OBJECT_WRITER_PRETTY = OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
 
+    public static final ObjectReader OBJECT_READER = OBJECT_MAPPER
+            .enable(JsonParser.Feature.ALLOW_COMMENTS)
+            .enable(JsonParser.Feature.ALLOW_YAML_COMMENTS)
+            .reader();
+
     public static List<String> getAt(ArrayNode jsonNodes, String pointer) {
         List<String> results = new LinkedList<>();
 
@@ -66,11 +73,11 @@ public class JSONUtil {
     }
 
     public static JsonNode readTree(String json) throws IOException {
-        return OBJECT_MAPPER.readTree(json);
+        return OBJECT_READER.readTree(json);
     }
 
     public static JsonNode readTree(InputStream inputStream) throws IOException {
-        return OBJECT_MAPPER.readTree(inputStream);
+        return OBJECT_READER.readTree(inputStream);
     }
 
     public static JsonNode readTree(File file) throws IOException {
@@ -78,12 +85,12 @@ public class JSONUtil {
             throw new FileNotFoundException("does not exist: " + file);
         }
 
-        return OBJECT_MAPPER.readTree(file);
+        return OBJECT_READER.readTree(new FileInputStream(file));
     }
 
     public static <T> T readObjectSafe(String json, Class<T> type) {
         try {
-            return OBJECT_MAPPER.readValue(json, type);
+            return OBJECT_READER.readValue(json, type);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -92,6 +99,14 @@ public class JSONUtil {
     public static String writeAsStringSafe(Object object) {
         try {
             return OBJECT_WRITER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static String writeAsPrettyStringSafe(Object object) {
+        try {
+            return OBJECT_WRITER_PRETTY.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
