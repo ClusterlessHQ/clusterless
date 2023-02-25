@@ -69,12 +69,15 @@ dependencies {
 
         testImplementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
 
-        testImplementation("org.junit-pioneer:junit-pioneer:2.0.0-RC1")
-        testImplementation("org.junit-pioneer:junit-pioneer-jackson:2.0.0-RC1")
+        // https://github.com/junit-pioneer/junit-pioneer/releases
+        testImplementation("org.junit-pioneer:junit-pioneer:2.0.0")
+        testImplementation("org.junit-pioneer:junit-pioneer-jackson:2.0.0")
 
+        // https://github.com/hosuaby/inject-resources
         testImplementation("io.hosuaby:inject-resources-core:0.3.2")
         testImplementation("io.hosuaby:inject-resources-junit-jupiter:0.3.2")
 
+        // https://github.com/webcompere/system-stubs
         testImplementation("uk.org.webcompere:system-stubs-core:2.0.2")
         testImplementation("uk.org.webcompere:system-stubs-jupiter:2.0.2")
         testImplementation("org.mockito:mockito-inline:5.1.1")
