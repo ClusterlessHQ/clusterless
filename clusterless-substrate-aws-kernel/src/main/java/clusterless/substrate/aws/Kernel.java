@@ -12,6 +12,7 @@ import clusterless.config.Configuration;
 import clusterless.managed.component.ComponentServices;
 import clusterless.model.Struct;
 import clusterless.startup.Startup;
+import clusterless.substrate.ProviderSubstratesOptions;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.aws.bootstrap.Bootstrap;
 import clusterless.substrate.aws.cdk.*;
@@ -26,7 +27,8 @@ import java.util.stream.Collectors;
 /**
  *
  */
-@CommandLine.Command(mixinStandardHelpOptions = true,
+@CommandLine.Command(
+        mixinStandardHelpOptions = true,
         scope = CommandLine.ScopeType.INHERIT,
         subcommands = {
                 Bootstrap.class,
@@ -37,7 +39,8 @@ import java.util.stream.Collectors;
                 Destroy.class,
                 Synth.class,
                 Report.class
-        })
+        }
+)
 public class Kernel extends Startup implements SubstrateProvider {
     private static final Logger LOG = LogManager.getLogger(Kernel.class);
 
@@ -45,6 +48,11 @@ public class Kernel extends Startup implements SubstrateProvider {
         System.exit(new Kernel().execute(args));
     }
 
+    /**
+     * added so --providers is parsed, but ignored. need a better solution
+     */
+    @CommandLine.Mixin
+    ProviderSubstratesOptions providerSubstratesOptions = ProviderSubstratesOptions.ignored();
 
     public Kernel() {
         configurations().add(AwsConfig.configOptions);

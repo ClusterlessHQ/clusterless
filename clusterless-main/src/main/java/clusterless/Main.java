@@ -40,6 +40,11 @@ import java.util.concurrent.Callable;
 )
 public class Main extends Startup implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Main.class);
+
+    /**
+     * This provides a global --providers predicate, but when calling a provider, we need to sort out a way
+     * to remove these args. currently the provider class parses the options, but ignores them
+     */
     @CommandLine.Mixin
     protected ProviderSubstratesOptions providerSubstratesOptions = new ProviderSubstratesOptions();
     private String[] args;
@@ -88,7 +93,7 @@ public class Main extends Startup implements Callable<Integer> {
             return run((LifecycleCommandOptions) command);
         }
 
-        return run(substratesOptions().substrates());
+        return run(substratesOptions().providerNames());
     }
 
     public Integer run(LifecycleCommandOptions command) throws IOException {
@@ -104,7 +109,7 @@ public class Main extends Startup implements Callable<Integer> {
     }
 
     public int run(Collection<String> declaredProviders) {
-        Map<String, SubstrateProvider> substrates = substratesOptions().requestedSubstrates();
+        Map<String, SubstrateProvider> substrates = substratesOptions().requestedProvider();
 
         LOG.info("available: {}", substrates.keySet());
 

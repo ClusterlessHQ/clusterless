@@ -112,7 +112,7 @@ public class ConfigCommand {
         if (name.equals("common")) {
             configClass = CommonConfig.class;
         } else {
-            SubstrateProvider substrateProvider = main.substratesOptions().requestedSubstrates().get(name);
+            SubstrateProvider substrateProvider = main.substratesOptions().requestedProvider().get(name);
             configClass = substrateProvider.configClass();
         }
 

@@ -19,31 +19,39 @@ import java.util.Set;
  *
  */
 public class ProviderSubstratesOptions {
-    protected final SubstrateProviders providers = new SubstrateProviders();
+    public static ProviderSubstratesOptions ignored() {
+        return new ProviderSubstratesOptions(true);
+    }
+
+    protected SubstrateProviders providers;
 
     @CommandLine.Option(
-            names = {"-P", "--provider"},
+            names = {"-P", "--providers"},
             description = "provider substrates to target",
             scope = CommandLine.ScopeType.INHERIT
     )
-    protected Set<String> substrates = new LinkedHashSet<>();
+    protected Set<String> providerNames = new LinkedHashSet<>();
 
     public ProviderSubstratesOptions() {
-        this.substrates.addAll(providers.names());
+        this.providers = new SubstrateProviders();
+        this.providerNames.addAll(providers.names());
     }
 
-    public Set<String> available() {
+    private ProviderSubstratesOptions(boolean ignore) {
+    }
+
+    public Set<String> availableNames() {
         return providers.names();
     }
 
-    public Set<String> substrates() {
-        return substrates;
+    public Set<String> providerNames() {
+        return providerNames;
     }
 
-    public Map<String, SubstrateProvider> requestedSubstrates() {
+    public Map<String, SubstrateProvider> requestedProvider() {
         Map<String, SubstrateProvider> result = new LinkedHashMap<>();
 
-        substrates.forEach(s -> result.put(s, providers.get(s)));
+        providerNames.forEach(s -> result.put(s, providers.get(s)));
 
         return result;
     }

@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.StdIo;
 
@@ -30,11 +31,11 @@ public class KernelTest {
             },
             "resources" : [
                 {
-                    "type" : "core:s3Bucket",
+                    "type" : "aws:core:s3Bucket",
                     "bucketName" : "sample-bucket1"
                 },
                 {
-                    "type" : "core:s3Bucket",
+                    "type" : "aws:core:s3Bucket",
                     "bucketName" : "sample-bucket2"
                 }
                 ]
@@ -47,6 +48,6 @@ public class KernelTest {
                 "-"
         };
 
-        new Kernel().execute(args);
+        Assertions.assertEquals(0, new Kernel().execute(args));
     }
 }

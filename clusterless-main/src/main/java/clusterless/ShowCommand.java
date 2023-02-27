@@ -84,7 +84,7 @@ public class ShowCommand {
 
         @Override
         public Integer handleList() throws Exception {
-            showCommand.main.printer().println(showCommand.main.substratesOptions().available());
+            showCommand.main.printer().println(showCommand.main.substratesOptions().availableNames());
             return 0;
         }
     }
@@ -104,7 +104,7 @@ public class ShowCommand {
                 return printModel(modelClass);
             }
 
-            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedSubstrates();
+            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
             for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
                 modelClass = entry.getValue().models().get(exclusive.name.get());
 
@@ -119,7 +119,7 @@ public class ShowCommand {
         protected Integer handleList() {
             showCommand.main.printer().println(Models.names());
 
-            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedSubstrates();
+            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
 
             for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
                 showCommand.main.printer().println(entry.getValue().models().keySet());
