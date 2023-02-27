@@ -17,7 +17,7 @@ dependencies {
     api(project(":clusterless-substrate-aws-common"))
 
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
-    api("software.amazon.awscdk:aws-cdk-lib:2.65.0")
+    api("software.amazon.awscdk:aws-cdk-lib:2.66.1")
     // https://mvnrepository.com/artifact/software.constructs/constructs
-    api("software.constructs:constructs:10.1.252")
+    api("software.constructs:constructs:10.1.261")
 }
