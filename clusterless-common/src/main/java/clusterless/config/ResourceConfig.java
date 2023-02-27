@@ -6,16 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.command;
-
-
-import picocli.CommandLine;
+package clusterless.config;
 
 /**
  *
  */
-@CommandLine.Command(
-        subcommands = {CommandLine.HelpCommand.class}
-)
-public class CommonCommandOptions {
+public class ResourceConfig extends Config {
+    private boolean removeAllOnDestroy = false;
+
+    public ResourceConfig() {
+    }
+
+    public boolean removeAllOnDestroy() {
+        return removeAllOnDestroy;
+    }
 }

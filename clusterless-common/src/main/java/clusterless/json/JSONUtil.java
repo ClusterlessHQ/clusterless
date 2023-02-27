@@ -8,6 +8,7 @@
 
 package clusterless.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -31,16 +33,22 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATION
  */
 public class JSONUtil {
 
-    public static final List<SimpleModule> modules = List.of(new JodaModule(), new JavaTimeModule());
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final List<SimpleModule> modules = List.of(
+            new JodaModule(),
+            new JavaTimeModule()
+    );
 
-    static {
-        OBJECT_MAPPER
+    private static ObjectMapper create() {
+        return new ObjectMapper()
                 .registerModules(modules)
                 .configure(WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
     }
 
+    public static final ObjectMapper OBJECT_MAPPER = create();
+
+    public static final ObjectMapper OBJECT_MAPPER_NO_NULL = create()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
     public static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer();
 
     public static final ObjectWriter OBJECT_WRITER_PRETTY = OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
@@ -72,20 +80,40 @@ public class JSONUtil {
         return OBJECT_MAPPER.getNodeFactory().arrayNode();
     }
 
+    public static ObjectNode createObjectNode() {
+        return OBJECT_MAPPER.getNodeFactory().objectNode();
+    }
+
     public static JsonNode readTree(String json) throws IOException {
         return OBJECT_READER.readTree(json);
+    }
+
+    public static ObjectNode valueToObjectNodeNoNulls(Object object) {
+        return OBJECT_MAPPER_NO_NULL.valueToTree(object);
+    }
+
+    public static ObjectNode valueToObjectNode(Object object) throws IOException {
+        return OBJECT_MAPPER.valueToTree(object);
     }
 
     public static JsonNode readTree(InputStream inputStream) throws IOException {
         return OBJECT_READER.readTree(inputStream);
     }
 
-    public static JsonNode readTree(File file) throws IOException {
+    public static <J extends JsonNode> J readTreeSafe(File file) {
+        try {
+            return readTree(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <J extends JsonNode> J readTree(File file) throws IOException {
         if (!file.exists()) {
             throw new FileNotFoundException("does not exist: " + file);
         }
 
-        return OBJECT_READER.readTree(new FileInputStream(file));
+        return (J) OBJECT_READER.readTree(new FileInputStream(file));
     }
 
     public static <T> T readObjectSafe(String json, Class<T> type) {

@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "verify"
 )
-public class Verify implements Callable<Integer> {
+public class Verify extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
     ProcessExec processExec = new ProcessExec();
 

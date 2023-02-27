@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "diff"
 )
-public class Diff implements Callable<Integer> {
+public class Diff extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
     ProcessExec processExec = new ProcessExec();
 

@@ -6,16 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.command;
+package clusterless.config;
 
-
-import picocli.CommandLine;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
  */
-@CommandLine.Command(
-        subcommands = {CommandLine.HelpCommand.class}
-)
-public class CommonCommandOptions {
+public abstract class Configuration extends Config {
+    @JsonIgnore
+    public abstract String name();
 }

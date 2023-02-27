@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.config.Configuration;
 import clusterless.managed.component.ComponentServices;
 import clusterless.model.Struct;
 import clusterless.startup.Startup;
@@ -44,6 +45,11 @@ public class Kernel extends Startup implements SubstrateProvider {
         System.exit(new Kernel().execute(args));
     }
 
+
+    public Kernel() {
+        configurations().add(AwsConfig.configOptions);
+    }
+
     @Override
     public String providerName() {
         return "aws";
@@ -54,6 +60,11 @@ public class Kernel extends Startup implements SubstrateProvider {
         return ComponentServices.INSTANCE.componentServices().entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().modelClass()));
+    }
+
+    @Override
+    public Class<? extends Configuration> configClass() {
+        return AwsConfig.class;
     }
 
     @Override

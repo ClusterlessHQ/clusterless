@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @CommandLine.Command(
         name = "deploy"
 )
-public class Deploy implements Callable<Integer> {
+public class Deploy extends CommonCommand implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Deploy.class);
     @CommandLine.Mixin
     ProcessExec processExec = new ProcessExec();

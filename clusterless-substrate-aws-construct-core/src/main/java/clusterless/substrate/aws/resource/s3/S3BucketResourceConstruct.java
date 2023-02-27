@@ -8,10 +8,9 @@
 
 package clusterless.substrate.aws.resource.s3;
 
-import clusterless.managed.component.ResourceComponent;
+import clusterless.config.CommonConfig;
 import clusterless.substrate.aws.construct.ResourceConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.construct.ModelConstruct;
 import clusterless.substrate.aws.util.TagsUtil;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
@@ -33,14 +32,18 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
     public S3BucketResourceConstruct(@NotNull ManagedComponentContext context, @NotNull S3BucketResource model) {
         super(context, model, model.bucketName());
 
+        CommonConfig config = context.configurations().get("common");
+
+        boolean removeOnDestroy = config.resource().removeAllOnDestroy() || model().removeOnDestroy();
+
         bucket = constructWithinHandler(() -> Bucket.Builder.create(this, id(model().bucketName()))
                 .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)
                 .encryption(BucketEncryption.S3_MANAGED)
                 .enforceSsl(true)
                 .versioned(model().versioned())
                 .bucketName(model().bucketName())
-                .removalPolicy(model().removeOnDestroy() ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
-                .autoDeleteObjects(model().removeOnDestroy()) // adds a lambda if true
+                .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
+                .autoDeleteObjects(removeOnDestroy) // adds a lambda if true
                 // as of 2.64.0 a lambda is installed -> https://github.com/aws/aws-cdk/issues/24086
                 .eventBridgeEnabled(model().enableEventBridge())
                 .build());

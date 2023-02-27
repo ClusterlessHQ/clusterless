@@ -6,16 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.command;
+package clusterless.substrate.aws.cdk;
 
-
+import clusterless.substrate.aws.Kernel;
 import picocli.CommandLine;
 
 /**
  *
  */
-@CommandLine.Command(
-        subcommands = {CommandLine.HelpCommand.class}
-)
-public class CommonCommandOptions {
+public class CommonCommand {
+    @CommandLine.ParentCommand
+    protected Kernel kernel;
 }

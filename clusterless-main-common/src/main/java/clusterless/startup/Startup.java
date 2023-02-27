@@ -8,6 +8,8 @@
 
 package clusterless.startup;
 
+import clusterless.config.CommonConfig;
+import clusterless.config.Configurations;
 import clusterless.printer.Printer;
 import picocli.CommandLine;
 
@@ -22,8 +24,6 @@ public class Startup {
     public static final String CLUSTERLESS_HOME = "clusterless.home";
 
     static {
-        // System.getenv().forEach((k, v) -> System.out.println(k + " = " + v));
-
         setHome();
     }
 
@@ -49,10 +49,24 @@ public class Startup {
     }
 
     @CommandLine.Mixin
-    Verbosity verbosity = new Verbosity();
+    protected Verbosity verbosity = new Verbosity();
 
     @CommandLine.Mixin
     Printer printer = new Printer();
+
+    Configurations configurations = new Configurations();
+
+    public Startup() {
+        configurations.add(CommonConfig.configOptions);
+    }
+
+    public Configurations configurations() {
+        return configurations;
+    }
+
+    public Verbosity verbosity() {
+        return verbosity;
+    }
 
     public Printer printer() {
         return printer;

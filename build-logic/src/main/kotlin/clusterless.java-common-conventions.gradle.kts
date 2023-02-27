@@ -48,10 +48,11 @@ dependencies {
 
         implementation("com.google.guava:guava:31.1-jre")
 
-        implementation("com.fasterxml.jackson.core:jackson-core:2.14.1")
-        implementation("com.fasterxml.jackson.core:jackson-databind:2.14.1")
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda:2.14.1")
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1")
+        implementation("com.fasterxml.jackson.core:jackson-core:2.14.2")
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda:2.14.2")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2")
+        implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.14.2")
 
         implementation("software.amazon.awssdk:s3:2.19.29")
         implementation("software.amazon.awssdk:cloudwatch:2.19.29")

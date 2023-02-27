@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
+import clusterless.config.Configurations;
 import clusterless.managed.component.ComponentContext;
 import clusterless.model.deploy.Deployable;
 import software.constructs.Construct;
@@ -17,20 +18,27 @@ import software.constructs.Construct;
  */
 public class ManagedComponentContext implements ComponentContext {
 
+    final Configurations configurations;
     final ManagedProject managedProject;
     final Deployable deployable;
     final Managed parent;
 
-    public ManagedComponentContext(ManagedProject managedProject, Deployable deployable) {
+    public ManagedComponentContext(Configurations configurations, ManagedProject managedProject, Deployable deployable) {
+        this.configurations = configurations;
         this.managedProject = managedProject;
         this.parent = managedProject;
         this.deployable = deployable;
     }
 
-    public ManagedComponentContext(ManagedProject managedProject, Deployable deployable, Managed parent) {
+    public ManagedComponentContext(Configurations configurations, ManagedProject managedProject, Deployable deployable, Managed parent) {
+        this.configurations = configurations;
         this.managedProject = managedProject;
         this.deployable = deployable;
         this.parent = parent;
+    }
+
+    public Configurations configurations() {
+        return configurations;
     }
 
     public ManagedProject managedProject() {

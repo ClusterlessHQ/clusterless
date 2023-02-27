@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.arc;
 
+import clusterless.config.Configurations;
 import clusterless.managed.component.WorkloadComponent;
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
@@ -23,11 +24,11 @@ import clusterless.util.Label;
 public class ArcStack extends ManagedStack {
     private Arc arc;
 
-    public ArcStack(ManagedProject managedProject, Deployable deployable, Arc arc) {
+    public ArcStack(Configurations configurations, ManagedProject managedProject, Deployable deployable, Arc arc) {
         super(Stacks.stackName(deployable, arcBaseId(arc)), managedProject, deployable, arcBaseId(arc));
         this.arc = arc;
 
-        ManagedComponentContext context = new ManagedComponentContext(managedProject, deployable, this);
+        ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, this);
 
         ArcOrchestration stateMachine = new ArcOrchestration(context, arc);
         ArcListener arcListener = new ArcListener(context, arc, true);

@@ -27,18 +27,18 @@ import java.util.concurrent.Callable;
         name = "show",
         description = "display details about providers and models",
         subcommands = {
-                Show.ShowProviders.class,
-                Show.ShowModel.class
+                ShowCommand.ShowProviders.class,
+                ShowCommand.ShowModel.class
         }
 )
-public class Show {
+public class ShowCommand {
     @CommandLine.ParentCommand
     Main main;
 
     @CommandLine.Mixin
     CommonCommandOptions commandOptions = new CommonCommandOptions();
 
-    public Show() {
+    public ShowCommand() {
     }
 
     public static class BaseShow implements Callable<Integer> {
@@ -54,7 +54,7 @@ public class Show {
         }
 
         @CommandLine.ParentCommand
-        Show show;
+        ShowCommand showCommand;
 
         @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
         Exclusive exclusive;
@@ -84,7 +84,7 @@ public class Show {
 
         @Override
         public Integer handleList() throws Exception {
-            show.main.printer().println(show.main.substratesOptions().available());
+            showCommand.main.printer().println(showCommand.main.substratesOptions().available());
             return 0;
         }
     }
@@ -104,7 +104,7 @@ public class Show {
                 return printModel(modelClass);
             }
 
-            Map<String, SubstrateProvider> providers = show.main.substratesOptions().requestedSubstrates();
+            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedSubstrates();
             for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
                 modelClass = entry.getValue().models().get(exclusive.name.get());
 
@@ -117,19 +117,19 @@ public class Show {
         }
 
         protected Integer handleList() {
-            show.main.printer().println(Models.names());
+            showCommand.main.printer().println(Models.names());
 
-            Map<String, SubstrateProvider> providers = show.main.substratesOptions().requestedSubstrates();
+            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedSubstrates();
 
             for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-                show.main.printer().println(entry.getValue().models().keySet());
+                showCommand.main.printer().println(entry.getValue().models().keySet());
             }
 
             return 0;
         }
 
         private int printModel(Class<? extends Struct> modelClass) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-            show.main.printer().println(JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance()));
+            showCommand.main.printer().println(JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance()));
             return 0;
         }
     }

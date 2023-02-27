@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "destroy"
 )
-public class Destroy implements Callable<Integer> {
+public class Destroy extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
     ProcessExec processExec = new ProcessExec();
     @CommandLine.Mixin

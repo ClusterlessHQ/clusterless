@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.cdk;
+package clusterless.substrate.aws.cdk.lifecycle;
 
+import clusterless.config.Configurations;
 import clusterless.managed.component.*;
 import clusterless.model.Model;
 import clusterless.model.deploy.Arc;
@@ -16,7 +17,7 @@ import clusterless.model.deploy.Extensible;
 import clusterless.model.deploy.Workload;
 import clusterless.startup.Loader;
 import clusterless.substrate.aws.arc.ArcStack;
-import clusterless.substrate.aws.cdk.lifecycle.StackGroups;
+import clusterless.substrate.aws.cdk.CDK;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
@@ -39,12 +40,16 @@ public class Lifecycle {
     ComponentServices componentServices = ComponentServices.INSTANCE;
 
     StackGroups stackGroups = new StackGroups();
+    private Configurations configurations;
 
     public Lifecycle() {
-
     }
 
-    protected void synthProject(List<File> projectFiles) throws IOException {
+    public void setConfigurations(Configurations configurations) {
+        this.configurations = configurations;
+    }
+
+    public void synthProject(List<File> projectFiles) throws IOException {
         List<Deployable> deployableModels = loadProjectModels(projectFiles);
 
         ManagedProject managedProject = mapProject(deployableModels);
@@ -116,12 +121,12 @@ public class Lifecycle {
             }
 
             // construct a stack for every embeddable type, currently only have Process that embeds in an Arc
-            ArcStack stack = new ArcStack(managedProject, deployable, arc);
+            ArcStack stack = new ArcStack(configurations, managedProject, deployable, arc);
 
             // force dependency on prior stacks, but not prior arcs
             priorStacks.forEach(stack::addDependency);
 
-            ManagedComponentContext context = new ManagedComponentContext(managedProject, deployable, stack);
+            ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, stack);
             WorkloadComponent construct = createConstructWith(context, modelComponentService, workload);
 
             stack.applyWorkloadComponent(construct);
@@ -137,7 +142,7 @@ public class Lifecycle {
         }
 
         // constructs a stack for every isolated declared model
-        construct(new ManagedComponentContext(managedProject, deployable), isolated);
+        construct(new ManagedComponentContext(configurations, managedProject, deployable), isolated);
     }
 
     private void constructIncludedStack(ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
@@ -154,7 +159,7 @@ public class Lifecycle {
         // make the new stack dependent on the prior stacks so order is retained during deployment
         managedProject.stacks().forEach(stack::addDependency);
 
-        ComponentContext context = new ManagedComponentContext(managedProject, deployable, stack);
+        ComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, stack);
 
         construct(context, included);
     }
@@ -238,4 +243,5 @@ public class Lifecycle {
 
         return values;
     }
+
 }

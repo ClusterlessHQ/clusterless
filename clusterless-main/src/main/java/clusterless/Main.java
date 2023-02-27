@@ -30,21 +30,16 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "cls",
-//        scope = CommandLine.ScopeType.INHERIT,
         mixinStandardHelpOptions = true,
         version = "1.0-wip",
         subcommands = {
-                Show.class
+                CommandLine.HelpCommand.class,
+                ConfigCommand.class,
+                ShowCommand.class
         }
 )
 public class Main extends Startup implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Main.class);
-    @CommandLine.Option(names = {"-V", "--version"}, versionHelp = true, description = "display version info")
-    boolean versionInfoRequested;
-
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
-    boolean usageHelpRequested;
-
     @CommandLine.Mixin
     protected ProviderSubstratesOptions providerSubstratesOptions = new ProviderSubstratesOptions();
     private String[] args;

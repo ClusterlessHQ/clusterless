@@ -8,6 +8,7 @@
 
 package clusterless.substrate;
 
+import clusterless.config.Configuration;
 import clusterless.model.Struct;
 
 import java.util.Map;
@@ -21,4 +22,6 @@ public interface SubstrateProvider {
     int execute(String[] args);
 
     Map<String, Class<? extends Struct>> models();
+
+    Class<? extends Configuration> configClass();
 }
