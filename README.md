@@ -1,12 +1,11 @@
 # Clusterless
 
-A command line tool for deploying continuously processing workloads for data that is continuously arriving, in the
-cloud.
+A tool for deploying scalable and secure data-processing workloads for continuously arriving data, across clouds.
 
 By standardizing the metadata as new data arrives, workloads can be implemented behind a consistent interface, and can
-be easily event-driven by upstream availability.
+be easily deployed to listen for upstream availability events.
 
-Not only can heterogeneous workloads can be chained together, they can be
+Not only can heterogeneous workloads can be chained together, they can be:
 
 - back-filled - after deployment (of new dataset version)
 - replayed - to correct for changes
@@ -15,7 +14,8 @@ Not only can heterogeneous workloads can be chained together, they can be
 
 Where workloads can be:
 
-- repartitioning data for improved accessibility (group the data by new partition keys)
+- reformatting (say from text to parquet)
+- repartitioning for improved accessibility and performance (group the data by new partition keys)
 - feature extraction
 - training and validation
 - GDPR support via tokenization or retention enforcement
@@ -26,6 +26,12 @@ And can be implemented as:
 - Serverless functions (Python, Java, Node, etc)
 - Native services (AWS SageMaker, AWS Athena, AWS Glue, etc)
 
+Where the intent isn't to have functional parity across substrates, but to ease secure and reliable interoperability
+between them.
+
+By leveraging native pay-as-you-go primitives, no runtimes or dedicated services need to be managed. Zero data arriving,
+zero costs (other than storage).
+
 Currently supported cloud substrates:
 
 - AWS
@@ -33,6 +39,8 @@ Currently supported cloud substrates:
 See the [docs](docs) folder for wip documentation.
 
 ## Prerequisites
+
+_If you already have Node and npm, skip to the AWS CDK install._
 
 Install [nvm](https://github.com/nvm-sh/nvm):
 
@@ -60,8 +68,8 @@ This will create the root main CLI interface and any substrate interfaces, [see 
 
 Currently available are:
 
-- `cls`
-- `cls-aws`
+- `cls` - the root cli interface
+- `cls-aws` - the AWS interface only used as an escape hatch and testing
 
 ## Running
 
