@@ -11,6 +11,7 @@ package clusterless.util;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,5 +36,16 @@ public class Lists {
 
     public static <E extends @Nullable Object> E[] toArray(E first, E[] rest) {
         return asList(first, rest).toArray(rest);
+    }
+
+    @SafeVarargs
+    public static <V> List<V> concat(List<V> first, List<V>... next) {
+        List<V> result = new LinkedList<>(first);
+
+        for (List<V> vs : next) {
+            result.addAll(vs);
+        }
+
+        return result;
     }
 }

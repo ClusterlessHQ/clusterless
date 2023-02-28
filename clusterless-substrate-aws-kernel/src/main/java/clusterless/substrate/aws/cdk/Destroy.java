@@ -10,6 +10,7 @@ package clusterless.substrate.aws.cdk;
 
 
 import clusterless.command.DestroyCommandOptions;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
 
@@ -27,6 +28,6 @@ public class Destroy extends CommonCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-        return processExec.executeLifecycleProcess("destroy", commandOptions);
+        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "destroy", getRequireDestroyApproval());
     }
 }

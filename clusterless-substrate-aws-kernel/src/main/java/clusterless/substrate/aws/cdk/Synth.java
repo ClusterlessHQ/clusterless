@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk;
 
 import clusterless.command.LifecycleCommandOptions;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.cdk.lifecycle.Lifecycle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

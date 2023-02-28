@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk;
 
 import clusterless.command.DiffCommandOptions;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
 
@@ -26,6 +27,6 @@ public class Diff extends CommonCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return processExec.executeLifecycleProcess("diff", commandOptions);
+        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "diff");
     }
 }

@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk;
 
 import clusterless.command.VerifyCommandOptions;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import picocli.CommandLine;
 
@@ -29,6 +30,6 @@ public class Verify extends CommonCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        return processExec.executeLifecycleProcess("synth", commandOptions);
+        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "synth");
     }
 }

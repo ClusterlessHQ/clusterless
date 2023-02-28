@@ -31,8 +31,8 @@ import java.util.List;
  *
  */
 public class ConfigManager {
-    public static final Path CURRENT_DIR = Paths.get(".").toAbsolutePath();
-    public static final Path HOME_DIR = Paths.get(System.getProperty("user.home")).toAbsolutePath();
+    public static final Path CURRENT_DIR = Paths.get(".").toAbsolutePath().normalize();
+    public static final Path HOME_DIR = Paths.get(System.getProperty("user.home")).toAbsolutePath().normalize();
     public static final Path GLOBAL_CONFIG_DIR = HOME_DIR.resolve(Paths.get(".cls"));
     public static final String GLOBAL_CONFIG_NAME = "config";
     public static final String LOCAL_CONFIG_NAME = ".clsconfig";

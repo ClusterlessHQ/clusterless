@@ -8,10 +8,9 @@
 
 package clusterless.substrate.aws;
 
-import clusterless.config.ConfigOptions;
+import clusterless.config.Config;
 import clusterless.config.Configuration;
-
-import java.nio.file.Paths;
+import clusterless.util.Label;
 
 /**
  * --require-approval     What security-sensitive changes need manual
@@ -19,11 +18,32 @@ import java.nio.file.Paths;
  * [string] [choices: "never", "any-change", "broadening"]
  */
 public class AwsConfig extends Configuration {
-    public static final ConfigOptions configOptions = ConfigOptions.Builder.builder()
-            .withLocalConfigName(Paths.get(".clsconfig-aws"))
-            .withGlobalConfigName(Paths.get("config-aws"))
-            .withConfigClass(AwsConfig.class)
-            .build();
+
+    public static class CDK extends Config {
+        public enum Approval implements Label.EnumLabel {
+            never,
+            any_change,
+            broadening;
+
+            public String value() {
+                return lowerHyphen();
+            }
+        }
+
+        Approval requireDeployApproval = Approval.broadening;
+
+        boolean requireDestroyApproval = true;
+
+        public Approval requireDeployApproval() {
+            return requireDeployApproval;
+        }
+
+        public boolean requireDestroyApproval() {
+            return requireDestroyApproval;
+        }
+    }
+
+    CDK cdk = new CDK();
 
     public AwsConfig() {
     }
@@ -31,5 +51,9 @@ public class AwsConfig extends Configuration {
     @Override
     public String name() {
         return "aws";
+    }
+
+    public CDK cdk() {
+        return cdk;
     }
 }

@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.config.ConfigManager;
 import clusterless.config.Configuration;
 import clusterless.managed.component.ComponentServices;
 import clusterless.model.Struct;
@@ -55,7 +56,7 @@ public class Kernel extends Startup implements SubstrateProvider {
     ProviderSubstratesOptions providerSubstratesOptions = ProviderSubstratesOptions.ignored();
 
     public Kernel() {
-        configurations().add(AwsConfig.configOptions);
+        configurations().add(ConfigManager.optionsFor(providerName(), AwsConfig.class));
     }
 
     @Override

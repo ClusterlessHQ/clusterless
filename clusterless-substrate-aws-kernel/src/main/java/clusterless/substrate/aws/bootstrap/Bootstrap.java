@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.bootstrap;
 
 import clusterless.command.BootstrapCommandOptions;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Stacks;
@@ -36,7 +37,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "bootstrap"
 )
-public class Bootstrap implements Callable<Integer> {
+public class Bootstrap extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
     ProcessExec processExec = new ProcessExec();
 
@@ -70,10 +71,10 @@ public class Bootstrap implements Callable<Integer> {
             return 0;
         }
 
-        String appArgs = "--synth %s".formatted(String.join(" ", args));
+        List<String> kernelArgs = Lists.concat(List.of("--synth"), args);
 
         processExec.setUseTempOutput(true);
-        processExec.executeCDKApp("deploy", "bootstrap", appArgs);
+        processExec.executeCDKApp(getConfig(), "deploy", getRequireDeployApproval(), "bootstrap", kernelArgs);
 
         return 0;
     }

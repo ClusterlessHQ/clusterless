@@ -13,8 +13,10 @@ import clusterless.startup.Startup;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import clusterless.util.URIs;
+import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -114,13 +116,21 @@ public class ProcessExec {
         return cdk();
     }
 
-    public Integer executeLifecycleProcess(String cdkCommand, LifecycleCommandOptions commandOptions) {
-        String projectAgs = "--project %s".formatted(filesAsArg(commandOptions.projectFiles()));
-
-        return executeCDKApp(cdkCommand, "synth", projectAgs);
+    public Integer executeLifecycleProcess(@NotNull AwsConfig config, @NotNull LifecycleCommandOptions commandOptions, @NotNull String cdkCommand) {
+        return executeLifecycleProcess(config, commandOptions, cdkCommand, Collections.emptyList());
     }
 
-    public Integer executeCDKApp(String cdkCommand, String kernelCommand, String kernelArgs) {
+    public Integer executeLifecycleProcess(@NotNull AwsConfig config, @NotNull LifecycleCommandOptions commandOptions, @NotNull String cdkCommand, @NotNull List<String> cdkCommandArgs) {
+        List<String> kernelArgs = List.of("--project", filesAsArg(commandOptions.projectFiles()));
+
+        return executeCDKApp(config, cdkCommand, cdkCommandArgs, "synth", kernelArgs);
+    }
+
+    public Integer executeCDKApp(@NotNull AwsConfig config, @NotNull String cdkCommand, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
+        return executeCDKApp(config, cdkCommand, Collections.emptyList(), kernelCommand, kernelArgs);
+    }
+
+    public Integer executeCDKApp(@NotNull AwsConfig config, @NotNull String cdkCommand, @NotNull List<String> commandArgs, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
         List<String> cdkCommands = new LinkedList<>();
 
         cdkCommands.add(
@@ -128,7 +138,7 @@ public class ProcessExec {
         );
 
         // execute the aws-cli app with the synth command
-        String awsKernel = ("%s %s %s").formatted(cdkApp(), kernelCommand, kernelArgs);
+        String awsKernel = ("%s %s %s").formatted(cdkApp(), kernelCommand, Joiner.on(" ").join(kernelArgs));
 
         // options only added if value is not null
         cdkCommands.addAll(
@@ -148,6 +158,8 @@ public class ProcessExec {
                         "--all" // deploy all stacks
                 )
         );
+
+        cdkCommands.addAll(commandArgs);
 
         return executeProcess(cdkCommands);
     }

@@ -12,6 +12,7 @@ import clusterless.command.DeployCommandOptions;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Placement;
 import clusterless.startup.Loader;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import clusterless.substrate.aws.resources.Buckets;
 import clusterless.substrate.aws.sdk.S3;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -66,6 +68,9 @@ public class Deploy extends CommonCommand implements Callable<Integer> {
             throw new IllegalStateException(message);
         }
 
-        return processExec.executeLifecycleProcess("deploy", commandOptions);
+        List<String> commandArgs = getRequireDeployApproval();
+
+        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "deploy", commandArgs);
     }
+
 }
