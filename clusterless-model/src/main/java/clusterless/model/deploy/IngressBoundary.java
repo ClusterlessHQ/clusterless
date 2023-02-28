@@ -10,8 +10,6 @@ package clusterless.model.deploy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.net.URI;
-
 /**
  *
  */
@@ -19,17 +17,11 @@ public class IngressBoundary extends Boundary {
 
     @JsonProperty(required = true)
     private String lotUnit;
-    @JsonProperty(required = true)
-    private URI listenURI;
 
     private boolean enableEventBridge = false;
 
     public String lotUnit() {
         return lotUnit;
-    }
-
-    public URI listenURI() {
-        return listenURI;
     }
 
     public boolean enableEventBridge() {

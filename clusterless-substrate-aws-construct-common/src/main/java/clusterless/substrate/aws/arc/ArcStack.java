@@ -22,7 +22,7 @@ import clusterless.util.Label;
  *
  */
 public class ArcStack extends ManagedStack {
-    private Arc arc;
+    private final Arc arc;
 
     public ArcStack(Configurations configurations, ManagedProject managedProject, Deployable deployable, Arc arc) {
         super(Stacks.stackName(deployable, arcBaseId(arc)), managedProject, deployable, arcBaseId(arc));
@@ -51,7 +51,7 @@ public class ArcStack extends ManagedStack {
     }
 
     private static Label arcBaseId(Arc arc) {
-        return Label.of("Arc").with(arc.workload().name());
+        return Label.of("Arc").with(arc.name());
     }
 
     public void applyWorkloadComponent(WorkloadComponent workloadComponent) {

@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.arc.s3copy;
 
 import clusterless.managed.component.ComponentService;
+import clusterless.managed.component.Isolation;
 import clusterless.managed.component.ModelType;
 import clusterless.managed.component.ProvidesComponent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
@@ -16,12 +17,16 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent(provides = ModelType.Workload, name = "aws:core:s3CopyWorkload")
+@ProvidesComponent(
+        provides = ModelType.Workload,
+        name = "aws:core:s3CopyWorkload",
+        isolation = Isolation.embedded
+)
 public class S3CopyWorkloadProvider implements ComponentService<ManagedComponentContext, S3CopyWorkload, S3CopyWorkloadConstruct> {
 
     @Override
     public S3CopyWorkloadConstruct create(ManagedComponentContext context, S3CopyWorkload model) {
-        return null;
+        return new S3CopyWorkloadConstruct(context, model);
     }
 
     @Override

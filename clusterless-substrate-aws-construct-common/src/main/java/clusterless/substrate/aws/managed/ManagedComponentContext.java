@@ -24,10 +24,7 @@ public class ManagedComponentContext implements ComponentContext {
     final Managed parent;
 
     public ManagedComponentContext(Configurations configurations, ManagedProject managedProject, Deployable deployable) {
-        this.configurations = configurations;
-        this.managedProject = managedProject;
-        this.parent = managedProject;
-        this.deployable = deployable;
+        this(configurations, managedProject, deployable, managedProject);
     }
 
     public ManagedComponentContext(Configurations configurations, ManagedProject managedProject, Deployable deployable, Managed parent) {
@@ -49,7 +46,7 @@ public class ManagedComponentContext implements ComponentContext {
         return deployable;
     }
 
-    public Construct parent() {
+    public Construct parentConstruct() {
         return parent.asConstruct();
     }
 }

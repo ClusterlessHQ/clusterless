@@ -23,7 +23,7 @@ public class Workloads {
         String version = deployable.project().version();
         String region = deployable.placement().region();
 
-        String arcName = arc.workload().name();
+        String arcName = arc.name();
 
         return Label.of(stage).upperOnly()
                 .with(Label.of(name))

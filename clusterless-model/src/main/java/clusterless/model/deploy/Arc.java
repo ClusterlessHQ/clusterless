@@ -25,6 +25,10 @@ public class Arc extends Model {
     Workload workload;
     List<SinkDataset> sinks = new ArrayList<>();
 
+    public String name() {
+        return name;
+    }
+
     public List<SourceDataset> sources() {
         return sources;
     }

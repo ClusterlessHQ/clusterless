@@ -10,10 +10,8 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
-import clusterless.managed.component.BoundaryComponent;
 import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.construct.ModelConstruct;
 import clusterless.substrate.aws.resources.Assets;
 import clusterless.substrate.aws.resources.Buckets;
 import clusterless.substrate.aws.resources.Events;
@@ -58,7 +56,7 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
         TemporalUnit temporalUnit = IntervalUnits.find(model().lotUnit());
         IntervalUnits.verifyHasFormatter(temporalUnit);
 
-        URI listenURI = URIs.normalizeURI(model().listenURI());
+        URI listenURI = URIs.normalizeURI(model().dataset().locationURI());
 
         String listenBucketName = listenURI.getHost();
         String listenPathPrefix = URIs.asKeyPath(listenURI);

@@ -13,13 +13,12 @@ import clusterless.model.deploy.SourceDataset;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
+import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.resources.Workloads;
 import clusterless.util.Label;
 import clusterless.util.OrderedSafeMaps;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.services.events.EventPattern;
-import software.amazon.awscdk.services.events.IRuleTarget;
-import software.amazon.awscdk.services.events.Rule;
+import software.amazon.awscdk.services.events.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class ArcListener extends ManagedConstruct {
     private final Rule rule;
 
     public ArcListener(@NotNull ManagedComponentContext context, @NotNull Arc arc, boolean enabled) {
-        super(context, Label.of(arc.workload().name()).with("Listener"));
+        super(context, Label.of(arc.name()).with("Listener"));
 
         List<String> ids = arc.sources()
                 .stream()
@@ -54,7 +53,11 @@ public class ArcListener extends ManagedConstruct {
 
         ruleName = Workloads.workloadBaseName(context().deployable(), arc).with("Rule");
 
+        String eventBusName = Events.arcEventBusNameRef(this);
+        IEventBus eventBus = EventBus.fromEventBusName(this, "EventBus", eventBusName);
+
         rule = Rule.Builder.create(this, ruleName.camelCase())
+                .eventBus(eventBus)
                 .ruleName(ruleName.lowerHyphen())
                 .eventPattern(eventPattern)
                 .enabled(enabled)

@@ -115,7 +115,7 @@ public class Lifecycle {
             ComponentService<ComponentContext, Model, Component> modelComponentService = embedded.get(workload);
 
             if (modelComponentService == null) {
-                String message = "component service not found for: %s, type: %s".formatted(workload.name(), workload.type());
+                String message = "component service not found in arc: %s, workload type: %s".formatted(arc.name(), workload.type());
                 LOG.error(message);
                 throw new IllegalStateException(message);
             }

@@ -19,7 +19,7 @@ public class ManagedConstruct extends Construct implements Managed {
     private final ManagedComponentContext context;
 
     public ManagedConstruct(@NotNull ManagedComponentContext context, Label baseId) {
-        super(context.parent(), baseId.camelCase());
+        super(context.parentConstruct(), baseId.camelCase());
         this.context = context;
     }
 

@@ -29,11 +29,12 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
     private final Label stateMachineName;
 
     public ArcOrchestration(@NotNull ManagedComponentContext context, @NotNull Arc arc) {
-        super(context, Label.of(arc.workload().name()).with("Orchestration"));
+        super(context, Label.of(arc.name()).with("Orchestration"));
 
         Pass head = Pass.Builder.create(this, "Start")
-                .inputPath("$.detail.responsePayload.event") // "$.detail.event"
-                .resultPath("$.inputKey.event")
+//                .inputPath("$.detail")
+//                .resultPath("$")
+                .outputPath("$.detail")
                 .build();
 
         head.next(succeed("Success"));
@@ -41,7 +42,6 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
         stateMachineName = Workloads.workloadBaseName(context().deployable(), arc);
 
         LogGroup logGroup = LogGroup.Builder.create(this, Label.of("LogGroup").with(stateMachineName).camelCase())
-//                .logGroupName("/aws/lambda/" + transformEventFunction.getFunctionName())
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .retention(RetentionDays.ONE_DAY)
                 .build();
