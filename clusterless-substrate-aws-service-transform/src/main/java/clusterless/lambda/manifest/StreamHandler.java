@@ -24,6 +24,8 @@ import java.io.OutputStream;
  *
  */
 public abstract class StreamHandler<E> implements RequestStreamHandler {
+    private static final byte[] _JsonNull = new byte[]{'n', 'u', 'l', 'l'};
+
     protected static final Logger LOG = LogManager.getLogger(PutEventTransformHandler.class);
     protected ObjectReader reader;
 
@@ -33,6 +35,8 @@ public abstract class StreamHandler<E> implements RequestStreamHandler {
 
     public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
         handleRequest(reader.readValue(input), context);
+
+        output.write(_JsonNull);
     }
 
     public abstract void handleRequest(E event, Context context);
