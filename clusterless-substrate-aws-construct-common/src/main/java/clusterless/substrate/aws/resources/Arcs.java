@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
-public class Workloads {
-    public static Label workloadBaseName(@NotNull Deployable deployable, @NotNull Arc arc) {
+public class Arcs {
+    public static Label arcBaseName(@NotNull Deployable deployable, @NotNull Arc arc) {
         String stage = deployable.placement().stage();
         String name = deployable.project().name();
         String version = deployable.project().version();

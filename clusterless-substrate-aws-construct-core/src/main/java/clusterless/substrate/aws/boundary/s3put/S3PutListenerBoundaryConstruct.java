@@ -60,19 +60,19 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
 
         String listenBucketName = listenURI.getHost();
         String listenPathPrefix = URIs.asKeyPath(listenURI);
-        String manifestBucketName = Buckets.bootstrapManifestBucketNameRef(this);
-        String eventBusName = Events.arcEventBusNameRef(this);
+        String manifestBucketRef = Buckets.manifestBucketNameRef(this);
+        String eventBusRef = Events.arcEventBusNameRef(this);
         String listenerRuleName = Rules.ruleName(this, model.name());
 
         IBucket listenBucket = Bucket.fromBucketName(this, "ListenBucket", listenBucketName);
-        IBucket manifestBucket = Bucket.fromBucketName(this, "ManifestBucket", manifestBucketName);
-        IEventBus arcEventBus = EventBus.fromEventBusName(this, "EventBus", eventBusName);
+        IBucket manifestBucket = Bucket.fromBucketName(this, "ManifestBucket", manifestBucketRef);
+        IEventBus arcEventBus = EventBus.fromEventBusName(this, "EventBus", eventBusRef);
 
         // declare lambda to convert put event into arc event
-        URI manifestPrefix = Buckets.bootstrapManifestURI(this, model().dataset().name(), model().dataset().version());
+        URI manifestPrefix = Buckets.manifestURI(this, model().dataset());
 
         TransformProps transformProps = TransformProps.Builder.builder()
-                .withEventBusName(eventBusName)
+                .withEventBusName(eventBusRef)
                 .withDatasetPrefix(listenURI)
                 .withDatasetName(model().dataset().name())
                 .withDatasetVersion(model().dataset().version())

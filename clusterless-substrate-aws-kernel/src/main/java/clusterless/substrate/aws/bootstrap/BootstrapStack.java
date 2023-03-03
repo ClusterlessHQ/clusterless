@@ -52,9 +52,9 @@ public class BootstrapStack extends StagedStack {
 
         Objects.requireNonNull(env);
 
-        String metadataBucketName = Buckets.bootstrapMetadataBucketName(this);
-        String arcStateBucketName = Buckets.bootstrapArcStateBucketName(this);
-        String manifestBucketName = Buckets.bootstrapManifestBucketName(this);
+        String metadataBucketName = Buckets.metadataBucketName(this);
+        String arcStateBucketName = Buckets.arcStateBucketName(this);
+        String manifestBucketName = Buckets.manifestBucketName(this);
 
         String arcEventBusName = Events.arcEventBusName(this);
 

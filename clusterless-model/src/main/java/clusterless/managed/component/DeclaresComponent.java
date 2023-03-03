@@ -8,8 +8,18 @@
 
 package clusterless.managed.component;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  *
  */
-public interface WorkloadComponent extends Component {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface DeclaresComponent {
+    ModelType provides();
+
+    Isolation isolation() default Isolation.grouped;
 }

@@ -11,6 +11,10 @@ pluginManagement {
     includeBuild("build-logic")
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.4.0"
+}
+
 rootProject.name = "clusterless"
 
 include("clusterless-common")
@@ -29,5 +33,11 @@ include("clusterless-substrate-aws-construct-common")
 // core provided deploy constructs
 include("clusterless-substrate-aws-construct-core")
 
+// common lambad apis
+include("clusterless-substrate-aws-lambda-common")
+
 // service lambdas
 include("clusterless-substrate-aws-service-transform")
+
+// core lambda workloads
+include("clusterless-substrate-aws-lambda-workload")

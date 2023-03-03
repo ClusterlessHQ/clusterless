@@ -10,11 +10,12 @@ package clusterless.substrate.aws.arc;
 
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.SourceDataset;
+import clusterless.model.deploy.Workload;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
+import clusterless.substrate.aws.resources.Arcs;
 import clusterless.substrate.aws.resources.Events;
-import clusterless.substrate.aws.resources.Workloads;
 import clusterless.util.Label;
 import clusterless.util.OrderedSafeMaps;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +33,10 @@ public class ArcListener extends ManagedConstruct {
     private final Label ruleName;
     private final Rule rule;
 
-    public ArcListener(@NotNull ManagedComponentContext context, @NotNull Arc arc, boolean enabled) {
+    public ArcListener(@NotNull ManagedComponentContext context, @NotNull Arc<? extends Workload> arc, boolean enabled) {
         super(context, Label.of(arc.name()).with("Listener"));
 
-        List<String> ids = arc.sources()
+        List<String> ids = arc.sources().values()
                 .stream()
                 .filter(SourceDataset::subscribe) // only listen for those subscribed too
                 .map(d -> ArcNotifyEvent.createDatasetId(d.name(), d.version()))
@@ -51,7 +52,7 @@ public class ArcListener extends ManagedConstruct {
                 .detail(detail)
                 .build();
 
-        ruleName = Workloads.workloadBaseName(context().deployable(), arc).with("Rule");
+        ruleName = Arcs.arcBaseName(context().deployable(), arc).with("Rule");
 
         String eventBusName = Events.arcEventBusNameRef(this);
         IEventBus eventBus = EventBus.fromEventBusName(this, "EventBus", eventBusName);

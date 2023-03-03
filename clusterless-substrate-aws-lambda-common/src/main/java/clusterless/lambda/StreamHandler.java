@@ -6,10 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda.manifest;
+package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
-import clusterless.lambda.transform.PutEventTransformHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -26,7 +25,7 @@ import java.io.OutputStream;
 public abstract class StreamHandler<E> implements RequestStreamHandler {
     private static final byte[] _JsonNull = new byte[]{'n', 'u', 'l', 'l'};
 
-    protected static final Logger LOG = LogManager.getLogger(PutEventTransformHandler.class);
+    protected static final Logger LOG = LogManager.getLogger(StreamHandler.class);
     protected ObjectReader reader;
 
     public StreamHandler(Class<E> type) {

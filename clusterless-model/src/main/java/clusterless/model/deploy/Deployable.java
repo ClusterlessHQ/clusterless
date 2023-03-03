@@ -32,7 +32,7 @@ public class Deployable extends Model {
     @JsonProperty("barriers")
     List<Barrier> barriers = new ArrayList<>();
     @JsonProperty("arcs")
-    List<Arc> arcs = new ArrayList<>();
+    List<Arc<? extends Workload>> arcs = new ArrayList<>();
 
     public Deployable() {
     }
@@ -65,7 +65,7 @@ public class Deployable extends Model {
         return barriers;
     }
 
-    public List<Arc> arcs() {
+    public List<Arc<? extends Workload>> arcs() {
         return arcs;
     }
 }

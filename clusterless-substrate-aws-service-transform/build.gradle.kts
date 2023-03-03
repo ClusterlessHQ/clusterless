@@ -34,24 +34,7 @@ dependencies {
     implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-common"))
-
-    implementation("com.google.guava:guava")
-
-    implementation("com.fasterxml.jackson.core:jackson-core")
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-
-    implementation("software.amazon.awssdk:s3")
-    implementation("software.amazon.awssdk:cloudwatch")
-    implementation("software.amazon.awssdk:eventbridge")
-
-    implementation("com.amazonaws:aws-lambda-java-core")
-//    implementation("com.amazonaws:aws-lambda-java-events")
-//    implementation("com.amazonaws:aws-lambda-java-serialization")
-    implementation("com.amazonaws:aws-lambda-java-log4j2")
-
-//    implementation("io.github.resilience4j:resilience4j-retry")
+    implementation(project(":clusterless-substrate-aws-lambda-common"))
 }
 
 openApiGenerate {

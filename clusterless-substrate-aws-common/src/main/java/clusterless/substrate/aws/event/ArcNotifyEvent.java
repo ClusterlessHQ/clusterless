@@ -66,7 +66,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
      *
      * @return a single string for pattern matching
      */
-    @JsonProperty()
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String datasetId() {
         return createDatasetId(datasetName(), datasetVersion());
     }

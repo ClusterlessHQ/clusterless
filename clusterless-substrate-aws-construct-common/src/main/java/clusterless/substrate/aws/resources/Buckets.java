@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.resources;
 
+import clusterless.model.deploy.Dataset;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.StagedApp;
@@ -53,7 +54,11 @@ public class Buckets {
     public static final Label MANIFEST_BUCKET_NAME = MANIFEST.bucketNameKey();
 
 
-    public static URI bootstrapManifestURI(@NotNull ManagedConstruct managedConstruct, String... names) {
+    public static URI manifestURI(@NotNull ManagedConstruct managedConstruct, Dataset dataset) {
+        return manifestURI(managedConstruct, dataset.name(), dataset.version());
+    }
+
+    public static URI manifestURI(@NotNull ManagedConstruct managedConstruct, String... names) {
         ManagedProject managedProject = ManagedProject.projectOf(managedConstruct);
 
         String path = Label.of(managedProject.name())
@@ -62,29 +67,29 @@ public class Buckets {
                 .lowerHyphenPath(true);
 
         try {
-            return new URI("s3", bootstrapManifestBucketName(managedConstruct), URIs.normalize("/", path), null);
+            return new URI("s3", manifestBucketName(managedConstruct), URIs.normalize("/", path), null);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("unable to create uri", e);
         }
     }
 
-    public static String bootstrapMetadataBucketName(@NotNull Construct scope) {
+    public static String metadataBucketName(@NotNull Construct scope) {
         return bootstrapBucketName(scope, METADATA);
     }
 
-    public static String bootstrapArcStateBucketName(@NotNull Construct scope) {
+    public static String arcStateBucketName(@NotNull Construct scope) {
         return bootstrapBucketName(scope, ARC_STATE);
     }
 
-    public static String bootstrapArcStateBucketNameRef(@NotNull Construct scope) {
+    public static String arcStateBucketNameRef(@NotNull Construct scope) {
         return bootstrapBucketNameRef(scope, ARC_STATE);
     }
 
-    public static String bootstrapManifestBucketName(@NotNull Construct scope) {
+    public static String manifestBucketName(@NotNull Construct scope) {
         return bootstrapBucketName(scope, MANIFEST);
     }
 
-    public static String bootstrapManifestBucketNameRef(@NotNull Construct scope) {
+    public static String manifestBucketNameRef(@NotNull Construct scope) {
         return bootstrapBucketNameRef(scope, MANIFEST);
     }
 

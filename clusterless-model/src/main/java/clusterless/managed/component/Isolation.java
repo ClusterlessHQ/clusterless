@@ -13,12 +13,16 @@ package clusterless.managed.component;
  */
 public enum Isolation {
     /**
-     * A container provider returns a resource that creates a new stack
+     * An independent provider returns a resource that creates a new stack
      */
-    isolated,
+    independent,
     /**
-     * A member provider returns a resource included in a managed stack
+     * A grouped provider returns a resource grouped into a common support stack
      */
-    included,
-    embedded
+    grouped,
+
+    /**
+     * A managed provider is embedded in a unique stack that manages the constructs
+     */
+    managed
 }

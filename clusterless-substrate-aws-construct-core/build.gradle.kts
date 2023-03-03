@@ -19,4 +19,6 @@ dependencies {
     // final packaging will likely depend on a shared library of structs
     // and a meta-data file referencing the deployable asset
     implementation(project(":clusterless-substrate-aws-service-transform"))
+    implementation(project(":clusterless-substrate-aws-lambda-common"))
+    implementation(project(":clusterless-substrate-aws-lambda-workload"))
 }

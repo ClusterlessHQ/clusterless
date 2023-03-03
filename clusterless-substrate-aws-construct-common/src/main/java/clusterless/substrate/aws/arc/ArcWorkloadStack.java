@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.arc;
 
+import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
-import clusterless.model.deploy.Workload;
 import clusterless.substrate.aws.managed.ManagedNestedStack;
 import clusterless.substrate.aws.managed.ManagedProject;
 import org.jetbrains.annotations.NotNull;
@@ -17,9 +17,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
-public class ArcWorkloadStack extends ManagedNestedStack {
-    public ArcWorkloadStack(@NotNull ManagedProject managedProject, Arc arc, Workload workload) {
-        super(managedProject, workload.label().with(arc.name()));
+public class ArcWorkloadStack extends ManagedNestedStack implements ArcComponent {
+    public ArcWorkloadStack(@NotNull ManagedProject managedProject, Arc arc) {
+        super(managedProject, arc.label().with(arc.name()));
 
 
     }

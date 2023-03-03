@@ -33,10 +33,6 @@ public abstract class Dataset extends Model {
         return version;
     }
 
-    public String role() {
-        return role;
-    }
-
     public URI locationURI() {
         return locationURI;
     }

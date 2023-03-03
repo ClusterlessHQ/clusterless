@@ -8,36 +8,42 @@
 
 package clusterless.model.deploy;
 
-import clusterless.model.Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
  */
-public class Arc extends Model {
+public class Arc<W extends Workload> extends Extensible {
     @JsonProperty(required = true)
     String name;
-    List<SourceDataset> sources = new ArrayList<>();
-    @JsonProperty(required = true)
-    Workload workload;
-    List<SinkDataset> sinks = new ArrayList<>();
+    Map<String, SourceDataset> sources = new LinkedHashMap<>();
+    Map<String, SinkDataset> sinks = new LinkedHashMap<>();
+
+    W workload;
+
+    public Arc() {
+    }
+
+    public Arc(W workload) {
+        this.workload = workload;
+    }
 
     public String name() {
         return name;
     }
 
-    public List<SourceDataset> sources() {
+    public Map<String, SourceDataset> sources() {
         return sources;
     }
 
-    public Workload workload() {
-        return workload;
+    public Map<String, SinkDataset> sinks() {
+        return sinks;
     }
 
-    public List<SinkDataset> sinks() {
-        return sinks;
+    public W workload() {
+        return workload;
     }
 }

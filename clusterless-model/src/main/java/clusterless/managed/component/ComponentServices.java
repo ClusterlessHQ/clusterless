@@ -9,6 +9,7 @@
 package clusterless.managed.component;
 
 import clusterless.model.Model;
+import clusterless.util.Annotations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,17 +34,18 @@ public class ComponentServices {
         ServiceLoader<ComponentService> serviceLoader = ServiceLoader.load(ComponentService.class);
 
         serviceLoader.stream().forEach(s -> {
-            ProvidesComponent annotation = s.type().getAnnotation(ProvidesComponent.class);
-            Isolation isolation = annotation.isolation();
-            ModelType model = annotation.provides();
-            String name = annotation.name();
+            Optional<DeclaresComponent> provides = Annotations.find(s.type(), DeclaresComponent.class);
+            Optional<ProvidesComponent> typeOf = Annotations.find(s.type(), ProvidesComponent.class);
+            Isolation isolation = provides.orElseThrow().isolation();
+            ModelType model = provides.orElseThrow().provides();
+            String type = typeOf.orElseThrow().value();
 
-            LOG.info("loading component service provider: {} {} {}", isolation, model, name);
+            LOG.info("loading component service provider: {} {} {}", isolation, model, type);
 
             ComponentService<ComponentContext, Model, Component> componentService = s.get();
 
             componentServices.get(isolation).computeIfAbsent(model, k -> new HashMap<>())
-                    .put(name, componentService);
+                    .put(type, componentService);
         });
     }
 

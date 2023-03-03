@@ -8,16 +8,19 @@
 
 package clusterless.substrate.aws.construct;
 
-import clusterless.managed.component.WorkloadComponent;
-import clusterless.model.deploy.Workload;
+import clusterless.managed.component.ArcComponent;
+import clusterless.model.deploy.Arc;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.services.stepfunctions.State;
 
 /**
  *
  */
-public class WorkloadConstruct<M extends Workload> extends ModelConstruct<M> implements WorkloadComponent {
-    public WorkloadConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
+public abstract class ArcConstruct<M extends Arc> extends ModelConstruct<M> implements ArcComponent {
+    public ArcConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
         super(context, model, model.name());
     }
+
+    public abstract State createState();
 }

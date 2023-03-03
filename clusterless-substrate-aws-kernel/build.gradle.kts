@@ -31,8 +31,13 @@ distributions {
             from(file("src/main/cdk/")) {
                 into("etc")
             }
-            val findByPath: Zip = tasks.findByPath(":clusterless-substrate-aws-service-transform:packageAll") as Zip
-            from(findByPath.archiveFile) {
+            val serviceTransform: Zip =
+                tasks.findByPath(":clusterless-substrate-aws-service-transform:packageAll") as Zip
+            from(serviceTransform.archiveFile) {
+                into("assets")
+            }
+            val lambdaWorkload: Zip = tasks.findByPath(":clusterless-substrate-aws-lambda-workload:packageAll") as Zip
+            from(lambdaWorkload.archiveFile) {
                 into("assets")
             }
         }

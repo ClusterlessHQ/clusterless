@@ -9,35 +9,18 @@
 package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.LotSource;
-import clusterless.model.Struct;
 import clusterless.model.deploy.IngressBoundary;
+import clusterless.substrate.aws.arc.props.LambdaJavaRuntimeProps;
 
 /**
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
-    public static class RuntimeProps implements Struct {
-        int memorySizeMB = 256 * 3;
-
-        int retryAttempts = 3;
-
-        int timeoutMin = 15;
-
-        public int memorySizeMB() {
-            return memorySizeMB;
-        }
-
-        public int retryAttempts() {
-            return retryAttempts;
-        }
-
-        public int timeoutMin() {
-            return timeoutMin;
-        }
-
-    }
-
-    RuntimeProps runtimeProps = new RuntimeProps();
+    LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
+            LambdaJavaRuntimeProps.MEM_1_024MB,
+            3,
+            15
+    );
 
     LotSource lotSource = LotSource.objectModifiedTime;
 
@@ -46,7 +29,7 @@ public class S3PutListenerBoundary extends IngressBoundary {
     public S3PutListenerBoundary() {
     }
 
-    public RuntimeProps runtimeProps() {
+    public LambdaJavaRuntimeProps runtimeProps() {
         return runtimeProps;
     }
 

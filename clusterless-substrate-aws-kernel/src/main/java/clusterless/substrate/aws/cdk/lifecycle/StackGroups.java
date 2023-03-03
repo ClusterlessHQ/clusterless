@@ -19,17 +19,17 @@ import java.util.List;
  */
 public class StackGroups {
     @NotNull
-    public List<ModelType[]> isolatableStackGroups() {
+    public List<ModelType[]> independentModels() {
         List<ModelType[]> stackGroups = new LinkedList<>();
 
-        // all values will result in one stack, but this controls the order of the stacks
+        // each instance result in one stack, but this controls the order of the stacks
         stackGroups.add(ModelType.values(ModelType.Resource));
         stackGroups.add(ModelType.values(ModelType.Boundary));
 
         return stackGroups;
     }
 
-    public List<ModelType[]> includableStackGroups() {
+    public List<ModelType[]> groupedModels() {
         List<ModelType[]> stackGroups = new LinkedList<>();
 
         // places these types in the same stack
@@ -38,11 +38,11 @@ public class StackGroups {
         return stackGroups;
     }
 
-    public List<ModelType[]> embeddedStackGroups() {
+    public List<ModelType[]> managedModels() {
         List<ModelType[]> stackGroups = new LinkedList<>();
 
-        // each of these is embedded in the parent type stack
-        stackGroups.add(ModelType.values(ModelType.Workload));
+        // each of these is embedded in a managed stack per type
+        stackGroups.add(ModelType.values(ModelType.Arc));
 
         return stackGroups;
     }

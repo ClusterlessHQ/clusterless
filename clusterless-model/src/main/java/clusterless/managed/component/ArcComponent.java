@@ -6,12 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.arc.s3copy;
-
-import clusterless.model.deploy.Workload;
+package clusterless.managed.component;
 
 /**
  *
  */
-public class S3CopyWorkload extends Workload {
+public interface ArcComponent extends Component {
 }

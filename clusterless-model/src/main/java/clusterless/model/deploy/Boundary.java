@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  *
  */
-public abstract class Boundary extends Extensible {
+public abstract class Boundary extends Support {
     @JsonProperty(required = true)
     String name;
 

@@ -60,8 +60,6 @@ public class PutEventTransformHandler extends ManifestHandler<AWSEvent> {
 
         request.setLotId(lotId);
 
-        URI manifestURI = putManifest(lotId, List.of(objectPath), request);
-
-        publishEvent(lotId, manifestURI, request);
+        publishEvent(putManifest(List.of(objectPath), request));
     }
 }

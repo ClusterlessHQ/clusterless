@@ -8,16 +8,15 @@
 
 package clusterless.substrate.aws.resource.eventbridge;
 
-import clusterless.managed.component.ComponentService;
-import clusterless.managed.component.ModelType;
 import clusterless.managed.component.ProvidesComponent;
+import clusterless.managed.component.ResourceComponentService;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 
 /**
  *
  */
-@ProvidesComponent(provides = ModelType.Resource, name = "aws:core:eventBus")
-public class EventBridgeResourceProvider implements ComponentService<ManagedComponentContext, EventBridgeResource, EventBridgeModelConstruct> {
+@ProvidesComponent("aws:core:eventBus")
+public class EventBridgeResourceProvider implements ResourceComponentService<ManagedComponentContext, EventBridgeResource, EventBridgeModelConstruct> {
 
     @Override
     public EventBridgeModelConstruct create(ManagedComponentContext context, EventBridgeResource model) {

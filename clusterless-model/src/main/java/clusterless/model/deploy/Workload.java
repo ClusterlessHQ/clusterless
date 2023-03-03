@@ -8,13 +8,10 @@
 
 package clusterless.model.deploy;
 
+import clusterless.model.Struct;
+
 /**
  *
  */
-public abstract class Workload extends Extensible {
-    String name;
-
-    public String name() {
-        return name;
-    }
+public class Workload implements Struct {
 }

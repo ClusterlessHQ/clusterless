@@ -8,17 +8,15 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
-import clusterless.managed.component.ComponentService;
-import clusterless.managed.component.Isolation;
-import clusterless.managed.component.ModelType;
+import clusterless.managed.component.BoundaryComponentService;
 import clusterless.managed.component.ProvidesComponent;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 
 /**
  *
  */
-@ProvidesComponent(provides = ModelType.Boundary, name = "aws:core:s3PutListenerBoundary", isolation = Isolation.included)
-public class S3PutListenerBoundaryProvider implements ComponentService<ManagedComponentContext, S3PutListenerBoundary, S3PutListenerBoundaryConstruct> {
+@ProvidesComponent("aws:core:s3PutListenerBoundary")
+public class S3PutListenerBoundaryProvider implements BoundaryComponentService<ManagedComponentContext, S3PutListenerBoundary, S3PutListenerBoundaryConstruct> {
     @Override
     public S3PutListenerBoundaryConstruct create(ManagedComponentContext context, S3PutListenerBoundary boundary) {
         return new S3PutListenerBoundaryConstruct(context, boundary);

@@ -9,9 +9,10 @@
 package clusterless.substrate.aws.arc;
 
 import clusterless.config.Configurations;
-import clusterless.managed.component.WorkloadComponent;
+import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
+import clusterless.model.deploy.Workload;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
@@ -22,39 +23,50 @@ import clusterless.util.Label;
  *
  */
 public class ArcStack extends ManagedStack {
-    private final Arc arc;
+    private Configurations configurations;
+    private ManagedProject managedProject;
+    private final Deployable deployable;
+    private final Arc<? extends Workload> arc;
 
-    public ArcStack(Configurations configurations, ManagedProject managedProject, Deployable deployable, Arc arc) {
+    private ArcOrchestration orchestration;
+    private ArcListener arcListener;
+
+    private static Label arcBaseId(Arc<? extends Workload> arc) {
+        return Label.of("Arc").with(arc.name());
+    }
+
+    public ArcStack(Configurations configurations, ManagedProject managedProject, Deployable deployable, Arc<? extends Workload> arc) {
         super(Stacks.stackName(deployable, arcBaseId(arc)), managedProject, deployable, arcBaseId(arc));
+        this.configurations = configurations;
+        this.managedProject = managedProject;
+        this.deployable = deployable;
         this.arc = arc;
+    }
 
+    public void applyArcWorkloadComponent(ArcComponent arcComponent) {
         ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, this);
 
-        ArcOrchestration stateMachine = new ArcOrchestration(context, arc);
-        ArcListener arcListener = new ArcListener(context, arc, true);
+        orchestration = new ArcOrchestration(context, arc);
 
-        arcListener.rule().addTarget(stateMachine.stateMachineTarget());
+        orchestration.buildOrchestrationWith(arcComponent);
 
-        ArcMeta.Builder.builder()
+        arcListener = new ArcListener(context, arc, true);
+
+        arcListener.rule().addTarget(orchestration.stateMachineTarget());
+    }
+
+    public ArcMeta arcMeta() {
+        return ArcMeta.Builder.builder()
                 .withArc(arc)
                 .withPlacement(deployable.placement())
                 .withProject(deployable.project())
                 .withArcDeployment(ArcMeta.ArcDeployment.Builder.builder()
                         .withStackName(this.getStackName())
-                        .withStepFunctionName(stateMachine.stateMachineName().lowerHyphen())
+                        .withStepFunctionName(orchestration.stateMachineName().lowerHyphen())
                         .withListenerRuleName(arcListener.ruleName().lowerHyphen())
 //                        .withManifestLocationURIs()
                         .build())
                 .build();
-
-
     }
 
-    private static Label arcBaseId(Arc arc) {
-        return Label.of("Arc").with(arc.name());
-    }
-
-    public void applyWorkloadComponent(WorkloadComponent workloadComponent) {
-        // set workload target on arc statemachine to the workload component state machine
-    }
 }

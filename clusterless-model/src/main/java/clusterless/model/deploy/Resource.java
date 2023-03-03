@@ -14,5 +14,5 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  *
  */
 @JsonTypeName
-public abstract class Resource extends Extensible {
+public abstract class Resource extends Support {
 }

@@ -23,14 +23,14 @@ application {
     mainClass.set("clusterless.Main")
 }
 
-val awsInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:installDist")
+val awsKernelInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:installDist")
 
-tasks.getAt("installDist").dependsOn(awsInstall)
+tasks.getAt("installDist").dependsOn(awsKernelInstall)
 
 distributions {
     main {
         contents {
-            from(awsInstall) {
+            from(awsKernelInstall) {
                 include("bin/")
                 include("etc/")
                 include("assets/")

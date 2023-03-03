@@ -26,9 +26,9 @@ public enum ModelType implements Label.EnumLabel {
             clusterless.model.deploy.Boundary.class,
             BoundaryComponent.class
     ),
-    Workload(
-            clusterless.model.deploy.Workload.class,
-            WorkloadComponent.class
+    Arc(
+            clusterless.model.deploy.Arc.class,
+            ArcComponent.class
     );
 
     static final Map<Class<?>, ModelType> types = new LinkedHashMap<>();

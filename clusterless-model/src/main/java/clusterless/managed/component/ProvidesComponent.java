@@ -19,9 +19,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ProvidesComponent {
-    String name();
-
-    ModelType provides();
-
-    Isolation isolation() default Isolation.included;
+    String value();
 }

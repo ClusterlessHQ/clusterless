@@ -77,67 +77,62 @@ public class Lifecycle {
             verifyComponentsAreAvailable(deployable);
 
             // create a stack for each isolatable construct
-            for (ModelType[] stackGroup : stackGroups.includableStackGroups()) {
-                constructIsolatedStacks(managedProject, deployable, stackGroup);
+            for (ModelType[] stackGroup : stackGroups.independentModels()) {
+                constructIndependentStacks(managedProject, deployable, stackGroup);
             }
 
-            // create a stack for includable constructs
-            for (ModelType[] stackGroup : stackGroups.isolatableStackGroups()) {
-                constructIncludedStack(managedProject, deployable, stackGroup);
+            // create a stack for grouped constructs
+            for (ModelType[] stackGroup : stackGroups.groupedModels()) {
+                constructGroupedStack(managedProject, deployable, stackGroup);
             }
 
-            // create a stack for includable constructs
-            for (ModelType[] stackGroup : stackGroups.embeddedStackGroups()) {
-                constructEmbeddedStacks(managedProject, deployable, stackGroup);
+            // create a stack for independent constructs
+            for (ModelType[] stackGroup : stackGroups.managedModels()) {
+                constructManagedStacks(managedProject, deployable, stackGroup);
             }
         }
 
         return managedProject;
     }
 
-    private void constructEmbeddedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] embeddable) {
-        Map<Extensible, ComponentService<ComponentContext, Model, Component>> embedded = getMangedTypesFor(Isolation.embedded, embeddable, deployable, new LinkedHashMap<>());
+    private void constructManagedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] independent) {
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> managed = getMangedTypesFor(Isolation.managed, independent, deployable, new LinkedHashMap<>());
 
-        if (embedded.isEmpty()) {
-            LOG.info("found no embeddable models");
+        if (managed.isEmpty()) {
+            LOG.info("found no managed models");
             return;
         }
 
         List<ManagedStack> priorStacks = new ArrayList<>(managedProject.stacks());
 
-        for (Arc arc : deployable.arcs()) {
-            Workload workload = arc.workload();
-
-            if (workload == null) {
-                throw new IllegalStateException("workload may not be null");
-            }
-
-            ComponentService<ComponentContext, Model, Component> modelComponentService = embedded.get(workload);
+        for (Arc<? extends Workload> arc : deployable.arcs()) {
+            ComponentService<ComponentContext, Model, Component> modelComponentService = managed.get(arc);
 
             if (modelComponentService == null) {
-                String message = "component service not found in arc: %s, workload type: %s".formatted(arc.name(), workload.type());
+                String message = "component service not found in arc: %s, type: %s".formatted(arc.name(), arc.type());
                 LOG.error(message);
                 throw new IllegalStateException(message);
             }
 
-            // construct a stack for every embeddable type, currently only have Process that embeds in an Arc
+            // construct a stack for every arc
             ArcStack stack = new ArcStack(configurations, managedProject, deployable, arc);
 
             // force dependency on prior stacks, but not prior arcs
             priorStacks.forEach(stack::addDependency);
 
             ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, stack);
-            WorkloadComponent construct = createConstructWith(context, modelComponentService, workload);
+            LOG.info("creating %s embedded construct: %s".formatted(arc.label(), arc.type()));
+            ArcComponent construct = (ArcComponent) modelComponentService.create(context, arc);
 
-            stack.applyWorkloadComponent(construct);
+            stack.applyArcWorkloadComponent(construct);
         }
     }
 
-    private void constructIsolatedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
-        Map<Extensible, ComponentService<ComponentContext, Model, Component>> isolated = getMangedTypesFor(Isolation.isolated, isolatable, deployable, new LinkedHashMap<>());
+    private void constructIndependentStacks(ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> isolated = getMangedTypesFor(Isolation.independent, isolatable, deployable, new LinkedHashMap<>());
 
         if (isolated.isEmpty()) {
-            LOG.info("found no isolatable models");
+            LOG.info("found no independent models");
             return;
         }
 
@@ -145,11 +140,11 @@ public class Lifecycle {
         construct(new ManagedComponentContext(configurations, managedProject, deployable), isolated);
     }
 
-    private void constructIncludedStack(ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
-        Map<Extensible, ComponentService<ComponentContext, Model, Component>> included = getMangedTypesFor(Isolation.included, includable, deployable, new LinkedHashMap<>());
+    private void constructGroupedStack(ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> included = getMangedTypesFor(Isolation.grouped, includable, deployable, new LinkedHashMap<>());
 
         if (included.isEmpty()) {
-            LOG.info("found no includable models");
+            LOG.info("found no grouped models");
             return;
         }
 
@@ -168,13 +163,9 @@ public class Lifecycle {
         containers.entrySet().stream().filter(e -> e.getValue() != null).forEach(e -> {
             Extensible extensible = e.getKey();
             ComponentService<ComponentContext, Model, Component> modelComponentService = e.getValue();
-            createConstructWith(context, modelComponentService, extensible);
+            LOG.info("creating %s construct: %s".formatted(extensible.label(), extensible.type()));
+            modelComponentService.create(context, extensible);
         });
-    }
-
-    private static <C extends Component> C createConstructWith(ComponentContext context, ComponentService<ComponentContext, Model, Component> modelComponentService, Extensible extensible) {
-        LOG.info("creating %s construct: %s".formatted(extensible.getClass().getSimpleName(), extensible.type()));
-        return (C) modelComponentService.create(context, extensible);
     }
 
     private void verifyComponentsAreAvailable(Deployable deployableModel) {
@@ -220,8 +211,7 @@ public class Lifecycle {
         switch (modelType) {
             case Resource -> extensibles = new ArrayList<>(deployableModel.resources());
             case Boundary -> extensibles = new ArrayList<>(deployableModel.boundaries());
-            case Workload ->
-                    extensibles = deployableModel.arcs().stream().map(Arc::workload).collect(Collectors.toList());
+            case Arc -> extensibles = new ArrayList<>(deployableModel.arcs());
         }
         return extensibles;
     }
