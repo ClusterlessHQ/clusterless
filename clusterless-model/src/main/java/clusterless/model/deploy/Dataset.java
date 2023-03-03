@@ -21,7 +21,6 @@ public abstract class Dataset extends Model {
     String name;
     @JsonProperty(required = true)
     String version;
-    String role;
     @JsonProperty(required = true)
     URI locationURI;
 

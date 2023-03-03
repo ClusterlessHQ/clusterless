@@ -93,26 +93,6 @@ dependencies {
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
-    filter {
-        isFailOnNoMatchingTests = false
-        excludeTestsMatching("*HandlerTest")
-    }
-}
-
-tasks.register<Test>("integrationTest") {
-    useJUnitPlatform()
-    filter {
-        isFailOnNoMatchingTests = false
-        includeTestsMatching("*HandlerTest")
-    }
-}
-
-tasks.named("check").get()
-    .dependsOn("integrationTest")
-
-
 testing {
     suites {
         // Configure the built-in test suite
@@ -131,13 +111,35 @@ testing {
                 implementation("uk.org.webcompere:system-stubs-core")
                 implementation("uk.org.webcompere:system-stubs-jupiter")
                 implementation("org.mockito:mockito-inline")
-                implementation("org.testcontainers:testcontainers")
-                implementation("org.testcontainers:junit-jupiter")
-                implementation("org.testcontainers:localstack")
-                implementation("com.amazonaws:aws-java-sdk-s3")
 
                 implementation("org.apache.logging.log4j:log4j-slf4j-impl") // used by inject-resources
             }
         }
+
+        val integrationTest by registering(JvmTestSuite::class) {
+            dependencies {
+                implementation(project())
+                implementation("org.testcontainers:testcontainers")
+                implementation("org.testcontainers:junit-jupiter")
+                implementation("org.testcontainers:localstack")
+                implementation("com.amazonaws:aws-java-sdk-s3")
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
     }
+}
+
+val integrationTestImplementation by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+tasks.named("check") {
+    dependsOn(testing.suites.named("integrationTest"))
 }
