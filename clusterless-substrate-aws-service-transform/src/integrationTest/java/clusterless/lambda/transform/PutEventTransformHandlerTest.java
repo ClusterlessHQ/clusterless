@@ -8,7 +8,8 @@
 
 package clusterless.lambda.transform;
 
-import clusterless.lambda.manifest.ManifestRequest;
+import clusterless.lambda.BaseHandlerTest;
+import clusterless.lambda.manifest.ManifestEventContext;
 import clusterless.lambda.transform.json.AWSEvent;
 import clusterless.temporal.IntervalUnit;
 import clusterless.util.URIs;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class PutEventTransformHandlerTest extends BaseHandlerTest {
-
     @Override
     protected TransformProps getProps() {
         return TransformProps.Builder.builder()
@@ -42,13 +42,13 @@ public class PutEventTransformHandlerTest extends BaseHandlerTest {
 
         PutEventTransformHandler handler = new PutEventTransformHandler();
 
-        ManifestRequest request = new ManifestRequest();
+        ManifestEventContext eventContext = new ManifestEventContext();
 
-        handler.handleEvent(event, context(), request);
+        handler.handleEvent(event, context(), eventContext);
 
         String lotId = "20211112PT5M000";
-        Assertions.assertEquals(lotId, request.lotId());
-        Assertions.assertEquals(1, request.datasetItemsSize());
-        Assertions.assertEquals(URIs.copyAppendPath(getManifestURI(), "lot=" + lotId, "manifest.json"), request.manifestURI());
+        Assertions.assertEquals(lotId, eventContext.lotId());
+        Assertions.assertEquals(1, eventContext.datasetItemsSize());
+        Assertions.assertEquals(URIs.copyAppendPath(getManifestURI(), "lot=" + lotId, "manifest.json"), eventContext.manifestURI());
     }
 }

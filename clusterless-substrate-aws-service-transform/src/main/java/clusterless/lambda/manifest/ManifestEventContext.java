@@ -8,12 +8,14 @@
 
 package clusterless.lambda.manifest;
 
+import clusterless.lambda.EventContext;
+
 import java.net.URI;
 
 /**
  *
  */
-public class ManifestRequest {
+public class ManifestEventContext implements EventContext {
     private String lotId;
     private int datasetItemsSize;
     private URI manifestURI;

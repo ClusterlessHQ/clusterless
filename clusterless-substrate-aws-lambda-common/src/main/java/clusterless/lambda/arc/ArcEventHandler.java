@@ -6,22 +6,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda;
+package clusterless.lambda.arc;
 
+import clusterless.lambda.EventHandler;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.util.Env;
 
 /**
  *
  */
-public abstract class ArcEventHandler extends StreamHandler<ArcNotifyEvent> {
+public abstract class ArcEventHandler extends EventHandler<ArcNotifyEvent, ArcEventContext> {
     protected static final ArcProps arcProps = Env.fromEnv(
             ArcProps.class,
-            () -> ArcProps.Builder.builder().build()
+            () -> ArcProps.Builder.builder()
+                    .build()
     );
 
     public ArcEventHandler() {
         super(ArcNotifyEvent.class);
+    }
+
+    @Override
+    protected ArcEventContext createEventContext() {
+        return new ArcEventContext();
     }
 
 }

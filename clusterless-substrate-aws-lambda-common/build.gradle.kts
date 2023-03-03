@@ -30,5 +30,26 @@ dependencies {
     api("com.amazonaws:aws-lambda-java-core")
     api("com.amazonaws:aws-lambda-java-log4j2")
 
+    testFixturesImplementation(project(":clusterless-common"))
+    testFixturesImplementation(project(":clusterless-model"))
+    testFixturesImplementation(project(":clusterless-substrate-aws-common"))
+
+    testFixturesImplementation("com.google.guava:guava")
+
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-core")
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+    testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    testFixturesImplementation("org.testcontainers:testcontainers")
+    testFixturesImplementation("org.testcontainers:junit-jupiter")
+    testFixturesImplementation("org.testcontainers:localstack")
+    testFixturesImplementation("com.amazonaws:aws-java-sdk-s3")
+    testFixturesImplementation("io.hosuaby:inject-resources-core")
+    testFixturesImplementation("io.hosuaby:inject-resources-junit-jupiter")
+    testFixturesImplementation("uk.org.webcompere:system-stubs-core")
+    testFixturesImplementation("uk.org.webcompere:system-stubs-jupiter")
+    testFixturesImplementation("org.mockito:mockito-inline")
+
 //    implementation("io.github.resilience4j:resilience4j-retry")
 }

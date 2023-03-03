@@ -1,4 +1,4 @@
-package clusterless.lambda.transform;
+package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
 import clusterless.model.Struct;
@@ -28,16 +28,20 @@ import java.net.URI;
 @Testcontainers
 @TestWithResources
 @ExtendWith(SystemStubsExtension.class)
+
 public abstract class BaseHandlerTest {
-    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:1.3.1");
+    @WithJacksonMapper
+    static ObjectMapper objectMapper = JSONUtil.OBJECT_MAPPER;
+
+    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:1.4.0");
+
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withServices(
                     LocalStackContainer.Service.S3,
                     LocalStackContainer.EnabledService.named("events")
             );
-    @WithJacksonMapper
-    static ObjectMapper objectMapper = JSONUtil.OBJECT_MAPPER;
+
     @SystemStub
     private EnvironmentVariables environmentVariables = new EnvironmentVariables()
             .set(Env.key(getProps()), Env.value(getProps()))

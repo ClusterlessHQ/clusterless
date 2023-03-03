@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda;
+package clusterless.lambda.arc;
 
 import clusterless.model.Struct;
 

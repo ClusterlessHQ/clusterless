@@ -8,7 +8,8 @@
 
 package clusterless.lambda.workload.s3copy;
 
-import clusterless.lambda.ArcEventHandler;
+import clusterless.lambda.arc.ArcEventContext;
+import clusterless.lambda.arc.ArcEventHandler;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import com.amazonaws.services.lambda.runtime.Context;
 
@@ -17,15 +18,11 @@ import com.amazonaws.services.lambda.runtime.Context;
  */
 public class S3CopyArcEventHandler extends ArcEventHandler {
     @Override
-    public void handleRequest(ArcNotifyEvent event, Context context) {
-
-        logObject("incoming event: {}", event);
-
+    protected void handleEvent(ArcNotifyEvent event, Context context, ArcEventContext eventContext) {
         // get manifests
 
         //  copy files
 
         // write manifest
-
     }
 }

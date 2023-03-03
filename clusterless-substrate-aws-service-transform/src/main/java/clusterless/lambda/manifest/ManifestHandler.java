@@ -8,7 +8,7 @@
 
 package clusterless.lambda.manifest;
 
-import clusterless.lambda.StreamHandler;
+import clusterless.lambda.EventHandler;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.manifest.Manifest;
 import clusterless.substrate.aws.PathFormats;
@@ -18,7 +18,6 @@ import clusterless.substrate.aws.sdk.S3;
 import clusterless.temporal.IntervalBuilder;
 import clusterless.util.Env;
 import clusterless.util.URIs;
-import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +27,7 @@ import java.util.Collection;
 /**
  *
  */
-public abstract class ManifestHandler<E> extends StreamHandler<E> {
+public abstract class ManifestHandler<E> extends EventHandler<E, ManifestEventContext> {
     private static final Logger LOG = LogManager.getLogger(ManifestHandler.class);
     protected static final TransformProps transformProps = Env.fromEnv(
             TransformProps.class,
@@ -44,41 +43,34 @@ public abstract class ManifestHandler<E> extends StreamHandler<E> {
     }
 
     @Override
-    public void handleRequest(E event, Context context) {
-
-        logObject("incoming event: {}", event);
-
-        ManifestRequest request = new ManifestRequest();
-
-        handleEvent(event, context, request);
+    protected ManifestEventContext createEventContext() {
+        return new ManifestEventContext();
     }
 
-    protected abstract void handleEvent(E event, Context context, ManifestRequest request);
-
-    protected ManifestRequest putManifest(Collection<URI> objects, ManifestRequest request) {
+    protected ManifestEventContext putManifest(Collection<URI> objects, ManifestEventContext eventContext) {
         Manifest manifest = Manifest.Builder.builder()
                 .withDatasetName(transformProps.datasetName())
                 .withDatasetVersion(transformProps.datasetVersion())
                 .withDatasetPrefix(transformProps.datasetPrefix())
-                .withLot(request.lotId())
+                .withLot(eventContext.lotId())
                 .build();
 
         for (URI object : objects) {
             manifest.datasetItems().add(object.toString());
         }
 
-        request.setDatasetItemsSize(manifest.datasetItems().size());
+        eventContext.setDatasetItemsSize(manifest.datasetItems().size());
 
         // put manifest, nested under the 'lot' partition
-        URI manifestURI = URIs.copyAppendPath(transformProps.manifestPrefix(), PathFormats.createManifestPath(request.lotId(), manifest.extension()));
+        URI manifestURI = URIs.copyAppendPath(transformProps.manifestPrefix(), PathFormats.createManifestPath(eventContext.lotId(), manifest.extension()));
 
-        request.setManifestURI(manifestURI);
+        eventContext.setManifestURI(manifestURI);
 
         // todo: perform a listing to test for states (completed, empty, etc)
         S3.Response exists = s3.exists(manifestURI);
 
         if (exists.isSuccess()) {
-            String message = String.format("manifest already exists: %s, having lot: %s", manifestURI, request.lotId());
+            String message = String.format("manifest already exists: %s, having lot: %s", manifestURI, eventContext.lotId());
             LOG.error(message);
             throw new ManifestExistsException(message);
         }
@@ -94,10 +86,10 @@ public abstract class ManifestHandler<E> extends StreamHandler<E> {
             throw new RuntimeException(message, response.exception());
         }
 
-        return request;
+        return eventContext;
     }
 
-    protected void publishEvent(ManifestRequest request) {
+    protected void publishEvent(ManifestEventContext request) {
         // publish notification on event-bus
         ArcNotifyEvent notifyEvent = ArcNotifyEvent.Builder.builder()
                 .withDatasetName(transformProps.datasetName())

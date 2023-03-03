@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.arc.s3copy;
 
-import clusterless.lambda.ArcProps;
+import clusterless.lambda.arc.ArcProps;
 import clusterless.lambda.workload.s3copy.S3CopyArcEventHandler;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
@@ -78,5 +78,4 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
                 .payloadResponseOnly(true) // sets .invocationType(LambdaInvocationType.REQUEST_RESPONSE)
                 .build();
     }
-
 }

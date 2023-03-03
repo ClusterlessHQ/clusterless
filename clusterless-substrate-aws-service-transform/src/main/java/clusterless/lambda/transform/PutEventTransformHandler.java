@@ -8,8 +8,8 @@
 
 package clusterless.lambda.transform;
 
+import clusterless.lambda.manifest.ManifestEventContext;
 import clusterless.lambda.manifest.ManifestHandler;
-import clusterless.lambda.manifest.ManifestRequest;
 import clusterless.lambda.transform.json.AWSEvent;
 import clusterless.substrate.aws.PathFormats;
 import clusterless.substrate.aws.sdk.S3;
@@ -29,7 +29,7 @@ public class PutEventTransformHandler extends ManifestHandler<AWSEvent> {
     }
 
     @Override
-    public void handleEvent(AWSEvent event, Context context, ManifestRequest request) {
+    public void handleEvent(AWSEvent event, Context context, ManifestEventContext eventContext) {
         OffsetDateTime time = event.getTime();
         String bucket = event.getDetail().getBucket().getName();
         String key = event.getDetail().getObject().getKey();
@@ -58,8 +58,8 @@ public class PutEventTransformHandler extends ManifestHandler<AWSEvent> {
                 break;
         }
 
-        request.setLotId(lotId);
+        eventContext.setLotId(lotId);
 
-        publishEvent(putManifest(List.of(objectPath), request));
+        publishEvent(putManifest(List.of(objectPath), eventContext));
     }
 }

@@ -15,6 +15,7 @@
 plugins {
     java
     idea
+    `java-test-fixtures`
 }
 
 version = "1.0-wip"
@@ -30,6 +31,31 @@ java {
     }
 }
 
+// some explanation on how to handle dependencies, slowly evolving
+// the 'constraints' force a version into the scope (implementation, testImplementation, etc.)
+// this allows us to only have to declare a dependency, without the version information
+// the test suites are a convenience for declaring different types of tests, e.g. unit test, and integration tests.
+// within the suite the dependency is declared as a `implementation` but it's a testImplementation in practice
+// this is where it gets difficult/tedious/redundant.. testFixtures - https://docs.gradle.org/8.0.1/userguide/java_testing.html#sec:java_test_fixtures
+// testFixtures (declared as a plugin above) let us create re-usable libraries, that depend on implementation
+// code and tests can depend on the fixture. this allows a fixture to be published (into maven) more safely than
+// we could prior (by packaging tests into their own jar, when we just wanted the tools in them).
+// testFixtures aren't tests and have their own dependencies, so we have to do double entry on the constraints
+// testFixtures actually can't see the implementation, so a dependency needs to be declared unless it was published as
+// `api` and not `implementation`
+// having said all that, this might be an improved approach: https://docs.gradle.org/current/userguide/platforms.html
+
+// helpers for preventing redundant lines
+fun DependencyConstraintHandlerScope.implementationAndTestFixture(constraintNotation: String) {
+    implementation(constraintNotation)
+    testFixturesImplementation(constraintNotation)
+}
+
+fun DependencyConstraintHandlerScope.testImplementationAndTestFixture(constraintNotation: String) {
+    testImplementation(constraintNotation)
+    testFixturesImplementation(constraintNotation)
+}
+
 dependencies {
     implementation("org.apache.logging.log4j:log4j-api")
     implementation("org.apache.logging.log4j:log4j-core")
@@ -41,55 +67,61 @@ dependencies {
         // manage dependency versions here
         implementation("info.picocli:picocli:4.7.1")
 
-        implementation("org.apache.logging.log4j:log4j-api:2.19.0")
-        implementation("org.apache.logging.log4j:log4j-core:2.19.0")
-        implementation("org.apache.logging.log4j:log4j-jul:2.19.0")
-        implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
+        val log4j = "2.19.0"
+        implementation("org.apache.logging.log4j:log4j-api:$log4j")
+        implementation("org.apache.logging.log4j:log4j-core:$log4j")
+        implementation("org.apache.logging.log4j:log4j-jul:$log4j")
+        implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4j")
 
-        implementation("com.google.guava:guava:31.1-jre")
+        implementationAndTestFixture("com.google.guava:guava:31.1-jre")
 
-        implementation("com.fasterxml.jackson.core:jackson-core:2.14.2")
-        implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda:2.14.2")
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2")
-        implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.14.2")
+        val jackson = "2.14.2"
+        implementationAndTestFixture("com.fasterxml.jackson.core:jackson-core:$jackson")
+        implementationAndTestFixture("com.fasterxml.jackson.core:jackson-databind:$jackson")
+        implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-joda:$jackson")
+        implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
+        implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jackson")
 
-        implementation("software.amazon.awssdk:s3:2.19.29")
-        implementation("software.amazon.awssdk:cloudwatch:2.19.29")
-        implementation("software.amazon.awssdk:eventbridge:2.19.29")
+        val awsSdk = "2.19.29"
+        implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
+        implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
+        implementationAndTestFixture("software.amazon.awssdk:eventbridge:$awsSdk")
 
         // https://github.com/aws/aws-lambda-java-libs
-        implementation("com.amazonaws:aws-lambda-java-core:1.2.2")
-        implementation("com.amazonaws:aws-lambda-java-events:3.11.0")
-        implementation("com.amazonaws:aws-lambda-java-serialization:1.0.1")
-        implementation("com.amazonaws:aws-lambda-java-log4j2:1.5.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.2")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-events:3.11.0")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-serialization:1.0.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-log4j2:1.5.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-tests:1.1.1")
 
-        implementation("javax.annotation:javax.annotation-api:1.3.2")
+        implementationAndTestFixture("javax.annotation:javax.annotation-api:1.3.2")
 
-        implementation("io.github.resilience4j:resilience4j-retry:2.0.2")
-
-        testImplementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
+        implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.0.2")
 
         // https://github.com/junit-pioneer/junit-pioneer/releases
-        testImplementation("org.junit-pioneer:junit-pioneer:2.0.0")
-        testImplementation("org.junit-pioneer:junit-pioneer-jackson:2.0.0")
+        val junitPioneer = "2.0.0"
+        testImplementationAndTestFixture("org.junit-pioneer:junit-pioneer:$junitPioneer")
+        testImplementationAndTestFixture("org.junit-pioneer:junit-pioneer-jackson:$junitPioneer")
 
         // https://github.com/hosuaby/inject-resources
-        testImplementation("io.hosuaby:inject-resources-core:0.3.2")
-        testImplementation("io.hosuaby:inject-resources-junit-jupiter:0.3.2")
+        val injectResources = "0.3.2"
+        testImplementationAndTestFixture("io.hosuaby:inject-resources-core:$injectResources")
+        testImplementationAndTestFixture("io.hosuaby:inject-resources-junit-jupiter:$injectResources")
 
         // https://github.com/webcompere/system-stubs
-        testImplementation("uk.org.webcompere:system-stubs-core:2.0.2")
-        testImplementation("uk.org.webcompere:system-stubs-jupiter:2.0.2")
-        testImplementation("org.mockito:mockito-inline:5.1.1")
+        val systemStubs = "2.0.2"
+        testImplementationAndTestFixture("uk.org.webcompere:system-stubs-core:$systemStubs")
+        testImplementationAndTestFixture("uk.org.webcompere:system-stubs-jupiter:$systemStubs")
+        testImplementationAndTestFixture("org.mockito:mockito-inline:5.1.1")
 
-        testImplementation("org.testcontainers:testcontainers:1.17.6")
-        testImplementation("org.testcontainers:junit-jupiter:1.17.6")
-        testImplementation("org.testcontainers:localstack:1.17.6")
+        val testContainers = "1.17.6"
+        testImplementationAndTestFixture("org.testcontainers:testcontainers:$testContainers")
+        testImplementationAndTestFixture("org.testcontainers:junit-jupiter:$testContainers")
+        testImplementationAndTestFixture("org.testcontainers:localstack:$testContainers")
         // https://github.com/testcontainers/testcontainers-java/issues/1442#issuecomment-694342883
-        testImplementation("com.amazonaws:aws-java-sdk-s3:1.11.860")
+        testImplementationAndTestFixture("com.amazonaws:aws-java-sdk-s3:1.11.860")
 
-        testImplementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
+        testImplementationAndTestFixture("org.apache.logging.log4j:log4j-slf4j-impl:$log4j")
     }
 }
 

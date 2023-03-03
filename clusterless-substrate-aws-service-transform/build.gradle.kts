@@ -35,6 +35,8 @@ dependencies {
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-common"))
     implementation(project(":clusterless-substrate-aws-lambda-common"))
+
+    testImplementation(testFixtures(project(":clusterless-substrate-aws-lambda-common")))
 }
 
 openApiGenerate {

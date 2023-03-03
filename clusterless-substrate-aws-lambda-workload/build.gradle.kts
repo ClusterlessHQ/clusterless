@@ -31,7 +31,7 @@ dependencies {
     implementation("com.amazonaws:aws-lambda-java-core")
     implementation("com.amazonaws:aws-lambda-java-log4j2")
 
-//    implementation("io.github.resilience4j:resilience4j-retry")
+    testImplementation(testFixtures(project(":clusterless-substrate-aws-lambda-common")))
 }
 
 tasks.register<Zip>("packageAll") {
