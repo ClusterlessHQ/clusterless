@@ -8,27 +8,39 @@
 
 package clusterless.lambda.transform;
 
+import clusterless.json.JSONUtil;
 import clusterless.lambda.BaseHandlerTest;
-import clusterless.lambda.manifest.ManifestEventContext;
+import clusterless.lambda.TestDatasets;
 import clusterless.lambda.transform.json.AWSEvent;
 import clusterless.temporal.IntervalUnit;
 import clusterless.util.URIs;
 import com.adelean.inject.resources.junit.jupiter.GivenJsonResource;
+import com.adelean.inject.resources.junit.jupiter.TestWithResources;
+import com.adelean.inject.resources.junit.jupiter.WithJacksonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.net.URI;
+import java.time.OffsetDateTime;
 
 /**
  *
  */
+@TestWithResources
 public class PutEventTransformHandlerTest extends BaseHandlerTest {
+    @WithJacksonMapper
+    static ObjectMapper objectMapper = JSONUtil.OBJECT_MAPPER;
+
+    static TestDatasets testDatasets = new TestDatasets();
+
     @Override
     protected TransformProps getProps() {
         return TransformProps.Builder.builder()
                 .withLotSource(LotSource.eventTime)
-                .withManifestPrefix(getManifestURI())
+                .withManifestPath(testDatasets.manifestPathList().get(0))
                 .withLotUnit(IntervalUnit.TWELFTHS.name())
-                .withDatasetName(getDataset().name())
-                .withDatasetVersion(getDataset().version())
+                .withDataset(testDatasets.datasetList().get(0))
                 .withEventBusName(eventBusName())
                 .build();
     }
@@ -42,13 +54,35 @@ public class PutEventTransformHandlerTest extends BaseHandlerTest {
 
         PutEventTransformHandler handler = new PutEventTransformHandler();
 
-        ManifestEventContext eventContext = new ManifestEventContext();
+        String lotId = "20211112PT5M000";
+
+        PutEventTransformObserver eventContext = new PutEventTransformObserver() {
+            @Override
+            public void applyEvent(OffsetDateTime time, String bucket, String key) {
+            }
+
+            @Override
+            public void applyIdentifierURI(URI identifierURI) {
+                Assertions.assertEquals(URI.create("s3://DOC-EXAMPLE-BUCKET1/project/version/y=2023/m=12/d=31/data.json"), identifierURI);
+            }
+
+            @Override
+            public void applyLotId(String value) {
+                Assertions.assertEquals(lotId, value);
+            }
+
+            @Override
+            public void applyDatasetItemsSize(int datasetItemsSize) {
+                Assertions.assertEquals(1, datasetItemsSize);
+            }
+
+            @Override
+            public void applyManifestURI(URI manifestURI) {
+                Assertions.assertEquals(URIs.copyAppendPath(testDatasets.manifestPathList().get(0), "lot=" + lotId, "manifest.json"), manifestURI);
+            }
+        };
 
         handler.handleEvent(event, context(), eventContext);
 
-        String lotId = "20211112PT5M000";
-        Assertions.assertEquals(lotId, eventContext.lotId());
-        Assertions.assertEquals(1, eventContext.datasetItemsSize());
-        Assertions.assertEquals(URIs.copyAppendPath(getManifestURI(), "lot=" + lotId, "manifest.json"), eventContext.manifestURI());
     }
 }

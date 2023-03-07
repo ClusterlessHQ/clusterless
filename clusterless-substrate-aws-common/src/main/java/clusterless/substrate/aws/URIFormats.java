@@ -15,11 +15,15 @@ import java.net.URI;
 /**
  *
  */
-public class PathFormats {
-    public static final String manifestPathFormat = "lot=%s/manifest.%s";
+public class URIFormats {
+    public static final String manifestFragmentFormat = "lot=%s/manifest.%s";
 
-    public static String createManifestPath(String lotId, String extension) {
-        return String.format(manifestPathFormat, lotId, extension);
+    public static URI createManifestIdentifier(URI manifestPath, String lotId, String extension) {
+        return URIs.copyAppendPath(manifestPath, createManifestFragment(lotId, extension));
+    }
+
+    public static String createManifestFragment(String lotId, String extension) {
+        return String.format(manifestFragmentFormat, lotId, extension);
     }
 
     public static URI createS3URI(String bucket, String key) {

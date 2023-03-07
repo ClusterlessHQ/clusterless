@@ -10,6 +10,7 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
+import clusterless.model.deploy.Dataset;
 import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Assets;
@@ -56,7 +57,7 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
         TemporalUnit temporalUnit = IntervalUnits.find(model().lotUnit());
         IntervalUnits.verifyHasFormatter(temporalUnit);
 
-        URI listenURI = URIs.normalizeURI(model().dataset().locationURI());
+        URI listenURI = URIs.normalizeURI(model().dataset().pathURI());
 
         String listenBucketName = listenURI.getHost();
         String listenPathPrefix = URIs.asKeyPath(listenURI);
@@ -73,10 +74,12 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
 
         TransformProps transformProps = TransformProps.Builder.builder()
                 .withEventBusName(eventBusRef)
-                .withDatasetPrefix(listenURI)
-                .withDatasetName(model().dataset().name())
-                .withDatasetVersion(model().dataset().version())
-                .withManifestPrefix(manifestPrefix)
+                .withDataset(Dataset.Builder.builder()
+                        .withName(model().dataset().name())
+                        .withVersion(model.dataset().version())
+                        .withPathURI(listenURI)
+                        .build())
+                .withManifestPath(manifestPrefix)
                 .withLotUnit(model.lotUnit())
                 .withLotSource(model().lotSource())
                 .withKeyRegex(model().keyRegex())

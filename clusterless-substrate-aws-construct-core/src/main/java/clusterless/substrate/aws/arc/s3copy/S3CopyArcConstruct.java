@@ -38,19 +38,19 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
     public S3CopyArcConstruct(@NotNull ManagedComponentContext context, @NotNull S3CopyArc model) {
         super(context, model);
 
-        Map<String, URI> sourceManifests = model.sources()
+        Map<String, URI> sourceManifestPaths = model.sources()
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestURI(this, e.getValue())));
 
-        Map<String, URI> sinkManifests = model.sinks()
+        Map<String, URI> sinkManifestPaths = model.sinks()
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestURI(this, e.getValue())));
 
         ArcProps arcProps = ArcProps.Builder.builder()
-                .withSourceManifests(sourceManifests)
-                .withSinkManifests(sinkManifests)
+                .withSourceManifestPaths(sourceManifestPaths)
+                .withSinkManifestPaths(sinkManifestPaths)
                 .build();
 
         Map<String, String> environment = Env.toEnv(arcProps);

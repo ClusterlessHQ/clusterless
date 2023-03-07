@@ -9,6 +9,7 @@
 package clusterless.lambda.transform;
 
 import clusterless.model.Struct;
+import clusterless.model.deploy.Dataset;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
@@ -26,15 +27,10 @@ public class TransformProps implements Struct {
     String keyRegex;
 
     @JsonProperty(required = true)
-    URI manifestPrefix;
+    URI manifestPath;
 
     @JsonProperty(required = true)
-    URI datasetPrefix;
-
-    @JsonProperty(required = true)
-    String datasetName;
-
-    String datasetVersion;
+    Dataset dataset;
 
     String eventBusName;
 
@@ -45,10 +41,8 @@ public class TransformProps implements Struct {
         lotUnit = builder.lotUnit;
         lotSource = builder.lotSource;
         keyRegex = builder.keyRegex;
-        manifestPrefix = builder.manifestPrefix;
-        datasetPrefix = builder.datasetPrefix;
-        datasetName = builder.datasetName;
-        datasetVersion = builder.datasetVersion;
+        manifestPath = builder.manifestPath;
+        dataset = builder.dataset;
         eventBusName = builder.eventBusName;
     }
 
@@ -64,20 +58,13 @@ public class TransformProps implements Struct {
         return keyRegex;
     }
 
-    public URI manifestPrefix() {
-        return manifestPrefix;
+    public URI manifestPath() {
+        return manifestPath;
     }
 
-    public URI datasetPrefix() {
-        return datasetPrefix;
-    }
 
-    public String datasetName() {
-        return datasetName;
-    }
-
-    public String datasetVersion() {
-        return datasetVersion;
+    public Dataset dataset() {
+        return dataset;
     }
 
     public String eventBusName() {
@@ -85,16 +72,14 @@ public class TransformProps implements Struct {
     }
 
     /**
-     * {@code Context} builder static inner class.
+     * {@code TransformProps} builder static inner class.
      */
     public static final class Builder {
         private String lotUnit;
         private LotSource lotSource;
         private String keyRegex;
-        private URI manifestPrefix;
-        private URI datasetPrefix;
-        private String datasetName;
-        private String datasetVersion;
+        private URI manifestPath;
+        private Dataset dataset;
         private String eventBusName;
 
         private Builder() {
@@ -107,96 +92,73 @@ public class TransformProps implements Struct {
         /**
          * Sets the {@code lotUnit} and returns a reference to this Builder enabling method chaining.
          *
-         * @param lotUnit the {@code lotUnit} to set
+         * @param val the {@code lotUnit} to set
          * @return a reference to this Builder
          */
-        public Builder withLotUnit(String lotUnit) {
-            this.lotUnit = lotUnit;
+        public Builder withLotUnit(String val) {
+            lotUnit = val;
             return this;
         }
 
         /**
          * Sets the {@code lotSource} and returns a reference to this Builder enabling method chaining.
          *
-         * @param lotSource the {@code lotSource} to set
+         * @param val the {@code lotSource} to set
          * @return a reference to this Builder
          */
-        public Builder withLotSource(LotSource lotSource) {
-            this.lotSource = lotSource;
+        public Builder withLotSource(LotSource val) {
+            lotSource = val;
             return this;
         }
 
         /**
          * Sets the {@code keyRegex} and returns a reference to this Builder enabling method chaining.
          *
-         * @param keyRegex the {@code keyRegex} to set
+         * @param val the {@code keyRegex} to set
          * @return a reference to this Builder
          */
-        public Builder withKeyRegex(String keyRegex) {
-            this.keyRegex = keyRegex;
+        public Builder withKeyRegex(String val) {
+            keyRegex = val;
             return this;
         }
 
         /**
-         * Sets the {@code manifestPrefix} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code withManifestPath} and returns a reference to this Builder enabling method chaining.
          *
-         * @param manifestPrefix the {@code manifestPrefix} to set
+         * @param val the {@code manifestPrefix} to set
          * @return a reference to this Builder
          */
-        public Builder withManifestPrefix(URI manifestPrefix) {
-            this.manifestPrefix = manifestPrefix;
+        public Builder withManifestPath(URI val) {
+            manifestPath = val;
             return this;
         }
 
         /**
-         * Sets the {@code datasetPrefix} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code dataset} and returns a reference to this Builder enabling method chaining.
          *
-         * @param datasetPrefix the {@code datasetPrefix} to set
+         * @param val the {@code dataset} to set
          * @return a reference to this Builder
          */
-        public Builder withDatasetPrefix(URI datasetPrefix) {
-            this.datasetPrefix = datasetPrefix;
+        public Builder withDataset(Dataset val) {
+            dataset = val;
             return this;
         }
-
-        /**
-         * Sets the {@code datasetName} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param datasetName the {@code datasetName} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDatasetName(String datasetName) {
-            this.datasetName = datasetName;
-            return this;
-        }
-
-        /**
-         * Sets the {@code datasetVersion} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param datasetVersion the {@code datasetVersion} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDatasetVersion(String datasetVersion) {
-            this.datasetVersion = datasetVersion;
-            return this;
-        }
-
 
         /**
          * Sets the {@code eventBusName} and returns a reference to this Builder enabling method chaining.
          *
-         * @param eventBusName the {@code eventBusName} to set
+         * @param val the {@code eventBusName} to set
          * @return a reference to this Builder
          */
-        public Builder withEventBusName(String eventBusName) {
-            this.eventBusName = eventBusName;
+        public Builder withEventBusName(String val) {
+            eventBusName = val;
             return this;
         }
 
         /**
-         * Returns a {@code Context} built from the parameters previously set.
+         * Returns a {@code TransformProps} built from the parameters previously set.
          *
-         * @return a {@code Context} built with parameters of this {@code Context.Builder}
+         * @return a {@code TransformProps} built with parameters of this {@code TransformProps.Builder}
          */
         public TransformProps build() {
             return new TransformProps(this);
@@ -209,10 +171,8 @@ public class TransformProps implements Struct {
         sb.append("lotUnit='").append(lotUnit).append('\'');
         sb.append(", lotSource=").append(lotSource);
         sb.append(", keyRegex='").append(keyRegex).append('\'');
-        sb.append(", manifestPrefix=").append(manifestPrefix);
-        sb.append(", datasetPrefix=").append(datasetPrefix);
-        sb.append(", datasetName='").append(datasetName).append('\'');
-        sb.append(", datasetVersion='").append(datasetVersion).append('\'');
+        sb.append(", manifestPath=").append(manifestPath);
+        sb.append(", dataset=").append(dataset);
         sb.append(", eventBusName='").append(eventBusName).append('\'');
         sb.append('}');
         return sb.toString();

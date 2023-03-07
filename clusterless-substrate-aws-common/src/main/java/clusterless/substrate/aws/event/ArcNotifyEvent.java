@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.event;
 
 import clusterless.model.Struct;
+import clusterless.model.deploy.Dataset;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
@@ -22,57 +23,17 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
 
     public static final String DATASET_ID = "datasetId";
 
-    String datasetName;
-    String datasetVersion;
+    Dataset dataset;
     String lotId;
-    URI manifestURI;
-    URI datasetPrefix;
+    URI manifest;
 
     public ArcNotifyEvent() {
     }
 
     private ArcNotifyEvent(Builder builder) {
-        datasetName = builder.datasetName;
-        datasetVersion = builder.datasetVersion;
+        dataset = builder.dataset;
         lotId = builder.lotId;
-        manifestURI = builder.manifestURI;
-        datasetPrefix = builder.datasetPrefix;
-    }
-
-    public String datasetVersion() {
-        return datasetVersion;
-    }
-
-    public String datasetName() {
-        return datasetName;
-    }
-
-    public String lotId() {
-        return lotId;
-    }
-
-    public URI manifestURI() {
-        return manifestURI;
-    }
-
-    public URI datasetPrefix() {
-        return datasetPrefix;
-    }
-
-    /**
-     * This is a fabricated value for use with pattern matching.
-     * <p>
-     * We are attempting to bypass any complexity if a listener is listening for two or more datasets.
-     *
-     * @return a single string for pattern matching
-     */
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public String datasetId() {
-        return createDatasetId(datasetName(), datasetVersion());
-    }
-
-    public static String createDatasetId(String datasetName, String datasetVersion) {
-        return String.format("%s/%s", datasetName, datasetVersion);
+        manifest = builder.manifest;
     }
 
     @Override
@@ -85,15 +46,41 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
         return DETAIL;
     }
 
+    public Dataset dataset() {
+        return dataset;
+    }
+
+    public String lotId() {
+        return lotId;
+    }
+
+    public URI manifest() {
+        return manifest;
+    }
+
+    /**
+     * This is a fabricated value for use with pattern matching.
+     * <p>
+     * We are attempting to bypass any complexity if a listener is listening for two or more datasets.
+     *
+     * @return a single string for pattern matching
+     */
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String datasetId() {
+        return createDatasetId(dataset.name(), dataset.version());
+    }
+
+    public static String createDatasetId(String datasetName, String datasetVersion) {
+        return String.format("%s/%s", datasetName, datasetVersion);
+    }
+
     /**
      * {@code ArcNotifyEvent} builder static inner class.
      */
     public static final class Builder {
-        private String datasetName;
-        private String datasetVersion;
+        private Dataset dataset;
         private String lotId;
-        private URI manifestURI;
-        private URI datasetPrefix;
+        private URI manifest;
 
         private Builder() {
         }
@@ -103,57 +90,35 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
         }
 
         /**
-         * Sets the {@code datasetName} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code dataset} and returns a reference to this Builder enabling method chaining.
          *
-         * @param datasetName the {@code datasetName} to set
+         * @param val the {@code dataset} to set
          * @return a reference to this Builder
          */
-        public Builder withDatasetName(String datasetName) {
-            this.datasetName = datasetName;
-            return this;
-        }
-
-        /**
-         * Sets the {@code datasetVersion} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param datasetVersion the {@code datasetVersion} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDatasetVersion(String datasetVersion) {
-            this.datasetVersion = datasetVersion;
+        public Builder withDataset(Dataset val) {
+            dataset = val;
             return this;
         }
 
         /**
          * Sets the {@code lotId} and returns a reference to this Builder enabling method chaining.
          *
-         * @param lotId the {@code lotId} to set
+         * @param val the {@code lotId} to set
          * @return a reference to this Builder
          */
-        public Builder withLotId(String lotId) {
-            this.lotId = lotId;
+        public Builder withLotId(String val) {
+            lotId = val;
             return this;
         }
 
         /**
-         * Sets the {@code manifestURI} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code manifest} and returns a reference to this Builder enabling method chaining.
          *
-         * @param manifestURI the {@code manifestURI} to set
+         * @param val the {@code manifest} to set
          * @return a reference to this Builder
          */
-        public Builder withManifestURI(URI manifestURI) {
-            this.manifestURI = manifestURI;
-            return this;
-        }
-
-        /**
-         * Sets the {@code datasetPrefix} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param datasetPrefix the {@code datasetPrefix} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDatasetPrefix(URI datasetPrefix) {
-            this.datasetPrefix = datasetPrefix;
+        public Builder withManifest(URI val) {
+            manifest = val;
             return this;
         }
 
@@ -165,5 +130,15 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
         public ArcNotifyEvent build() {
             return new ArcNotifyEvent(this);
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ArcNotifyEvent{");
+        sb.append("dataset=").append(dataset);
+        sb.append(", lotId='").append(lotId).append('\'');
+        sb.append(", manifest=").append(manifest);
+        sb.append('}');
+        return sb.toString();
     }
 }

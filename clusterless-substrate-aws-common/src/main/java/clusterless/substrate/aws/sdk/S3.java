@@ -89,14 +89,14 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public Response put(URI location, String contentType, Object manifest) {
+    public Response put(URI location, String contentType, Object value) {
         Objects.requireNonNull(location, "location");
         Objects.requireNonNull(contentType, "contentType");
-        Objects.requireNonNull(manifest, "manifest");
+        Objects.requireNonNull(value, "value");
 
         String bucketName = location.getHost();
         String key = URIs.asKeyPath(location);
-        String body = JSONUtil.writeAsStringSafe(manifest);
+        String body = JSONUtil.writeAsStringSafe(value);
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -106,6 +106,55 @@ public class S3 extends ClientBase<S3Client> {
 
         try (S3Client client = createClient()) {
             return new Response(client.putObject(putObjectRequest, RequestBody.fromString(body)));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    public Response get(URI location) {
+        Objects.requireNonNull(location, "location");
+
+        String bucketName = location.getHost();
+        String key = URIs.asKeyPath(location);
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        try (S3Client client = createClient()) {
+            return new Response(client.getObjectAsBytes(getObjectRequest));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    /**
+     * Has a limit of 5G objects,
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    public Response copy(URI from, URI to) {
+        Objects.requireNonNull(from, "from");
+        Objects.requireNonNull(to, "to");
+
+        String fromBucket = from.getHost();
+        String fromKey = URIs.asKeyPath(from);
+
+        String toBucket = to.getHost();
+        String toKey = URIs.asKeyPath(to);
+
+        CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                .sourceBucket(fromBucket)
+                .sourceKey(fromKey)
+                .destinationBucket(toBucket)
+                .destinationKey(toKey)
+                .build();
+
+        try (S3Client client = createClient()) {
+            return new Response(client.copyObject(copyObjectRequest));
         } catch (Exception exception) {
             return new Response(exception);
         }

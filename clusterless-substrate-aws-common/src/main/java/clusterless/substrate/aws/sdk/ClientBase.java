@@ -10,10 +10,13 @@ package clusterless.substrate.aws.sdk;
 
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.Optional;
 
 /**
@@ -58,6 +61,7 @@ public abstract class ClientBase<C> {
         AwsResponse awsResponse;
         SdkHttpResponse sdkHttpResponse;
         Exception exception;
+        ResponseBytes<GetObjectResponse> objectAsBytes;
 
         public Response(PutEventsResponse putEventsResponse) {
             this((AwsResponse) putEventsResponse);
@@ -76,6 +80,11 @@ public abstract class ClientBase<C> {
             this.exception = exception;
         }
 
+        public Response(ResponseBytes<GetObjectResponse> objectAsBytes) {
+            this.awsResponse = objectAsBytes.response();
+            this.objectAsBytes = objectAsBytes;
+        }
+
         public boolean isSuccess() {
             return ClientBase.this.isSuccess(this);
         }
@@ -90,6 +99,10 @@ public abstract class ClientBase<C> {
 
         public Exception exception() {
             return exception;
+        }
+
+        public ByteBuffer objectAsBytes() {
+            return objectAsBytes.asByteBuffer();
         }
     }
 }

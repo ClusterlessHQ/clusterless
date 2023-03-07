@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.event;
 
 import clusterless.json.JSONUtil;
+import clusterless.model.deploy.Dataset;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,10 +24,12 @@ public class NotifyEventTest {
     @Test
     void arcNotifyEvent() throws IOException {
         ArcNotifyEvent event = ArcNotifyEvent.Builder.builder()
-                .withDatasetName("name")
-                .withDatasetVersion("version")
+                .withDataset(Dataset.Builder.builder()
+                        .withName("name")
+                        .withVersion("version")
+                        .build())
                 .withLotId("20220101")
-                .withManifestURI(URI.create("s3://foo/bar"))
+                .withManifest(URI.create("s3://foo/bar/manifest.json"))
                 .build();
 
         String json = JSONUtil.writeAsStringSafe(event);

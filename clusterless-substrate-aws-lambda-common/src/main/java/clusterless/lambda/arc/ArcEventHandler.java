@@ -15,7 +15,7 @@ import clusterless.util.Env;
 /**
  *
  */
-public abstract class ArcEventHandler extends EventHandler<ArcNotifyEvent, ArcEventContext> {
+public abstract class ArcEventHandler extends EventHandler<ArcNotifyEvent, ArcEventObserver> {
     protected static final ArcProps arcProps = Env.fromEnv(
             ArcProps.class,
             () -> ArcProps.Builder.builder()
@@ -25,10 +25,4 @@ public abstract class ArcEventHandler extends EventHandler<ArcNotifyEvent, ArcEv
     public ArcEventHandler() {
         super(ArcNotifyEvent.class);
     }
-
-    @Override
-    protected ArcEventContext createEventContext() {
-        return new ArcEventContext();
-    }
-
 }

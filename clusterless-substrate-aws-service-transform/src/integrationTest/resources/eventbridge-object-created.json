@@ -15,7 +15,7 @@
       "name": "DOC-EXAMPLE-BUCKET1"
     },
     "object": {
-      "key": "example-key",
+      "key": "/project/version/y=2023/m=12/d=31/data.json",
       "size": 5,
       "etag": "b1946ac92492d2347c6235b4d2611184",
       "version-id": "IYV3p45BT0ac8hjHg1houSdS1a.Mro8e",

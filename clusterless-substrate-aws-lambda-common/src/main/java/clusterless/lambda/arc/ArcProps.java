@@ -9,33 +9,57 @@
 package clusterless.lambda.arc;
 
 import clusterless.model.Struct;
+import clusterless.model.deploy.SinkDataset;
+import clusterless.model.deploy.SourceDataset;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  *
  */
 public class ArcProps implements Struct {
-    Map<String, URI> sourceManifests;
+    Map<String, SourceDataset> sources;
+    Map<String, SinkDataset> sinks;
 
-    Map<String, URI> sinkManifests;
+    Map<String, URI> sourceManifestPaths;
+    Map<String, URI> sinkManifestPaths;
 
     public ArcProps() {
     }
 
-    private ArcProps(Builder builder) {
-        sourceManifests = builder.sourceManifests;
-        sinkManifests = builder.sinkManifests;
+    public Map<String, SourceDataset> sources() {
+        return sources;
     }
 
+    public Map<String, SinkDataset> sinks() {
+        return sinks;
+    }
+
+    public Map<String, URI> sourceManifestPaths() {
+        return sourceManifestPaths;
+    }
+
+    public Map<String, URI> sinkManifestPaths() {
+        return sinkManifestPaths;
+    }
+
+    private ArcProps(Builder builder) {
+        sources = builder.sources;
+        sinks = builder.sinks;
+        sourceManifestPaths = builder.sourceManifestPaths;
+        sinkManifestPaths = builder.sinkManifestPaths;
+    }
 
     /**
      * {@code ArcProps} builder static inner class.
      */
     public static final class Builder {
-        private Map<String, URI> sourceManifests;
-        private Map<String, URI> sinkManifests;
+        private Map<String, SourceDataset> sources = new LinkedHashMap<>();
+        private Map<String, SinkDataset> sinks = new LinkedHashMap<>();
+        private Map<String, URI> sourceManifestPaths;
+        private Map<String, URI> sinkManifestPaths;
 
         private Builder() {
         }
@@ -45,24 +69,46 @@ public class ArcProps implements Struct {
         }
 
         /**
-         * Sets the {@code sourceManifests} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code sources} and returns a reference to this Builder enabling method chaining.
          *
-         * @param sourceManifests the {@code sourceManifests} to set
+         * @param val the {@code sources} to set
          * @return a reference to this Builder
          */
-        public Builder withSourceManifests(Map<String, URI> sourceManifests) {
-            this.sourceManifests = sourceManifests;
+        public Builder withSources(Map<String, SourceDataset> val) {
+            sources = val;
             return this;
         }
 
         /**
-         * Sets the {@code sinkManifests} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code sinks} and returns a reference to this Builder enabling method chaining.
          *
-         * @param sinkManifests the {@code sinkManifests} to set
+         * @param val the {@code sinks} to set
          * @return a reference to this Builder
          */
-        public Builder withSinkManifests(Map<String, URI> sinkManifests) {
-            this.sinkManifests = sinkManifests;
+        public Builder withSinks(Map<String, SinkDataset> val) {
+            sinks = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@code sourceManifestPaths} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code sourceManifestPaths} to set
+         * @return a reference to this Builder
+         */
+        public Builder withSourceManifestPaths(Map<String, URI> val) {
+            sourceManifestPaths = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@code sinkManifestPaths} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code sinkManifestPaths} to set
+         * @return a reference to this Builder
+         */
+        public Builder withSinkManifestPaths(Map<String, URI> val) {
+            sinkManifestPaths = val;
             return this;
         }
 

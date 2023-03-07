@@ -10,60 +10,58 @@ package clusterless.model.manifest;
 
 import clusterless.model.Content;
 import clusterless.model.Struct;
+import clusterless.model.UriType;
+import clusterless.model.deploy.Dataset;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  *
  */
 public class Manifest implements Content, Struct {
+    public static final String JSON_EXTENSION = "json";
     @JsonProperty(required = true)
-    String datasetName;
-    String datasetVersion;
+    Dataset dataset;
+
     @JsonProperty(required = true)
-    String lot;
+    String lotId;
+
     @JsonProperty(required = true)
-    URI datasetPrefix;
+    UriType uriType = UriType.prefix;
     @JsonProperty(required = true)
-    List<String> datasetItems;
+    List<URI> uris;
 
     public Manifest() {
     }
 
     private Manifest(Builder builder) {
-        datasetName = builder.datasetName;
-        datasetVersion = builder.datasetVersion;
-        lot = builder.lot;
-        datasetPrefix = builder.datasetPrefix;
-        datasetItems = builder.datasetItems;
+        dataset = builder.dataset;
+        lotId = builder.lotId;
+        uriType = builder.uriType;
+        uris = builder.uris;
     }
 
-    public String datasetName() {
-        return datasetName;
+    public Dataset dataset() {
+        return dataset;
     }
 
-    public String datasetVersion() {
-        return datasetVersion;
+    public String lotId() {
+        return lotId;
     }
 
-    public String lot() {
-        return lot;
+    public UriType datasetURIType() {
+        return uriType;
     }
 
-    public URI datasetPrefix() {
-        return datasetPrefix;
-    }
-
-    public List<String> datasetItems() {
-        return datasetItems;
+    public List<URI> uris() {
+        return uris;
     }
 
     @Override
     public String extension() {
-        return "json";
+        return JSON_EXTENSION;
     }
 
     @Override
@@ -71,15 +69,15 @@ public class Manifest implements Content, Struct {
         return "application/json";
     }
 
+
     /**
      * {@code Manifest} builder static inner class.
      */
     public static final class Builder {
-        private String datasetName;
-        private String datasetVersion;
-        private String lot;
-        private URI datasetPrefix;
-        private List<String> datasetItems = new LinkedList<>();
+        private Dataset dataset;
+        private String lotId;
+        private UriType uriType;
+        private List<URI> uris;
 
         private Builder() {
         }
@@ -89,57 +87,46 @@ public class Manifest implements Content, Struct {
         }
 
         /**
-         * Sets the {@code datasetName} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code dataset} and returns a reference to this Builder enabling method chaining.
          *
-         * @param datasetName the {@code datasetName} to set
+         * @param val the {@code dataset} to set
          * @return a reference to this Builder
          */
-        public Builder withDatasetName(String datasetName) {
-            this.datasetName = datasetName;
+        public Builder withDataset(Dataset val) {
+            dataset = val;
             return this;
         }
 
         /**
-         * Sets the {@code datasetVersion} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code lotId} and returns a reference to this Builder enabling method chaining.
          *
-         * @param datasetVersion the {@code datasetVersion} to set
+         * @param val the {@code lot} to set
          * @return a reference to this Builder
          */
-        public Builder withDatasetVersion(String datasetVersion) {
-            this.datasetVersion = datasetVersion;
+        public Builder withLotId(String val) {
+            lotId = val;
             return this;
         }
 
         /**
-         * Sets the {@code lot} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code uriType} and returns a reference to this Builder enabling method chaining.
          *
-         * @param lot the {@code lot} to set
+         * @param val the {@code uriType} to set
          * @return a reference to this Builder
          */
-        public Builder withLot(String lot) {
-            this.lot = lot;
+        public Builder withUriType(UriType val) {
+            uriType = val;
             return this;
         }
 
         /**
-         * Sets the {@code datasetPrefix} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code uris} and returns a reference to this Builder enabling method chaining.
          *
-         * @param datasetPrefix the {@code datasetPrefix} to set
+         * @param val the {@code uris} to set
          * @return a reference to this Builder
          */
-        public Builder withDatasetPrefix(URI datasetPrefix) {
-            this.datasetPrefix = datasetPrefix;
-            return this;
-        }
-
-        /**
-         * Sets the {@code datasetItems} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param datasetItems the {@code datasetItems} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDatasetItems(List<String> datasetItems) {
-            this.datasetItems = datasetItems;
+        public Builder withUris(List<URI> val) {
+            uris = val;
             return this;
         }
 
@@ -151,17 +138,5 @@ public class Manifest implements Content, Struct {
         public Manifest build() {
             return new Manifest(this);
         }
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Manifest{");
-        sb.append("datasetName='").append(datasetName).append('\'');
-        sb.append(", datasetVersion='").append(datasetVersion).append('\'');
-        sb.append(", lot='").append(lot).append('\'');
-        sb.append(", datasetPrefix=").append(datasetPrefix);
-        sb.append(", datasetItems=").append(datasetItems);
-        sb.append('}');
-        return sb.toString();
     }
 }

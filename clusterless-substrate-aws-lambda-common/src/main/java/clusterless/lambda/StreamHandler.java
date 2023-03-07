@@ -26,10 +26,15 @@ public abstract class StreamHandler<E> implements RequestStreamHandler {
     private static final byte[] _JsonNull = new byte[]{'n', 'u', 'l', 'l'};
 
     protected static final Logger LOG = LogManager.getLogger(StreamHandler.class);
+
+    public static <E> ObjectReader objectReaderFor(Class<E> type) {
+        return JSONUtil.OBJECT_MAPPER.readerFor(type);
+    }
+
     protected ObjectReader reader;
 
     public StreamHandler(Class<E> type) {
-        this.reader = JSONUtil.OBJECT_MAPPER.readerFor(type);
+        this.reader = objectReaderFor(type);
     }
 
     public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
@@ -42,9 +47,5 @@ public abstract class StreamHandler<E> implements RequestStreamHandler {
 
     protected void logObject(String message, Object object) {
         LOG.info(message, JSONUtil.writeAsStringSafe(object));
-    }
-
-    protected void logMessage(String message, Object... objects) {
-        LOG.info(message, objects);
     }
 }

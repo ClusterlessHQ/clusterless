@@ -10,8 +10,12 @@ package clusterless.util;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.net.URI;
+import java.util.stream.Stream;
 
 /**
  *
@@ -39,11 +43,19 @@ public class URIsTest {
         Assertions.assertEquals("/foo/", URIs.normalize("/", "foo//"));
         Assertions.assertEquals("/foo/", URIs.normalize("/", "/foo//"));
 
+        Assertions.assertEquals("/bar/foo/", URIs.normalize("/bar", "foo//"));
+        Assertions.assertEquals("/bar/foo/", URIs.normalize("/bar", "/foo//"));
+
         Assertions.assertEquals("foo/", URIs.normalize("foo//", ""));
         Assertions.assertEquals("foo/bar", URIs.normalize("foo//", "bar"));
         Assertions.assertEquals("foo/bar/", URIs.normalize("foo//", "bar/"));
         Assertions.assertEquals("/foo/", URIs.normalize("/foo//"));
         Assertions.assertEquals("/foo/bar/", URIs.normalize("/foo/", "bar//"));
+
+        Assertions.assertEquals("foo/bar", URIs.normalize("foo//", "/bar"));
+        Assertions.assertEquals("foo/bar/", URIs.normalize("foo//", "/bar/"));
+        Assertions.assertEquals("/foo/bar/", URIs.normalize("/foo/", "/bar//"));
+
         Assertions.assertEquals("", URIs.normalize(IS_NULL, IS_NULL));
     }
 
@@ -70,5 +82,46 @@ public class URIsTest {
         Assertions.assertNull(URIs.asKeyPath(URI.create("/")));
         Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket")));
         Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket/")));
+    }
+
+    public static Stream<Arguments> copyArguments() {
+        return Stream.of(
+                Arguments.arguments(
+                        "s3://from/path/",
+                        "s3://from/path/one/two/three/file.txt",
+                        "s3://to/path1/path2/",
+                        "s3://to/path1/path2/one/two/three/file.txt"
+                ),
+                Arguments.arguments(
+                        "s3://from/path",
+                        "s3://from/path/one/two/three/file.txt",
+                        "s3://to/path1/path2",
+                        "s3://to/path1/path2/one/two/three/file.txt"
+                ),
+                Arguments.arguments(
+                        "s3://from/path/",
+                        "s3://from/path/one/two/three/file.txt",
+                        "s3://to/path1/path2",
+                        "s3://to/path1/path2/one/two/three/file.txt"
+                ),
+                Arguments.arguments(
+                        "s3://from/path",
+                        "s3://from/path/one/two/three/file.txt",
+                        "s3://to/path1/path2/",
+                        "s3://to/path1/path2/one/two/three/file.txt"
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("copyArguments")
+    void copy(String fromBaseString, String fromString, String toBaseString, String toString) {
+        URI fromBase = URI.create(fromBaseString);
+        URI from = URI.create(fromString);
+        URI toBase = URI.create(toBaseString);
+        URI expectedTo = URI.create(toString);
+        URI actualTo = URIs.fromTo(fromBase, from, toBase);
+
+        Assertions.assertEquals(expectedTo, actualTo);
     }
 }

@@ -16,13 +16,22 @@ import java.net.URI;
 /**
  *
  */
-public abstract class Dataset extends Model {
+public class Dataset extends Model {
     @JsonProperty(required = true)
     String name;
     @JsonProperty(required = true)
     String version;
     @JsonProperty(required = true)
-    URI locationURI;
+    URI pathURI;
+
+    protected Dataset() {
+    }
+
+    private Dataset(Builder builder) {
+        name = builder.name;
+        version = builder.version;
+        pathURI = builder.pathURI;
+    }
 
     public String name() {
         return name;
@@ -32,7 +41,75 @@ public abstract class Dataset extends Model {
         return version;
     }
 
-    public URI locationURI() {
-        return locationURI;
+    public URI pathURI() {
+        return pathURI;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Dataset{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append(", pathURI=").append(pathURI);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    /**
+     * {@code Dataset} builder static inner class.
+     */
+    public static final class Builder {
+        private String name;
+        private String version;
+        private URI pathURI;
+
+        private Builder() {
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        /**
+         * Sets the {@code name} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code name} to set
+         * @return a reference to this Builder
+         */
+        public Builder withName(String val) {
+            name = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@code version} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code version} to set
+         * @return a reference to this Builder
+         */
+        public Builder withVersion(String val) {
+            version = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@code pathURI} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code pathURI} to set
+         * @return a reference to this Builder
+         */
+        public Builder withPathURI(URI val) {
+            pathURI = val;
+            return this;
+        }
+
+        /**
+         * Returns a {@code Dataset} built from the parameters previously set.
+         *
+         * @return a {@code Dataset} built with parameters of this {@code Dataset.Builder}
+         */
+        public Dataset build() {
+            return new Dataset(this);
+        }
     }
 }

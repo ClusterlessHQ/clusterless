@@ -147,5 +147,9 @@ public class JSONUtil {
             throw new UncheckedIOException(e);
         }
     }
+
+    public static <E> ObjectReader objectReaderFor(Class<E> type) {
+        return OBJECT_MAPPER.readerFor(type);
+    }
 }
 

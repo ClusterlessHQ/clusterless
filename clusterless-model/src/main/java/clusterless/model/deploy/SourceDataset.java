@@ -17,10 +17,13 @@ public class SourceDataset extends Dataset {
 
     boolean subscribe = true;
 
+    public SourceDataset() {
+    }
+
     private SourceDataset(Builder builder) {
         name = builder.name;
         version = builder.version;
-        locationURI = builder.locationURI;
+        pathURI = builder.pathURI;
         subscribe = builder.subscribe;
     }
 
@@ -28,14 +31,13 @@ public class SourceDataset extends Dataset {
         return subscribe;
     }
 
-
     /**
      * {@code SourceDataset} builder static inner class.
      */
     public static final class Builder {
         private String name;
         private String version;
-        private URI locationURI;
+        private URI pathURI;
         private boolean subscribe;
 
         private Builder() {
@@ -68,13 +70,13 @@ public class SourceDataset extends Dataset {
         }
 
         /**
-         * Sets the {@code locationURI} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code pathURI} and returns a reference to this Builder enabling method chaining.
          *
-         * @param val the {@code locationURI} to set
+         * @param val the {@code pathURI} to set
          * @return a reference to this Builder
          */
-        public Builder withLocationURI(URI val) {
-            locationURI = val;
+        public Builder withPathURI(URI val) {
+            pathURI = val;
             return this;
         }
 
