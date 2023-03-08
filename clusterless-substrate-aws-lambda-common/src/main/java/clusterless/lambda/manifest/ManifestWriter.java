@@ -56,22 +56,18 @@ public class ManifestWriter {
         // todo: perform a listing to test for states (completed, empty, etc)
         S3.Response exists = s3.exists(sinkManifestIdentifier);
 
-        if (exists.isSuccess()) {
-            String message = String.format("manifest already exists: %s", sinkManifestIdentifier);
-            LOG.error(message);
-            throw new ManifestExistsException(message);
-        }
+        exists.isNotSuccessOrThrow(
+                r -> String.format("manifest already exists: %s", sinkManifestIdentifier),
+                ManifestExistsException::new
+        );
 
         LOG.info("writing {} to path: {}", () -> manifest.getClass().getSimpleName(), () -> sinkManifestIdentifier);
 
         S3.Response response = s3.put(sinkManifestIdentifier, manifest.contentType(), manifest);
 
-        if (!response.isSuccess()) {
-            String message = String.format("unable to write object: %s, %s", sinkManifestIdentifier, response.errorMessage());
-            LOG.error(message, response.errorMessage());
-
-            throw new RuntimeException(message, response.exception());
-        }
+        response.isSuccessOrThrowRuntime(
+                r -> String.format("unable to write object: %s, %s", sinkManifestIdentifier, r.errorMessage())
+        );
 
         return sinkManifestIdentifier;
     }

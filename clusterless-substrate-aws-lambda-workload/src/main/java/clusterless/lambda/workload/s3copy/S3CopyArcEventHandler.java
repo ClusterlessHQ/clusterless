@@ -94,12 +94,9 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
 
                 S3.Response copyResponse = s3.copy(fromUri, toURI);
 
-                if (!copyResponse.isSuccess()) {
-                    String message = String.format("unable to copy object: %s, %s", fromUri, copyResponse.errorMessage());
-                    LOG.error(message, copyResponse.errorMessage());
-
-                    throw new RuntimeException(message, copyResponse.exception());
-                }
+                copyResponse.isSuccessOrThrowRuntime(
+                        r -> String.format("unable to copy object: %s, %s", fromUri, r.errorMessage())
+                );
             }
 
             manifestWriters.get(role).putManifest(results, lotId);

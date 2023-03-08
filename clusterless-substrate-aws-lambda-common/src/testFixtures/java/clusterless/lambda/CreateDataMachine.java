@@ -45,12 +45,9 @@ public class CreateDataMachine {
 
         S3.Response response = s3.create(bucketName);
 
-        if (!response.isSuccess()) {
-            String message = String.format("unable to create bucket: %s, %s", bucketName, response.errorMessage());
-            LOG.error(message, response.errorMessage());
-
-            throw new RuntimeException(message, response.exception());
-        }
+        response.isSuccessOrThrowRuntime(
+                r -> String.format("unable to create bucket: %s, %s", bucketName, r.errorMessage())
+        );
     }
 
     public CreateDataMachine buildSources(Map<String, URI> manifestMap, Map<String, SourceDataset> sourceMap) {
@@ -67,12 +64,9 @@ public class CreateDataMachine {
 
                 S3.Response dataResponse = s3.put(dataIdentifier, "application/text", String.format("role=%s,lot=%s", role, lot));
 
-                if (!dataResponse.isSuccess()) {
-                    String message = String.format("unable to write data: %s, %s", dataIdentifier, dataResponse.errorMessage());
-                    LOG.error(message, dataResponse.errorMessage());
-
-                    throw new RuntimeException(message, dataResponse.exception());
-                }
+                dataResponse.isSuccessOrThrowRuntime(
+                        r -> String.format("unable to write data: %s, %s", dataIdentifier, r.errorMessage())
+                );
 
                 Manifest manifest = Manifest.Builder.builder()
                         .withUris(List.of(dataIdentifier))
@@ -88,12 +82,9 @@ public class CreateDataMachine {
 
                 S3.Response manifestResponse = s3.put(manifestIdentifier, manifest.contentType(), manifest);
 
-                if (!manifestResponse.isSuccess()) {
-                    String message = String.format("unable to write manifest: %s, %s", manifestIdentifier, manifestResponse.errorMessage());
-                    LOG.error(message, manifestResponse.errorMessage());
-
-                    throw new RuntimeException(message, manifestResponse.exception());
-                }
+                manifestResponse.isSuccessOrThrowRuntime(
+                        r -> String.format("unable to write manifest: %s, %s", manifestIdentifier, r.errorMessage())
+                );
             }
         }
 

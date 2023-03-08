@@ -21,6 +21,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  *
@@ -99,6 +102,44 @@ public abstract class ClientBase<C> {
         public boolean isSuccess() {
             return ClientBase.this.isSuccess(this);
         }
+
+        public void isSuccessOrThrowRuntime() {
+            isSuccessOrThrow(RuntimeException::new);
+        }
+
+        public void isSuccessOrThrow(Function<Exception, RuntimeException> exception) {
+            if (isSuccess()) {
+                return;
+            }
+
+            LOG.error(this.errorMessage());
+
+            throw exception.apply(this.exception);
+        }
+
+        public void isSuccessOrThrowRuntime(Function<Response, String> message) {
+            isSuccessOrThrow(message, RuntimeException::new);
+        }
+
+        public void isNotSuccessOrThrow(Function<Response, String> message, BiFunction<String, Exception, RuntimeException> exception) {
+            isOrThrow(Predicate.not(Response::isSuccess), message, exception);
+        }
+
+        public void isSuccessOrThrow(Function<Response, String> message, BiFunction<String, Exception, RuntimeException> exception) {
+            isOrThrow(Response::isSuccess, message, exception);
+        }
+
+        private void isOrThrow(Predicate<Response> predicate, Function<Response, String> message, BiFunction<String, Exception, RuntimeException> exception) {
+            if (predicate.test(this)) {
+                return;
+            }
+
+            String m = message.apply(this);
+            LOG.error(m, this.errorMessage());
+
+            throw exception.apply(m, this.exception);
+        }
+
 
         public String errorMessage() {
             if (exception != null) {

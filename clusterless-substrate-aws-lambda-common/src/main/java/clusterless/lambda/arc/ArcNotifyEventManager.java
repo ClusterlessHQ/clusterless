@@ -31,11 +31,8 @@ public class ArcNotifyEventManager {
 
         EventBus.Response response = eventBus.put(eventBusName, notifyEvent);
 
-        if (!response.isSuccess()) {
-            String message = String.format("unable to publish event: %s, %s", eventBusName, response.errorMessage());
-            LOG.error(message, response.errorMessage());
-
-            throw new RuntimeException(message, response.exception());
-        }
+        response.isSuccessOrThrowRuntime(
+                r -> String.format("unable to publish event: %s, %s", eventBusName, r.errorMessage())
+        );
     }
 }

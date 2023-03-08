@@ -20,10 +20,8 @@ public class BootstrapMachine {
 
         LOG.info("creating bucket: {}", bucketName);
 
-        S3.Response s3Response = s3.create(bucketName);
-        if (!s3Response.isSuccess()) {
-            throw new RuntimeException(s3Response.exception());
-        }
+        s3.create(bucketName)
+                .isSuccessOrThrowRuntime();
 
         LOG.info("created bucket: {}", bucketName);
 
@@ -37,10 +35,8 @@ public class BootstrapMachine {
 
         LOG.info("creating eventbus: {}", eventBusName);
 
-        EventBus.Response eventResponse = eventBus.create(eventBusName);
-        if (!eventResponse.isSuccess()) {
-            throw new RuntimeException(eventResponse.exception());
-        }
+        eventBus.create(eventBusName)
+                .isSuccessOrThrowRuntime();
 
         LOG.info("created eventbus: {}", eventBusName);
 
