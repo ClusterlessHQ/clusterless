@@ -26,7 +26,7 @@ public class ManifestReader {
         }
 
         try {
-            return manifestReader.readValue(response.objectAsBytes().array());
+            return manifestReader.readValue(response.inputStream());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

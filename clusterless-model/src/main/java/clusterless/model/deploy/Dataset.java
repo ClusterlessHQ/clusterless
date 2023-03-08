@@ -27,6 +27,12 @@ public class Dataset extends Model {
     protected Dataset() {
     }
 
+    public Dataset(Dataset other) {
+        this.name = other.name;
+        this.version = other.version;
+        this.pathURI = other.pathURI;
+    }
+
     private Dataset(Builder builder) {
         name = builder.name;
         version = builder.version;

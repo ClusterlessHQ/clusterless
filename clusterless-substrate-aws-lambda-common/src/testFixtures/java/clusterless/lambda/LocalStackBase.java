@@ -1,8 +1,6 @@
 package clusterless.lambda;
 
 import clusterless.model.Struct;
-import clusterless.substrate.aws.sdk.EventBus;
-import clusterless.substrate.aws.sdk.S3;
 import clusterless.util.Env;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +16,11 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 @Testcontainers
 @ExtendWith(SystemStubsExtension.class)
-public abstract class BaseHandlerTest {
+public abstract class LocalStackBase {
+    static {
+        System.setProperty("clusterless.localstack.enabled", "true");
+    }
+
     static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:1.4.0");
 
     @Container
@@ -48,20 +50,9 @@ public abstract class BaseHandlerTest {
     }
 
     @BeforeEach
-    void setUp() {
-        S3 s3 = new S3();
-        S3.Response s3Response = s3.create(TestDatasets.MANIFEST_BUCKET);
-        if (!s3Response.isSuccess()) {
-            throw new RuntimeException(s3Response.exception());
-        }
-
-        String eventBusName = eventBusName();
-        if (eventBusName != null) {
-            EventBus eventBus = new EventBus();
-            EventBus.Response eventResponse = eventBus.create(eventBusName);
-            if (!eventResponse.isSuccess()) {
-                throw new RuntimeException(eventResponse.exception());
-            }
-        }
+    public void bootstrap() {
+        new BootstrapMachine()
+                .applyBucket(TestDatasets.MANIFEST_BUCKET)
+                .applyEventbus(eventBusName());
     }
 }

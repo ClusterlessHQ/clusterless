@@ -8,6 +8,8 @@
 
 package clusterless.substrate.aws.sdk;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -15,6 +17,7 @@ import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Optional;
@@ -23,6 +26,8 @@ import java.util.Optional;
  *
  */
 public abstract class ClientBase<C> {
+    private static final Logger LOG = LogManager.getLogger(ClientBase.class);
+    protected static final boolean localStackEnabled = Boolean.getBoolean("clusterless.localstack.enabled");
     protected static final String defaultRegion = System.getenv("AWS_DEFAULT_REGION");
     protected static final String defaultProfile = System.getenv("AWS_PROFILE");
     protected final DefaultCredentialsProvider credentialsProvider;
@@ -56,10 +61,17 @@ public abstract class ClientBase<C> {
 
     protected abstract C createClient(String region);
 
-    public class Response {
+    protected void logEndpointOverride() {
+        if (endpointOverride != null) {
+            LOG.info("client using endpoint override: {}", endpointOverride);
+        } else if (localStackEnabled) {
+            LOG.warn("s3 client not using endpoint override");
+        }
+    }
 
-        AwsResponse awsResponse;
-        SdkHttpResponse sdkHttpResponse;
+    public class Response {
+        final AwsResponse awsResponse;
+        final SdkHttpResponse sdkHttpResponse;
         Exception exception;
         ResponseBytes<GetObjectResponse> objectAsBytes;
 
@@ -72,16 +84,15 @@ public abstract class ClientBase<C> {
             this.sdkHttpResponse = awsResponse.sdkHttpResponse();
         }
 
-        public Response(SdkHttpResponse sdkHttpResponse) {
-            this.sdkHttpResponse = sdkHttpResponse;
-        }
-
         public Response(Exception exception) {
+            this.awsResponse = null;
+            this.sdkHttpResponse = null;
             this.exception = exception;
         }
 
         public Response(ResponseBytes<GetObjectResponse> objectAsBytes) {
             this.awsResponse = objectAsBytes.response();
+            this.sdkHttpResponse = this.awsResponse.sdkHttpResponse();
             this.objectAsBytes = objectAsBytes;
         }
 
@@ -103,6 +114,10 @@ public abstract class ClientBase<C> {
 
         public ByteBuffer objectAsBytes() {
             return objectAsBytes.asByteBuffer();
+        }
+
+        public InputStream inputStream() {
+            return objectAsBytes.asInputStream();
         }
     }
 }

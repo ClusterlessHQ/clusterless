@@ -47,7 +47,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
     protected ArcEventObserver observer() {
         return new ArcEventObserver() {
             @Override
-            public void applyManifest(Manifest manifest) {
+            public void applyFromManifest(Manifest manifest) {
                 String name = manifest.dataset().name();
                 String version = manifest.dataset().version();
                 String lotId = manifest.lotId();
@@ -69,11 +69,11 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
     @Override
     protected void handleEvent(ArcNotifyEvent event, Context context, ArcEventObserver eventObserver) {
         String lotId = event.lotId();
-        URI manifest = event.manifest();
+        URI incomingManifestIdentifier = event.manifest();
 
-        Manifest incomingManifest = manifestReader.getManifest(manifest);
+        Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
 
-        eventObserver.applyManifest(incomingManifest);
+        eventObserver.applyFromManifest(incomingManifest);
 
         //  copy files
         URI fromDatasetPath = incomingManifest.dataset().pathURI();

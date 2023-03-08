@@ -25,6 +25,8 @@ public class EventBus extends ClientBase<EventBridgeClient> {
 
     @Override
     protected EventBridgeClient createClient(String region) {
+        logEndpointOverride();
+
         return EventBridgeClient.builder()
                 .region(Region.of(region))
                 .credentialsProvider(credentialsProvider)

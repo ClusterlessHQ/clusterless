@@ -9,7 +9,7 @@
 package clusterless.lambda.transform;
 
 import clusterless.json.JSONUtil;
-import clusterless.lambda.BaseHandlerTest;
+import clusterless.lambda.LocalStackBase;
 import clusterless.lambda.TestDatasets;
 import clusterless.lambda.transform.json.AWSEvent;
 import clusterless.temporal.IntervalUnit;
@@ -22,13 +22,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.time.OffsetDateTime;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  *
  */
 @TestWithResources
-public class PutEventTransformHandlerTest extends BaseHandlerTest {
+public class PutEventTransformHandlerTest extends LocalStackBase {
     @WithJacksonMapper
     static ObjectMapper objectMapper = JSONUtil.OBJECT_MAPPER;
 
@@ -56,33 +58,13 @@ public class PutEventTransformHandlerTest extends BaseHandlerTest {
 
         String lotId = "20211112PT5M000";
 
-        PutEventTransformObserver eventContext = new PutEventTransformObserver() {
-            @Override
-            public void applyEvent(OffsetDateTime time, String bucket, String key) {
-            }
-
-            @Override
-            public void applyIdentifierURI(URI identifierURI) {
-                Assertions.assertEquals(URI.create("s3://DOC-EXAMPLE-BUCKET1/project/version/y=2023/m=12/d=31/data.json"), identifierURI);
-            }
-
-            @Override
-            public void applyLotId(String value) {
-                Assertions.assertEquals(lotId, value);
-            }
-
-            @Override
-            public void applyDatasetItemsSize(int datasetItemsSize) {
-                Assertions.assertEquals(1, datasetItemsSize);
-            }
-
-            @Override
-            public void applyManifestURI(URI manifestURI) {
-                Assertions.assertEquals(URIs.copyAppendPath(testDatasets.manifestPathList().get(0), "lot=" + lotId, "manifest.json"), manifestURI);
-            }
-        };
+        PutEventTransformObserver eventContext = mock();
 
         handler.handleEvent(event, context(), eventContext);
 
+        verify(eventContext).applyIdentifierURI(URI.create("s3://DOC-EXAMPLE-BUCKET1/project/version/y=2023/m=12/d=31/data.json"));
+        verify(eventContext).applyLotId(lotId);
+        verify(eventContext).applyDatasetItemsSize(1);
+        verify(eventContext).applyManifestURI(URIs.copyAppendPath(testDatasets.manifestPathList().get(0), "lot=" + lotId, "manifest.json"));
     }
 }

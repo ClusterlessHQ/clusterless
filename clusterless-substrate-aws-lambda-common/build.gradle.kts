@@ -41,6 +41,8 @@ dependencies {
     testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
     testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    testFixturesImplementation("org.mockito:mockito-core")
+
     testFixturesImplementation("org.testcontainers:testcontainers")
     testFixturesImplementation("org.testcontainers:junit-jupiter")
     testFixturesImplementation("org.testcontainers:localstack")

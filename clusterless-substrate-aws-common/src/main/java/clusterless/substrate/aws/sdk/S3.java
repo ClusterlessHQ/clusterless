@@ -10,6 +10,8 @@ package clusterless.substrate.aws.sdk;
 
 import clusterless.json.JSONUtil;
 import clusterless.util.URIs;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -23,6 +25,7 @@ import java.util.Objects;
  *
  */
 public class S3 extends ClientBase<S3Client> {
+    private static final Logger LOG = LogManager.getLogger(S3.class);
 
     public S3() {
     }
@@ -94,9 +97,18 @@ public class S3 extends ClientBase<S3Client> {
         Objects.requireNonNull(contentType, "contentType");
         Objects.requireNonNull(value, "value");
 
+        String body = JSONUtil.writeAsStringSafe(value);
+
+        return put(location, contentType, body);
+    }
+
+    public Response put(URI location, String contentType, String body) {
+        Objects.requireNonNull(location, "location");
+        Objects.requireNonNull(contentType, "contentType");
+        Objects.requireNonNull(body, "body");
+
         String bucketName = location.getHost();
         String key = URIs.asKeyPath(location);
-        String body = JSONUtil.writeAsStringSafe(value);
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -178,6 +190,9 @@ public class S3 extends ClientBase<S3Client> {
 
     @Override
     protected S3Client createClient(String region) {
+
+        logEndpointOverride();
+
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(credentialsProvider)
