@@ -58,7 +58,6 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
             @Override
             public void applyLotId(String lotId) {
                 LOG.info("using lot: {}", lotId);
-
             }
 
             @Override

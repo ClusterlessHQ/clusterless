@@ -30,11 +30,18 @@ public class LambdaJavaRuntimeProps implements Struct {
         return MEM_LOWER <= memorySizeMiB && memorySizeMiB <= MEM_UPPER;
     }
 
+    public enum Architecture {
+        ARM_64,
+        X86_64
+    }
+
     int memorySizeMB = MEM_DEFAULT;
 
     int retryAttempts = 3;
 
     int timeoutMin = 5;
+
+    Architecture architecture = Architecture.ARM_64;
 
     public LambdaJavaRuntimeProps() {
     }
@@ -43,6 +50,13 @@ public class LambdaJavaRuntimeProps implements Struct {
         this.memorySizeMB = memorySizeMB;
         this.retryAttempts = retryAttempts;
         this.timeoutMin = timeoutMin;
+    }
+
+    public LambdaJavaRuntimeProps(int memorySizeMB, int retryAttempts, int timeoutMin, Architecture architecture) {
+        this.memorySizeMB = memorySizeMB;
+        this.retryAttempts = retryAttempts;
+        this.timeoutMin = timeoutMin;
+        this.architecture = architecture;
     }
 
     public int memorySizeMB() {
@@ -57,4 +71,7 @@ public class LambdaJavaRuntimeProps implements Struct {
         return timeoutMin;
     }
 
+    public Architecture architecture() {
+        return architecture;
+    }
 }

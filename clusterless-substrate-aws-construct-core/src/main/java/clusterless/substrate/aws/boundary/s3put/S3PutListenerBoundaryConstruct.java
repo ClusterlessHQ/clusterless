@@ -11,6 +11,7 @@ package clusterless.substrate.aws.boundary.s3put;
 import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
+import clusterless.substrate.aws.arc.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Assets;
@@ -27,6 +28,7 @@ import software.amazon.awscdk.services.events.EventPattern;
 import software.amazon.awscdk.services.events.IEventBus;
 import software.amazon.awscdk.services.events.Rule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
+import software.amazon.awscdk.services.lambda.Architecture;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.logs.LogGroup;
@@ -96,6 +98,8 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .runtime(Runtime.JAVA_11)
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
+                .reservedConcurrentExecutions(1)
+                .architecture(architecture())
                 .build();
 
         LogGroup.Builder.create(this, Label.of("LogGroup").with(functionLabel).camelCase())
@@ -143,5 +147,18 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .eventPattern(pattern)
                 .targets(List.of(lambdaFunction))
                 .build();
+    }
+
+    private Architecture architecture() {
+        LambdaJavaRuntimeProps.Architecture architecture = model().runtimeProps.architecture();
+        switch (architecture) {
+            case ARM_64 -> {
+                return Architecture.ARM_64;
+            }
+            case X86_64 -> {
+                return Architecture.X86_64;
+            }
+        }
+        throw new IllegalStateException("unknown architecture: " + architecture);
     }
 }
