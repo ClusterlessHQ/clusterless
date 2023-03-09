@@ -24,7 +24,8 @@ public class ArcProps implements Struct {
     Map<String, SinkDataset> sinks;
 
     Map<String, URI> sourceManifestPaths;
-    Map<String, URI> sinkManifestPaths;
+    Map<String, URI> sinkManifestCompletePaths;
+    Map<String, URI> sinkManifestRollbackPaths;
 
     public ArcProps() {
     }
@@ -41,15 +42,20 @@ public class ArcProps implements Struct {
         return sourceManifestPaths;
     }
 
-    public Map<String, URI> sinkManifestPaths() {
-        return sinkManifestPaths;
+    public Map<String, URI> sinkManifestCompletePaths() {
+        return sinkManifestCompletePaths;
+    }
+
+    public Map<String, URI> sinkManifestRollbackPaths() {
+        return sinkManifestRollbackPaths;
     }
 
     private ArcProps(Builder builder) {
         sources = builder.sources;
         sinks = builder.sinks;
         sourceManifestPaths = builder.sourceManifestPaths;
-        sinkManifestPaths = builder.sinkManifestPaths;
+        sinkManifestCompletePaths = builder.sinkManifestCompletePaths;
+        sinkManifestRollbackPaths = builder.sinkManifestRollbackPaths;
     }
 
     /**
@@ -59,7 +65,8 @@ public class ArcProps implements Struct {
         private Map<String, SourceDataset> sources = new LinkedHashMap<>();
         private Map<String, SinkDataset> sinks = new LinkedHashMap<>();
         private Map<String, URI> sourceManifestPaths;
-        private Map<String, URI> sinkManifestPaths;
+        private Map<String, URI> sinkManifestCompletePaths;
+        private Map<String, URI> sinkManifestRollbackPaths;
 
         private Builder() {
         }
@@ -102,13 +109,24 @@ public class ArcProps implements Struct {
         }
 
         /**
-         * Sets the {@code sinkManifestPaths} and returns a reference to this Builder enabling method chaining.
+         * Sets the {@code sinkManifestCompletePaths} and returns a reference to this Builder enabling method chaining.
          *
-         * @param val the {@code sinkManifestPaths} to set
+         * @param val the {@code sinkManifestCompletePaths} to set
          * @return a reference to this Builder
          */
-        public Builder withSinkManifestPaths(Map<String, URI> val) {
-            sinkManifestPaths = val;
+        public Builder withSinkManifestCompletePaths(Map<String, URI> val) {
+            sinkManifestCompletePaths = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@code sinkManifestRollbackPaths} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code sinkManifestRollbackPaths} to set
+         * @return a reference to this Builder
+         */
+        public Builder withSinkManifestRollbackPaths(Map<String, URI> val) {
+            sinkManifestRollbackPaths = val;
             return this;
         }
 

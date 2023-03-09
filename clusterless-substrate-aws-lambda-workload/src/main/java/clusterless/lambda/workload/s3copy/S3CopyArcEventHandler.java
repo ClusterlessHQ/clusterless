@@ -17,6 +17,8 @@ import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.sdk.S3;
+import clusterless.util.Tuple2;
+import clusterless.util.Tuple3;
 import clusterless.util.URIs;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +41,8 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
 
     protected Map<String, ManifestWriter> manifestWriters = ManifestWriter.writers(
             arcProps.sinks(),
-            arcProps.sinkManifestPaths(),
+            arcProps.sinkManifestCompletePaths(),
+            arcProps.sinkManifestRollbackPaths(),
             UriType.identifier
     );
 
@@ -63,6 +66,10 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
                 LOG.info("writing to dataset name: {}, version: {}, with role: {} at {}", name, version, role, pathURI);
             }
 
+            @Override
+            public void applyToManifest(String role, URI manifest) {
+                LOG.info("write manifest: {}, with role: {}", manifest, role);
+            }
         };
     }
 
@@ -79,27 +86,54 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
         URI fromDatasetPath = incomingManifest.dataset().pathURI();
         List<URI> fromUris = incomingManifest.uris();
 
-        for (Map.Entry<String, URI> entry : arcProps.sinkManifestPaths().entrySet()) {
-            List<URI> results = new LinkedList<>();
+        for (Map.Entry<String, SinkDataset> roleEntry : arcProps.sinks().entrySet()) {
+            // not using a map so that collisions can be managed independently on the to/from sides
+            List<Tuple2<URI, URI>> toUris = new LinkedList<>();
 
-            String role = entry.getKey();
-            SinkDataset sinkDataset = arcProps.sinks().get(role);
+            String role = roleEntry.getKey();
+            SinkDataset sinkDataset = roleEntry.getValue();
             eventObserver.applyToDataset(role, sinkDataset);
 
             URI toDatasetPath = sinkDataset.pathURI();
             for (URI fromUri : fromUris) {
                 URI toURI = URIs.fromTo(fromDatasetPath, fromUri, toDatasetPath);
-
-                results.add(toURI);
-
-                S3.Response copyResponse = s3.copy(fromUri, toURI);
-
-                copyResponse.isSuccessOrThrowRuntime(
-                        r -> String.format("unable to copy object: %s, %s", fromUri, r.errorMessage())
-                );
+                toUris.add(new Tuple2<>(fromUri, toURI));
             }
 
-            manifestWriters.get(role).putManifest(results, lotId);
+            // todo: check integrity of uris to be copied
+
+            List<URI> completed = new LinkedList<>();
+            List<Tuple3<URI, URI, String>> failed = new LinkedList<>();
+
+            s3.copy(
+                    toUris,
+                    completed::add,
+                    (tuple, response) -> {
+                        failed.add(new Tuple3<>(tuple.get_1(), tuple.get_2(), response.errorMessage()));
+                        return failed.size() >= 5;
+                    }
+            );
+
+            boolean copyFailed = failed.isEmpty();
+
+            URI manifest = null;
+
+            if (!copyFailed) {
+                LOG.error("s3 object copy errors: {}, failed: {}", fromUris.size(), failed.size());
+                for (Tuple3<URI, URI, String> failure : failed) {
+                    LOG.error("failed from: {}, to: {}, message: {}", failure.get_1(), failure.get_2(), failure.get_3());
+                }
+
+                manifest = manifestWriters.get(role).writeRollbackManifest(completed, lotId);
+
+            }
+            if (completed.isEmpty()) {
+                LOG.error("no objects copied with no errors, from: {}", fromUris.size());
+            } else {
+                manifest = manifestWriters.get(role).writeSuccessManifest(completed, lotId);
+            }
+
+            eventObserver.applyToManifest(role, manifest);
         }
     }
 }

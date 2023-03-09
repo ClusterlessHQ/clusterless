@@ -9,10 +9,12 @@
 package clusterless.substrate.aws.resources;
 
 import clusterless.model.deploy.Dataset;
+import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.util.Label;
+import clusterless.util.Partition;
 import clusterless.util.URIs;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Fn;
@@ -54,20 +56,24 @@ public class Buckets {
     public static final Label MANIFEST_BUCKET_NAME = MANIFEST.bucketNameKey();
 
 
-    public static URI manifestURI(@NotNull ManagedConstruct managedConstruct, Dataset dataset) {
-        return manifestURI(managedConstruct, dataset.name(), dataset.version());
+    public static URI manifestPath(@NotNull ManagedConstruct managedConstruct, ManifestState state, Dataset dataset) {
+        return manifestPath(managedConstruct, state, dataset.name(), dataset.version());
     }
 
-    public static URI manifestURI(@NotNull ManagedConstruct managedConstruct, String... names) {
+    protected static URI manifestPath(@NotNull ManagedConstruct managedConstruct, ManifestState manifestState, String... names) {
         ManagedProject managedProject = ManagedProject.projectOf(managedConstruct);
 
-        String path = Label.of(managedProject.name())
+        Partition attempt = manifestState.hasAttempts() ? Partition.namedOf("attempt", System.currentTimeMillis()) : Partition.NULL;
+
+        String path = Partition.of(managedProject.name())
                 .with(managedProject.version())
                 .having(names)
-                .lowerHyphenPath(true);
+                .with(manifestState)
+                .with(attempt)
+                .path();
 
         try {
-            return new URI("s3", manifestBucketName(managedConstruct), URIs.normalize("/", path), null);
+            return new URI("s3", manifestBucketName(managedConstruct), URIs.normalize(path), null);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("unable to create uri", e);
         }

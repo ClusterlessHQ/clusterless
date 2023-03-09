@@ -11,6 +11,7 @@ package clusterless.substrate.aws.boundary.s3put;
 import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
+import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.arc.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
@@ -72,7 +73,7 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
         IEventBus arcEventBus = EventBus.fromEventBusName(this, "EventBus", eventBusRef);
 
         // declare lambda to convert put event into arc event
-        URI manifestPrefix = Buckets.manifestURI(this, model().dataset());
+        URI manifestPrefix = Buckets.manifestPath(this, ManifestState.complete, model().dataset());
 
         TransformProps transformProps = TransformProps.Builder.builder()
                 .withEventBusName(eventBusRef)

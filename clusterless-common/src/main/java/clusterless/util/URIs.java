@@ -63,6 +63,7 @@ public class URIs {
      * @return
      */
     public static String normalize(String path) {
+        //  todo:  return value.replaceAll("(?<!:)/{2,}", "/");
         String empty = Strings.nullToEmpty(path);
         return normalize(Paths.get(empty), empty);
     }

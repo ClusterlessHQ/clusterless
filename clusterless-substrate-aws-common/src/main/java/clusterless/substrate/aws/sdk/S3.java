@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.sdk;
 
 import clusterless.json.JSONUtil;
+import clusterless.util.Tuple2;
 import clusterless.util.URIs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +20,10 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 /**
  *
@@ -170,6 +174,47 @@ public class S3 extends ClientBase<S3Client> {
         } catch (Exception exception) {
             return new Response(exception);
         }
+    }
+
+    public boolean copy(List<Tuple2<URI, URI>> toUris, Consumer<URI> success, BiFunction<Tuple2<URI, URI>, Response, Boolean> failure) {
+        Objects.requireNonNull(toUris, "toUris");
+
+        try (S3Client client = createClient()) {
+            for (Tuple2<URI, URI> tuple : toUris) {
+                URI from = tuple.get_1();
+                URI to = tuple.get_2();
+
+                String fromBucket = from.getHost();
+                String fromKey = URIs.asKeyPath(from);
+
+                String toBucket = to.getHost();
+                String toKey = URIs.asKeyPath(to);
+
+                CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                        .sourceBucket(fromBucket)
+                        .sourceKey(fromKey)
+                        .destinationBucket(toBucket)
+                        .destinationKey(toKey)
+                        .build();
+
+                Response response;
+                try {
+                    response = new Response(client.copyObject(copyObjectRequest));
+                } catch (Exception exception) {
+                    response = new Response(exception);
+                }
+
+                if (response.isSuccess()) {
+                    success.accept(to);
+                } else {
+                    // stop on true
+                    if (failure.apply(tuple, response)) {
+                        return false; // success
+                    }
+                }
+            }
+        }
+        return true; // success
     }
 
     public boolean exists(Response response) {

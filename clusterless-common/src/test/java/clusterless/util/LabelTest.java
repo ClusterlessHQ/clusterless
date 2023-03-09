@@ -6,14 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed;
+package clusterless.util;
 
-import clusterless.util.Label;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static clusterless.managed.LabelTest.Value.Case;
-import static clusterless.managed.LabelTest.Value.Lower;
+import static clusterless.util.LabelTest.Value.Case;
+import static clusterless.util.LabelTest.Value.Lower;
 
 /**
  *
@@ -120,9 +119,7 @@ public class LabelTest {
         public Label abbreviated() {
             return Label.of(abbr);
         }
-
     }
-
 
     @Test
     void enumeration() {

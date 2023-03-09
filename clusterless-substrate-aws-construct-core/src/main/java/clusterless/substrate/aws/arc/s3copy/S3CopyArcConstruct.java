@@ -10,6 +10,7 @@ package clusterless.substrate.aws.arc.s3copy;
 
 import clusterless.lambda.arc.ArcProps;
 import clusterless.lambda.workload.s3copy.S3CopyArcEventHandler;
+import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Assets;
@@ -41,16 +42,22 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
         Map<String, URI> sourceManifestPaths = model.sources()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestURI(this, e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestPath(this, ManifestState.complete, e.getValue())));
 
-        Map<String, URI> sinkManifestPaths = model.sinks()
+        Map<String, URI> sinkManifestCompletePaths = model.sinks()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestURI(this, e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestPath(this, ManifestState.complete, e.getValue())));
+
+        Map<String, URI> sinkManifestRollbackPaths = model.sinks()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestPath(this, ManifestState.partial, e.getValue())));
 
         ArcProps arcProps = ArcProps.Builder.builder()
                 .withSourceManifestPaths(sourceManifestPaths)
-                .withSinkManifestPaths(sinkManifestPaths)
+                .withSinkManifestCompletePaths(sinkManifestCompletePaths)
+                .withSinkManifestRollbackPaths(sinkManifestRollbackPaths)
                 .build();
 
         Map<String, String> environment = Env.toEnv(arcProps);

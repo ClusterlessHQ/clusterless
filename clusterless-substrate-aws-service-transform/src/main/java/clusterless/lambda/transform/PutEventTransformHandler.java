@@ -41,7 +41,9 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
     protected ManifestWriter manifestWriter = new ManifestWriter(
             transformProps.manifestPath(),
-            transformProps.dataset(), UriType.identifier
+            null,
+            transformProps.dataset(),
+            UriType.identifier
     );
 
     protected ArcNotifyEventManager arcNotifyEventManager = new ArcNotifyEventManager(
@@ -113,7 +115,7 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
         eventObserver.applyDatasetItemsSize(uris.size());
 
-        URI manifestURI = manifestWriter.putManifest(uris, lotId);
+        URI manifestURI = manifestWriter.writeSuccessManifest(uris, lotId);
 
         eventObserver.applyManifestURI(manifestURI);
 

@@ -18,29 +18,44 @@ public class ManifestWriter {
     private static final Logger LOG = LogManager.getLogger(ManifestWriter.class);
 
     protected static final S3 s3 = new S3();
-    private final URI sinkManifestPath;
+    private final URI sinkManifestCompletePath;
+    private URI sinkManifestRollbackPath;
     private final Dataset sinkDataset;
     private final UriType uriType;
 
-    public static Map<String, ManifestWriter> writers(Map<String, SinkDataset> sinks, Map<String, URI> sinkManifestPaths, UriType uriType) {
+    public static Map<String, ManifestWriter> writers(Map<String, SinkDataset> sinks, Map<String, URI> sinkManifestCompletePaths, Map<String, URI> sinkManifestRollbackPaths, UriType uriType) {
         Map<String, ManifestWriter> results = new HashMap<>();
 
         for (Map.Entry<String, SinkDataset> entry : sinks.entrySet()) {
             String role = entry.getKey();
             SinkDataset sinkDataset = entry.getValue();
-            results.put(role, new ManifestWriter(sinkManifestPaths.get(role), sinkDataset, uriType));
+            results.put(role, new ManifestWriter(
+                    sinkManifestCompletePaths.get(role),
+                    sinkManifestRollbackPaths.get(role),
+                    sinkDataset,
+                    uriType
+            ));
         }
 
         return results;
     }
 
-    public ManifestWriter(URI sinkManifestPath, Dataset sinkDataset, UriType uriType) {
-        this.sinkManifestPath = sinkManifestPath;
+    public ManifestWriter(URI sinkManifestCompletePath, URI sinkManifestRollbackPath, Dataset sinkDataset, UriType uriType) {
+        this.sinkManifestCompletePath = sinkManifestCompletePath;
+        this.sinkManifestRollbackPath = sinkManifestRollbackPath;
         this.sinkDataset = new Dataset(sinkDataset);
         this.uriType = uriType;
     }
 
-    public URI putManifest(List<URI> uris, String lotId) {
+    public URI writeRollbackManifest(List<URI> uris, String lotId) {
+        return writeManifest(uris, lotId, sinkManifestRollbackPath);
+    }
+
+    public URI writeSuccessManifest(List<URI> uris, String lotId) {
+        return writeManifest(uris, lotId, sinkManifestCompletePath);
+    }
+
+    private URI writeManifest(List<URI> uris, String lotId, URI sinkManifestPath) {
         Manifest manifest = Manifest.Builder.builder()
                 .withLotId(lotId)
                 .withUriType(uriType)
