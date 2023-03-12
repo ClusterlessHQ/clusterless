@@ -4,8 +4,8 @@ import clusterless.model.UriType;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
-import clusterless.substrate.aws.URIFormats;
 import clusterless.substrate.aws.sdk.S3;
+import clusterless.substrate.aws.uri.ManifestURI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,12 +18,12 @@ public class ManifestWriter {
     private static final Logger LOG = LogManager.getLogger(ManifestWriter.class);
 
     protected static final S3 s3 = new S3();
-    private final URI sinkManifestCompletePath;
-    private URI sinkManifestRollbackPath;
+    private final ManifestURI sinkManifestCompletePath;
+    private final ManifestURI sinkManifestPartialPath;
     private final Dataset sinkDataset;
     private final UriType uriType;
 
-    public static Map<String, ManifestWriter> writers(Map<String, SinkDataset> sinks, Map<String, URI> sinkManifestCompletePaths, Map<String, URI> sinkManifestRollbackPaths, UriType uriType) {
+    public static Map<String, ManifestWriter> writers(Map<String, SinkDataset> sinks, Map<String, ManifestURI> sinkManifestCompletePaths, Map<String, ManifestURI> sinkManifestPartialPaths, UriType uriType) {
         Map<String, ManifestWriter> results = new HashMap<>();
 
         for (Map.Entry<String, SinkDataset> entry : sinks.entrySet()) {
@@ -31,7 +31,7 @@ public class ManifestWriter {
             SinkDataset sinkDataset = entry.getValue();
             results.put(role, new ManifestWriter(
                     sinkManifestCompletePaths.get(role),
-                    sinkManifestRollbackPaths.get(role),
+                    sinkManifestPartialPaths.get(role),
                     sinkDataset,
                     uriType
             ));
@@ -40,22 +40,22 @@ public class ManifestWriter {
         return results;
     }
 
-    public ManifestWriter(URI sinkManifestCompletePath, URI sinkManifestRollbackPath, Dataset sinkDataset, UriType uriType) {
+    public ManifestWriter(ManifestURI sinkManifestCompletePath, ManifestURI sinkManifestPartialPath, Dataset sinkDataset, UriType uriType) {
         this.sinkManifestCompletePath = sinkManifestCompletePath;
-        this.sinkManifestRollbackPath = sinkManifestRollbackPath;
+        this.sinkManifestPartialPath = sinkManifestPartialPath;
         this.sinkDataset = new Dataset(sinkDataset);
         this.uriType = uriType;
     }
 
-    public URI writeRollbackManifest(List<URI> uris, String lotId) {
-        return writeManifest(uris, lotId, sinkManifestRollbackPath);
+    public URI writePartialManifest(List<URI> uris, String lotId) {
+        return writeManifest(uris, lotId, sinkManifestPartialPath);
     }
 
     public URI writeSuccessManifest(List<URI> uris, String lotId) {
         return writeManifest(uris, lotId, sinkManifestCompletePath);
     }
 
-    private URI writeManifest(List<URI> uris, String lotId, URI sinkManifestPath) {
+    private URI writeManifest(List<URI> uris, String lotId, ManifestURI sinkManifestPath) {
         Manifest manifest = Manifest.Builder.builder()
                 .withLotId(lotId)
                 .withUriType(uriType)
@@ -64,9 +64,9 @@ public class ManifestWriter {
                 .build();
 
         // put manifest, nested under the 'lot' partition
-        URI sinkManifestIdentifier = URIFormats.createManifestIdentifier(sinkManifestPath, lotId, manifest.extension());
+        URI sinkManifestIdentifier = sinkManifestPath.withLot(lotId).uri();
 
-        LOG.info("testing manifest; {}", sinkManifestIdentifier);
+        LOG.info("testing manifest: {}", sinkManifestIdentifier);
 
         // todo: perform a listing to test for states (completed, empty, etc)
         S3.Response exists = s3.exists(sinkManifestIdentifier);

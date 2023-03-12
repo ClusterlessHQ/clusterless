@@ -42,7 +42,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
     protected Map<String, ManifestWriter> manifestWriters = ManifestWriter.writers(
             arcProps.sinks(),
             arcProps.sinkManifestCompletePaths(),
-            arcProps.sinkManifestRollbackPaths(),
+            arcProps.sinkManifestPartialPaths(),
             UriType.identifier
     );
 
@@ -124,7 +124,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
                     LOG.error("failed from: {}, to: {}, message: {}", failure.get_1(), failure.get_2(), failure.get_3());
                 }
 
-                manifest = manifestWriters.get(role).writeRollbackManifest(completed, lotId);
+                manifest = manifestWriters.get(role).writePartialManifest(completed, lotId);
 
             }
             if (completed.isEmpty()) {

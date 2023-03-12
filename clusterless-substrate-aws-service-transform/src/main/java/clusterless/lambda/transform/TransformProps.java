@@ -10,9 +10,8 @@ package clusterless.lambda.transform;
 
 import clusterless.model.Struct;
 import clusterless.model.deploy.Dataset;
+import clusterless.substrate.aws.uri.ManifestURI;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.net.URI;
 
 /**
  *
@@ -27,7 +26,10 @@ public class TransformProps implements Struct {
     String keyRegex;
 
     @JsonProperty(required = true)
-    URI manifestPath;
+    ManifestURI manifestCompletePath;
+
+    @JsonProperty(required = true)
+    ManifestURI manifestPartialPath;
 
     @JsonProperty(required = true)
     Dataset dataset;
@@ -37,13 +39,8 @@ public class TransformProps implements Struct {
     public TransformProps() {
     }
 
-    private TransformProps(Builder builder) {
-        lotUnit = builder.lotUnit;
-        lotSource = builder.lotSource;
-        keyRegex = builder.keyRegex;
-        manifestPath = builder.manifestPath;
-        dataset = builder.dataset;
-        eventBusName = builder.eventBusName;
+    public static Builder builder() {
+        return Builder.aTransformProps();
     }
 
     public String lotUnit() {
@@ -58,10 +55,13 @@ public class TransformProps implements Struct {
         return keyRegex;
     }
 
-    public URI manifestPath() {
-        return manifestPath;
+    public ManifestURI manifestCompletePath() {
+        return manifestCompletePath;
     }
 
+    public ManifestURI manifestPartialPath() {
+        return manifestPartialPath;
+    }
 
     public Dataset dataset() {
         return dataset;
@@ -71,97 +71,67 @@ public class TransformProps implements Struct {
         return eventBusName;
     }
 
-    /**
-     * {@code TransformProps} builder static inner class.
-     */
     public static final class Builder {
-        private String lotUnit;
-        private LotSource lotSource;
-        private String keyRegex;
-        private URI manifestPath;
-        private Dataset dataset;
-        private String eventBusName;
+        String lotUnit;
+        LotSource lotSource;
+        String keyRegex;
+        ManifestURI manifestCompletePath;
+        ManifestURI manifestPartialPath;
+        Dataset dataset;
+        String eventBusName;
 
         private Builder() {
         }
 
-        public static Builder builder() {
+        public static Builder aTransformProps() {
             return new Builder();
         }
 
-        /**
-         * Sets the {@code lotUnit} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code lotUnit} to set
-         * @return a reference to this Builder
-         */
-        public Builder withLotUnit(String val) {
-            lotUnit = val;
+        public Builder withLotUnit(String lotUnit) {
+            this.lotUnit = lotUnit;
             return this;
         }
 
-        /**
-         * Sets the {@code lotSource} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code lotSource} to set
-         * @return a reference to this Builder
-         */
-        public Builder withLotSource(LotSource val) {
-            lotSource = val;
+        public Builder withLotSource(LotSource lotSource) {
+            this.lotSource = lotSource;
             return this;
         }
 
-        /**
-         * Sets the {@code keyRegex} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code keyRegex} to set
-         * @return a reference to this Builder
-         */
-        public Builder withKeyRegex(String val) {
-            keyRegex = val;
+        public Builder withKeyRegex(String keyRegex) {
+            this.keyRegex = keyRegex;
             return this;
         }
 
-        /**
-         * Sets the {@code withManifestPath} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code manifestPrefix} to set
-         * @return a reference to this Builder
-         */
-        public Builder withManifestPath(URI val) {
-            manifestPath = val;
+        public Builder withManifestCompletePath(ManifestURI manifestCompletePath) {
+            this.manifestCompletePath = manifestCompletePath;
             return this;
         }
 
-        /**
-         * Sets the {@code dataset} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code dataset} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDataset(Dataset val) {
-            dataset = val;
+        public Builder withManifestPartialPath(ManifestURI manifestPartialPath) {
+            this.manifestPartialPath = manifestPartialPath;
             return this;
         }
 
-        /**
-         * Sets the {@code eventBusName} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code eventBusName} to set
-         * @return a reference to this Builder
-         */
-        public Builder withEventBusName(String val) {
-            eventBusName = val;
+        public Builder withDataset(Dataset dataset) {
+            this.dataset = dataset;
             return this;
         }
 
-        /**
-         * Returns a {@code TransformProps} built from the parameters previously set.
-         *
-         * @return a {@code TransformProps} built with parameters of this {@code TransformProps.Builder}
-         */
+        public Builder withEventBusName(String eventBusName) {
+            this.eventBusName = eventBusName;
+            return this;
+        }
+
         public TransformProps build() {
-            return new TransformProps(this);
+            TransformProps transformProps = new TransformProps();
+            transformProps.keyRegex = this.keyRegex;
+            transformProps.eventBusName = this.eventBusName;
+            transformProps.lotUnit = this.lotUnit;
+            transformProps.lotSource = this.lotSource;
+            transformProps.dataset = this.dataset;
+            transformProps.manifestCompletePath = this.manifestCompletePath;
+            transformProps.manifestPartialPath = this.manifestPartialPath;
+            return transformProps;
         }
     }
 
@@ -171,7 +141,8 @@ public class TransformProps implements Struct {
         sb.append("lotUnit='").append(lotUnit).append('\'');
         sb.append(", lotSource=").append(lotSource);
         sb.append(", keyRegex='").append(keyRegex).append('\'');
-        sb.append(", manifestPath=").append(manifestPath);
+        sb.append(", manifestCompletePath=").append(manifestCompletePath);
+        sb.append(", manifestPartialPath=").append(manifestPartialPath);
         sb.append(", dataset=").append(dataset);
         sb.append(", eventBusName='").append(eventBusName).append('\'');
         sb.append('}');

@@ -11,8 +11,6 @@ package clusterless.substrate.aws.sdk;
 import clusterless.json.JSONUtil;
 import clusterless.util.Tuple2;
 import clusterless.util.URIs;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -20,16 +18,20 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  *
  */
 public class S3 extends ClientBase<S3Client> {
-    private static final Logger LOG = LogManager.getLogger(S3.class);
+    public static URI createS3URI(String bucket, String key) {
+        return URIs.create("s3", bucket, key);
+    }
 
     public S3() {
     }
@@ -61,13 +63,13 @@ public class S3 extends ClientBase<S3Client> {
         return exists(defaultRegion, location);
     }
 
-    public Response exists(String region, URI location) {
+    public Response exists(String region, URI identifier) {
         Objects.requireNonNull(region, "region");
-        Objects.requireNonNull(location, "location");
+        Objects.requireNonNull(identifier, "identifier");
 
         HeadObjectRequest request = HeadObjectRequest.builder()
-                .bucket(location.getHost())
-                .key(URIs.asKeyPath(location))
+                .bucket(identifier.getHost())
+                .key(URIs.asKey(identifier))
                 .build();
 
         try (S3Client client = createClient(region)) {
@@ -75,6 +77,18 @@ public class S3 extends ClientBase<S3Client> {
         } catch (Exception exception) {
             return new Response(exception);
         }
+    }
+
+    public boolean exists(Response response) {
+        if (hasNoAwsResponse(response)) {
+            return false;
+        }
+
+        if (response.sdkHttpResponse == null) {
+            throw new IllegalStateException("sdk http response is null");
+        }
+
+        return response.sdkHttpResponse.isSuccessful();
     }
 
     public Response create(String bucketName) {
@@ -96,23 +110,23 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public Response put(URI location, String contentType, Object value) {
-        Objects.requireNonNull(location, "location");
+    public Response put(URI identifier, String contentType, Object value) {
+        Objects.requireNonNull(identifier, "identifier");
         Objects.requireNonNull(contentType, "contentType");
         Objects.requireNonNull(value, "value");
 
         String body = JSONUtil.writeAsStringSafe(value);
 
-        return put(location, contentType, body);
+        return put(identifier, contentType, body);
     }
 
-    public Response put(URI location, String contentType, String body) {
-        Objects.requireNonNull(location, "location");
+    public Response put(URI identifier, String contentType, String body) {
+        Objects.requireNonNull(identifier, "identifier");
         Objects.requireNonNull(contentType, "contentType");
         Objects.requireNonNull(body, "body");
 
-        String bucketName = location.getHost();
-        String key = URIs.asKeyPath(location);
+        String bucketName = identifier.getHost();
+        String key = URIs.asKey(identifier);
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -127,11 +141,11 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public Response get(URI location) {
-        Objects.requireNonNull(location, "location");
+    public Response get(URI identifier) {
+        Objects.requireNonNull(identifier, "identifier");
 
-        String bucketName = location.getHost();
-        String key = URIs.asKeyPath(location);
+        String bucketName = identifier.getHost();
+        String key = URIs.asKey(identifier);
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
@@ -145,6 +159,92 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
+    public Response remove(URI identifier) {
+        Objects.requireNonNull(identifier, "identifier");
+
+        try (S3Client client = createClient()) {
+            return remove(client, identifier);
+        }
+    }
+
+    private S3.Response remove(S3Client client, URI identifier) {
+        try {
+            return new Response(client.deleteObject(createDeleteRequest(identifier)));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    private static DeleteObjectRequest createDeleteRequest(URI identifier) {
+        String bucketName = identifier.getHost();
+        String key = URIs.asKey(identifier);
+
+        return DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+    }
+
+    public Response move(URI fromIdentifier, URI toIdentifier) {
+        Objects.requireNonNull(fromIdentifier, "fromIdentifier");
+        Objects.requireNonNull(toIdentifier, "toIdentifier");
+
+        try (S3Client client = createClient()) {
+            ClientBase<S3Client>.Response response = copy(client, fromIdentifier, toIdentifier);
+
+            if (!response.isSuccess()) {
+                return response;
+            }
+
+            return remove(client, fromIdentifier);
+        }
+    }
+
+    public Response listPath(URI path) {
+        Objects.requireNonNull(path, "path");
+
+        String bucketName = path.getHost();
+        String key = URIs.asKeyPath(path);
+
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .prefix(key)
+                .delimiter("/")
+                .maxKeys(1000)
+                .build();
+
+        try (S3Client client = createClient()) {
+            return new Response(client.listObjectsV2(listObjectsV2Request));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    public List<String> listPath(Response response) {
+        if (hasNoAwsResponse(response)) {
+            return Collections.emptyList();
+        }
+
+        ListObjectsV2Response awsResponse = (ListObjectsV2Response) response.awsResponse();
+
+        if (awsResponse.hasCommonPrefixes() && !awsResponse.commonPrefixes().isEmpty()) {
+            return awsResponse.commonPrefixes()
+                    .stream()
+                    .map(CommonPrefix::prefix)
+                    .collect(Collectors.toList());
+        }
+
+        if (awsResponse.hasContents()) {
+            return awsResponse.contents()
+                    .stream()
+                    .map(S3Object::key)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
+    }
+
+
     /**
      * Has a limit of 5G objects,
      *
@@ -156,23 +256,8 @@ public class S3 extends ClientBase<S3Client> {
         Objects.requireNonNull(from, "from");
         Objects.requireNonNull(to, "to");
 
-        String fromBucket = from.getHost();
-        String fromKey = URIs.asKeyPath(from);
-
-        String toBucket = to.getHost();
-        String toKey = URIs.asKeyPath(to);
-
-        CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
-                .sourceBucket(fromBucket)
-                .sourceKey(fromKey)
-                .destinationBucket(toBucket)
-                .destinationKey(toKey)
-                .build();
-
         try (S3Client client = createClient()) {
-            return new Response(client.copyObject(copyObjectRequest));
-        } catch (Exception exception) {
-            return new Response(exception);
+            return copy(client, from, to);
         }
     }
 
@@ -184,25 +269,7 @@ public class S3 extends ClientBase<S3Client> {
                 URI from = tuple.get_1();
                 URI to = tuple.get_2();
 
-                String fromBucket = from.getHost();
-                String fromKey = URIs.asKeyPath(from);
-
-                String toBucket = to.getHost();
-                String toKey = URIs.asKeyPath(to);
-
-                CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
-                        .sourceBucket(fromBucket)
-                        .sourceKey(fromKey)
-                        .destinationBucket(toBucket)
-                        .destinationKey(toKey)
-                        .build();
-
-                Response response;
-                try {
-                    response = new Response(client.copyObject(copyObjectRequest));
-                } catch (Exception exception) {
-                    response = new Response(exception);
-                }
+                S3.Response response = copy(client, from, to);
 
                 if (response.isSuccess()) {
                     success.accept(to);
@@ -217,16 +284,26 @@ public class S3 extends ClientBase<S3Client> {
         return true; // success
     }
 
-    public boolean exists(Response response) {
-        if (response.exception instanceof NoSuchBucketException || response.exception instanceof NoSuchKeyException) {
-            return false;
+    private ClientBase<S3Client>.Response copy(S3Client client, URI from, URI to) {
+        try {
+            return new Response(client.copyObject(createCopyRequest(from, to)));
+        } catch (Exception exception) {
+            return new Response(exception);
         }
+    }
 
-        if (response.exception != null) {
-            return false;
-        }
+    private static CopyObjectRequest createCopyRequest(URI from, URI to) {
+        String fromBucket = from.getHost();
+        String fromKey = URIs.asKey(from);
+        String toBucket = to.getHost();
+        String toKey = URIs.asKey(to);
 
-        return response.sdkHttpResponse.isSuccessful();
+        return CopyObjectRequest.builder()
+                .sourceBucket(fromBucket)
+                .sourceKey(fromKey)
+                .destinationBucket(toBucket)
+                .destinationKey(toKey)
+                .build();
     }
 
     public Instant lastModified(Response response) {
@@ -243,5 +320,17 @@ public class S3 extends ClientBase<S3Client> {
                 .credentialsProvider(credentialsProvider)
                 .endpointOverride(endpointOverride)
                 .build();
+    }
+
+    private static boolean hasNoAwsResponse(ClientBase<S3Client>.Response response) {
+        if (response.exception instanceof NoSuchBucketException || response.exception instanceof NoSuchKeyException) {
+            return true;
+        }
+
+        if (response.exception != null) {
+            return true;
+        }
+
+        return response.awsResponse == null;
     }
 }

@@ -11,6 +11,8 @@ package clusterless.util;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Label simplifies creating complex strings used for naming, displays, and paths.
@@ -18,6 +20,8 @@ import java.util.Objects;
  * An Enum can be a Label by implementing {@link EnumPartition}.
  */
 public interface Partition {
+    Pattern SEPARATOR_REGEX = Pattern.compile("^/+$");
+
     /**
      * Concatenate all the given labels .
      *
@@ -28,6 +32,10 @@ public interface Partition {
         return Arrays.stream(partitions).reduce(Partition.NULL, Partition::with);
     }
 
+    /**
+     * Will force the enum type and value to be lowercase, unless the enum also
+     * implements {@link Label}, in which {@link Label#lowerHyphen()} is called.
+     */
     interface EnumPartition extends NamedPartition {
         String name();
 
@@ -40,11 +48,37 @@ public interface Partition {
         }
 
         default String value() {
+            // todo: currently an enum can't implement both
+            if (this instanceof Label) {
+                return ((Label) this).lowerHyphen();
+            }
             return name().toLowerCase(Locale.ROOT);
         }
     }
 
-    Partition NULL = () -> null;
+    Partition NULL = new Partition() {
+        @Override
+        public String partition() {
+            return null;
+        }
+
+        @Override
+        public boolean isNull() {
+            return true;
+        }
+    };
+
+    Partition SEPARATOR = new Partition() {
+        @Override
+        public String partition() {
+            return "/";
+        }
+
+        @Override
+        public boolean isSeparator() {
+            return true;
+        }
+    };
 
     static String nameOrNull(Partition value) {
         return value == null ? null : value.partition();
@@ -53,6 +87,10 @@ public interface Partition {
     static Partition namedOf(Object key, Object value) {
         Partition keyPart = of(key);
         Partition valuePart = of(value);
+
+        if (valuePart.isNull()) {
+            return NULL;
+        }
 
         return keyPart.named(valuePart);
     }
@@ -73,6 +111,10 @@ public interface Partition {
             return of((Partition) value);
         }
 
+        if (value instanceof Optional) {
+            return of(((Optional<?>) value).orElse(null));
+        }
+
         return of(value.toString());
     }
 
@@ -89,12 +131,19 @@ public interface Partition {
             return NULL;
         }
 
+        if (SEPARATOR_REGEX.matcher(value).matches()) {
+            return SEPARATOR;
+        }
 
-        return () -> value.toLowerCase(Locale.ROOT);
+        return () -> value;
     }
 
     default boolean isNull() {
         return partition() == null;
+    }
+
+    default boolean isSeparator() {
+        return false;
     }
 
     default Partition having(String... values) {
@@ -107,20 +156,24 @@ public interface Partition {
         Partition keyPart = of(key);
         Partition valuePart = of(value);
 
+        if (valuePart.isNull()) {
+            return this;
+        }
+
         return with(keyPart.named(valuePart));
     }
 
     default NamedPartition named(Partition value) {
-        if (value == null || value.isNull()) {
-            return this::partition;
-        }
-
         return () -> String.format("%s=%s", partition(), value.partition());
     }
 
     default Partition with(Object object) {
         if (object == null) {
             return this;
+        }
+
+        if (object instanceof Optional) {
+            return with(((Optional<?>) object).orElse(null));
         }
 
         if (object instanceof Label) {
@@ -137,9 +190,20 @@ public interface Partition {
             return this;
         }
 
-        // if first in chain in already null, return the next
+        // if first in chain is already null, return the next
         if (this.isNull()) {
             return partition;
+        }
+
+
+        // collapse the two slashes
+        if (this.isSeparator() && partition.isSeparator()) {
+            return NULL;
+        }
+
+        // drop the separator
+        if (partition.isSeparator()) {
+            return this;
         }
 
         return () -> String.format("%s/%s", Partition.this.partition(), partition.partition());
@@ -166,7 +230,23 @@ public interface Partition {
      * @return String year=2023/month=12
      */
     default String partition(boolean trailingSlash) {
-        return trailingSlash ? partition().concat("/") : partition();
+        return !isNull() && trailingSlash ? partition().concat("/") : partition();
+    }
+
+    /**
+     * Results in a path string, with a leading and trailing slash
+     * <p>
+     * Unless object is not null, then results in a prefix string, with only a leading
+     *
+     * @return String /year=2023/month=12/ or /year=2023/month=12/file.txt
+     */
+    default String pathUnless(Object object) {
+        Partition of = of(object);
+        if (of.isNull()) {
+            return path();
+        }
+
+        return with(of).prefix();
     }
 
     /**

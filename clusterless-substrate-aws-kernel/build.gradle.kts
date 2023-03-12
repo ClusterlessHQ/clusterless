@@ -36,7 +36,13 @@ distributions {
             from(serviceTransform.archiveFile) {
                 into("assets")
             }
-            val lambdaWorkload: Zip = tasks.findByPath(":clusterless-substrate-aws-lambda-workload:packageAll") as Zip
+            val lambdaArc: Zip =
+                tasks.findByPath(":clusterless-substrate-aws-lambda-arc:packageAll") as Zip
+            from(lambdaArc.archiveFile) {
+                into("assets")
+            }
+            val lambdaWorkload: Zip =
+                tasks.findByPath(":clusterless-substrate-aws-lambda-workload:packageAll") as Zip
             from(lambdaWorkload.archiveFile) {
                 into("assets")
             }

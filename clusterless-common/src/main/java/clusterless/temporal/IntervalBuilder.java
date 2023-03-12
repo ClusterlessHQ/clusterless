@@ -20,6 +20,11 @@ public class IntervalBuilder {
     final TemporalUnit lotUnit;
     final DateTimeFormatter lotFormatter;
 
+    public IntervalBuilder(TemporalUnit lotUnit) {
+        this.lotUnit = lotUnit;
+        this.lotFormatter = IntervalUnits.formatter(this.lotUnit);
+    }
+
     public IntervalBuilder(String lotUnit) {
         this.lotUnit = IntervalUnits.find(lotUnit);
         this.lotFormatter = IntervalUnits.formatter(this.lotUnit);

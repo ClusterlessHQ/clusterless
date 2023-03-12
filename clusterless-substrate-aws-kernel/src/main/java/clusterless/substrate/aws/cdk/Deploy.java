@@ -14,8 +14,9 @@ import clusterless.model.deploy.Placement;
 import clusterless.startup.Loader;
 import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
-import clusterless.substrate.aws.resources.Buckets;
 import clusterless.substrate.aws.sdk.S3;
+import clusterless.substrate.aws.store.StateStore;
+import clusterless.substrate.aws.store.Stores;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -47,10 +48,7 @@ public class Deploy extends CommonCommand implements Callable<Integer> {
         S3 s3 = new S3(processExec.profile());
 
         for (Placement placement : placements) {
-            String account = placement.account();
-            String region = placement.region();
-            String stage = placement.stage();
-            String bucketName = Buckets.bootstrapBucketName(Buckets.BootstrapBucket.METADATA, account, region, stage);
+            String bucketName = Stores.bootstrapStoreName(StateStore.Meta, placement);
 
             LOG.info("confirming bootstrap: {}", bucketName);
 
@@ -61,8 +59,11 @@ public class Deploy extends CommonCommand implements Callable<Integer> {
             }
 
             // todo: add copy/paste bootstrap command here
+            String account = placement.account();
+            String region = placement.region();
+            String stage = placement.stage();
             LOG.error("bootstrap bucket does not exist: {}, {}", bucketName, s3.error(response));
-            String message = "must bootstrap account: %s, region: %s, stage: %s".formatted(account, region, stage);
+            String message = String.format("must bootstrap account: %s, region: %s, stage: %s", account, region, stage);
             LOG.error(message);
 
             throw new IllegalStateException(message);

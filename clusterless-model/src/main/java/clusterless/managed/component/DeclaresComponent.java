@@ -8,6 +8,8 @@
 
 package clusterless.managed.component;
 
+import clusterless.managed.ModelType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

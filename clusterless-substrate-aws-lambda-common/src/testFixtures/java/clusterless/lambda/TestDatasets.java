@@ -1,26 +1,34 @@
 package clusterless.lambda;
 
-import clusterless.model.deploy.Dataset;
-import clusterless.model.deploy.SinkDataset;
-import clusterless.model.deploy.SourceDataset;
-import clusterless.model.manifest.Manifest;
-import clusterless.substrate.aws.URIFormats;
-import clusterless.util.URIs;
+import clusterless.model.deploy.*;
+import clusterless.model.manifest.ManifestState;
+import clusterless.substrate.aws.uri.ManifestURI;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class TestDatasets {
+    public static Placement defaultPlacement = Placement.Builder.builder()
+            .withAccount("00000000")
+            .withRegion("us-west-2")
+            .withProvider("aws")
+            .withStage("prod")
+            .build();
 
-    public static final String MANIFEST_BUCKET = "manifests";
-    Map<String, String> roles = new LinkedHashMap<>();
+    public static Project project = Project.Builder.builder()
+            .withName("test-project")
+            .withVersion("20230101")
+            .build();
+    Map<String, String> roles;
+
+    public Placement placement = defaultPlacement;
 
     public TestDatasets() {
         this(1);
@@ -43,6 +51,12 @@ public class TestDatasets {
         roles = IntStream.range(0, size).boxed().collect(Collectors.toMap(TestDatasets::role, TestDatasets::name));
     }
 
+    public TestDatasets(Placement placement, String... roles) {
+        this(roles);
+        Objects.requireNonNull(placement, "placement is null");
+        this.placement = placement;
+    }
+
     public Map<String, Dataset> datasetMap() {
         return datasetMap(roles);
     }
@@ -55,47 +69,55 @@ public class TestDatasets {
         return sinkDatasetMap(roles);
     }
 
-
-    public Map<String, URI> manifestIdentifierMap(String lotId) {
-        return manifestIdentifierMap(datasetMap(), lotId);
+    public Map<String, ManifestURI> manifestIdentifierMap(String lotId, ManifestState state) {
+        return manifestIdentifierMap(lotId, datasetMap(), state);
     }
 
-    public Map<String, URI> manifestIdentifierMap(String lotId, Map<String, ? extends Dataset> datasetMap) {
-        return manifestIdentifierMap(datasetMap, lotId);
+    public Map<String, ManifestURI> manifestIdentifierMap(String lotId, Map<String, ? extends Dataset> datasetMap, ManifestState state) {
+        return manifestIdentifierMap(datasetMap, lotId, state);
     }
 
-    public Map<String, URI> sourceManifestPathMap() {
-        return manifestPathMap(sourceDatasetMap());
+    public Map<String, ManifestURI> sourceManifestPathMap(ManifestState state) {
+        return manifestPathMap(sourceDatasetMap(), state);
     }
 
-    public Map<String, URI> sinkManifestPathMap() {
-        return manifestPathMap(sinkDatasetMap());
+    public Map<String, ManifestURI> sinkManifestPathMap(ManifestState state) {
+        return manifestPathMap(sinkDatasetMap(), state);
     }
 
-    public Map<String, URI> manifestPathMap() {
-        return manifestPathMap(datasetMap());
+    public Map<String, ManifestURI> manifestPathMap() {
+        return manifestPathMap(datasetMap(), null);
     }
 
     public List<Dataset> datasetList() {
         return datasets(roles).collect(Collectors.toList());
     }
 
-    public List<URI> manifestPathList() {
-        return manifestPaths(roles).collect(Collectors.toList());
+    public List<ManifestURI> manifestPathList(ManifestState state) {
+        return manifestPaths(roles, state).collect(Collectors.toList());
     }
 
     public Stream<Dataset> datasets() {
         return datasets(roles);
     }
 
-    public static Map<String, URI> manifestPathMap(Map<String, ? extends Dataset> datasetMap) {
+    public Map<String, ManifestURI> manifestPathMap(Map<String, ? extends Dataset> datasetMap, ManifestState state) {
         return datasetMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> manifestPathURIFor(e.getValue().name())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> ManifestURI.builder()
+                        .withPlacement(placement)
+                        .withDataset(e.getValue())
+                        .withState(state)
+                        .build()));
     }
 
-    public static Map<String, URI> manifestIdentifierMap(Map<String, ? extends Dataset> datasetMap, String lotId) {
-        return manifestPathMap(datasetMap).entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> URIFormats.createManifestIdentifier(e.getValue(), lotId, Manifest.JSON_EXTENSION)));
+    public Map<String, ManifestURI> manifestIdentifierMap(Map<String, ? extends Dataset> datasetMap, String lotId, ManifestState state) {
+        return datasetMap.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> ManifestURI.builder()
+                        .withPlacement(placement)
+                        .withDataset(e.getValue())
+                        .withLotId(lotId)
+                        .withState(state)
+                        .build()));
     }
 
     public static Map<String, Dataset> datasetMap(Map<String, String> roles) {
@@ -119,9 +141,13 @@ public class TestDatasets {
         );
     }
 
-    public static Stream<URI> manifestPaths(Map<String, String> roles) {
-        return roles.values().stream().map(
-                TestDatasets::manifestPathURIFor
+    public Stream<ManifestURI> manifestPaths(Map<String, String> roles, ManifestState state) {
+        return roles.values().stream().map(e ->
+                ManifestURI.builder()
+                        .withPlacement(placement)
+                        .withDataset(datasetFor(e))
+                        .withState(state)
+                        .build()
         );
     }
 
@@ -131,9 +157,12 @@ public class TestDatasets {
         );
     }
 
-    public static Stream<URI> manifestPaths(int size) {
+    public Stream<ManifestURI> manifestPaths(int size) {
         return IntStream.range(0, size).mapToObj(
-                i -> manifestPathURIFor(name(i))
+                i -> ManifestURI.builder()
+                        .withPlacement(placement)
+                        .withDataset(datasetFor(name(i)))
+                        .build()
         );
     }
 
@@ -142,7 +171,7 @@ public class TestDatasets {
         return Dataset.Builder.builder()
                 .withName(name)
                 .withVersion(version())
-                .withPathURI(path(name))
+                .withPathURI(datasetPath(name))
                 .build();
     }
 
@@ -152,7 +181,7 @@ public class TestDatasets {
         return SourceDataset.Builder.builder()
                 .withName(qualified)
                 .withVersion(version())
-                .withPathURI(path(qualified))
+                .withPathURI(datasetPath(qualified))
                 .build();
     }
 
@@ -162,13 +191,8 @@ public class TestDatasets {
         return SinkDataset.Builder.builder()
                 .withName(qualified)
                 .withVersion(version())
-                .withPathURI(path(qualified))
+                .withPathURI(datasetPath(qualified))
                 .build();
-    }
-
-    @NotNull
-    public static URI manifestPathURIFor(String name) {
-        return URIs.copyAppendPath(URI.create("s3://" + MANIFEST_BUCKET + "/"), name, version());
     }
 
     @NotNull
@@ -177,8 +201,8 @@ public class TestDatasets {
     }
 
     @NotNull
-    public static URI path(String path) {
-        return URI.create(String.format("s3://bucket-%s/path/", path));
+    public static URI datasetPath(String path) {
+        return URI.create(String.format("s3://dataset-bucket-%s/path/", path));
     }
 
     public static String version() {

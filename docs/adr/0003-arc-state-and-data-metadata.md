@@ -140,6 +140,8 @@ source lot dataset.
 
 ### State Model
 
+#### Arc States
+
 An Arc runtime state can be:
 
 - `running` - the workload is currently processing, prevents concurrent executions
@@ -165,6 +167,8 @@ graph LR;
 
 Arc state for a given lot is a roll up of lot workload states, or specifically the manifest states for a given lot.
 Where the manifest state is a function of the workload that created it.
+
+#### Manifest States
 
 If a workload completes successfully, it will write a manifest, this manifest contains a complete representation of the
 new data created by the workload.
@@ -194,7 +198,7 @@ eliminate the need for get requests of an object.
 
 For example:
 
-> s3://prod-state-us-west-2-01234567890/arc-name/version/lot=llll/state=running/arc.txt
+> s3://prod-state-us-west-2-01234567890/project-name/project-version/arc-name/lot/state.arc
 
 Manifest state should be kept in a centralized and well known location that is simple for workloads to access, like
 object storage.
@@ -206,11 +210,11 @@ The state of a manifest should be built into the naming of the manifest data.
 
 For example, for a `complete` state:
 
-> s3://prod-manifest-us-west-2-01234567890/dataset-name/version/lot=llll/state=complete/manifest.json
+> s3://prod-manifest-us-west-2-01234567890/dataset-name/dataset-version/lot/state/manifest.json
 
 For a `partial` state:
 
-> s3://prod-manifest-us-west-2-01234567890/dataset-name/version/lot=llll/state=partial/attempt=1678314769/manifest.json
+> s3://prod-manifest-us-west-2-01234567890/dataset-name/dataset-version/lot/partial/1678314769/manifest.json
 
 Note above we include an `attempt` partition so that we don't step on multiple attempts across multiple failing retries.
 

@@ -15,11 +15,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 
 /**
  *
  */
 public class URIs {
+    private static final Pattern NORMALIZE = Pattern.compile("(?<!:)/{2,}");
+
     public static URI create(String scheme, String authority, String path) {
         try {
             return new URI(scheme, authority, normalize("/", path), null, null);
@@ -28,17 +31,35 @@ public class URIs {
         }
     }
 
-    public static URI copyAppendPath(URI uri, String... path) {
+    public static URI copyAppendAsPath(URI uri, String... path) {
+        return copyAppend(
+                uri,
+                Partition.NULL
+                        .having(path)
+                        .partition(true) // #path will prepend a "/"
+        );
+    }
+
+    public static URI copyAppend(URI uri, String... path) {
+        if (path.length == 0) {
+            return uri;
+        }
+
         try {
-            return new URI(uri.getScheme(), uri.getAuthority(), normalize(uri.getPath(), path), null, null);
+            String normalize = normalize(
+                    Partition.of(uri.getPath())
+                            .having(path)
+                            .partition(path[path.length - 1].endsWith("/"))
+            );
+            return new URI(uri.getScheme(), uri.getAuthority(), normalize, null, null);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("unable to copy uri", e);
         }
     }
 
-    public static URI copyWithPath(URI uri, String path) {
+    public static URI copyWith(URI uri, String path) {
         try {
-            return new URI(uri.getScheme(), uri.getAuthority(), normalize("/", path), null, null);
+            return new URI(uri.getScheme(), uri.getAuthority(), path, null, null);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("unable to copy uri", e);
         }
@@ -51,7 +72,7 @@ public class URIs {
 
         String normalize = normalize(uri.getPath());
 
-        return copyWithPath(uri, normalize);
+        return copyWith(uri, normalize);
     }
 
     /**
@@ -63,9 +84,8 @@ public class URIs {
      * @return
      */
     public static String normalize(String path) {
-        //  todo:  return value.replaceAll("(?<!:)/{2,}", "/");
         String empty = Strings.nullToEmpty(path);
-        return normalize(Paths.get(empty), empty);
+        return NORMALIZE.matcher(empty).replaceAll("/");
     }
 
     public static String normalize(String path, String append) {
@@ -77,6 +97,14 @@ public class URIs {
     }
 
     public static String normalize(String path, String... appends) {
+        return normalize(
+                Partition.of(path)
+                        .having(appends)
+                        .partition()
+        );
+    }
+
+    public static String normalizeX(String path, String... appends) {
         String first = Strings.nullToEmpty(path);
 
         Path head = Paths.get(first);
@@ -105,7 +133,33 @@ public class URIs {
         return result;
     }
 
+    /**
+     * Returns the path part of the uri without the leading slash, but with a trailing slash, for use in S3 request.
+     *
+     * @param uri
+     * @return
+     */
     public static String asKeyPath(URI uri) {
+        String key = asKey(uri);
+
+        if (key == null) {
+            return null;
+        }
+
+        if (key.endsWith("/")) {
+            return key;
+        }
+
+        return key.concat("/");
+    }
+
+    /**
+     * Returns the path part of the uri without the leading slash, for use in S3 request.
+     *
+     * @param uri
+     * @return
+     */
+    public static String asKey(URI uri) {
         String normalize = uri.normalize().getPath();
 
         if (normalize.isEmpty()) {
@@ -143,6 +197,6 @@ public class URIs {
             throw new IllegalArgumentException(String.format("fromBase and from must have a common path, got fromBase: %s, from: %s", fromBasePath, fromPath));
         }
 
-        return copyAppendPath(toBase, fromPath.substring(fromBasePath.length()));
+        return copyAppend(toBase, fromPath.substring(fromBasePath.length()));
     }
 }

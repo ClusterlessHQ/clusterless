@@ -1,11 +1,12 @@
 package clusterless.model.manifest;
 
+import clusterless.model.State;
 import clusterless.util.Partition;
 import clusterless.util.Strings;
 
 import java.util.Locale;
 
-public enum ManifestState implements Partition.EnumPartition {
+public enum ManifestState implements State, Partition.EnumPartition {
     complete,
     partial,
     removed;
@@ -18,8 +19,8 @@ public enum ManifestState implements Partition.EnumPartition {
     public boolean hasAttempts() {
         switch (this) {
             case partial:
-                return true;
             case removed:
+                return true;
             case complete:
                 break;
         }
@@ -32,12 +33,14 @@ public enum ManifestState implements Partition.EnumPartition {
             return null;
         }
 
-        String[] split = partition.split("=", 2);
+        partition = partition.toLowerCase(Locale.ROOT);
 
-        if (split.length == 1) {
-            return valueOf(split[0].toLowerCase(Locale.ROOT));
+        for (ManifestState value : values()) {
+            if (partition.matches(String.format("^(.*[=])?%s([.].*)?$", value))) {
+                return value;
+            }
         }
 
-        return valueOf(split[1].toLowerCase(Locale.ROOT));
+        return null;
     }
 }

@@ -8,7 +8,11 @@
 
 package clusterless.json;
 
-import clusterless.managed.component.*;
+import clusterless.managed.ModelType;
+import clusterless.managed.component.Component;
+import clusterless.managed.component.ComponentContext;
+import clusterless.managed.component.ComponentService;
+import clusterless.managed.component.ComponentServices;
 import clusterless.model.Model;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;

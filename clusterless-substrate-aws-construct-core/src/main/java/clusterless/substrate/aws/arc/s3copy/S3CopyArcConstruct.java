@@ -14,7 +14,8 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Assets;
-import clusterless.substrate.aws.resources.Buckets;
+import clusterless.substrate.aws.resources.StateURIs;
+import clusterless.substrate.aws.uri.ManifestURI;
 import clusterless.util.Env;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,6 @@ import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.stepfunctions.State;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,25 +39,25 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
     public S3CopyArcConstruct(@NotNull ManagedComponentContext context, @NotNull S3CopyArc model) {
         super(context, model);
 
-        Map<String, URI> sourceManifestPaths = model.sources()
+        Map<String, ManifestURI> sourceManifestPaths = model.sources()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestPath(this, ManifestState.complete, e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.complete, e.getValue())));
 
-        Map<String, URI> sinkManifestCompletePaths = model.sinks()
+        Map<String, ManifestURI> sinkManifestCompletePaths = model.sinks()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestPath(this, ManifestState.complete, e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.complete, e.getValue())));
 
-        Map<String, URI> sinkManifestRollbackPaths = model.sinks()
+        Map<String, ManifestURI> sinkManifestPartialPaths = model.sinks()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> Buckets.manifestPath(this, ManifestState.partial, e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.partial, e.getValue())));
 
         ArcProps arcProps = ArcProps.Builder.builder()
                 .withSourceManifestPaths(sourceManifestPaths)
                 .withSinkManifestCompletePaths(sinkManifestCompletePaths)
-                .withSinkManifestRollbackPaths(sinkManifestRollbackPaths)
+                .withSinkManifestPartialPaths(sinkManifestPartialPaths)
                 .build();
 
         Map<String, String> environment = Env.toEnv(arcProps);

@@ -4,8 +4,8 @@ import clusterless.model.UriType;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.Manifest;
-import clusterless.substrate.aws.URIFormats;
 import clusterless.substrate.aws.sdk.S3;
+import clusterless.substrate.aws.uri.ManifestURI;
 import clusterless.util.URIs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,7 +50,7 @@ public class CreateDataMachine {
         );
     }
 
-    public CreateDataMachine buildSources(Map<String, URI> manifestMap, Map<String, SourceDataset> sourceMap) {
+    public CreateDataMachine buildSources(Map<String, ManifestURI> manifestMap, Map<String, SourceDataset> sourceMap) {
         for (String lot : lots) {
             for (Map.Entry<String, SourceDataset> entry : sourceMap.entrySet()) {
                 String role = entry.getKey();
@@ -58,7 +58,7 @@ public class CreateDataMachine {
 
                 URI datasetPath = dataset.pathURI();
 
-                URI dataIdentifier = URIs.copyAppendPath(datasetPath, String.format("lot=%s", lot), "data.csv");
+                URI dataIdentifier = URIs.copyAppend(datasetPath, String.format("lot=%s", lot), "data.csv");
 
                 LOG.info("writing data for: {}", dataIdentifier);
 
@@ -75,8 +75,8 @@ public class CreateDataMachine {
                         .withUriType(UriType.identifier)
                         .build();
 
-                URI manifestPath = manifestMap.get(role);
-                URI manifestIdentifier = URIFormats.createManifestIdentifier(manifestPath, manifest.lotId(), manifest.extension());
+                ManifestURI manifestPath = manifestMap.get(role);
+                URI manifestIdentifier = manifestPath.withLot(lot).uri();
 
                 LOG.info("writing manifest for: {}", manifestIdentifier);
 

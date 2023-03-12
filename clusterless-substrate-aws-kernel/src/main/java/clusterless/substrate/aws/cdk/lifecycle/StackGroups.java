@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.cdk.lifecycle;
 
-import clusterless.managed.component.ModelType;
+import clusterless.managed.ModelType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;

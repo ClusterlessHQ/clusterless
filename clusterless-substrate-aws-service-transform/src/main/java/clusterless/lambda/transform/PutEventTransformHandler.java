@@ -13,7 +13,6 @@ import clusterless.lambda.arc.ArcNotifyEventManager;
 import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.lambda.transform.json.AWSEvent;
 import clusterless.model.UriType;
-import clusterless.substrate.aws.URIFormats;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.temporal.IntervalBuilder;
 import clusterless.util.Env;
@@ -33,15 +32,15 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
     protected static final S3 s3 = new S3();
     protected static final TransformProps transformProps = Env.fromEnv(
             TransformProps.class,
-            () -> TransformProps.Builder.builder()
+            () -> TransformProps.builder()
                     .build()
     );
 
     protected static final IntervalBuilder intervalBuilder = new IntervalBuilder(transformProps.lotUnit());
 
     protected ManifestWriter manifestWriter = new ManifestWriter(
-            transformProps.manifestPath(),
-            null,
+            transformProps.manifestCompletePath(),
+            transformProps.manifestPartialPath(),
             transformProps.dataset(),
             UriType.identifier
     );
@@ -91,7 +90,7 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
         eventObserver.applyEvent(time, bucket, key);
 
-        URI identifier = URIFormats.createS3URI(bucket, key);
+        URI identifier = S3.createS3URI(bucket, key);
 
         eventObserver.applyIdentifierURI(identifier);
 

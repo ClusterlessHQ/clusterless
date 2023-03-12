@@ -33,8 +33,11 @@ include("clusterless-substrate-aws-construct-common")
 // core provided deploy constructs
 include("clusterless-substrate-aws-construct-core")
 
-// common lambad apis
+// common lambda apis
 include("clusterless-substrate-aws-lambda-common")
+
+// lambdas for arc management
+include("clusterless-substrate-aws-lambda-arc")
 
 // service lambdas
 include("clusterless-substrate-aws-service-transform")

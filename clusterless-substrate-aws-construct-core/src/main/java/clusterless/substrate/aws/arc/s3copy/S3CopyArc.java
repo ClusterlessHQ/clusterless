@@ -10,7 +10,7 @@ package clusterless.substrate.aws.arc.s3copy;
 
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Workload;
-import clusterless.substrate.aws.arc.props.LambdaJavaRuntimeProps;
+import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 
 /**
  *

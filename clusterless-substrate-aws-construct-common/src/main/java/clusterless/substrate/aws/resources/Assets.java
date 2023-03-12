@@ -27,8 +27,16 @@ import java.util.stream.Stream;
  *
  */
 public class Assets {
+
+    public static final String CLS_ASSETS_PATH = "CLS_ASSETS_PATH";
+
     public static Code find(Pattern pattern) {
         Path assetDistributionPath = getAssetDistributionPath();
+
+        if (System.getenv(CLS_ASSETS_PATH) != null) {
+            return Code.fromAsset(assetDistributionPath.toAbsolutePath().toString());
+        }
+
         List<Path> files;
         try (Stream<Path> list = Files.list(assetDistributionPath)) {
             files = list
@@ -53,10 +61,10 @@ public class Assets {
     }
 
     public static Path getAssetDistributionPath() {
-        String clsAssetsPath = System.getenv("CLS_ASSETS_PATH");
+        String clsAssetsPath = System.getenv(CLS_ASSETS_PATH);
 
         if (clsAssetsPath != null) {
-            return Paths.get(clsAssetsPath);
+            return Paths.get(clsAssetsPath).toAbsolutePath();
         }
 
         URL location = Assets.class.getProtectionDomain()

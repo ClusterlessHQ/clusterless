@@ -17,6 +17,7 @@ import java.util.List;
  *
  */
 public interface Orchestration {
+
     default CatchProps catchAll() {
         return CatchProps.builder()
                 .resultPath(JsonPath.DISCARD)

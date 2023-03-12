@@ -11,8 +11,8 @@ package clusterless.lambda.arc;
 import clusterless.model.Struct;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
+import clusterless.substrate.aws.uri.ManifestURI;
 
-import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,9 +23,9 @@ public class ArcProps implements Struct {
     Map<String, SourceDataset> sources;
     Map<String, SinkDataset> sinks;
 
-    Map<String, URI> sourceManifestPaths;
-    Map<String, URI> sinkManifestCompletePaths;
-    Map<String, URI> sinkManifestRollbackPaths;
+    Map<String, ManifestURI> sourceManifestPaths;
+    Map<String, ManifestURI> sinkManifestCompletePaths;
+    Map<String, ManifestURI> sinkManifestPartialPaths;
 
     public ArcProps() {
     }
@@ -38,16 +38,16 @@ public class ArcProps implements Struct {
         return sinks;
     }
 
-    public Map<String, URI> sourceManifestPaths() {
+    public Map<String, ManifestURI> sourceManifestPaths() {
         return sourceManifestPaths;
     }
 
-    public Map<String, URI> sinkManifestCompletePaths() {
+    public Map<String, ManifestURI> sinkManifestCompletePaths() {
         return sinkManifestCompletePaths;
     }
 
-    public Map<String, URI> sinkManifestRollbackPaths() {
-        return sinkManifestRollbackPaths;
+    public Map<String, ManifestURI> sinkManifestPartialPaths() {
+        return sinkManifestPartialPaths;
     }
 
     private ArcProps(Builder builder) {
@@ -55,7 +55,7 @@ public class ArcProps implements Struct {
         sinks = builder.sinks;
         sourceManifestPaths = builder.sourceManifestPaths;
         sinkManifestCompletePaths = builder.sinkManifestCompletePaths;
-        sinkManifestRollbackPaths = builder.sinkManifestRollbackPaths;
+        sinkManifestPartialPaths = builder.sinkManifestPartialPaths;
     }
 
     /**
@@ -64,9 +64,9 @@ public class ArcProps implements Struct {
     public static final class Builder {
         private Map<String, SourceDataset> sources = new LinkedHashMap<>();
         private Map<String, SinkDataset> sinks = new LinkedHashMap<>();
-        private Map<String, URI> sourceManifestPaths;
-        private Map<String, URI> sinkManifestCompletePaths;
-        private Map<String, URI> sinkManifestRollbackPaths;
+        private Map<String, ManifestURI> sourceManifestPaths;
+        private Map<String, ManifestURI> sinkManifestCompletePaths;
+        private Map<String, ManifestURI> sinkManifestPartialPaths;
 
         private Builder() {
         }
@@ -103,7 +103,7 @@ public class ArcProps implements Struct {
          * @param val the {@code sourceManifestPaths} to set
          * @return a reference to this Builder
          */
-        public Builder withSourceManifestPaths(Map<String, URI> val) {
+        public Builder withSourceManifestPaths(Map<String, ManifestURI> val) {
             sourceManifestPaths = val;
             return this;
         }
@@ -114,7 +114,7 @@ public class ArcProps implements Struct {
          * @param val the {@code sinkManifestCompletePaths} to set
          * @return a reference to this Builder
          */
-        public Builder withSinkManifestCompletePaths(Map<String, URI> val) {
+        public Builder withSinkManifestCompletePaths(Map<String, ManifestURI> val) {
             sinkManifestCompletePaths = val;
             return this;
         }
@@ -125,8 +125,8 @@ public class ArcProps implements Struct {
          * @param val the {@code sinkManifestRollbackPaths} to set
          * @return a reference to this Builder
          */
-        public Builder withSinkManifestRollbackPaths(Map<String, URI> val) {
-            sinkManifestRollbackPaths = val;
+        public Builder withSinkManifestPartialPaths(Map<String, ManifestURI> val) {
+            sinkManifestPartialPaths = val;
             return this;
         }
 

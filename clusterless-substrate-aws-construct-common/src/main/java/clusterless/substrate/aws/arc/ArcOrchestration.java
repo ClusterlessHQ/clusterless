@@ -8,12 +8,14 @@
 
 package clusterless.substrate.aws.arc;
 
+import clusterless.lambda.arc.ArcStateProps;
 import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
-import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
+import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.resources.Arcs;
+import clusterless.substrate.aws.uri.ArcURI;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.RemovalPolicy;
@@ -28,23 +30,50 @@ import software.amazon.awscdk.services.stepfunctions.*;
 public class ArcOrchestration extends ManagedConstruct implements Orchestration {
 
     private final Label stateMachineName;
+    private final ArcStateProps arcStateProps;
+    private final LambdaJavaRuntimeProps runtimeProps;
     private StateMachine stateMachine;
 
-    public ArcOrchestration(@NotNull ManagedComponentContext context, @NotNull Arc arc) {
+    public ArcOrchestration(@NotNull ManagedComponentContext context, @NotNull Arc<?> arc) {
         super(context, Label.of(arc.name()).with("Orchestration"));
 
         stateMachineName = Arcs.arcBaseName(context().deployable(), arc);
+
+        arcStateProps = ArcStateProps.builder()
+                .withName(arc.name())
+                .withProject(context().deployable().project())
+                .withSinks(arc.sinks())
+                .withSources(arc.sources())
+                .withArcStatePath(
+                        ArcURI.builder()
+                                .withPlacement(context().deployable().placement())
+                                .withProject(context().deployable().project())
+                                .withArcName(arc.name())
+                                .build()
+                )
+                .build();
+
+        runtimeProps = LambdaJavaRuntimeProps.builder()
+                .withTimeoutMin(5)
+                .build();
     }
 
     public void buildOrchestrationWith(ArcComponent arcComponent) {
-        Pass head = Pass.Builder.create(this, "Start")
+        IChainable head = Pass.Builder.create(this, "Start")
                 .outputPath("$.detail")
                 .build();
 
-        State workload = ((ArcConstruct<?>) arcComponent).createState();
-        head.next(workload);
+        Chain next = Chain.start(head);
 
-        ((INextable) workload).next(succeed("Success"));
+        ArcStartStateGate startStateGate = new ArcStartStateGate(context(), arcStateProps, runtimeProps);
+
+//        next.next(startStateGate.createState())
+//                .next(Choice.Builder.create(this, "StateStart")
+//                        .build()
+//                        .when(Condition.stringEquals("","")))
+//
+//                .next(((ArcConstruct<?>) arcComponent).createState())
+//                .next(succeed("Success"));
 
         stateMachine = StateMachine.Builder.create(this, stateMachineName.camelCase())
                 .stateMachineName(stateMachineName.lowerHyphen())

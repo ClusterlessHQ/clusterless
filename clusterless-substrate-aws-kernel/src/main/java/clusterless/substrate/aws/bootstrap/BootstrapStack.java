@@ -10,7 +10,7 @@ package clusterless.substrate.aws.bootstrap;
 
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.managed.StagedStack;
-import clusterless.substrate.aws.resources.Buckets;
+import clusterless.substrate.aws.resources.BootstrapStores;
 import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.util.ErrorsUtil;
 import clusterless.util.Label;
@@ -24,6 +24,9 @@ import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketEncryption;
 
 import java.util.Objects;
+
+import static clusterless.substrate.aws.store.StateStore.Arc;
+import static clusterless.substrate.aws.store.StateStore.Manifest;
 
 /**
  * keys to consider exporting
@@ -52,9 +55,9 @@ public class BootstrapStack extends StagedStack {
 
         Objects.requireNonNull(env);
 
-        String metadataBucketName = Buckets.metadataBucketName(this);
-        String arcStateBucketName = Buckets.arcStateBucketName(this);
-        String manifestBucketName = Buckets.manifestBucketName(this);
+        String metadataBucketName = BootstrapStores.metadataStoreName(this);
+        String arcStateBucketName = BootstrapStores.arcStateStoreName(this);
+        String manifestBucketName = BootstrapStores.manifestStoreName(this);
 
         String arcEventBusName = Events.arcEventBusName(this);
 
@@ -68,8 +71,8 @@ public class BootstrapStack extends StagedStack {
 
         createOutputFor(stage().with("BootstrapVersion"), BOOTSTRAP_VERSION, "clusterless bootstrap version");
         createOutputFor(stage().with(Events.ARC_EVENT_BUS_NAME), arcEventBusName, "clusterless arc event bus name");
-        createOutputFor(stage().with(Buckets.ARC_STATE_BUCKET_NAME), arcStateBucketName, "clusterless arc state bucket name");
-        createOutputFor(stage().with(Buckets.MANIFEST_BUCKET_NAME), manifestBucketName, "clusterless manifest bucket name");
+        createOutputFor(stage().with(Arc.storeNameKey()), arcStateBucketName, "clusterless arc state bucket name");
+        createOutputFor(stage().with(Manifest.storeNameKey()), manifestBucketName, "clusterless manifest bucket name");
     }
 
     protected void createOutputFor(Label name, String value, String description) {
@@ -85,7 +88,7 @@ public class BootstrapStack extends StagedStack {
     private Bucket constructSharedBucket(String bucketName, Label prefix) {
         LOG.info("initializing {} bucket: {}", prefix.lowerHyphen(), bucketName);
 
-        Bucket bucket = ErrorsUtil.construct(() -> Bucket.Builder.create(this, bucketName)
+        return ErrorsUtil.construct(() -> Bucket.Builder.create(this, bucketName)
                 .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)
                 .encryption(BucketEncryption.S3_MANAGED)
                 .enforceSsl(true)
@@ -94,7 +97,5 @@ public class BootstrapStack extends StagedStack {
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .autoDeleteObjects(true)
                 .build(), LOG);
-
-        return bucket;
     }
 }

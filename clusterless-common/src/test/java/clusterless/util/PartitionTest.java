@@ -15,6 +15,9 @@ public class PartitionTest {
         Assertions.assertEquals("case=lower/language=english", Partition.namedOf("case", "lower").with(Partition.namedOf("language", "english")).partition());
         Assertions.assertEquals("case=lower/language=english", Partition.namedOf("case", "lower").with(null).withNamed("language", "english").partition());
         Assertions.assertEquals("case=lower/language=english", Partition.namedOf("case", "lower").withNamed("language", "english").with(null).partition());
+
+        Assertions.assertNull(Partition.namedOf("case", null).withNamed("language", null).with(null).partition());
+        Assertions.assertEquals("case=lower", Partition.namedOf("case", "lower").withNamed("language", null).with(null).partition());
     }
 
     @Test
@@ -23,6 +26,25 @@ public class PartitionTest {
 
         Assertions.assertEquals("lower/one/two/three", with.partition());
         Assertions.assertEquals("lower/one/two/three/", with.partition(true));
+        Assertions.assertEquals("/lower/one/two/three/", with.path());
+    }
+
+    @Test
+    void havingSlashes() {
+        Partition with = Partition.of("lower").having("/", "one", "/", "/", "two", "three");
+
+        Assertions.assertEquals("lower/one/two/three", with.partition());
+        Assertions.assertEquals("lower/one/two/three/", with.partition(true));
+        Assertions.assertEquals("/lower/one/two/three/", with.path());
+    }
+
+    @Test
+    void havingSlashesRoot() {
+        Partition with = Partition.of("///").having("/", "one", "/", "/", "two", "three");
+
+        Assertions.assertEquals("one/two/three", with.partition());
+        Assertions.assertEquals("one/two/three/", with.partition(true));
+        Assertions.assertEquals("/one/two/three/", with.path());
     }
 
     @Test
@@ -31,6 +53,7 @@ public class PartitionTest {
 
         Assertions.assertEquals("lower/one/two/three", with.partition());
         Assertions.assertEquals("lower/one/two/three/", with.partition(true));
+        Assertions.assertEquals("/lower/one/two/three/", with.path());
     }
 
     enum Case implements Partition.EnumPartition {

@@ -8,6 +8,7 @@
 
 package clusterless.managed.component;
 
+import clusterless.managed.ModelType;
 import clusterless.model.deploy.Arc;
 
 /**

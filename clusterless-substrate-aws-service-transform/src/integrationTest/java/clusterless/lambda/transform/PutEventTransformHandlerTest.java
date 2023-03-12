@@ -11,9 +11,10 @@ package clusterless.lambda.transform;
 import clusterless.json.JSONUtil;
 import clusterless.lambda.LocalStackBase;
 import clusterless.lambda.TestDatasets;
+import clusterless.lambda.TestLots;
 import clusterless.lambda.transform.json.AWSEvent;
+import clusterless.model.manifest.ManifestState;
 import clusterless.temporal.IntervalUnit;
-import clusterless.util.URIs;
 import com.adelean.inject.resources.junit.jupiter.GivenJsonResource;
 import com.adelean.inject.resources.junit.jupiter.TestWithResources;
 import com.adelean.inject.resources.junit.jupiter.WithJacksonMapper;
@@ -34,15 +35,24 @@ public class PutEventTransformHandlerTest extends LocalStackBase {
     @WithJacksonMapper
     static ObjectMapper objectMapper = JSONUtil.OBJECT_MAPPER;
 
-    static TestDatasets testDatasets = new TestDatasets();
+    TestDatasets datasets;
+
+    public TestDatasets datasets() {
+        if (datasets == null) {
+            datasets = new TestDatasets(defaultPlacement(), "main");
+        }
+
+        return datasets;
+    }
 
     @Override
     protected TransformProps getProps() {
-        return TransformProps.Builder.builder()
+        return TransformProps.builder()
                 .withLotSource(LotSource.eventTime)
-                .withManifestPath(testDatasets.manifestPathList().get(0))
+                .withManifestCompletePath(datasets().manifestPathList(ManifestState.complete).get(0))
+                .withManifestPartialPath(datasets().manifestPathList(ManifestState.partial).get(0))
                 .withLotUnit(IntervalUnit.TWELFTHS.name())
-                .withDataset(testDatasets.datasetList().get(0))
+                .withDataset(datasets().datasetList().get(0))
                 .withEventBusName(eventBusName())
                 .build();
     }
@@ -56,7 +66,7 @@ public class PutEventTransformHandlerTest extends LocalStackBase {
 
         PutEventTransformHandler handler = new PutEventTransformHandler();
 
-        String lotId = "20211112PT5M000";
+        String lotId = TestLots.COMMON_LOT;
 
         PutEventTransformObserver eventContext = mock();
 
@@ -65,6 +75,6 @@ public class PutEventTransformHandlerTest extends LocalStackBase {
         verify(eventContext).applyIdentifierURI(URI.create("s3://DOC-EXAMPLE-BUCKET1/project/version/y=2023/m=12/d=31/data.json"));
         verify(eventContext).applyLotId(lotId);
         verify(eventContext).applyDatasetItemsSize(1);
-        verify(eventContext).applyManifestURI(URIs.copyAppendPath(testDatasets.manifestPathList().get(0), "lot=" + lotId, "manifest.json"));
+        verify(eventContext).applyManifestURI(datasets().manifestPathList(ManifestState.complete).get(0).withLot(lotId).uri());
     }
 }

@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.config.Configurations;
+import clusterless.managed.ModelType;
 import clusterless.managed.component.*;
 import clusterless.model.Model;
 import clusterless.model.deploy.Arc;
@@ -121,7 +122,7 @@ public class Lifecycle {
             priorStacks.forEach(stack::addDependency);
 
             ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, stack);
-            LOG.info("creating %s embedded construct: %s".formatted(arc.label(), arc.type()));
+            LOG.info(String.format("creating %s embedded construct: %s", arc.label(), arc.type()));
             ArcComponent construct = (ArcComponent) modelComponentService.create(context, arc);
 
             stack.applyArcWorkloadComponent(construct);

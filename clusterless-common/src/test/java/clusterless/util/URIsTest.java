@@ -72,10 +72,24 @@ public class URIsTest {
     }
 
     @Test
-    void prefix() {
-        Assertions.assertEquals("foo", URIs.asKeyPath(URI.create("/foo")));
+    void asKey() {
+        Assertions.assertEquals("foo", URIs.asKey(URI.create("/foo")));
+        Assertions.assertEquals("foo/", URIs.asKey(URI.create("/foo/")));
+        Assertions.assertEquals("foo/", URIs.asKey(URI.create("/foo//")));
+        Assertions.assertEquals("foo/", URIs.asKey(URI.create("s3://bucket/foo//")));
+        Assertions.assertEquals("foo/", URIs.asKey(URI.create("s3://bucket//foo//")));
+        Assertions.assertNull(URIs.asKey(URI.create("/")));
+        Assertions.assertNull(URIs.asKey(URI.create("/")));
+        Assertions.assertNull(URIs.asKey(URI.create("s3://bucket")));
+        Assertions.assertNull(URIs.asKey(URI.create("s3://bucket/")));
+    }
+
+    @Test
+    void asPath() {
+        Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("/foo")));
         Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("/foo/")));
         Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("/foo//")));
+        Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket/foo")));
         Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket/foo//")));
         Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket//foo//")));
         Assertions.assertNull(URIs.asKeyPath(URI.create("/")));
@@ -84,7 +98,47 @@ public class URIsTest {
         Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket/")));
     }
 
-    public static Stream<Arguments> copyArguments() {
+    public static Stream<Arguments> copyAppend() {
+        return Stream.of(
+                Arguments.arguments("s3://from/1", "s3://from/", new String[]{"1"}),
+                Arguments.arguments("s3://from/1/2", "s3://from/", new String[]{"1", "2"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from/", new String[]{"1", "2/"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from/", new String[]{"1/", "2/"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from", new String[]{"1/", "2/"}),
+                Arguments.arguments("s3://from/1/2/3", "s3://from", new String[]{"1/", "2/", "3"}),
+                Arguments.arguments("s3://from/1/2/3/", "s3://from", new String[]{"1/", "2/", "3", "/"}),
+                Arguments.arguments("s3://from/a/b/c/1/2/3/", "s3://from/a/b/c", new String[]{"1/", "2/", "3", "/"}),
+                Arguments.arguments("s3://from/a/b/c/1/2/3/", "s3://from/a/b/c", new String[]{"1/", "2/", "3", "/", "/"})
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("copyAppend")
+    void copyAppend(String expected, String base, String... append) {
+        Assertions.assertEquals(URI.create(expected), URIs.copyAppend(URI.create(base), append));
+    }
+
+    public static Stream<Arguments> copyAppendAsPath() {
+        return Stream.of(
+                Arguments.arguments("s3://from/1/", "s3://from/", new String[]{"1"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from/", new String[]{"1", "2"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from/", new String[]{"1", "2/"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from/", new String[]{"1/", "2/"}),
+                Arguments.arguments("s3://from/1/2/", "s3://from", new String[]{"1/", "2/"}),
+                Arguments.arguments("s3://from/1/2/3/", "s3://from", new String[]{"1/", "2/", "3"}),
+                Arguments.arguments("s3://from/1/2/3/", "s3://from", new String[]{"1/", "2/", "3", "/"}),
+                Arguments.arguments("s3://from/a/b/c/1/2/3/", "s3://from/a/b/c", new String[]{"1/", "2/", "3", "/"}),
+                Arguments.arguments("s3://from/a/b/c/1/2/3/", "s3://from/a/b/c", new String[]{"1/", "2/", "3", "/", "/"})
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("copyAppendAsPath")
+    void copyAppendAsPath(String expected, String base, String... append) {
+        Assertions.assertEquals(URI.create(expected), URIs.copyAppendAsPath(URI.create(base), append));
+    }
+
+    public static Stream<Arguments> fromTo() {
         return Stream.of(
                 Arguments.arguments(
                         "s3://from/path/",
@@ -114,8 +168,8 @@ public class URIsTest {
     }
 
     @ParameterizedTest
-    @MethodSource("copyArguments")
-    void copy(String fromBaseString, String fromString, String toBaseString, String toString) {
+    @MethodSource("fromTo")
+    public void fromTo(String fromBaseString, String fromString, String toBaseString, String toString) {
         URI fromBase = URI.create(fromBaseString);
         URI from = URI.create(fromString);
         URI toBase = URI.create(toBaseString);

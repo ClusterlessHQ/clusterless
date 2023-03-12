@@ -10,7 +10,7 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.LotSource;
 import clusterless.model.deploy.IngressBoundary;
-import clusterless.substrate.aws.arc.props.LambdaJavaRuntimeProps;
+import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 
 /**
  *

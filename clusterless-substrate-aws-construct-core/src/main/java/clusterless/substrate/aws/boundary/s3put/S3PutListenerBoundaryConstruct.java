@@ -12,13 +12,11 @@ import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.manifest.ManifestState;
-import clusterless.substrate.aws.arc.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.resources.Assets;
-import clusterless.substrate.aws.resources.Buckets;
-import clusterless.substrate.aws.resources.Events;
-import clusterless.substrate.aws.resources.Rules;
+import clusterless.substrate.aws.props.Lookup;
+import clusterless.substrate.aws.resources.*;
+import clusterless.substrate.aws.uri.ManifestURI;
 import clusterless.temporal.IntervalUnits;
 import clusterless.util.*;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +27,6 @@ import software.amazon.awscdk.services.events.EventPattern;
 import software.amazon.awscdk.services.events.IEventBus;
 import software.amazon.awscdk.services.events.Rule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
-import software.amazon.awscdk.services.lambda.Architecture;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.logs.LogGroup;
@@ -63,8 +60,8 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
         URI listenURI = URIs.normalizeURI(model().dataset().pathURI());
 
         String listenBucketName = listenURI.getHost();
-        String listenPathPrefix = URIs.asKeyPath(listenURI);
-        String manifestBucketRef = Buckets.manifestBucketNameRef(this);
+        String listenPathPrefix = URIs.asKey(listenURI);
+        String manifestBucketRef = BootstrapStores.manifestStoreNameRef(this);
         String eventBusRef = Events.arcEventBusNameRef(this);
         String listenerRuleName = Rules.ruleName(this, model.name());
 
@@ -73,16 +70,18 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
         IEventBus arcEventBus = EventBus.fromEventBusName(this, "EventBus", eventBusRef);
 
         // declare lambda to convert put event into arc event
-        URI manifestPrefix = Buckets.manifestPath(this, ManifestState.complete, model().dataset());
+        ManifestURI manifestComplete = StateURIs.manifestPath(this, ManifestState.complete, model().dataset());
+        ManifestURI manifestPartial = StateURIs.manifestPath(this, ManifestState.partial, model().dataset());
 
-        TransformProps transformProps = TransformProps.Builder.builder()
+        TransformProps transformProps = TransformProps.builder()
                 .withEventBusName(eventBusRef)
                 .withDataset(Dataset.Builder.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())
                         .withPathURI(listenURI)
                         .build())
-                .withManifestPath(manifestPrefix)
+                .withManifestCompletePath(manifestComplete)
+                .withManifestPartialPath(manifestPartial)
                 .withLotUnit(model.lotUnit())
                 .withLotSource(model().lotSource())
                 .withKeyRegex(model().keyRegex())
@@ -100,7 +99,7 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
                 .reservedConcurrentExecutions(1)
-                .architecture(architecture())
+                .architecture(Lookup.architecture(model().runtimeProps.architecture()))
                 .build();
 
         LogGroup.Builder.create(this, Label.of("LogGroup").with(functionLabel).camelCase())
@@ -148,18 +147,5 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .eventPattern(pattern)
                 .targets(List.of(lambdaFunction))
                 .build();
-    }
-
-    private Architecture architecture() {
-        LambdaJavaRuntimeProps.Architecture architecture = model().runtimeProps.architecture();
-        switch (architecture) {
-            case ARM_64 -> {
-                return Architecture.ARM_64;
-            }
-            case X86_64 -> {
-                return Architecture.X86_64;
-            }
-        }
-        throw new IllegalStateException("unknown architecture: " + architecture);
     }
 }

@@ -99,6 +99,14 @@ public abstract class ClientBase<C> {
             this.objectAsBytes = objectAsBytes;
         }
 
+        protected AwsResponse awsResponse() {
+            return awsResponse;
+        }
+
+        protected SdkHttpResponse sdkHttpResponse() {
+            return sdkHttpResponse;
+        }
+
         public boolean isSuccess() {
             return ClientBase.this.isSuccess(this);
         }

@@ -8,6 +8,7 @@
 
 package clusterless.managed.component;
 
+import clusterless.managed.ModelType;
 import clusterless.model.Model;
 import clusterless.util.Annotations;
 import org.apache.logging.log4j.LogManager;

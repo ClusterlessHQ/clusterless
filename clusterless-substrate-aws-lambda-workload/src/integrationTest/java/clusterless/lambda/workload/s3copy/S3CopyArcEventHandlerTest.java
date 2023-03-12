@@ -7,6 +7,7 @@ import clusterless.lambda.arc.ArcEventObserver;
 import clusterless.lambda.arc.ArcProps;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
+import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,25 +26,32 @@ import static org.mockito.Mockito.verify;
  * And the BaseHandlerTest will fail if @TestInstance(PER_CLASS) is set to overcome that.
  */
 public class S3CopyArcEventHandlerTest extends LocalStackBase {
+    TestDatasets datasets;
 
-    static TestDatasets datasets = new TestDatasets("main");
+    public TestDatasets datasets() {
+        if (datasets == null) {
+            datasets = new TestDatasets(defaultPlacement(), "main");
+        }
+
+        return datasets;
+    }
 
     @Override
     protected ArcProps getProps() {
         return ArcProps.Builder.builder()
-                .withSources(datasets.sourceDatasetMap())
-                .withSourceManifestPaths(datasets.sourceManifestPathMap())
-                .withSinks(datasets.sinkDatasetMap())
-                .withSinkManifestCompletePaths(datasets.sinkManifestPathMap())
-                .withSinkManifestRollbackPaths(datasets.sinkManifestPathMap())
+                .withSources(datasets().sourceDatasetMap())
+                .withSourceManifestPaths(datasets().sourceManifestPathMap(ManifestState.complete))
+                .withSinks(datasets().sinkDatasetMap())
+                .withSinkManifestCompletePaths(datasets().sinkManifestPathMap(ManifestState.complete))
+                .withSinkManifestPartialPaths(datasets().sinkManifestPathMap(ManifestState.partial))
                 .build();
     }
 
     Stream<ArcNotifyEvent> events() {
         return Stream.of(
                 ArcNotifyEvent.Builder.builder()
-                        .withDataset(datasets.sourceDatasetMap().get("main"))
-                        .withManifest(datasets.manifestIdentifierMap("20230227PT5M287", datasets.sourceDatasetMap()).get("main"))
+                        .withDataset(datasets().sourceDatasetMap().get("main"))
+                        .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
                         .withLotId("20230227PT5M287")
                         .build()
         );

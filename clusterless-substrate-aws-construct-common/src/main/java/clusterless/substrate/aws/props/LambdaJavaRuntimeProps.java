@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.arc.props;
+package clusterless.substrate.aws.props;
 
 import clusterless.model.Struct;
 
@@ -28,6 +28,10 @@ public class LambdaJavaRuntimeProps implements Struct {
 
     public static boolean validMemorySizeMib(int memorySizeMiB) {
         return MEM_LOWER <= memorySizeMiB && memorySizeMiB <= MEM_UPPER;
+    }
+
+    public static Builder builder() {
+        return Builder.aLambdaJavaRuntimeProps();
     }
 
     public enum Architecture {
@@ -73,5 +77,43 @@ public class LambdaJavaRuntimeProps implements Struct {
 
     public Architecture architecture() {
         return architecture;
+    }
+
+    public static final class Builder {
+        int memorySizeMB = MEM_DEFAULT;
+        int retryAttempts = 3;
+        int timeoutMin = 5;
+        Architecture architecture = Architecture.ARM_64;
+
+        private Builder() {
+        }
+
+        public static Builder aLambdaJavaRuntimeProps() {
+            return new Builder();
+        }
+
+        public Builder withMemorySizeMB(int memorySizeMB) {
+            this.memorySizeMB = memorySizeMB;
+            return this;
+        }
+
+        public Builder withRetryAttempts(int retryAttempts) {
+            this.retryAttempts = retryAttempts;
+            return this;
+        }
+
+        public Builder withTimeoutMin(int timeoutMin) {
+            this.timeoutMin = timeoutMin;
+            return this;
+        }
+
+        public Builder withArchitecture(Architecture architecture) {
+            this.architecture = architecture;
+            return this;
+        }
+
+        public LambdaJavaRuntimeProps build() {
+            return new LambdaJavaRuntimeProps(memorySizeMB, retryAttempts, timeoutMin, architecture);
+        }
     }
 }

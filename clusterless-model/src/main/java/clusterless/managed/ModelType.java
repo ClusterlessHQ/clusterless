@@ -6,8 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.managed.component;
+package clusterless.managed;
 
+import clusterless.managed.component.ArcComponent;
+import clusterless.managed.component.BoundaryComponent;
+import clusterless.managed.component.Component;
+import clusterless.managed.component.ResourceComponent;
 import clusterless.model.Model;
 import clusterless.util.Label;
 
