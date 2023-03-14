@@ -59,7 +59,7 @@ public class KernelTest {
                 ]
             }
             """)
-    void resources() {
+    void createResourcesProject() {
         Assertions.assertEquals(0, new Kernel().execute(args));
     }
 
@@ -98,7 +98,7 @@ public class KernelTest {
               ]
             }
                      \s""")
-    void copyArc() {
+    void copyArcProject() {
         Assertions.assertEquals(0, new Kernel().execute(args));
     }
 }

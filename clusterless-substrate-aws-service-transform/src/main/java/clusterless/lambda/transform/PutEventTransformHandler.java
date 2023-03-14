@@ -40,7 +40,6 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
     protected ManifestWriter manifestWriter = new ManifestWriter(
             transformProps.manifestCompletePath(),
-            transformProps.manifestPartialPath(),
             transformProps.dataset(),
             UriType.identifier
     );

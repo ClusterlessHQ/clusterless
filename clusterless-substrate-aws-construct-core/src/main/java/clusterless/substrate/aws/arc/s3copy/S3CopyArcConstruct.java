@@ -22,9 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.stepfunctions.CatchProps;
+import software.amazon.awscdk.services.stepfunctions.Errors;
 import software.amazon.awscdk.services.stepfunctions.State;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -44,20 +47,16 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.complete, e.getValue())));
 
-        Map<String, ManifestURI> sinkManifestCompletePaths = model.sinks()
+        Map<String, ManifestURI> sinkManifestPaths = model.sinks()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.complete, e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, e.getValue())));
 
-        Map<String, ManifestURI> sinkManifestPartialPaths = model.sinks()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.partial, e.getValue())));
-
-        ArcProps arcProps = ArcProps.Builder.builder()
+        ArcProps arcProps = ArcProps.builder()
+                .withSources(model().sources())
+                .withSinks(model().sinks())
                 .withSourceManifestPaths(sourceManifestPaths)
-                .withSinkManifestCompletePaths(sinkManifestCompletePaths)
-                .withSinkManifestPartialPaths(sinkManifestPartialPaths)
+                .withSinkManifestPaths(sinkManifestPaths)
                 .build();
 
         Map<String, String> environment = Env.toEnv(arcProps);
@@ -72,6 +71,8 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
                 .memorySize(model().workload().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().workload().runtimeProps().timeoutMin()))
                 .build();
+
+        grantPermissionsTo(function());
     }
 
     public Function function() {
@@ -79,10 +80,21 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
     }
 
     @Override
-    public State createState() {
-        return LambdaInvoke.Builder.create(this, "S3CopyFunction")
+    public State createState(String resultPath, State failed) {
+        LambdaInvoke invoke = LambdaInvoke.Builder.create(this, "S3CopyFunction")
                 .lambdaFunction(function())
+                .retryOnServiceExceptions(true)
                 .payloadResponseOnly(true) // sets .invocationType(LambdaInvocationType.REQUEST_RESPONSE)
+                .resultPath(resultPath)
                 .build();
+
+        invoke.addCatch(
+                failed,
+                CatchProps.builder()
+                        .errors(List.of(Errors.ALL))
+                        .build()
+        );
+
+        return invoke;
     }
 }

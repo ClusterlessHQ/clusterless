@@ -98,7 +98,7 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .runtime(Runtime.JAVA_11)
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
-                .reservedConcurrentExecutions(1)
+//                .reservedConcurrentExecutions(1) // UnreservedConcurrentExecution below its minimum value of [10].
                 .architecture(Lookup.architecture(model().runtimeProps.architecture()))
                 .build();
 

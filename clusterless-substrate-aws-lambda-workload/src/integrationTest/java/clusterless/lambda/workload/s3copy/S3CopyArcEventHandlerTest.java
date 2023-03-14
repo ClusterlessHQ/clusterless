@@ -9,11 +9,13 @@ import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
+import clusterless.substrate.aws.event.ArcStateContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -38,21 +40,27 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
 
     @Override
     protected ArcProps getProps() {
-        return ArcProps.Builder.builder()
+        return ArcProps.builder()
                 .withSources(datasets().sourceDatasetMap())
-                .withSourceManifestPaths(datasets().sourceManifestPathMap(ManifestState.complete))
+                .withSourceManifestPaths(datasets().sourceManifestPathMap())
                 .withSinks(datasets().sinkDatasetMap())
-                .withSinkManifestCompletePaths(datasets().sinkManifestPathMap(ManifestState.complete))
-                .withSinkManifestPartialPaths(datasets().sinkManifestPathMap(ManifestState.partial))
+                .withSinkManifestPaths(datasets().sinkManifestPathMap())
                 .build();
     }
 
-    Stream<ArcNotifyEvent> events() {
+    Stream<ArcStateContext> events() {
         return Stream.of(
-                ArcNotifyEvent.Builder.builder()
-                        .withDataset(datasets().sourceDatasetMap().get("main"))
-                        .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
-                        .withLotId("20230227PT5M287")
+                ArcStateContext.builder()
+                        .withArcNotifyEvent(
+                                ArcNotifyEvent.Builder.builder()
+                                        .withDataset(datasets().sourceDatasetMap().get("main"))
+                                        .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
+                                        .withLotId("20230227PT5M287")
+                                        .build()
+                        )
+                        .withCurrentState(null)
+                        .withPreviousState(null)
+                        .withRole("main")
                         .build()
         );
     }
@@ -68,15 +76,17 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
     }
 
     public void invoke(
-            ArcNotifyEvent event
+            ArcStateContext arcStateContext
     ) {
-        Assertions.assertNotNull(event);
+        Assertions.assertNotNull(arcStateContext);
 
         S3CopyArcEventHandler handler = new S3CopyArcEventHandler();
 
         ArcEventObserver eventContext = mock();
 
-        handler.handleEvent(event, context(), eventContext);
+        Map<String, ManifestState> result = handler.handleEvent(arcStateContext, context(), eventContext);
+
+        Assertions.assertFalse(result.isEmpty());
 
         verify(eventContext).applyFromManifest(argThat(m -> m.uris().size() == 1));
         SourceDataset mainSource = getProps().sources().get("main");
@@ -89,6 +99,6 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
 
     @TestFactory
     Stream<DynamicTest> tests() {
-        return events().map(e -> dynamicTest(e.datasetId(), () -> invoke(e)));
+        return events().map(e -> dynamicTest(e.arcNotifyEvent().datasetId(), () -> invoke(e)));
     }
 }

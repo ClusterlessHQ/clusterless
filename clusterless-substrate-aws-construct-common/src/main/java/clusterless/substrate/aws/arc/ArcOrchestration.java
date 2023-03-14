@@ -11,6 +11,9 @@ package clusterless.substrate.aws.arc;
 import clusterless.lambda.arc.ArcStateProps;
 import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
+import clusterless.model.state.ArcState;
+import clusterless.substrate.aws.arc.state.ArcStartStateGate;
+import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
@@ -28,7 +31,6 @@ import software.amazon.awscdk.services.stepfunctions.*;
  *
  */
 public class ArcOrchestration extends ManagedConstruct implements Orchestration {
-
     private final Label stateMachineName;
     private final ArcStateProps arcStateProps;
     private final LambdaJavaRuntimeProps runtimeProps;
@@ -59,33 +61,64 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
     }
 
     public void buildOrchestrationWith(ArcComponent arcComponent) {
-        IChainable head = Pass.Builder.create(this, "Start")
-                .outputPath("$.detail")
-                .build();
-
-        Chain next = Chain.start(head);
-
-        ArcStartStateGate startStateGate = new ArcStartStateGate(context(), arcStateProps, runtimeProps);
-
-//        next.next(startStateGate.createState())
-//                .next(Choice.Builder.create(this, "StateStart")
-//                        .build()
-//                        .when(Condition.stringEquals("","")))
-//
-//                .next(((ArcConstruct<?>) arcComponent).createState())
-//                .next(succeed("Success"));
+        Chain rootChain = Chain.start(pass("CurrentStateChoice", "$.detail"))
+                .next(new ArcStartStateGate(context(), arcStateProps, runtimeProps))
+                .next(startChoice(
+                        Chain.start(stateFrom(arcComponent, fail("Partial", "Partial results")))
+                                // todo: add CompeteGate here to send notification events
+                                .next(succeed("Complete")))
+                );
 
         stateMachine = StateMachine.Builder.create(this, stateMachineName.camelCase())
                 .stateMachineName(stateMachineName.lowerHyphen())
                 .stateMachineType(StateMachineType.STANDARD)
                 .logs(createLogOptions())
-                .definition(head)
+                .definition(rootChain)
                 .build();
+    }
+
+    private State stateFrom(ArcComponent arcComponent, Fail fail) {
+        return ((ArcConstruct<?>) arcComponent)
+                .createState("$.sinkStates", fail);
+    }
+
+    @NotNull
+    private Choice startChoice(Chain workloadChain) {
+        return Choice.Builder.create(this, "StateStart")
+                .build()
+                .when(
+                        Condition.and(
+                                Condition.isPresent("$.previousState"),
+                                Condition.stringEquals("$.previousState", ArcState.running.name())
+                        ),
+                        succeed("AlreadyRunning", "Workload is already running, skipping.")
+                ).when(
+                        Condition.and(
+                                Condition.isPresent("$.currentState"),
+                                Condition.or(
+                                        Condition.stringEquals("$.currentState", ArcState.complete.name()),
+                                        Condition.stringEquals("$.currentState", ArcState.missing.name())
+                                )
+                        ),
+                        succeed("AlreadyComplete", "Workload already completed.")
+                ).when(
+                        Condition.and(
+                                Condition.isPresent("$.currentState"),
+                                Condition.stringEquals("$.currentState", ArcState.running.name())
+                        ),
+                        workloadChain
+                ).otherwise(
+                        fail("UnknownState", "Unknown arc state encountered")
+                );
     }
 
     @NotNull
     private LogOptions createLogOptions() {
-        LogGroup logGroup = LogGroup.Builder.create(this, Label.of("LogGroup").with(stateMachineName).camelCase())
+        String baseId = Label.of("LogGroup")
+                .with(stateMachineName)
+                .camelCase();
+
+        LogGroup logGroup = LogGroup.Builder.create(this, baseId)
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .retention(RetentionDays.ONE_DAY)
                 .build();

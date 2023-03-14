@@ -15,7 +15,9 @@ import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.model.UriType;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
+import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
+import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.util.Tuple2;
 import clusterless.util.Tuple3;
@@ -25,9 +27,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -41,8 +45,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
 
     protected Map<String, ManifestWriter> manifestWriters = ManifestWriter.writers(
             arcProps.sinks(),
-            arcProps.sinkManifestCompletePaths(),
-            arcProps.sinkManifestPartialPaths(),
+            arcProps.sinkManifestPaths(),
             UriType.identifier
     );
 
@@ -74,27 +77,33 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
     }
 
     @Override
-    protected void handleEvent(ArcNotifyEvent event, Context context, ArcEventObserver eventObserver) {
-        String lotId = event.lotId();
-        URI incomingManifestIdentifier = event.manifest();
+    protected Map<String, ManifestState> handleEvent(ArcStateContext arcStateContext, Context context, ArcEventObserver eventObserver) {
+        String fromRole = arcStateContext.role();
+        ArcNotifyEvent notifyEvent = arcStateContext.arcNotifyEvent();
+        String lotId = notifyEvent.lotId();
+        URI incomingManifestIdentifier = notifyEvent.manifest();
 
         Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
 
         eventObserver.applyFromManifest(incomingManifest);
 
+        Map<String, ManifestState> result = new LinkedHashMap<>();
+
         //  copy files
         URI fromDatasetPath = incomingManifest.dataset().pathURI();
         List<URI> fromUris = incomingManifest.uris();
 
-        for (Map.Entry<String, SinkDataset> roleEntry : arcProps.sinks().entrySet()) {
-            // not using a map so that collisions can be managed independently on the to/from sides
-            List<Tuple2<URI, URI>> toUris = new LinkedList<>();
+        for (Map.Entry<String, SinkDataset> sinkRoleEntry : arcProps.sinks().entrySet()) {
 
-            String role = roleEntry.getKey();
-            SinkDataset sinkDataset = roleEntry.getValue();
-            eventObserver.applyToDataset(role, sinkDataset);
+            String toRole = sinkRoleEntry.getKey();
+            SinkDataset sinkDataset = sinkRoleEntry.getValue();
+
+            eventObserver.applyToDataset(toRole, sinkDataset);
 
             URI toDatasetPath = sinkDataset.pathURI();
+
+            // not using a map so that collisions can be managed independently on the to/from sides
+            List<Tuple2<URI, URI>> toUris = new LinkedList<>();
             for (URI fromUri : fromUris) {
                 URI toURI = URIs.fromTo(fromDatasetPath, fromUri, toDatasetPath);
                 toUris.add(new Tuple2<>(fromUri, toURI));
@@ -114,26 +123,38 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
                     }
             );
 
-            boolean copyFailed = failed.isEmpty();
+            ManifestWriter manifestWriter = manifestWriters.get(toRole);
 
-            URI manifest = null;
+            URI manifestURI;
 
-            if (!copyFailed) {
+            if (!failed.isEmpty()) { // unintentional
                 LOG.error("s3 object copy errors: {}, failed: {}", fromUris.size(), failed.size());
                 for (Tuple3<URI, URI, String> failure : failed) {
                     LOG.error("failed from: {}, to: {}, message: {}", failure.get_1(), failure.get_2(), failure.get_3());
                 }
 
-                manifest = manifestWriters.get(role).writePartialManifest(completed, lotId);
+                List<String> errors = failed.stream().map(Tuple3::get_3).distinct().limit(3).collect(Collectors.toList());
 
-            }
-            if (completed.isEmpty()) {
-                LOG.error("no objects copied with no errors, from: {}", fromUris.size());
-            } else {
-                manifest = manifestWriters.get(role).writeSuccessManifest(completed, lotId);
+                manifestURI = manifestWriter.writePartialManifest(completed, lotId, String.format("copy failed on role: %s, num: %d with: %s", toRole, failed.size(), errors));
+
+                result.put(toRole, ManifestState.partial);
+
+            } else if (completed.isEmpty()) { // intentional
+                // if we allow for a filter predicate on the declaration, this will be a valid state
+                LOG.info("no objects copied with no errors, role: {} -> {}, having: {}", fromRole, toRole, fromUris.size());
+                manifestURI = manifestWriter.writeEmptyManifest(completed, lotId);
+
+                result.put(toRole, ManifestState.empty);
+            } else { // intentional
+                LOG.info("successfully copied objects with no errors, role: {} -> {}, having: {}", fromRole, toRole, fromUris.size());
+                manifestURI = manifestWriter.writeSuccessManifest(completed, lotId);
+
+                result.put(toRole, ManifestState.complete);
             }
 
-            eventObserver.applyToManifest(role, manifest);
+            eventObserver.applyToManifest(toRole, manifestURI);
         }
+
+        return result;
     }
 }

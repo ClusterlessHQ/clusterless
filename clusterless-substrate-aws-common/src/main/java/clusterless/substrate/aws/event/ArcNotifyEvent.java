@@ -17,6 +17,12 @@ import java.net.URI;
 /**
  *
  */
+
+/**
+ * The ArcNotifyEvent is passed between Arc state machines.
+ * <p>
+ * This is the JSON observed on and subscribed to on an event bus.
+ */
 public class ArcNotifyEvent implements NotifyEvent, Struct {
     public static final String SOURCE = "clusterless.arc";
     public static final String DETAIL = "Clusterless Arc Notification";

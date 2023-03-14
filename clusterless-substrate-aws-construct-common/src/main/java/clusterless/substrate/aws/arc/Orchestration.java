@@ -30,8 +30,20 @@ public interface Orchestration {
                 .build();
     }
 
+    default Succeed succeed(String id, String comment) {
+        return Succeed.Builder.create((Construct) this, id)
+                .comment(comment)
+                .build();
+    }
+
     default Pass pass(String id) {
         return Pass.Builder.create((Construct) this, id)
+                .build();
+    }
+
+    default Pass pass(String id, String outputPath) {
+        return Pass.Builder.create((Construct) this, id)
+                .outputPath(outputPath)
                 .build();
     }
 

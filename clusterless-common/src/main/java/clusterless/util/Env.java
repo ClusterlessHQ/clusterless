@@ -34,7 +34,8 @@ public class Env {
     }
 
     public static String key(Object object) {
-        return Label.of(object.getClass().getSimpleName()).upperUnderscore();
+        Class<?> type = object.getClass();
+        return keyNameFor(type);
     }
 
     public static <T> T fromEnv(Class<T> type) {
@@ -42,12 +43,16 @@ public class Env {
     }
 
     public static <T> T fromEnv(Class<T> type, Supplier<T> defaultValue) {
-        String value = System.getenv(Label.of(type.getSimpleName()).upperUnderscore());
+        String value = System.getenv(keyNameFor(type));
 
         if (value == null) {
             return defaultValue.get();
         }
 
         return JSONUtil.readObjectSafe(value, type);
+    }
+
+    private static String keyNameFor(Class<?> type) {
+        return Label.of(type.getSimpleName()).upperUnderscore();
     }
 }

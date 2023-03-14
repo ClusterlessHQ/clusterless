@@ -49,10 +49,10 @@ public class ArcStateManager {
 
         if (currentStateIdentifier == null) {
             s3.put(newStateIdentifier, "application/txt", "").
-                    isSuccessOrThrowRuntime();
+                    isSuccessOrThrow(e -> new RuntimeException("unable to set state at: " + newStateIdentifier, e));
         } else {
             s3.move(currentStateIdentifier, newStateIdentifier).
-                    isSuccessOrThrowRuntime();
+                    isSuccessOrThrow(e -> new RuntimeException("unable to move state at: " + currentStateIdentifier + ", to: " + newStateIdentifier, e));
         }
 
         return currentState;

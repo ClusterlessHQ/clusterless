@@ -9,6 +9,7 @@ import java.util.Locale;
 public enum ManifestState implements State, Partition.EnumPartition {
     complete,
     partial,
+    empty,
     removed;
 
     @Override
@@ -21,6 +22,7 @@ public enum ManifestState implements State, Partition.EnumPartition {
             case partial:
             case removed:
                 return true;
+            case empty:
             case complete:
                 break;
         }

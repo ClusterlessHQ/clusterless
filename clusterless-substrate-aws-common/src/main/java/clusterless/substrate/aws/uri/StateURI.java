@@ -40,6 +40,22 @@ public abstract class StateURI<S extends State, T extends StateURI<S, T>> implem
         }
     }
 
+    public StateStore stateStore() {
+        return stateStore;
+    }
+
+    public Placement placement() {
+        return placement;
+    }
+
+    public String lotId() {
+        return lotId;
+    }
+
+    public S state() {
+        return state;
+    }
+
     protected abstract T copy();
 
     protected T setStoreName(String storeName) {

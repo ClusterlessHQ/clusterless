@@ -6,7 +6,6 @@ import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.substrate.aws.uri.ArcURI;
 
-import java.net.URI;
 import java.util.Map;
 
 public class ArcStateProps implements Struct {
@@ -15,7 +14,6 @@ public class ArcStateProps implements Struct {
     Map<String, SourceDataset> sources;
     Map<String, SinkDataset> sinks;
     ArcURI arcStatePath;
-    Map<String, URI> manifestPath;
 
     public static Builder builder() {
         return Builder.anArcStateProps();
@@ -41,17 +39,12 @@ public class ArcStateProps implements Struct {
         return arcStatePath;
     }
 
-    public Map<String, URI> manifestPath() {
-        return manifestPath;
-    }
-
     public static final class Builder {
         Project project;
         String name;
         Map<String, SourceDataset> sources;
         Map<String, SinkDataset> sinks;
         ArcURI arcStatePath;
-        Map<String, URI> manifestPath;
 
         private Builder() {
         }
@@ -85,18 +78,12 @@ public class ArcStateProps implements Struct {
             return this;
         }
 
-        public Builder withManifestPath(Map<String, URI> manifestPath) {
-            this.manifestPath = manifestPath;
-            return this;
-        }
-
         public ArcStateProps build() {
             ArcStateProps arcStateProps = new ArcStateProps();
-            arcStateProps.manifestPath = this.manifestPath;
+            arcStateProps.project = this.project;
+            arcStateProps.sources = this.sources;
             arcStateProps.sinks = this.sinks;
             arcStateProps.name = this.name;
-            arcStateProps.sources = this.sources;
-            arcStateProps.project = this.project;
             arcStateProps.arcStatePath = this.arcStatePath;
             return arcStateProps;
         }

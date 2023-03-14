@@ -11,6 +11,7 @@ package clusterless.substrate.aws.arc;
 import clusterless.config.Configurations;
 import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
+import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Workload;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
@@ -18,6 +19,11 @@ import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
 import clusterless.substrate.aws.resources.Stacks;
 import clusterless.util.Label;
+import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.s3.IBucket;
+
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  *
@@ -50,9 +56,23 @@ public class ArcStack extends ManagedStack {
 
         orchestration.buildOrchestrationWith(arcComponent);
 
+//        grantEach(arc.sources(), "Source", b->b.grantRead(orchestration.stateMachine()));
+//        grantEach(arc.sinks(), "Sink", b->b.grantReadWrite(orchestration.stateMachine()));
+//
+//        BootstrapStores.arcStateBucket(this).grantReadWrite(orchestration.stateMachine());
+//        BootstrapStores.manifestBucket(this).grantReadWrite(orchestration.stateMachine());
+
         arcListener = new ArcListener(context, arc, true);
 
         arcListener.rule().addTarget(orchestration.stateMachineTarget());
+    }
+
+    protected void grantEach(Map<String, ? extends Dataset> sources, String id, Consumer<IBucket> grant) {
+        sources.forEach((key, value) -> {
+            String baseId = Label.of(key).with(id).camelCase();
+            String bucketName = value.pathURI().getHost();
+            grant.accept(Bucket.fromBucketName(this, baseId, bucketName));
+        });
     }
 
     public ArcMeta arcMeta() {
@@ -64,9 +84,7 @@ public class ArcStack extends ManagedStack {
                         .withStackName(this.getStackName())
                         .withStepFunctionName(orchestration.stateMachineName().lowerHyphen())
                         .withListenerRuleName(arcListener.ruleName().lowerHyphen())
-//                        .withManifestLocationURIs()
                         .build())
                 .build();
     }
-
 }

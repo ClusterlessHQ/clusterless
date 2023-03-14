@@ -9,8 +9,10 @@
 package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
+import clusterless.substrate.aws.event.ArcStateContext;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.logging.log4j.LogManager;
@@ -31,12 +33,26 @@ public abstract class StreamResultHandler<E, R> implements RequestStreamHandler 
         return JSONUtil.OBJECT_MAPPER.readerFor(type);
     }
 
+    public static <E> ObjectReader objectReaderFor(JavaType type) {
+        return JSONUtil.OBJECT_MAPPER.readerFor(type);
+    }
+
     public static <R> ObjectWriter objectWriterFor(Class<R> type) {
         return JSONUtil.OBJECT_MAPPER.writerFor(type);
     }
 
+    private ObjectWriter objectWriterFor(JavaType type) {
+        return JSONUtil.OBJECT_MAPPER.writerFor(type);
+    }
+
     protected final ObjectReader reader;
+
     protected final ObjectWriter writer;
+
+    public StreamResultHandler(Class<ArcStateContext> readerType, JavaType writerType) {
+        this.reader = objectReaderFor(readerType);
+        this.writer = objectWriterFor(writerType);
+    }
 
     public StreamResultHandler(Class<E> readerType, Class<R> writerType) {
         this.reader = objectReaderFor(readerType);

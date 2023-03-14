@@ -14,6 +14,14 @@ import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
 
 public class StateURIs {
+    public static ManifestURI manifestPath(@NotNull ManagedConstruct managedConstruct, Dataset dataset) {
+        Placement placement = placementFor(managedConstruct);
+        return ManifestURI.builder()
+                .withPlacement(placement)
+                .withDataset(dataset)
+                .build();
+    }
+
     public static ManifestURI manifestPath(@NotNull ManagedConstruct managedConstruct, ManifestState state, Dataset dataset) {
         Placement placement = placementFor(managedConstruct);
         return ManifestURI.builder()

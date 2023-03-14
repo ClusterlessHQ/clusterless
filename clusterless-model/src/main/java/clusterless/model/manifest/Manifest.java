@@ -22,25 +22,36 @@ import java.util.List;
  */
 public class Manifest implements Content, Struct {
     public static final String JSON_EXTENSION = "json";
+
+    @JsonProperty(required = true)
+    ManifestState state;
+    String comment;
     @JsonProperty(required = true)
     Dataset dataset;
-
     @JsonProperty(required = true)
     String lotId;
-
     @JsonProperty(required = true)
-    UriType uriType = UriType.prefix;
+    UriType uriType = UriType.identifier;
     @JsonProperty(required = true)
     List<URI> uris;
 
     public Manifest() {
     }
 
-    private Manifest(Builder builder) {
-        dataset = builder.dataset;
-        lotId = builder.lotId;
-        uriType = builder.uriType;
-        uris = builder.uris;
+    public static Builder builder() {
+        return Builder.aManifest();
+    }
+
+    public ManifestState state() {
+        return state;
+    }
+
+    public String comment() {
+        return comment;
+    }
+
+    public UriType uriType() {
+        return uriType;
     }
 
     public Dataset dataset() {
@@ -49,10 +60,6 @@ public class Manifest implements Content, Struct {
 
     public String lotId() {
         return lotId;
-    }
-
-    public UriType datasetURIType() {
-        return uriType;
     }
 
     public List<URI> uris() {
@@ -70,73 +77,60 @@ public class Manifest implements Content, Struct {
     }
 
 
-    /**
-     * {@code Manifest} builder static inner class.
-     */
     public static final class Builder {
-        private Dataset dataset;
-        private String lotId;
-        private UriType uriType;
-        private List<URI> uris;
+        ManifestState state;
+        String comment;
+        Dataset dataset;
+        String lotId;
+        UriType uriType = UriType.identifier;
+        List<URI> uris;
 
         private Builder() {
         }
 
-        public static Builder builder() {
+        public static Builder aManifest() {
             return new Builder();
         }
 
-        /**
-         * Sets the {@code dataset} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code dataset} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDataset(Dataset val) {
-            dataset = val;
+        public Builder withState(ManifestState state) {
+            this.state = state;
             return this;
         }
 
-        /**
-         * Sets the {@code lotId} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code lot} to set
-         * @return a reference to this Builder
-         */
-        public Builder withLotId(String val) {
-            lotId = val;
+        public Builder withComment(String comment) {
+            this.comment = comment;
             return this;
         }
 
-        /**
-         * Sets the {@code uriType} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code uriType} to set
-         * @return a reference to this Builder
-         */
-        public Builder withUriType(UriType val) {
-            uriType = val;
+        public Builder withDataset(Dataset dataset) {
+            this.dataset = dataset;
             return this;
         }
 
-        /**
-         * Sets the {@code uris} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code uris} to set
-         * @return a reference to this Builder
-         */
-        public Builder withUris(List<URI> val) {
-            uris = val;
+        public Builder withLotId(String lotId) {
+            this.lotId = lotId;
             return this;
         }
 
-        /**
-         * Returns a {@code Manifest} built from the parameters previously set.
-         *
-         * @return a {@code Manifest} built with parameters of this {@code Manifest.Builder}
-         */
+        public Builder withUriType(UriType uriType) {
+            this.uriType = uriType;
+            return this;
+        }
+
+        public Builder withUris(List<URI> uris) {
+            this.uris = uris;
+            return this;
+        }
+
         public Manifest build() {
-            return new Manifest(this);
+            Manifest manifest = new Manifest();
+            manifest.uris = this.uris;
+            manifest.comment = this.comment;
+            manifest.state = this.state;
+            manifest.uriType = this.uriType;
+            manifest.dataset = this.dataset;
+            manifest.lotId = this.lotId;
+            return manifest;
         }
     }
 }

@@ -148,18 +148,12 @@ An Arc runtime state can be:
 - `complete` - the workload completed successfully, prevents duplicate executions
 - `partial` - the workload failed and any artifacts should be removed/ignored, allows for retries via a new running
   state
-- `empty` - intentionally no data in this lot, for audit completeness, also a flag to subscribers
 - `missing` - if a partial is cleaned up, the arc state may be considered intentionally missing and eligible for a retry
-
-The `empty` state is important for subscribers. An event will still be sent on completion of a lot, but the subscribers
-may act differently if the lot contains no data. For example, they should mark their state as `empty`and then fire a
-downstream event. Gap reporting tools will also depend on this state.
 
 ```mermaid
 graph LR;
     running-->complete;
     running-->partial;
-    running-->empty;
     partial-->running;
     partial-->missing;
     missing-->running;
@@ -180,7 +174,11 @@ A Manifest state can be:
 
 - `complete` - the workload was successful
 - `partial` - the workload did not complete, but some data was created
+- `empty` - intentionally no data in this lot, for audit completeness, also a flag to subscribers
 - `removed` - all the data in the manifest was removed from storage
+
+The `empty` state is important for subscribers. An event will still be sent on completion of a lot, but the subscribers
+may act differently if the lot contains no data. Gap reporting tools will depend on this state.
 
 The relationship between a `lot` and manifest files is one-to-many. That is, a dataset lot may have a hierarchical set
 of manifest files, one for each leaf partition (if the lot is broken into parts to allow for parallelization of

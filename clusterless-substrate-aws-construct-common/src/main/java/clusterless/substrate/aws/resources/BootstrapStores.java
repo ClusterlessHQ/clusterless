@@ -14,6 +14,8 @@ import clusterless.substrate.aws.store.Stores;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Fn;
+import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.s3.IBucket;
 import software.constructs.Construct;
 
 import static clusterless.substrate.aws.store.StateStore.*;
@@ -27,8 +29,16 @@ public class BootstrapStores {
         return bootstrapStoreName(scope, Meta);
     }
 
+    public static @NotNull IBucket metadataBucket(@NotNull Construct scope) {
+        return fromBucket(scope, Meta);
+    }
+
     public static String arcStateStoreName(@NotNull Construct scope) {
         return bootstrapStoreName(scope, Arc);
+    }
+
+    public static @NotNull IBucket arcStateBucket(Construct scope) {
+        return fromBucket(scope, Arc);
     }
 
     public static String arcStateStoreNameRef(@NotNull Construct scope) {
@@ -39,8 +49,17 @@ public class BootstrapStores {
         return bootstrapStoreName(scope, Manifest);
     }
 
+    public static @NotNull IBucket manifestBucket(@NotNull Construct scope) {
+        return fromBucket(scope, Manifest);
+    }
+
     public static String manifestStoreNameRef(@NotNull Construct scope) {
         return bootstrapStoreNameRef(scope, Manifest);
+    }
+
+    @NotNull
+    private static IBucket fromBucket(Construct scope, StateStore store) {
+        return Bucket.fromBucketName(scope, Label.of(store).with("Bucket").camelCase(), bootstrapStoreName(scope, store));
     }
 
     private static String bootstrapStoreName(@NotNull Construct scope, StateStore bucketName) {

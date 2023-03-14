@@ -18,7 +18,6 @@ import java.util.Locale;
  * <pre>
  *  running-->complete;
  *  running-->partial;
- *  running-->empty;
  *  partial-->running;
  *  partial-->missing;
  *  missing-->running;
@@ -28,7 +27,6 @@ public enum ArcState implements State, Partition.EnumPartition {
     running,
     complete,
     partial,
-    empty,
     missing;
 
     @Override

@@ -77,8 +77,16 @@ public class TestDatasets {
         return manifestIdentifierMap(datasetMap, lotId, state);
     }
 
+    public Map<String, ManifestURI> sourceManifestPathMap() {
+        return manifestPathMap(sourceDatasetMap(), null);
+    }
+
     public Map<String, ManifestURI> sourceManifestPathMap(ManifestState state) {
         return manifestPathMap(sourceDatasetMap(), state);
+    }
+
+    public Map<String, ManifestURI> sinkManifestPathMap() {
+        return manifestPathMap(sinkDatasetMap(), null);
     }
 
     public Map<String, ManifestURI> sinkManifestPathMap(ManifestState state) {

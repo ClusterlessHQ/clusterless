@@ -14,11 +14,12 @@ public class ArcStateManagerTest extends LocalStackBase {
     @Override
     protected ArcStateProps getProps() {
         return ArcStateProps.builder()
-                .withArcStatePath(ArcURI.builder()
-                        .withPlacement(defaultPlacement())
-                        .withProject(defaultProject())
-                        .withArcName("test-arc")
-                        .build()
+                .withArcStatePath(
+                        ArcURI.builder()
+                                .withPlacement(defaultPlacement())
+                                .withProject(defaultProject())
+                                .withArcName("test-arc")
+                                .build()
                 )
                 .build();
     }
@@ -32,8 +33,8 @@ public class ArcStateManagerTest extends LocalStackBase {
 
         new TestLots().lotStream(5).forEach(lot -> {
             testStateTransition(arcStateManager, null, ArcState.running, ArcState.complete, lot);
-            testStateTransition(arcStateManager, ArcState.complete, ArcState.empty, ArcState.missing, lot);
-            testStateTransition(arcStateManager, ArcState.missing, ArcState.empty, ArcState.partial, lot);
+            testStateTransition(arcStateManager, ArcState.complete, ArcState.partial, ArcState.missing, lot);
+            testStateTransition(arcStateManager, ArcState.missing, ArcState.running, ArcState.partial, lot);
         });
     }
 

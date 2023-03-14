@@ -4,6 +4,7 @@ import clusterless.model.UriType;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.Manifest;
+import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.aws.uri.ManifestURI;
 import clusterless.util.URIs;
@@ -68,7 +69,7 @@ public class CreateDataMachine {
                         r -> String.format("unable to write data: %s, %s", dataIdentifier, r.errorMessage())
                 );
 
-                Manifest manifest = Manifest.Builder.builder()
+                Manifest manifest = Manifest.builder()
                         .withUris(List.of(dataIdentifier))
                         .withDataset(new Dataset(dataset)) // don't serialize a subclass
                         .withLotId(lot)
@@ -76,7 +77,7 @@ public class CreateDataMachine {
                         .build();
 
                 ManifestURI manifestPath = manifestMap.get(role);
-                URI manifestIdentifier = manifestPath.withLot(lot).uri();
+                URI manifestIdentifier = manifestPath.withState(ManifestState.complete).withLot(lot).uri();
 
                 LOG.info("writing manifest for: {}", manifestIdentifier);
 

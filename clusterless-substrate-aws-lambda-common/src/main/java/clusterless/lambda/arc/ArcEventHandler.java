@@ -8,21 +8,26 @@
 
 package clusterless.lambda.arc;
 
-import clusterless.lambda.EventHandler;
-import clusterless.substrate.aws.event.ArcNotifyEvent;
+import clusterless.lambda.EventResultHandler;
+import clusterless.model.manifest.ManifestState;
+import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.util.Env;
+
+import java.util.Map;
 
 /**
  *
  */
-public abstract class ArcEventHandler extends EventHandler<ArcNotifyEvent, ArcEventObserver> {
+public abstract class ArcEventHandler extends EventResultHandler<ArcStateContext, Map<String, ManifestState>, ArcEventObserver> {
     protected static final ArcProps arcProps = Env.fromEnv(
             ArcProps.class,
-            () -> ArcProps.Builder.builder()
+            () -> ArcProps.builder()
                     .build()
     );
 
     public ArcEventHandler() {
-        super(ArcNotifyEvent.class);
+        super(ArcStateContext.class, getMapTypeFor(String.class, ManifestState.class));
+
+        logObject("using arcProps", arcProps);
     }
 }
