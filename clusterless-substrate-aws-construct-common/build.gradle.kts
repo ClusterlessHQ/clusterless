@@ -18,7 +18,7 @@ dependencies {
     api(project(":clusterless-substrate-aws-lambda-arc"))
 
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
-    api("software.amazon.awscdk:aws-cdk-lib:2.66.1")
+    api("software.amazon.awscdk:aws-cdk-lib:2.72.1")
     // https://mvnrepository.com/artifact/software.constructs/constructs
-    api("software.constructs:constructs:10.1.261")
+    api("software.constructs:constructs:10.1.299")
 }
