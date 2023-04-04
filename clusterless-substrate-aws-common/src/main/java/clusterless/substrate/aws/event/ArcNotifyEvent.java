@@ -15,10 +15,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 
 /**
- *
- */
-
-/**
  * The ArcNotifyEvent is passed between Arc state machines.
  * <p>
  * This is the JSON observed on and subscribed to on an event bus.
@@ -37,7 +33,8 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
     }
 
     private ArcNotifyEvent(Builder builder) {
-        dataset = builder.dataset;
+        // dataset has subclasses with additional properties we don't need, so normalize
+        dataset = builder.dataset == null ? null : new Dataset(builder.dataset);
         lotId = builder.lotId;
         manifest = builder.manifest;
     }

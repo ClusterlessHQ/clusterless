@@ -15,7 +15,6 @@ import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.model.UriType;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
-import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.sdk.S3;
@@ -77,7 +76,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
     }
 
     @Override
-    protected Map<String, ManifestState> handleEvent(ArcStateContext arcStateContext, Context context, ArcEventObserver eventObserver) {
+    protected Map<String, URI> handleEvent(ArcStateContext arcStateContext, Context context, ArcEventObserver eventObserver) {
         String fromRole = arcStateContext.role();
         ArcNotifyEvent notifyEvent = arcStateContext.arcNotifyEvent();
         String lotId = notifyEvent.lotId();
@@ -87,7 +86,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
 
         eventObserver.applyFromManifest(incomingManifest);
 
-        Map<String, ManifestState> result = new LinkedHashMap<>();
+        Map<String, URI> result = new LinkedHashMap<>();
 
         //  copy files
         URI fromDatasetPath = incomingManifest.dataset().pathURI();
@@ -136,21 +135,16 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
                 List<String> errors = failed.stream().map(Tuple3::get_3).distinct().limit(3).collect(Collectors.toList());
 
                 manifestURI = manifestWriter.writePartialManifest(completed, lotId, String.format("copy failed on role: %s, num: %d with: %s", toRole, failed.size(), errors));
-
-                result.put(toRole, ManifestState.partial);
-
             } else if (completed.isEmpty()) { // intentional
                 // if we allow for a filter predicate on the declaration, this will be a valid state
                 LOG.info("no objects copied with no errors, role: {} -> {}, having: {}", fromRole, toRole, fromUris.size());
                 manifestURI = manifestWriter.writeEmptyManifest(completed, lotId);
-
-                result.put(toRole, ManifestState.empty);
             } else { // intentional
                 LOG.info("successfully copied objects with no errors, role: {} -> {}, having: {}", fromRole, toRole, fromUris.size());
                 manifestURI = manifestWriter.writeSuccessManifest(completed, lotId);
-
-                result.put(toRole, ManifestState.complete);
             }
+
+            result.put(toRole, manifestURI);
 
             eventObserver.applyToManifest(toRole, manifestURI);
         }

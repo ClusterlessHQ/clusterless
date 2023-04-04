@@ -9,16 +9,16 @@
 package clusterless.lambda.arc;
 
 import clusterless.lambda.EventResultHandler;
-import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.util.Env;
 
+import java.net.URI;
 import java.util.Map;
 
 /**
  *
  */
-public abstract class ArcEventHandler extends EventResultHandler<ArcStateContext, Map<String, ManifestState>, ArcEventObserver> {
+public abstract class ArcEventHandler extends EventResultHandler<ArcStateContext, Map<String, URI>, ArcEventObserver> {
     protected static final ArcProps arcProps = Env.fromEnv(
             ArcProps.class,
             () -> ArcProps.builder()
@@ -26,7 +26,7 @@ public abstract class ArcEventHandler extends EventResultHandler<ArcStateContext
     );
 
     public ArcEventHandler() {
-        super(ArcStateContext.class, getMapTypeFor(String.class, ManifestState.class));
+        super(ArcStateContext.class, getMapTypeFor(String.class, URI.class));
 
         logObject("using arcProps", arcProps);
     }

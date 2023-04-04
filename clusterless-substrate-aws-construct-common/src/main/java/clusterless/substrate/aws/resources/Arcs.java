@@ -17,18 +17,16 @@ import org.jetbrains.annotations.NotNull;
  *
  */
 public class Arcs {
-    public static Label arcBaseName(@NotNull Deployable deployable, @NotNull Arc arc) {
+    public static Label arcBaseName(@NotNull Deployable deployable, @NotNull Arc<?> arc) {
         String stage = deployable.placement().stage();
-        String name = deployable.project().name();
+        String project = deployable.project().name();
         String version = deployable.project().version();
-        String region = deployable.placement().region();
 
         String arcName = arc.name();
 
         return Label.of(stage).upperOnly()
-                .with(Label.of(name))
+                .with(project)
                 .with(arcName)
-                .with(Label.of(version))
-                .with(Label.of(region));
+                .with(version);
     }
 }

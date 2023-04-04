@@ -1,7 +1,6 @@
 package clusterless.substrate.aws.event;
 
 import clusterless.model.Struct;
-import clusterless.model.manifest.ManifestState;
 import clusterless.model.state.ArcState;
 
 import java.net.URI;
@@ -18,7 +17,7 @@ public class ArcStateContext implements Struct {
     String role;
     ArcNotifyEvent arcNotifyEvent;
     Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<>();
-    Map<String, ManifestState> sinkStates = new LinkedHashMap<>(); // result of the arc workload
+    Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
 
     public ArcStateContext() {
     }
@@ -47,8 +46,8 @@ public class ArcStateContext implements Struct {
         return existingPartialManifests;
     }
 
-    public Map<String, ManifestState> sinkStates() {
-        return sinkStates;
+    public Map<String, URI> sinkManifests() {
+        return sinkManifests;
     }
 
     public static final class Builder {

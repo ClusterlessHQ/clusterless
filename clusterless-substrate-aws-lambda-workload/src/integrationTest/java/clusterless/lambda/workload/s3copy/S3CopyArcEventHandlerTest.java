@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -84,7 +85,7 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
 
         ArcEventObserver eventContext = mock();
 
-        Map<String, ManifestState> result = handler.handleEvent(arcStateContext, context(), eventContext);
+        Map<String, URI> result = handler.handleEvent(arcStateContext, context(), eventContext);
 
         Assertions.assertFalse(result.isEmpty());
 

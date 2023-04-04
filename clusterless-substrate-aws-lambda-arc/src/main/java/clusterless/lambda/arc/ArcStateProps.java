@@ -14,6 +14,7 @@ public class ArcStateProps implements Struct {
     Map<String, SourceDataset> sources;
     Map<String, SinkDataset> sinks;
     ArcURI arcStatePath;
+    String eventBusName;
 
     public static Builder builder() {
         return Builder.anArcStateProps();
@@ -39,12 +40,17 @@ public class ArcStateProps implements Struct {
         return arcStatePath;
     }
 
+    public String eventBusName() {
+        return eventBusName;
+    }
+
     public static final class Builder {
         Project project;
         String name;
         Map<String, SourceDataset> sources;
         Map<String, SinkDataset> sinks;
         ArcURI arcStatePath;
+        String eventBusName;
 
         private Builder() {
         }
@@ -78,11 +84,17 @@ public class ArcStateProps implements Struct {
             return this;
         }
 
+        public Builder withEventBusName(String eventBusName) {
+            this.eventBusName = eventBusName;
+            return this;
+        }
+
         public ArcStateProps build() {
             ArcStateProps arcStateProps = new ArcStateProps();
             arcStateProps.project = this.project;
-            arcStateProps.sources = this.sources;
+            arcStateProps.eventBusName = this.eventBusName;
             arcStateProps.sinks = this.sinks;
+            arcStateProps.sources = this.sources;
             arcStateProps.name = this.name;
             arcStateProps.arcStatePath = this.arcStatePath;
             return arcStateProps;
