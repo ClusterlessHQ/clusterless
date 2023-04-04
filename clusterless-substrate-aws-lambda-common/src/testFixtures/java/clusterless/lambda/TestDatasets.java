@@ -109,6 +109,10 @@ public class TestDatasets {
         return datasets(roles);
     }
 
+    public Map<String, ManifestURI> manifestPathMapFor(Map<String, ? extends Dataset> datasetMap) {
+        return manifestPathMap(datasetMap, null);
+    }
+
     public Map<String, ManifestURI> manifestPathMap(Map<String, ? extends Dataset> datasetMap, ManifestState state) {
         return datasetMap.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> ManifestURI.builder()

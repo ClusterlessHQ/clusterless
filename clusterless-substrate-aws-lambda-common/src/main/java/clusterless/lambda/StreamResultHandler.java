@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ParameterizedMessageFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,11 @@ import java.util.function.Function;
  */
 public abstract class StreamResultHandler<E, R> implements RequestStreamHandler {
     protected static final Logger LOG = LogManager.getLogger(StreamResultHandler.class);
+
+    /**
+     * Use the same message format as log4j.
+     */
+    protected static ParameterizedMessageFactory messageFactory = new ParameterizedMessageFactory();
 
     public static <E> ObjectReader objectReaderFor(Class<E> type) {
         return JSONUtil.OBJECT_MAPPER.readerFor(type);
@@ -60,9 +66,30 @@ public abstract class StreamResultHandler<E, R> implements RequestStreamHandler 
     }
 
     public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
-        E event = reader.readValue(input);
-        R result = handleRequest(event, context);
-        writer.writeValue(output, result);
+        E event;
+
+        try {
+            event = reader.readValue(input);
+        } catch (IOException e) {
+            LOG.error("unable to read input", e);
+            throw e;
+        }
+
+        R result;
+
+        try {
+            result = handleRequest(event, context);
+        } catch (RuntimeException e) {
+            LOG.error("unable to handle request", e);
+            throw e;
+        }
+
+        try {
+            writer.writeValue(output, result);
+        } catch (IOException e) {
+            LOG.error("unable to write output", e);
+            throw e;
+        }
     }
 
     public abstract R handleRequest(E event, Context context);
@@ -71,8 +98,9 @@ public abstract class StreamResultHandler<E, R> implements RequestStreamHandler 
         LOG.info(message, JSONUtil.writeAsStringSafe(object));
     }
 
-    protected void logErrorAndThrow(Function<String, RuntimeException> exception, String format, Object... values) {
-        String message = String.format(format, values);
+    protected <T> T logErrorAndThrow(Function<String, RuntimeException> exception, String format, Object... values) {
+        // use the log4j message factory so that we don't introduce yet another log format
+        String message = messageFactory.newMessage(format, values).getFormattedMessage();
         LOG.error(message);
         throw exception.apply(message);
     }

@@ -12,12 +12,14 @@ import clusterless.lambda.arc.ArcStateProps;
 import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
 import clusterless.model.state.ArcState;
+import clusterless.substrate.aws.arc.state.ArcCompleteStateGate;
 import clusterless.substrate.aws.arc.state.ArcStartStateGate;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.resources.Arcs;
+import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.uri.ArcURI;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
@@ -32,16 +34,18 @@ import software.amazon.awscdk.services.stepfunctions.*;
  */
 public class ArcOrchestration extends ManagedConstruct implements Orchestration {
     private final Label stateMachineName;
+    private final Arc<?> arc;
     private final ArcStateProps arcStateProps;
     private final LambdaJavaRuntimeProps runtimeProps;
     private StateMachine stateMachine;
 
     public ArcOrchestration(@NotNull ManagedComponentContext context, @NotNull Arc<?> arc) {
         super(context, Label.of(arc.name()).with("Orchestration"));
+        this.arc = arc;
 
-        stateMachineName = Arcs.arcBaseName(context().deployable(), arc);
+        this.stateMachineName = Arcs.arcBaseName(context().deployable(), arc);
 
-        arcStateProps = ArcStateProps.builder()
+        this.arcStateProps = ArcStateProps.builder()
                 .withName(arc.name())
                 .withProject(context().deployable().project())
                 .withSinks(arc.sinks())
@@ -53,20 +57,25 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                                 .withArcName(arc.name())
                                 .build()
                 )
+                .withEventBusName(Events.arcEventBusNameRef(this))
                 .build();
 
-        runtimeProps = LambdaJavaRuntimeProps.builder()
+        this.runtimeProps = LambdaJavaRuntimeProps.builder()
                 .withTimeoutMin(5)
                 .build();
     }
 
     public void buildOrchestrationWith(ArcComponent arcComponent) {
         Chain rootChain = Chain.start(pass("CurrentStateChoice", "$.detail"))
-                .next(new ArcStartStateGate(context(), arcStateProps, runtimeProps))
-                .next(startChoice(
-                        Chain.start(stateFrom(arcComponent, fail("Partial", "Partial results")))
-                                // todo: add CompeteGate here to send notification events
-                                .next(succeed("Complete")))
+                // confirm the state is valid and forward to the workload
+                .next(new ArcStartStateGate(context(), arc, arcStateProps, runtimeProps))
+                .next(
+                        startGateResultChoice(
+                                Chain.start(stateFrom(arcComponent, fail("Failed", "Failed with unhandled error")))
+                                        // publish new events on complete of workload
+                                        .next(new ArcCompleteStateGate(context(), arc, arcStateProps, runtimeProps))
+                                        .next(succeed("Complete"))
+                        )
                 );
 
         stateMachine = StateMachine.Builder.create(this, stateMachineName.camelCase())
@@ -79,11 +88,11 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
 
     private State stateFrom(ArcComponent arcComponent, Fail fail) {
         return ((ArcConstruct<?>) arcComponent)
-                .createState("$.sinkStates", fail);
+                .createState("$.sinkManifests", fail);
     }
 
     @NotNull
-    private Choice startChoice(Chain workloadChain) {
+    private Choice startGateResultChoice(Chain workloadChain) {
         return Choice.Builder.create(this, "StateStart")
                 .build()
                 .when(

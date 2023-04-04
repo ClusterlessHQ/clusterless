@@ -9,7 +9,7 @@
 package clusterless.lambda.transform;
 
 import clusterless.lambda.EventHandler;
-import clusterless.lambda.arc.ArcNotifyEventManager;
+import clusterless.lambda.arc.ArcNotifyEventPublisher;
 import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.lambda.transform.json.AWSEvent;
 import clusterless.model.UriType;
@@ -44,7 +44,7 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
             UriType.identifier
     );
 
-    protected ArcNotifyEventManager arcNotifyEventManager = new ArcNotifyEventManager(
+    protected ArcNotifyEventPublisher arcNotifyEventPublisher = new ArcNotifyEventPublisher(
             transformProps.eventBusName(),
             transformProps.dataset()
     );
@@ -89,6 +89,11 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
         eventObserver.applyEvent(time, bucket, key);
 
+        if (key.endsWith("/")) {
+            LOG.info("key ends with a path separator, skipping: {}", key);
+            return;
+        }
+
         URI identifier = S3.createS3URI(bucket, key);
 
         eventObserver.applyIdentifierURI(identifier);
@@ -117,7 +122,7 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
         eventObserver.applyManifestURI(manifestURI);
 
-        arcNotifyEventManager.publishEvent(lotId, manifestURI);
+        arcNotifyEventPublisher.publishEvent(lotId, manifestURI);
     }
 
     private static String fromModifiedTime(URI objectPath) {

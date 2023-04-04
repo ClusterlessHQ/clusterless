@@ -5,8 +5,11 @@ import clusterless.model.deploy.Dataset;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedStateMachineFragment;
 import clusterless.substrate.aws.resources.BootstrapStores;
+import clusterless.substrate.aws.resources.Events;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.services.events.EventBus;
+import software.amazon.awscdk.services.events.IEventBus;
 import software.amazon.awscdk.services.iam.IGrantable;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
@@ -32,9 +35,17 @@ public abstract class ArcStateMachineFragment extends ManagedStateMachineFragmen
                 .camelCase();
     }
 
-    protected void grantPermissionsTo(IGrantable grantable) {
-        grantDatasets(grantable);
-        grantBootstrapReadWrite(grantable);
+    protected abstract void grantPermissionsTo(IGrantable grantable);
+
+    protected void grantEventBus(IGrantable grantable) {
+        String eventBusRef = Events.arcEventBusNameRef(this);
+        IEventBus arcEventBus = EventBus.fromEventBusName(this, "EventBus", eventBusRef);
+        arcEventBus.grantPutEventsTo(grantable);
+    }
+
+    protected void grantBootstrapReadWrite(@NotNull IGrantable grantee) {
+        BootstrapStores.arcStateBucket(this).grantReadWrite(grantee);
+        BootstrapStores.manifestBucket(this).grantReadWrite(grantee);
     }
 
     protected void grantDatasets(IGrantable grantable) {
@@ -48,10 +59,5 @@ public abstract class ArcStateMachineFragment extends ManagedStateMachineFragmen
             String bucketName = value.pathURI().getHost();
             grant.accept(Bucket.fromBucketName(this, baseId, bucketName));
         });
-    }
-
-    protected void grantBootstrapReadWrite(@NotNull IGrantable grantee) {
-        BootstrapStores.arcStateBucket(this).grantReadWrite(grantee);
-        BootstrapStores.manifestBucket(this).grantReadWrite(grantee);
     }
 }

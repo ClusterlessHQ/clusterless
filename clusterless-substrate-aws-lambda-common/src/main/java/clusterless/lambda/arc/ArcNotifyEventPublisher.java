@@ -1,25 +1,38 @@
 package clusterless.lambda.arc;
 
 import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.sdk.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-public class ArcNotifyEventManager {
-    private static final Logger LOG = LogManager.getLogger(ArcNotifyEventManager.class);
+public class ArcNotifyEventPublisher {
+    private static final Logger LOG = LogManager.getLogger(ArcNotifyEventPublisher.class);
     protected static final EventBus eventBus = new EventBus();
     private final String eventBusName;
     private final Dataset dataset;
 
-    public ArcNotifyEventManager(String eventBusName, Dataset dataset) {
+    public ArcNotifyEventPublisher(String eventBusName, Dataset dataset) {
         this.eventBusName = eventBusName;
         this.dataset = dataset;
     }
 
+    public static Map<String, ArcNotifyEventPublisher> publishers(String eventBusName, Map<String, SinkDataset> datasets) {
+        return datasets.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new ArcNotifyEventPublisher(eventBusName, e.getValue())));
+    }
+
     public void publishEvent(String lotId, URI manifestURI) {
+        Objects.requireNonNull(lotId, "lotId may not be null");
+        Objects.requireNonNull(manifestURI, "manifestURI may not be null");
+
         // publish notification on event-bus
         ArcNotifyEvent notifyEvent = ArcNotifyEvent.Builder.builder()
                 .withDataset(dataset)

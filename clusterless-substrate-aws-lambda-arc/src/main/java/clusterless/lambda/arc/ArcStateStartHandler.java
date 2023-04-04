@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Converts an ArcNotifyEvent into an ArcStateContext for use within the state machine.
  */
 public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, ArcStateContext> {
     private static final Logger LOG = LogManager.getLogger(ArcStateStartHandler.class);
@@ -36,12 +36,31 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
 
     ArcStateManager arcStateManager = new ArcStateManager(arcStateProps.arcStatePath());
 
+    protected ArcStateStartHandler(ArcStateManager arcStateManager) {
+        this();
+        this.arcStateManager = arcStateManager;
+    }
+
     public ArcStateStartHandler() {
         super(ArcNotifyEvent.class, ArcStateContext.class);
     }
 
     protected ArcStateStartObserver observer() {
         return new ArcStateStartObserver() {
+            @Override
+            public void applyCurrentState(String lotId, ArcState currentState) {
+
+            }
+
+            @Override
+            public void applyFinalArcStates(ArcState previous, ArcState current) {
+
+            }
+
+            @Override
+            public void applyRoles(List<String> roles) {
+
+            }
         };
     }
 
@@ -62,8 +81,11 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         // get arc state
         Optional<ArcState> currentState = arcStateManager.findStateFor(lotId);
 
+        eventObserver.applyCurrentState(lotId, currentState.orElse(null));
+
         // if already running, punt back up to the state machine
         if (currentState.isPresent() && currentState.get() == ArcState.running) {
+            eventObserver.applyFinalArcStates(ArcState.running, ArcState.running);
             LOG.info("lot already running: {}", lotId);
             return ArcStateContext.builder()
                     .withArcNotifyEvent(event)
@@ -75,6 +97,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         // if already completed, punt back up to the state machine
         if (currentState.isPresent() && (currentState.get() == ArcState.complete || currentState.get() == ArcState.missing)) {
             LOG.info("lot already completed: {}", lotId);
+            eventObserver.applyFinalArcStates(currentState.get(), currentState.get());
             return ArcStateContext.builder()
                     .withArcNotifyEvent(event)
                     .withPreviousState(currentState.get())
@@ -93,13 +116,15 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         // confirm there isn't some race condition
         // todo: create new exception to capture in state machine
         if (!currentState.equals(previousState)) {
-            logErrorAndThrow(IllegalStateException::new, "unexpected state change from: %s, to: %s", currentState.orElse(null), previousState.orElse(null));
+            logErrorAndThrow(IllegalStateException::new, "unexpected state change from: {}, to: {}", currentState.orElse(null), previousState.orElse(null));
         }
 
         List<String> roles = arcStateProps.sources().entrySet()
                 .stream()
                 .filter(e -> Objects.equals(e.getValue().name(), event.dataset().name()) && Objects.equals(e.getValue().version(), event.dataset().version()))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
+
+        eventObserver.applyRoles(roles);
 
         if (roles.size() == 0) {
             logErrorAndThrow(IllegalStateException::new, "no role found for: {}", event.dataset());
@@ -112,6 +137,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         // embed notify event
         // create sink manifests identifiers
         // list existing sink partial manifest identifiers
+        eventObserver.applyFinalArcStates(currentState.orElse(null), ArcState.running);
         return ArcStateContext.builder()
                 .withArcNotifyEvent(event)
                 .withRole(roles.get(0))
@@ -120,5 +146,4 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
 //                .withSinkCompleteManifest()
                 .build();
     }
-
 }

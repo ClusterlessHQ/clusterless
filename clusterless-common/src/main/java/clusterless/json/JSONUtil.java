@@ -116,6 +116,14 @@ public class JSONUtil {
         return (J) OBJECT_READER.readTree(new FileInputStream(file));
     }
 
+    public static <T> T readObjectSafe(byte[] bytes, Class<T> type) {
+        try {
+            return OBJECT_READER.readValue(bytes, type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static <T> T readObjectSafe(String json, Class<T> type) {
         try {
             return OBJECT_READER.readValue(json, type);

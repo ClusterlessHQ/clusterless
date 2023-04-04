@@ -1,7 +1,6 @@
 package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
-import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcStateContext;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.JavaType;
@@ -18,7 +17,7 @@ public abstract class EventResultHandler<E, R, O extends EventObserver> extends 
         super(incoming, outgoing);
     }
 
-    public static MapType getMapTypeFor(Class<String> keyClass, Class<ManifestState> valueClass) {
+    public static MapType getMapTypeFor(Class<String> keyClass, Class<?> valueClass) {
         return JSONUtil.OBJECT_MAPPER.getTypeFactory().constructMapType(LinkedHashMap.class, keyClass, valueClass);
     }
 

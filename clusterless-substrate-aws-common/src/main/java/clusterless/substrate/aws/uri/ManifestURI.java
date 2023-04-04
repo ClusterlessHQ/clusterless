@@ -100,6 +100,10 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         return state == null;
     }
 
+    public static ManifestURI parse(URI uri) {
+        return parse(uri.toString());
+    }
+
     public static ManifestURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
 
