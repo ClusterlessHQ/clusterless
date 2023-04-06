@@ -17,6 +17,7 @@ import clusterless.substrate.aws.ProcessExec;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.aws.store.StateStore;
 import clusterless.substrate.aws.store.Stores;
+import clusterless.util.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -63,7 +64,7 @@ public class Deploy extends CommonCommand implements Callable<Integer> {
             String region = placement.region();
             String stage = placement.stage();
             LOG.error("bootstrap bucket does not exist: {}, {}", bucketName, s3.error(response));
-            String message = String.format("must bootstrap account: %s, region: %s, stage: %s", account, region, stage);
+            String message = String.format("must bootstrap account: %s, region: %s, stage: %s", account, region, Strings.nullToEmpty(stage));
             LOG.error(message);
 
             throw new IllegalStateException(message);
