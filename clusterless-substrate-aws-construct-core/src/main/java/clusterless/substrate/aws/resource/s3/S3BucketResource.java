@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.resource.s3;
 
+import clusterless.config.ResourceConfig;
 import clusterless.model.deploy.Resource;
 
 import java.util.LinkedHashMap;
@@ -23,9 +24,11 @@ public class S3BucketResource extends Resource {
     private boolean enableEventBridge = true;
 
     /**
-     * When true (the default) the bucket and it's data will be removed when the project is destroyed.
+     * When true, the bucket and it's data will be removed when the project is destroyed.
+     * <p>
+     * Unless the {@link ResourceConfig#removeAllOnDestroy()} is true.
      */
-    private boolean removeOnDestroy = true;
+    private boolean removeOnDestroy = false;
     private Map<String, String> tags = new LinkedHashMap<>();
 
     public S3BucketResource() {
