@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.resources;
 
 import clusterless.model.deploy.Deployable;
+import clusterless.model.deploy.Region;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
@@ -28,13 +29,13 @@ public class Stacks {
         String stage = deployable.placement().stage();
         String name = deployable.project().name();
         String version = deployable.project().version();
-        String region = deployable.placement().region();
+        Label region = Region.of(deployable.placement().region());
 
         return Label.of(stage).upperOnly()
                 .with(Label.of(name))
                 .with(baseId)
                 .with(Label.of(version))
-                .with(Label.of(region));
+                .with(region);
     }
 
     public static String bootstrapStackName(@NotNull Label stage) {
