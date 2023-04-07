@@ -9,7 +9,7 @@
 plugins {
     id("clusterless.java-library-conventions")
     id("clusterless.java-override-conventions-jdk11")
-    id("org.openapi.generator") version "6.3.0"
+    id("org.openapi.generator") version "6.5.0"
 }
 
 val generatedRoot = "$buildDir/generated/openapi"
