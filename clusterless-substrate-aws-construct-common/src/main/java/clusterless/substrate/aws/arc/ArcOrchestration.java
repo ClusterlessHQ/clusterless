@@ -74,7 +74,7 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                                 Chain.start(stateFrom(arcComponent, fail("Failed", "Failed with unhandled error")))
                                         // publish new events on complete of workload
                                         .next(new ArcCompleteStateGate(context(), arc, arcStateProps, runtimeProps))
-                                        .next(succeed("Complete"))
+                                        .next(completeGateResultChoice())
                         )
                 );
 
@@ -117,7 +117,28 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                         ),
                         workloadChain
                 ).otherwise(
-                        fail("UnknownState", "Unknown arc state encountered")
+                        fail("UnknownStart", "Unknown arc state encountered.")
+                );
+    }
+
+    @NotNull
+    private Choice completeGateResultChoice() {
+        return Choice.Builder.create(this, "StateComplete")
+                .build()
+                .when(
+                        Condition.and(
+                                Condition.isPresent("$.currentState"),
+                                Condition.stringEquals("$.currentState", ArcState.partial.name())
+                        ),
+                        succeed("Partial", "Only partial data was handled")
+                ).when(
+                        Condition.and(
+                                Condition.isPresent("$.currentState"),
+                                Condition.stringEquals("$.currentState", ArcState.complete.name())
+                        ),
+                        succeed("Complete", "Workload completed.")
+                ).otherwise(
+                        fail("UnknownComplete", "Unknown arc state encountered")
                 );
     }
 
@@ -128,6 +149,7 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                 .camelCase();
 
         LogGroup logGroup = LogGroup.Builder.create(this, baseId)
+                .logGroupName("/aws/vendedlogs/states/" + stateMachineName)
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .retention(RetentionDays.ONE_DAY)
                 .build();
