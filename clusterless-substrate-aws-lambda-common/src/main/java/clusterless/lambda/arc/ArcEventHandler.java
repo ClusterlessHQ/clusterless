@@ -9,6 +9,7 @@
 package clusterless.lambda.arc;
 
 import clusterless.lambda.EventResultHandler;
+import clusterless.model.deploy.WorkloadProps;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.util.Env;
 
@@ -18,12 +19,16 @@ import java.util.Map;
 /**
  *
  */
-public abstract class ArcEventHandler extends EventResultHandler<ArcStateContext, Map<String, URI>, ArcEventObserver> {
-    protected static final ArcProps arcProps = Env.fromEnv(
+public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResultHandler<ArcStateContext, Map<String, URI>, ArcEventObserver> {
+    protected static final ArcProps<?> arcProps = Env.fromEnv(
             ArcProps.class,
-            () -> ArcProps.builder()
-                    .build()
+            () -> ArcProps.builder().build()
     );
+
+    @SuppressWarnings("unchecked")
+    protected P workloadProperties() {
+        return (P) arcProps.workloadProps();
+    }
 
     public ArcEventHandler() {
         super(ArcStateContext.class, getMapTypeFor(String.class, URI.class));

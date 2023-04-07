@@ -35,12 +35,12 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class S3CopyArcEventHandler extends ArcEventHandler {
+public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
     private static final Logger LOG = LogManager.getLogger(S3CopyArcEventHandler.class);
 
     protected static final S3 s3 = new S3();
 
-    ManifestReader manifestReader = new ManifestReader();
+    protected ManifestReader manifestReader = new ManifestReader();
 
     protected Map<String, ManifestWriter> manifestWriters = ManifestWriter.writers(
             arcProps.sinks(),
@@ -130,6 +130,14 @@ public class S3CopyArcEventHandler extends ArcEventHandler {
                 LOG.error("s3 object copy errors: {}, failed: {}", fromUris.size(), failed.size());
                 for (Tuple3<URI, URI, String> failure : failed) {
                     LOG.error("failed from: {}, to: {}, message: {}", failure.get_1(), failure.get_2(), failure.get_3());
+                }
+
+                int ceil = (int) Math.ceil(toUris.size() * workloadProperties().failArcOnPartialPercent());
+                if (failed.size() >= ceil) {
+                    logErrorAndThrow(
+                            RuntimeException::new,
+                            "too many copy operations returned errors, failed: {}, is greater than allowed: {}", failed.size(), ceil
+                    );
                 }
 
                 List<String> errors = failed.stream().map(Tuple3::get_3).distinct().limit(3).collect(Collectors.toList());

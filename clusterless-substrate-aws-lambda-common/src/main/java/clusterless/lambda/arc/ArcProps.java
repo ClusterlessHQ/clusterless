@@ -11,6 +11,7 @@ package clusterless.lambda.arc;
 import clusterless.model.Struct;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
+import clusterless.model.deploy.WorkloadProps;
 import clusterless.substrate.aws.uri.ManifestURI;
 
 import java.util.Map;
@@ -18,17 +19,19 @@ import java.util.Map;
 /**
  *
  */
-public class ArcProps implements Struct {
+public class ArcProps<P extends WorkloadProps> implements Struct {
     Map<String, SourceDataset> sources;
     Map<String, SinkDataset> sinks;
 
     Map<String, ManifestURI> sourceManifestPaths;
     Map<String, ManifestURI> sinkManifestPaths;
 
+    P workloadProps;
+
     public ArcProps() {
     }
 
-    public static Builder builder() {
+    public static <P extends WorkloadProps> Builder<P> builder() {
         return Builder.anArcProps();
     }
 
@@ -48,45 +51,56 @@ public class ArcProps implements Struct {
         return sinkManifestPaths;
     }
 
-    public static final class Builder {
+    public P workloadProps() {
+        return workloadProps;
+    }
+
+    public static final class Builder<P extends WorkloadProps> {
         Map<String, SourceDataset> sources;
         Map<String, SinkDataset> sinks;
         Map<String, ManifestURI> sourceManifestPaths;
         Map<String, ManifestURI> sinkManifestPaths;
+        P workloadProps;
 
         private Builder() {
         }
 
-        public static Builder anArcProps() {
-            return new Builder();
+        private static <P extends WorkloadProps> Builder<P> anArcProps() {
+            return new Builder<>();
         }
 
-        public Builder withSources(Map<String, SourceDataset> sources) {
+        public Builder<P> withSources(Map<String, SourceDataset> sources) {
             this.sources = sources;
             return this;
         }
 
-        public Builder withSinks(Map<String, SinkDataset> sinks) {
+        public Builder<P> withSinks(Map<String, SinkDataset> sinks) {
             this.sinks = sinks;
             return this;
         }
 
-        public Builder withSourceManifestPaths(Map<String, ManifestURI> sourceManifestPaths) {
+        public Builder<P> withSourceManifestPaths(Map<String, ManifestURI> sourceManifestPaths) {
             this.sourceManifestPaths = sourceManifestPaths;
             return this;
         }
 
-        public Builder withSinkManifestPaths(Map<String, ManifestURI> sinkManifestPaths) {
+        public Builder<P> withSinkManifestPaths(Map<String, ManifestURI> sinkManifestPaths) {
             this.sinkManifestPaths = sinkManifestPaths;
             return this;
         }
 
-        public ArcProps build() {
-            ArcProps arcProps = new ArcProps();
-            arcProps.sinks = this.sinks;
-            arcProps.sourceManifestPaths = this.sourceManifestPaths;
+        public Builder<P> withWorkloadProps(P workloadProps) {
+            this.workloadProps = workloadProps;
+            return this;
+        }
+
+        public ArcProps<P> build() {
+            ArcProps<P> arcProps = new ArcProps<>();
             arcProps.sources = this.sources;
+            arcProps.sinks = this.sinks;
+            arcProps.workloadProps = this.workloadProps;
             arcProps.sinkManifestPaths = this.sinkManifestPaths;
+            arcProps.sourceManifestPaths = this.sourceManifestPaths;
             return arcProps;
         }
     }

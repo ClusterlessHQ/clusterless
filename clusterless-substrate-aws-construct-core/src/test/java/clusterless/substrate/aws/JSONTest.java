@@ -11,6 +11,7 @@ package clusterless.substrate.aws;
 import clusterless.json.JSONUtil;
 import clusterless.model.Model;
 import clusterless.model.deploy.Extensible;
+import clusterless.substrate.aws.arc.s3copy.S3CopyArc;
 import clusterless.substrate.aws.boundary.s3put.S3PutListenerBoundary;
 import clusterless.substrate.aws.resource.eventbridge.EventBridgeResource;
 import clusterless.substrate.aws.resource.s3.S3BucketResource;
@@ -27,7 +28,7 @@ public class JSONTest {
     @ParameterizedTest
     @ValueSource(classes = {
             S3PutListenerBoundary.class,
-//            S3CopyWorkload.class,
+            S3CopyArc.class,
             EventBridgeResource.class,
             S3BucketResource.class
     })

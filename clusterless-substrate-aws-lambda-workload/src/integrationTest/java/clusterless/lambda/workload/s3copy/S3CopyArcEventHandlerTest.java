@@ -40,7 +40,7 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
     }
 
     @Override
-    protected ArcProps getProps() {
+    protected ArcProps<?> getProps() {
         return ArcProps.builder()
                 .withSources(datasets().sourceDatasetMap())
                 .withSourceManifestPaths(datasets().sourceManifestPathMap())

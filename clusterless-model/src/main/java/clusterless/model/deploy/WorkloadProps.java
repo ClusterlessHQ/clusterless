@@ -13,14 +13,5 @@ import clusterless.model.Struct;
 /**
  *
  */
-public class Workload<W extends WorkloadProps> implements Struct {
-    W workloadProps;
-
-    public Workload(W workloadProps) {
-        this.workloadProps = workloadProps;
-    }
-
-    public W workloadProps() {
-        return workloadProps;
-    }
+public class WorkloadProps implements Struct {
 }

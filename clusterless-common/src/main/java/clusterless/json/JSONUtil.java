@@ -156,6 +156,10 @@ public class JSONUtil {
         }
     }
 
+    public static <T> T treeToValue(JsonNode n, Class<T> type) throws JsonProcessingException {
+        return OBJECT_MAPPER.treeToValue(n, type);
+    }
+
     public static <E> ObjectReader objectReaderFor(Class<E> type) {
         return OBJECT_MAPPER.readerFor(type);
     }

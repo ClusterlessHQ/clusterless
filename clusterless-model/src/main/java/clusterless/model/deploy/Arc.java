@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  *
  */
-public class Arc<W extends Workload> extends Extensible {
+public class Arc<W extends Workload<?>> extends Extensible {
     @JsonProperty(required = true)
     String name;
     Map<String, SourceDataset> sources = new LinkedHashMap<>();

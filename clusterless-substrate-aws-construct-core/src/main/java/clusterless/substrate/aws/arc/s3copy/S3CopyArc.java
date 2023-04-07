@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.arc.s3copy;
 
+import clusterless.lambda.workload.s3copy.S3CopyProps;
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Workload;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
@@ -17,18 +18,21 @@ import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
  */
 public class S3CopyArc extends Arc<S3CopyArc.CopyWorkload> {
 
-    public static class CopyWorkload extends Workload {
+    public static class CopyWorkload extends Workload<S3CopyProps> {
         LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
                 LambdaJavaRuntimeProps.MEM_512MB,
                 3,
                 15
         );
 
+        public CopyWorkload() {
+            super(new S3CopyProps());
+        }
+
         public LambdaJavaRuntimeProps runtimeProps() {
             return runtimeProps;
         }
     }
-
 
     public S3CopyArc() {
         super(new CopyWorkload());

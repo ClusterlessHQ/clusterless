@@ -10,6 +10,7 @@ package clusterless.substrate.aws.arc.s3copy;
 
 import clusterless.lambda.arc.ArcProps;
 import clusterless.lambda.workload.s3copy.S3CopyArcEventHandler;
+import clusterless.model.deploy.WorkloadProps;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
@@ -52,11 +53,12 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, e.getValue())));
 
-        ArcProps arcProps = ArcProps.builder()
+        ArcProps<WorkloadProps> arcProps = ArcProps.builder()
                 .withSources(model().sources())
                 .withSinks(model().sinks())
                 .withSourceManifestPaths(sourceManifestPaths)
                 .withSinkManifestPaths(sinkManifestPaths)
+                .withWorkloadProps(model.workload().workloadProps())
                 .build();
 
         Map<String, String> environment = Env.toEnv(arcProps);

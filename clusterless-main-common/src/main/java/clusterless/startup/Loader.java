@@ -9,7 +9,9 @@
 package clusterless.startup;
 
 import clusterless.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.File;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -62,7 +65,16 @@ public class Loader {
         int count = 0;
         for (JsonNode jsonNode : arrayNode) {
             if (retainFilter.test(jsonNode)) {
-                results.add(function.apply(JSONUtil.treeToValueSafe(jsonNode, type), count++));
+                try {
+                    results.add(function.apply(JSONUtil.treeToValue(jsonNode, type), count++));
+                } catch (UnrecognizedPropertyException e) {
+                    // todo: support proper exit code
+                    // Unrecognized field "<propertyName>" (class <className>), not marked as ignorable (one known property: "<best guess property>"])
+                    String path = e.getPath().stream().map(r -> r.getFieldName() == null ? "[" + r.getIndex() + "]" : r.getFieldName()).collect(Collectors.joining("."));
+                    throw new IllegalArgumentException("invalid file format for \"" + type.getName() + "\", unrecognized field \"" + path + "\"", e);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
