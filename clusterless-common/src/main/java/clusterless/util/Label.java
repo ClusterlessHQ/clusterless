@@ -93,6 +93,11 @@ public interface Label {
             public Label abbreviated() {
                 return abbr;
             }
+
+            @Override
+            public String toString() {
+                return camelCase();
+            }
         };
     }
 
@@ -131,6 +136,11 @@ public interface Label {
             @Override
             public String shortLowerUnderscore() {
                 return this.camelCase();
+            }
+
+            @Override
+            public String toString() {
+                return camelCase();
             }
         };
     }
@@ -228,6 +238,11 @@ public interface Label {
             @Override
             public String shortLowerUnderscore() {
                 return String.format("%s_%s", Label.this.shortLowerUnderscore(), label.shortLowerUnderscore());
+            }
+
+            @Override
+            public String toString() {
+                return camelCase();
             }
         };
     }
