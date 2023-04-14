@@ -72,6 +72,8 @@ dependencies {
         implementation("org.apache.logging.log4j:log4j-core:$log4j")
         implementation("org.apache.logging.log4j:log4j-jul:$log4j")
         implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4j")
+        implementation("org.apache.logging.log4j:log4j-to-slf4j:$log4j")
+        implementation("org.apache.logging.log4j:log4j-web:$log4j")
 
         implementationAndTestFixture("com.google.guava:guava:31.1-jre")
 
@@ -81,6 +83,7 @@ dependencies {
         implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-joda:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jackson")
+        implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jackson")
 
         val awsSdk = "2.19.29"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")

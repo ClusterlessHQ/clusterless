@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
+
+import static clusterless.json.JSONUtil.readPropertiesSafe;
 
 /**
  *
@@ -59,5 +62,31 @@ public class ConfigTest {
         Assertions.assertEquals("a1", resultConfig.a);
         Assertions.assertEquals("b", resultConfig.b);
         Assertions.assertEquals("c", resultConfig.c);
+    }
+
+    @Test
+    void verifyDefaultsProperties() {
+        Properties properties = new Properties();
+
+        properties.setProperty("common.c", "cp");
+        properties.setProperty("unknown.c", "cp");
+
+        TestConfig overrideConfig = new TestConfig("a1", null, null);
+        TestConfig defaultConfig = new TestConfig("a", "b", "c");
+
+        List<ObjectNode> configs = new LinkedList<>();
+
+        configs.add(JSONUtil.valueToObjectNodeNoNulls(readPropertiesSafe(properties, "common", TestConfig.class)));
+        configs.add(JSONUtil.valueToObjectNodeNoNulls(overrideConfig));
+        configs.add(JSONUtil.valueToObjectNodeNoNulls(defaultConfig));
+
+        TestConfig resultConfig = ConfigManager.mergeIntoConfig(configs, TestConfig.class);
+
+        Assertions.assertNotNull(resultConfig.a);
+        Assertions.assertNotNull(resultConfig.b);
+        Assertions.assertNotNull(resultConfig.c);
+        Assertions.assertEquals("a1", resultConfig.a);
+        Assertions.assertEquals("b", resultConfig.b);
+        Assertions.assertEquals("cp", resultConfig.c);
     }
 }

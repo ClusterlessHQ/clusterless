@@ -8,27 +8,31 @@
 
 package clusterless.config;
 
+import clusterless.util.Lazy;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.function.Supplier;
 
 /**
  *
  */
 public class Configurations {
-    final Map<String, Configuration> configMap = new LinkedHashMap<>();
+    private final Supplier<Properties> properties;
+    final Map<String, Lazy<Configuration>> configMap = new LinkedHashMap<>();
 
-    public Configurations() {
+    public Configurations(Supplier<Properties> properties) {
+        this.properties = properties;
     }
 
     public void add(ConfigOptions configOptions) {
-        Configuration config = ConfigManager.loadConfig(configOptions);
-
-        configMap.put(config.name(), config);
+        configMap.put(configOptions.configNamespace(), Lazy.of(() -> ConfigManager.loadConfig(properties.get(), configOptions)));
     }
 
     public <C extends Config> C get(String name) {
         if (configMap.containsKey(name)) {
-            return (C) configMap.get(name);
+            return (C) configMap.get(name).get();
         }
 
         throw new IllegalStateException("config not found: " + name);

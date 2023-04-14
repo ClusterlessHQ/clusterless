@@ -17,6 +17,7 @@ public class CommonConfig extends Configuration {
     public static final ConfigOptions configOptions = ConfigOptions.Builder.builder()
             .withLocalConfigName(Paths.get(ConfigManager.LOCAL_CONFIG_NAME))
             .withGlobalConfigName(Paths.get(ConfigManager.GLOBAL_CONFIG_NAME))
+            .withConfigNamespace("common")
             .withConfigClass(CommonConfig.class)
             .build();
 

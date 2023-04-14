@@ -74,5 +74,4 @@ public class Deploy extends CommonCommand implements Callable<Integer> {
 
         return processExec.executeLifecycleProcess(getConfig(), commandOptions, "deploy", commandArgs);
     }
-
 }

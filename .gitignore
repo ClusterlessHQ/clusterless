@@ -4,3 +4,4 @@ out
 build
 workspace
 cdk.out
+gradle.properties

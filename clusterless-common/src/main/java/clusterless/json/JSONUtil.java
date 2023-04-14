@@ -18,12 +18,16 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS;
@@ -38,16 +42,24 @@ public class JSONUtil {
             new JavaTimeModule()
     );
 
-    private static ObjectMapper create() {
+    private static ObjectMapper createObjectMapper() {
         return new ObjectMapper()
                 .registerModules(modules)
                 .configure(WRITE_DATES_AS_TIMESTAMPS, false)
                 .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
     }
 
-    public static final ObjectMapper OBJECT_MAPPER = create();
+    private static JavaPropsMapper createPropertiesMapper() {
+        return (JavaPropsMapper) new JavaPropsMapper()
+                .registerModules(modules)
+                .configure(WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
+    }
 
-    public static final ObjectMapper OBJECT_MAPPER_NO_NULL = create()
+    public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
+    public static final JavaPropsMapper PROPERTIES_MAPPER = createPropertiesMapper();
+
+    public static final ObjectMapper OBJECT_MAPPER_NO_NULL = createObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_NULL);
     public static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer();
 
@@ -92,7 +104,7 @@ public class JSONUtil {
         return OBJECT_MAPPER_NO_NULL.valueToTree(object);
     }
 
-    public static ObjectNode valueToObjectNode(Object object) throws IOException {
+    public static ObjectNode valueToObjectNode(Object object) {
         return OBJECT_MAPPER.valueToTree(object);
     }
 
@@ -127,6 +139,23 @@ public class JSONUtil {
     public static <T> T readObjectSafe(String json, Class<T> type) {
         try {
             return OBJECT_READER.readValue(json, type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T readObjectSafe(Path path, Class<T> type) {
+        try {
+            return OBJECT_READER.readValue(path.toFile(), type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T readPropertiesSafe(Properties properties, String namespace, Class<T> type) {
+        try {
+            JavaPropsSchema schema = JavaPropsSchema.emptySchema().withPrefix(namespace);
+            return PROPERTIES_MAPPER.readPropertiesAs(properties, schema, type);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

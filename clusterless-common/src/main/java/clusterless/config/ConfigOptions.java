@@ -16,6 +16,7 @@ public class ConfigOptions {
     private final Path globalConfigName;
     private final Path localPath;
     private final Path localConfigName;
+    private final String configNamespace;
     private final Class<? extends Configuration> configClass;
 
     private ConfigOptions(Builder builder) {
@@ -24,6 +25,7 @@ public class ConfigOptions {
         globalConfigName = builder.globalConfigName;
         localPath = builder.localPath;
         localConfigName = builder.localConfigName;
+        configNamespace = builder.configNamespace;
         configClass = builder.configClass;
     }
 
@@ -47,6 +49,10 @@ public class ConfigOptions {
         return localConfigName;
     }
 
+    public String configNamespace() {
+        return configNamespace;
+    }
+
     public Class<? extends Configuration> configClass() {
         return configClass;
     }
@@ -60,6 +66,7 @@ public class ConfigOptions {
         private Path globalConfigName;
         private Path localPath = ConfigManager.CURRENT_DIR;
         private Path localConfigName;
+        private String configNamespace;
         private Class<? extends Configuration> configClass;
 
         private Builder() {
@@ -121,6 +128,17 @@ public class ConfigOptions {
          */
         public Builder withLocalConfigName(Path localConfigName) {
             this.localConfigName = localConfigName;
+            return this;
+        }
+
+        /**
+         * Sets the {@code configNamespace} and returns a reference to this Builder enabling method chaining.
+         *
+         * @param val the {@code configNamespace} to set
+         * @return a reference to this Builder
+         */
+        public Builder withConfigNamespace(String val) {
+            configNamespace = val;
             return this;
         }
 

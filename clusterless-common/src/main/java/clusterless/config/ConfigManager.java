@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,11 +28,16 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
+
+import static clusterless.json.JSONUtil.readPropertiesSafe;
+import static clusterless.json.JSONUtil.valueToObjectNodeNoNulls;
 
 /**
  *
  */
 public class ConfigManager {
+    private static final Logger LOG = LogManager.getLogger(ConfigManager.class);
     public static final Path CURRENT_DIR = Paths.get(".").toAbsolutePath().normalize();
     public static final Path HOME_DIR = Paths.get(System.getProperty("user.home")).toAbsolutePath().normalize();
     public static final Path GLOBAL_CONFIG_DIR = HOME_DIR.resolve(Paths.get(".cls"));
@@ -88,6 +95,7 @@ public class ConfigManager {
         return ConfigOptions.Builder.builder()
                 .withGlobalConfigName(Paths.get(String.format("%s-%s", GLOBAL_CONFIG_NAME, name)))
                 .withLocalConfigName(Paths.get(String.format("%s-%s", LOCAL_CONFIG_NAME, name)))
+                .withConfigNamespace(name)
                 .withConfigClass(configClass)
                 .build();
     }
@@ -113,7 +121,19 @@ public class ConfigManager {
     }
 
     public static <C extends Configuration> C loadConfig(ConfigOptions configOptions) {
+        return loadConfig(new Properties(), configOptions);
+    }
+
+    public static <C extends Configuration> C loadConfig(Properties properties, ConfigOptions configOptions) {
         List<ObjectNode> configs = new LinkedList<>();
+
+        // properties take precedence over config files
+        // currently system properties are not considered
+        if (!properties.isEmpty()) {
+            LOG.info("provided properties: {}", properties);
+
+            configs.add(valueToObjectNodeNoNulls(readPropertiesSafe(properties, configOptions.configNamespace(), configOptions.configClass())));
+        }
 
         Path currentDir = configOptions.localPath();
 

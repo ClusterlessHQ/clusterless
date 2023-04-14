@@ -52,6 +52,6 @@ distributions {
 
 idea {
     module {
-        sourceDirs.add(file("src/main/cdk"))
+        resourceDirs.add(file("src/main/cdk"))
     }
 }

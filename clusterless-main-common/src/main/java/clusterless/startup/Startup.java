@@ -16,6 +16,7 @@ import picocli.CommandLine;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  *
@@ -54,10 +55,20 @@ public class Startup {
     @CommandLine.Mixin
     Printer printer = new Printer();
 
-    Configurations configurations = new Configurations();
+    @CommandLine.Option(
+            names = {"-D", "--property"},
+            mapFallbackValue = "",
+            description = "key=value properties, will be passed down")
+    Properties properties = new Properties();
+
+    Configurations configurations = new Configurations(this::properties);
 
     public Startup() {
         configurations.add(CommonConfig.configOptions);
+    }
+
+    public Properties properties() {
+        return properties;
     }
 
     public Configurations configurations() {
