@@ -27,6 +27,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
@@ -156,6 +157,15 @@ public class JSONUtil {
         try {
             JavaPropsSchema schema = JavaPropsSchema.emptySchema().withPrefix(namespace);
             return PROPERTIES_MAPPER.readPropertiesAs(properties, schema, type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static Map<String, String> asMapSafe(String namespace, Object object) {
+        try {
+            JavaPropsSchema schema = JavaPropsSchema.emptySchema().withPrefix(namespace);
+            return PROPERTIES_MAPPER.writeValueAsMap(object, schema);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -68,7 +68,7 @@ public class Main extends Startup implements Callable<Integer> {
             return;
         }
 
-        commandLine.execute(args);
+        System.exit(commandLine.execute(args));
     }
 
     public Main(String[] args) {

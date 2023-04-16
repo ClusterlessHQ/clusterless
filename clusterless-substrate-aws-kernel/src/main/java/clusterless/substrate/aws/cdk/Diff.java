@@ -27,6 +27,6 @@ public class Diff extends CommonCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "diff");
+        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, "diff");
     }
 }

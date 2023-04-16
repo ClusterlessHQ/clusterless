@@ -30,6 +30,6 @@ public class Verify extends CommonCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "synth");
+        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, "synth");
     }
 }

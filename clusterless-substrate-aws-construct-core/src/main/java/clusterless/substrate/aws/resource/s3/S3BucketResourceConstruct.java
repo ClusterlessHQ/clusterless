@@ -12,6 +12,8 @@ import clusterless.config.CommonConfig;
 import clusterless.substrate.aws.construct.ResourceConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.util.TagsUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.CfnOutputProps;
@@ -27,6 +29,7 @@ import java.util.Locale;
  *
  */
 public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResource> {
+    private static final Logger LOG = LogManager.getLogger(S3BucketResourceConstruct.class);
     private final IBucket bucket;
 
     public S3BucketResourceConstruct(@NotNull ManagedComponentContext context, @NotNull S3BucketResource model) {
@@ -35,6 +38,10 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
         CommonConfig config = context.configurations().get("common");
 
         boolean removeOnDestroy = config.resource().removeAllOnDestroy() || model().removeOnDestroy();
+
+        if (removeOnDestroy) {
+            LOG.info("resource: {}, and all objects will be removed on destroy: {}", model().bucketName(), removeOnDestroy);
+        }
 
         bucket = constructWithinHandler(() -> Bucket.Builder.create(this, id(model().bucketName()))
                 .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)

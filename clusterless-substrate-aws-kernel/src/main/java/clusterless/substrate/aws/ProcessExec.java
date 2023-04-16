@@ -9,6 +9,9 @@
 package clusterless.substrate.aws;
 
 import clusterless.command.LifecycleCommandOptions;
+import clusterless.config.CommonConfig;
+import clusterless.config.Configuration;
+import clusterless.json.JSONUtil;
 import clusterless.startup.Startup;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
@@ -116,29 +119,32 @@ public class ProcessExec {
         return cdk();
     }
 
-    public Integer executeLifecycleProcess(@NotNull AwsConfig config, @NotNull LifecycleCommandOptions commandOptions, @NotNull String cdkCommand) {
-        return executeLifecycleProcess(config, commandOptions, cdkCommand, Collections.emptyList());
+    public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull LifecycleCommandOptions commandOptions, @NotNull String cdkCommand) {
+        return executeLifecycleProcess(commonConfig, awsConfig, commandOptions, cdkCommand, Collections.emptyList());
     }
 
-    public Integer executeLifecycleProcess(@NotNull AwsConfig config, @NotNull LifecycleCommandOptions commandOptions, @NotNull String cdkCommand, @NotNull List<String> cdkCommandArgs) {
+    public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull LifecycleCommandOptions commandOptions, @NotNull String cdkCommand, @NotNull List<String> cdkCommandArgs) {
         List<String> kernelArgs = List.of("--project", filesAsArg(commandOptions.projectFiles()));
 
-        return executeCDKApp(config, cdkCommand, cdkCommandArgs, "synth", kernelArgs);
+        return executeCDKApp(commonConfig, awsConfig, cdkCommand, cdkCommandArgs, "synth", kernelArgs);
     }
 
-    public Integer executeCDKApp(@NotNull AwsConfig config, @NotNull String cdkCommand, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
-        return executeCDKApp(config, cdkCommand, Collections.emptyList(), kernelCommand, kernelArgs);
-    }
-
-    public Integer executeCDKApp(@NotNull AwsConfig config, @NotNull String cdkCommand, @NotNull List<String> commandArgs, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
+    public Integer executeCDKApp(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull String cdkCommand, @NotNull List<String> commandArgs, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
         List<String> cdkCommands = new LinkedList<>();
 
         cdkCommands.add(
                 getCKDBinary()
         );
 
+        List<String> appArgs = addPropertiesToArgs(commonConfig, awsConfig);
+
         // execute the aws-cli app with the synth command
-        String awsKernel = ("%s %s %s").formatted(cdkApp(), kernelCommand, Joiner.on(" ").join(kernelArgs));
+        String awsKernel = Joiner.on(" ").join(
+                cdkApp(),
+                Joiner.on(" ").join(appArgs),
+                kernelCommand,
+                Joiner.on(" ").join(kernelArgs)
+        );
 
         // options only added if value is not null
         cdkCommands.addAll(
@@ -162,6 +168,20 @@ public class ProcessExec {
         cdkCommands.addAll(commandArgs);
 
         return executeProcess(cdkCommands);
+    }
+
+    @NotNull
+    private static List<String> addPropertiesToArgs(@NotNull Configuration... configs) {
+        List<String> apArgs = new LinkedList<>();
+        Map<String, String> properties = new LinkedHashMap<>();
+
+        for (Configuration config : configs) {
+            properties.putAll(JSONUtil.asMapSafe(config.name(), config));
+        }
+
+        Startup.asPropertyArgs(apArgs, properties);
+
+        return apArgs;
     }
 
     private String createOutputPath() {
@@ -216,7 +236,11 @@ public class ProcessExec {
 
         Process process = processBuilder.start();
 
-        return process.waitFor();
+        int exitCode = process.waitFor();
+
+        LOG.info("completed with exit code: {}", exitCode);
+
+        return exitCode;
     }
 
     private Map<String, String> getEnvironment() {

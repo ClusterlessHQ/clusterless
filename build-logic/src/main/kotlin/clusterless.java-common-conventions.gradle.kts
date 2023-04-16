@@ -27,7 +27,7 @@ repositories {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
-        vendor.set(JvmVendorSpec.GRAAL_VM)
+//        vendor.set(JvmVendorSpec.GRAAL_VM)
     }
 }
 
@@ -67,7 +67,7 @@ dependencies {
         // manage dependency versions here
         implementation("info.picocli:picocli:4.7.1")
 
-        val log4j = "2.19.0"
+        val log4j = "2.20.0"
         implementation("org.apache.logging.log4j:log4j-api:$log4j")
         implementation("org.apache.logging.log4j:log4j-core:$log4j")
         implementation("org.apache.logging.log4j:log4j-jul:$log4j")

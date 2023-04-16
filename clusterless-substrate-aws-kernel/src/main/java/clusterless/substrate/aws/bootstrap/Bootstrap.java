@@ -74,7 +74,7 @@ public class Bootstrap extends CommonCommand implements Callable<Integer> {
         List<String> kernelArgs = Lists.concat(List.of("--synth"), args);
 
         processExec.setUseTempOutput(true);
-        processExec.executeCDKApp(getConfig(), "deploy", getRequireDeployApproval(), "bootstrap", kernelArgs);
+        processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), "deploy", getRequireDeployApproval(), "bootstrap", kernelArgs);
 
         return 0;
     }

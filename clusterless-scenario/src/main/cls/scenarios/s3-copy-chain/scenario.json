@@ -1,0 +1,7 @@
+{
+  "name": "copy-chain",
+  "description": "chained copy workloads",
+  "projectFiles": [
+    "test-s3-copy-arc-project-chain.json"
+  ]
+}

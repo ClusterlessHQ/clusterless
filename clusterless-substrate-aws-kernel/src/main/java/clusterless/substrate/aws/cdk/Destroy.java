@@ -27,7 +27,12 @@ public class Destroy extends CommonCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-
-        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "destroy", getRequireDestroyApproval());
+        return processExec.executeLifecycleProcess(
+                getCommonConfig(),
+                getProviderConfig(),
+                commandOptions,
+                "destroy",
+                getRequireDestroyApproval()
+        );
     }
 }

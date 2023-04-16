@@ -16,6 +16,8 @@ import picocli.CommandLine;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -47,6 +49,12 @@ public class Startup {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void asPropertyArgs(List<String> args, Map<String, String> properties) {
+        properties.entrySet().stream()
+                .map((e) -> e.getKey() + "=" + e.getValue()).
+                forEach(p -> args.addAll(List.of("-D", p)));
     }
 
     @CommandLine.Mixin

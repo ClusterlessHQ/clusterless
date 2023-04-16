@@ -12,7 +12,7 @@ package clusterless.config;
  *
  */
 public class ResourceConfig extends Config {
-    private boolean removeAllOnDestroy = false;
+    boolean removeAllOnDestroy = false;
 
     public ResourceConfig() {
     }

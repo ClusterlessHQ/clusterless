@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.config.CommonConfig;
 import clusterless.substrate.aws.cdk.CDK;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
@@ -22,20 +23,24 @@ public class CommonCommand {
     @CommandLine.ParentCommand
     protected Kernel kernel;
 
-    protected AwsConfig getConfig() {
+    protected CommonConfig getCommonConfig() {
+        return kernel.configurations().get("common");
+    }
+
+    protected AwsConfig getProviderConfig() {
         return kernel.configurations().get(CDK.PROVIDER);
     }
 
     @NotNull
     protected List<String> getRequireDeployApproval() {
         return List.of(
-                "--require-approval", getConfig().cdk().requireDeployApproval().value()
+                "--require-approval", getProviderConfig().cdk().requireDeployApproval().value()
         );
     }
 
     @NotNull
     protected List<String> getRequireDestroyApproval() {
-        if (getConfig().cdk().requireDestroyApproval) {
+        if (!getProviderConfig().cdk().requireDestroyApproval()) {
             return List.of(
                     "--force"
             );

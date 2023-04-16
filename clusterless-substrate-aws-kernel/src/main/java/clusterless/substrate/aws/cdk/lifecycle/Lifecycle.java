@@ -41,7 +41,7 @@ public class Lifecycle {
     ComponentServices componentServices = ComponentServices.INSTANCE;
 
     StackGroups stackGroups = new StackGroups();
-    private Configurations configurations;
+    Configurations configurations;
 
     public Lifecycle() {
     }
@@ -106,7 +106,7 @@ public class Lifecycle {
 
         List<ManagedStack> priorStacks = new ArrayList<>(managedProject.stacks());
 
-        for (Arc<? extends Workload> arc : deployable.arcs()) {
+        for (Arc<? extends Workload<?>> arc : deployable.arcs()) {
             ComponentService<ComponentContext, Model, Component> modelComponentService = managed.get(arc);
 
             if (modelComponentService == null) {

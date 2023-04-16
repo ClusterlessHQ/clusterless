@@ -44,3 +44,6 @@ include("clusterless-substrate-aws-service-transform")
 
 // core lambda workloads
 include("clusterless-substrate-aws-lambda-workload")
+
+// test scenarios
+include("clusterless-scenario")

@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -70,8 +69,12 @@ public class Deploy extends CommonCommand implements Callable<Integer> {
             throw new IllegalStateException(message);
         }
 
-        List<String> commandArgs = getRequireDeployApproval();
-
-        return processExec.executeLifecycleProcess(getConfig(), commandOptions, "deploy", commandArgs);
+        return processExec.executeLifecycleProcess(
+                getCommonConfig(),
+                getProviderConfig(),
+                commandOptions,
+                "deploy",
+                getRequireDeployApproval()
+        );
     }
 }
