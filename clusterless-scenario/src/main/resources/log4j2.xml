@@ -7,7 +7,7 @@
   ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
   -->
 
-<Configuration status="off" name="clusterless" packages="">
+<Configuration status="off" name="clusterless">
     <Appenders>
         <Console name="STDERR" target="SYSTEM_ERR">
             <!--            <PatternLayout pattern="%m%n"/>-->
