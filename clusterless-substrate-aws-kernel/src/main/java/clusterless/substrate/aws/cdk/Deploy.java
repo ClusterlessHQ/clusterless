@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 public class Deploy extends CommonCommand implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Deploy.class);
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec();
-    @CommandLine.Mixin
     DeployCommandOptions commandOptions = new DeployCommandOptions();
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec(commandOptions);
 
     @Override
     public Integer call() throws Exception {

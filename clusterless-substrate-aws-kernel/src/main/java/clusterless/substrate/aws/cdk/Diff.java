@@ -20,10 +20,10 @@ import java.util.concurrent.Callable;
 )
 public class Diff extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec();
-
-    @CommandLine.Mixin
     DiffCommandOptions commandOptions = new DiffCommandOptions();
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec(commandOptions);
+
 
     @Override
     public Integer call() throws Exception {

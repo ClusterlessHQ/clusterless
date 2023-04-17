@@ -20,10 +20,9 @@ import java.util.concurrent.Callable;
 )
 public class Verify extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec();
-
-    @CommandLine.Mixin
     VerifyCommandOptions commandOptions = new VerifyCommandOptions();
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec(commandOptions);
 
     public Verify() {
     }

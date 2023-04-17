@@ -21,9 +21,9 @@ import java.util.concurrent.Callable;
 )
 public class Destroy extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec();
-    @CommandLine.Mixin
     DestroyCommandOptions commandOptions = new DestroyCommandOptions();
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec(commandOptions);
 
     @Override
     public Integer call() throws Exception {

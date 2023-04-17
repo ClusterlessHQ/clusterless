@@ -39,10 +39,9 @@ import java.util.concurrent.Callable;
 )
 public class Bootstrap extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec();
-
-    @CommandLine.Mixin
     BootstrapCommandOptions commandOptions = new BootstrapCommandOptions();
+    @CommandLine.Mixin
+    ProcessExec processExec = new ProcessExec(commandOptions);
 
     @Override
     public Integer call() throws Exception {

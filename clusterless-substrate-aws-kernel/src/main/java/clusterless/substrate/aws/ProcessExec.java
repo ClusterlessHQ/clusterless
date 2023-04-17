@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.command.CommonCommandOptions;
 import clusterless.command.LifecycleCommandOptions;
 import clusterless.config.CommonConfig;
 import clusterless.config.Configuration;
@@ -28,6 +29,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -44,8 +46,7 @@ import java.util.stream.Collectors;
 public class ProcessExec {
     private static final Logger LOG = LogManager.getLogger(ProcessExec.class);
 
-    @CommandLine.Option(names = "--dry-run", description = "do not execute underlying cdk binary")
-    private boolean dryRun = false;
+    private Supplier<Boolean> dryRun = () -> false;
 
     @CommandLine.Option(names = "--cdk", description = {"path to the cdk binary", "uses $PATH by default to search for 'cdk'"})
     private String cdk = "cdk";
@@ -81,8 +82,16 @@ public class ProcessExec {
     public ProcessExec() {
     }
 
+    public ProcessExec(CommonCommandOptions commandOptions) {
+        this(commandOptions::dryRun);
+    }
+
+    public ProcessExec(Supplier<Boolean> dryRun) {
+        this.dryRun = dryRun;
+    }
+
     public boolean dryRun() {
-        return dryRun;
+        return dryRun.get();
     }
 
     public String cdk() {
@@ -225,7 +234,7 @@ public class ProcessExec {
         LOG.info("command: {}", args);
 
         if (dryRun()) {
-            LOG.info("dry run, not executing command");
+            LOG.warn("dry run, not executing command: {}", args);
             return 0;
         }
 
