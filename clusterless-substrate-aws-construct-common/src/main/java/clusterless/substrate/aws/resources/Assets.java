@@ -47,12 +47,12 @@ public class Assets {
         }
 
         if (files.isEmpty()) {
-            throw new IllegalStateException("no assets matching: %s found in: %s".formatted(pattern, assetDistributionPath.toAbsolutePath()));
+            throw new IllegalStateException(String.format("no assets matching: %s found in: %s", pattern, assetDistributionPath.toAbsolutePath()));
         }
 
         if (files.size() > 1) {
             Set<Path> collect = files.stream().map(Path::getFileName).collect(Collectors.toSet());
-            throw new IllegalStateException("too many assets matching: %s found in: %s, found: %s".formatted(pattern, assetDistributionPath.toAbsolutePath(), collect));
+            throw new IllegalStateException(String.format("too many assets matching: %s found in: %s, found: %s", pattern, assetDistributionPath.toAbsolutePath(), collect));
         }
 
         Path path = files.get(0);

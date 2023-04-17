@@ -110,7 +110,7 @@ public class Lifecycle {
             ComponentService<ComponentContext, Model, Component> modelComponentService = managed.get(arc);
 
             if (modelComponentService == null) {
-                String message = "component service not found in arc: %s, type: %s".formatted(arc.name(), arc.type());
+                String message = String.format("component service not found in arc: %s, type: %s", arc.name(), arc.type());
                 LOG.error(message);
                 throw new IllegalStateException(message);
             }
@@ -164,7 +164,7 @@ public class Lifecycle {
         containers.entrySet().stream().filter(e -> e.getValue() != null).forEach(e -> {
             Extensible extensible = e.getKey();
             ComponentService<ComponentContext, Model, Component> modelComponentService = e.getValue();
-            LOG.info("creating %s construct: %s".formatted(extensible.label(), extensible.type()));
+            LOG.info("creating {} construct: {}", extensible.label(), extensible.type());
             modelComponentService.create(context, extensible);
         });
     }
@@ -208,13 +208,16 @@ public class Lifecycle {
 
     @NotNull
     private static List<Extensible> getExtensiblesFor(ModelType modelType, Deployable deployableModel) {
-        List<Extensible> extensibles = Collections.emptyList();
         switch (modelType) {
-            case Resource -> extensibles = new ArrayList<>(deployableModel.resources());
-            case Boundary -> extensibles = new ArrayList<>(deployableModel.boundaries());
-            case Arc -> extensibles = new ArrayList<>(deployableModel.arcs());
+            case Resource:
+                return new ArrayList<>(deployableModel.resources());
+            case Boundary:
+                return new ArrayList<>(deployableModel.boundaries());
+            case Arc:
+                return new ArrayList<>(deployableModel.arcs());
         }
-        return extensibles;
+
+        return Collections.emptyList();
     }
 
     private static Set<String> verifyNonNull(String propertyName, Set<String> values) {

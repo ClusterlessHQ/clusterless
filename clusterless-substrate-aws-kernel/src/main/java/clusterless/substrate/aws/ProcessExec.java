@@ -52,7 +52,7 @@ public class ProcessExec {
     private String cdk = "cdk";
 
     @CommandLine.Option(names = "--cdk-app", description = "path to the cls-aws kernel")
-    private String cdkApp = URIs.normalize("%s/bin/cls-aws".formatted(System.getProperty(Startup.CLUSTERLESS_HOME)));
+    private String cdkApp = URIs.normalize(String.format("%s/bin/cls-aws", System.getProperty(Startup.CLUSTERLESS_HOME)));
 
     @CommandLine.Option(
             names = "--use-localstack",

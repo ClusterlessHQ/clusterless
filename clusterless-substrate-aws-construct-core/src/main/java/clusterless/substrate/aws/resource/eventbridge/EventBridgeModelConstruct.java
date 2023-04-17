@@ -9,8 +9,8 @@
 package clusterless.substrate.aws.resource.eventbridge;
 
 import clusterless.managed.component.ResourceComponent;
-import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.construct.ModelConstruct;
+import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
@@ -34,13 +34,13 @@ public class EventBridgeModelConstruct extends ModelConstruct<EventBridgeResourc
                 .build();
 
         new CfnOutput(this, id("EventBusARN"), new CfnOutputProps.Builder()
-                .exportName("eventbus:%s:arn".formatted(model().eventBusName().toLowerCase(Locale.ROOT)))
+                .exportName(String.format("eventbus:%s:arn", model().eventBusName().toLowerCase(Locale.ROOT)))
                 .value(eventBus().getEventBusArn())
                 .description("event bus arn")
                 .build());
 
         new CfnOutput(this, id("EventBusName"), new CfnOutputProps.Builder()
-                .exportName("eventbus:%s:name".formatted(model().eventBusName().toLowerCase(Locale.ROOT)))
+                .exportName(String.format("eventbus:%s:name", model().eventBusName().toLowerCase(Locale.ROOT)))
                 .value(eventBus().getEventBusName())
                 .description("event bus name")
                 .build());

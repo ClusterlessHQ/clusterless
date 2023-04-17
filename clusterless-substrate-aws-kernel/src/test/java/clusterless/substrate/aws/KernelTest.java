@@ -35,69 +35,66 @@ public class KernelTest {
     };
 
     @Test
-    @StdIo("""
-            {
-            "project": {
-                "name" : "TestProject",
-                "version": "20230101-00"
-            },
-            "placement": {
-                "stage": "prod",
-                "provider": "aws",
-                "account": "abc123",
-                "region": "us-east-2"
-            },
-            "resources" : [
-                {
-                    "type" : "aws:core:s3Bucket",
-                    "bucketName" : "sample-bucket1"
-                },
-                {
-                    "type" : "aws:core:s3Bucket",
-                    "bucketName" : "sample-bucket2"
-                }
-                ]
-            }
-            """)
+    @StdIo("{\n" +
+           "\"project\": {\n" +
+           "    \"name\" : \"TestProject\",\n" +
+           "    \"version\": \"20230101-00\"\n" +
+           "},\n" +
+           "\"placement\": {\n" +
+           "    \"stage\": \"prod\",\n" +
+           "    \"provider\": \"aws\",\n" +
+           "    \"account\": \"abc123\",\n" +
+           "    \"region\": \"us-east-2\"\n" +
+           "},\n" +
+           "\"resources\" : [\n" +
+           "    {\n" +
+           "        \"type\" : \"aws:core:s3Bucket\",\n" +
+           "        \"bucketName\" : \"sample-bucket1\"\n" +
+           "    },\n" +
+           "    {\n" +
+           "        \"type\" : \"aws:core:s3Bucket\",\n" +
+           "        \"bucketName\" : \"sample-bucket2\"\n" +
+           "    }\n" +
+           "    ]\n" +
+           "}\n")
     void createResourcesProject() {
         Assertions.assertEquals(0, new Kernel().execute(args));
     }
 
     @Test
-    @StdIo("""
-            {
-              "project": {
-                "name": "TestProject",
-                "version": "20230101-00"
-              },
-              "placement": {
-                "stage": "prod",
-                "provider": "aws",
-                "account": "abc123",
-                "region": "us-east-2"
-              },
-              "arcs": [
-                {
-                  "type": "aws:core:s3CopyArc",
-                  "name": "copyWorkload",
-                  "sources": {
-                    "main": {
-                      "name": "ingress",
-                      "version": "20220101",
-                      "pathURI": "s3://clusterless-test/ingress/"
-                    }
-                  },
-                  "sinks": {
-                    "main": {
-                      "name": "copy",
-                      "version": "20230101",
-                      "pathURI": "s3://clusterless-test/copy/"
-                    }
-                  }
-                }
-              ]
-            }
-                     \s""")
+    @StdIo("{\n" +
+           "  \"project\": {\n" +
+           "    \"name\": \"TestProject\",\n" +
+           "    \"version\": \"20230101-00\"\n" +
+           "  },\n" +
+           "  \"placement\": {\n" +
+           "    \"stage\": \"prod\",\n" +
+           "    \"provider\": \"aws\",\n" +
+           "    \"account\": \"abc123\",\n" +
+           "    \"region\": \"us-east-2\"\n" +
+           "  },\n" +
+           "  \"arcs\": [\n" +
+           "    {\n" +
+           "      \"type\": \"aws:core:s3CopyArc\",\n" +
+           "      \"name\": \"copyWorkload\",\n" +
+           "      \"sources\": {\n" +
+           "        \"main\": {\n" +
+           "          \"name\": \"ingress\",\n" +
+           "          \"version\": \"20220101\",\n" +
+           "          \"pathURI\": \"s3://clusterless-test/ingress/\"\n" +
+           "        }\n" +
+           "      },\n" +
+           "      \"sinks\": {\n" +
+           "        \"main\": {\n" +
+           "          \"name\": \"copy\",\n" +
+           "          \"version\": \"20230101\",\n" +
+           "          \"pathURI\": \"s3://clusterless-test/copy/\"\n" +
+           "        }\n" +
+           "      }\n" +
+           "    }\n" +
+           "  ]\n" +
+           "}\n" +
+           "          ")
     void copyArcProject() {
         Assertions.assertEquals(0, new Kernel().execute(args));
     }

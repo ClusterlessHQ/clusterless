@@ -49,10 +49,8 @@ public class ConfigCommand {
 
     @CommandLine.Command(
             name = "init",
-            description = """
-                    create a local or global configuration file.
-                    set a provider name via --config to initialize a provider specific configuration. 
-                    """
+            description = "create a local or global configuration file.\n" +
+                          "set a provider name via --config to initialize a provider specific configuration.\n"
     )
     public Integer init(
             @CommandLine.Option(
@@ -66,10 +64,8 @@ public class ConfigCommand {
             ) boolean global,
             @CommandLine.Option(
                     names = "--merge",
-                    description = """
-                            merge all visible configuration files and cli options before writing
-                            use this option to capture global and local configuration settings into a single configuration file
-                            """
+                    description = "merge all visible configuration files and cli options before writing\n" +
+                                  "use this option to capture global and local configuration settings into a single configuration file\n"
             ) boolean merge,
             @CommandLine.Option(
                     names = "--force",

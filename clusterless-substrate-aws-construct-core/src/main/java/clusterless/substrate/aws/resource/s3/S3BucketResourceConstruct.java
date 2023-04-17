@@ -58,7 +58,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
         TagsUtil.applyTags(bucket, model().tags());
 
         new CfnOutput(this, id("BucketARN"), new CfnOutputProps.Builder()
-                .exportName("s3:%s:arn".formatted(model().bucketName().toLowerCase(Locale.ROOT)))
+                .exportName(String.format("s3:%s:arn", model().bucketName().toLowerCase(Locale.ROOT)))
                 .value(bucket().getBucketArn())
                 .description("s3 bucket arn")
                 .build());
