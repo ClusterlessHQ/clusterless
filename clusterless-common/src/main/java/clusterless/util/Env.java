@@ -11,6 +11,7 @@ package clusterless.util;
 import clusterless.json.JSONUtil;
 
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -30,7 +31,7 @@ public class Env {
     }
 
     public static String value(Object object) {
-        return JSONUtil.writeAsStringSafe(object);
+        return JSONUtil.writeTypedAsStringSafe(object);
     }
 
     public static String key(Object object) {
@@ -43,13 +44,19 @@ public class Env {
     }
 
     public static <T> T fromEnv(Class<T> type, Supplier<T> defaultValue) {
-        String value = System.getenv(keyNameFor(type));
+        Function<String, String> envMap = System::getenv;
+        return fromEnv(envMap, type, defaultValue);
+    }
+
+    public static <T> T fromEnv(Function<String, String> envMap, Class<T> type, Supplier<T> defaultValue) {
+        String key = keyNameFor(type);
+        String value = envMap.apply(key);
 
         if (value == null) {
             return defaultValue.get();
         }
 
-        return JSONUtil.readObjectSafe(value, type);
+        return JSONUtil.readTypedObjectSafe(value, type);
     }
 
     private static String keyNameFor(Class<?> type) {

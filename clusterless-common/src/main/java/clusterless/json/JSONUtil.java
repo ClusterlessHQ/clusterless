@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -58,6 +59,13 @@ public class JSONUtil {
     }
 
     public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
+
+    public static final ObjectMapper TYPED_OBJECT_MAPPER = createObjectMapper()
+            .activateDefaultTypingAsProperty(
+                    new DefaultBaseTypeLimitingValidator(),
+                    ObjectMapper.DefaultTyping.NON_FINAL,
+                    "__type"
+            );
     public static final JavaPropsMapper PROPERTIES_MAPPER = createPropertiesMapper();
 
     public static final ObjectMapper OBJECT_MAPPER_NO_NULL = createObjectMapper()
@@ -145,6 +153,14 @@ public class JSONUtil {
         }
     }
 
+    public static <T> T readTypedObjectSafe(String json, Class<T> type) {
+        try {
+            return TYPED_OBJECT_MAPPER.readValue(json, type);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static <T> T readObjectSafe(Path path, Class<T> type) {
         try {
             return OBJECT_READER.readValue(path.toFile(), type);
@@ -174,6 +190,14 @@ public class JSONUtil {
     public static String writeAsStringSafe(Object object) {
         try {
             return OBJECT_WRITER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static String writeTypedAsStringSafe(Object object) {
+        try {
+            return TYPED_OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
