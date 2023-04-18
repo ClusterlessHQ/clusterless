@@ -33,18 +33,29 @@ public abstract class ClientBase<C> {
     protected static final boolean localStackEnabled = Boolean.getBoolean("clusterless.localstack.enabled");
     protected static final String defaultRegion = System.getenv("AWS_DEFAULT_REGION");
     protected static final String defaultProfile = System.getenv("AWS_PROFILE");
+
     protected final DefaultCredentialsProvider credentialsProvider;
+
+    protected final String region;
     protected URI endpointOverride = Optional.ofNullable(System.getenv().get("AWS_S3_ENDPOINT"))
             .map(URI::create).orElse(null);
 
     public ClientBase() {
-        this(defaultProfile);
+        this(defaultProfile, defaultRegion);
     }
 
     public ClientBase(String profile) {
-        credentialsProvider = DefaultCredentialsProvider.builder()
+        this.credentialsProvider = DefaultCredentialsProvider.builder()
                 .profileName(profile)
                 .build();
+        this.region = defaultRegion;
+    }
+
+    public ClientBase(String profile, String region) {
+        this.credentialsProvider = DefaultCredentialsProvider.builder()
+                .profileName(profile == null ? defaultProfile : profile)
+                .build();
+        this.region = region == null ? defaultRegion : region;
     }
 
     protected boolean isSuccess(Response response) {
@@ -59,7 +70,7 @@ public abstract class ClientBase<C> {
     }
 
     protected C createClient() {
-        return createClient(defaultRegion);
+        return createClient(region);
     }
 
     protected abstract C createClient(String region);

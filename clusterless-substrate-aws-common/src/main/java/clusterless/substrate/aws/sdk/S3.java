@@ -33,6 +33,8 @@ public class S3 extends ClientBase<S3Client> {
         return URIs.create("s3", bucket, key);
     }
 
+    private final int maxKeys = 1000;
+
     public S3() {
     }
 
@@ -40,8 +42,12 @@ public class S3 extends ClientBase<S3Client> {
         super(profile);
     }
 
+    public S3(String profile, String region) {
+        super(profile, region);
+    }
+
     public Response exists(String bucketName) {
-        return exists(defaultRegion, bucketName);
+        return exists(region, bucketName);
     }
 
     public Response exists(String region, String bucketName) {
@@ -60,7 +66,7 @@ public class S3 extends ClientBase<S3Client> {
     }
 
     public Response exists(URI location) {
-        return exists(defaultRegion, location);
+        return exists(region, location);
     }
 
     public Response exists(String region, URI identifier) {
@@ -92,7 +98,7 @@ public class S3 extends ClientBase<S3Client> {
     }
 
     public Response create(String bucketName) {
-        return create(defaultRegion, bucketName);
+        return create(region, bucketName);
     }
 
     public Response create(String region, String bucketName) {
@@ -200,7 +206,15 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public Response listPath(URI path) {
+    public Response listPaths(URI path) {
+        return list(path, "/");
+    }
+
+    public Response listObjects(URI path) {
+        return list(path, null);
+    }
+
+    protected ClientBase<S3Client>.Response list(URI path, String delimiter) {
         Objects.requireNonNull(path, "path");
 
         String bucketName = path.getHost();
@@ -209,8 +223,8 @@ public class S3 extends ClientBase<S3Client> {
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
                 .prefix(key)
-                .delimiter("/")
-                .maxKeys(1000)
+                .delimiter(delimiter)
+                .maxKeys(maxKeys)
                 .build();
 
         try (S3Client client = createClient()) {
@@ -220,7 +234,7 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public List<String> listPath(Response response) {
+    public List<String> listChildren(Response response) {
         if (hasNoAwsResponse(response)) {
             return Collections.emptyList();
         }

@@ -48,11 +48,11 @@ public class ArcStateManager {
         LOG.info("setting arc state to: {}", newStateIdentifier);
 
         if (currentStateIdentifier == null) {
-            s3.put(newStateIdentifier, "application/txt", "").
-                    isSuccessOrThrow(e -> new RuntimeException("unable to set state at: " + newStateIdentifier, e));
+            s3.put(newStateIdentifier, "application/txt", "")
+                    .isSuccessOrThrow(e -> new RuntimeException("unable to set state at: " + newStateIdentifier, e));
         } else {
-            s3.move(currentStateIdentifier, newStateIdentifier).
-                    isSuccessOrThrow(e -> new RuntimeException("unable to move state at: " + currentStateIdentifier + ", to: " + newStateIdentifier, e));
+            s3.move(currentStateIdentifier, newStateIdentifier)
+                    .isSuccessOrThrow(e -> new RuntimeException("unable to move state at: " + currentStateIdentifier + ", to: " + newStateIdentifier, e));
         }
 
         return currentState;
@@ -64,13 +64,13 @@ public class ArcStateManager {
 
         LOG.info("listing state paths for: {}", path);
 
-        S3.Response response = s3.listPath(path);
+        S3.Response response = s3.listPaths(path);
 
         if (!response.isSuccess()) {
             return Optional.empty();
         }
 
-        List<String> paths = s3.listPath(response);
+        List<String> paths = s3.listChildren(response);
 
         LinkedList<ArcState> states = paths.stream()
                 .map(this::resolve)
