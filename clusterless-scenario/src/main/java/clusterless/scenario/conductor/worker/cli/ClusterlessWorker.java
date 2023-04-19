@@ -1,4 +1,4 @@
-package clusterless.scenario.conductor.worker;
+package clusterless.scenario.conductor.worker.cli;
 
 import clusterless.scenario.Options;
 import com.netflix.conductor.client.worker.Worker;

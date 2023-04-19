@@ -14,6 +14,12 @@ plugins {
 dependencies {
     implementation(project(":clusterless-common"))
     implementation(project(":clusterless-main-common"))
+    implementation(project(":clusterless-substrate-aws-common")) {
+        exclude("org.apache.logging.log4j")
+        exclude("log4j:log4j")
+        exclude("org.slf4j:slf4j-log4j12")
+        exclude("org.apache.logging.log4j:log4j-slf4j-impl")
+    }
 
     // the log4j exclusion works around the strict version requirement
     val conductor = "3.13.5"
@@ -57,7 +63,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation:$springBoot")
     implementation("org.springframework.boot:spring-boot-starter-web:$springBoot")
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springBoot")
-    implementation("org.springframework.retry:spring-retry:2.0.1")
+    implementation("org.springframework.retry:spring-retry:1.3.3") // 2.0.1 is on jdk 17
 
     implementation("org.apache.logging.log4j:log4j-web")
 
@@ -81,7 +87,7 @@ sjsonnet {
     create("scenarios") {
         indent.set(2)
         sources.from(file("src/main/cls/scenarios"))
-        sources.filter { f -> f.extension == "jsonnet" }
+            .filter { f -> f.extension == "jsonnet" }
         externalVariables.putAll(
             properties.filter { p -> p.key.startsWith("aws.") }.toMap()
         )
@@ -91,12 +97,11 @@ sjsonnet {
 val copyScenarios = tasks.register<Copy>("copyScenarios") {
     val jsonnet = tasks.named("jsonnetScenariosGenerate")
     dependsOn.add(jsonnet)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from("src/main/cls/scenarios") {
         exclude("**/*.jsonnet")
     }
-    from(jsonnet) {
-        exclude("**/scenario.json")
-    }
+    from(jsonnet)
     into(layout.buildDirectory.dir("scenarios"))
 }
 
@@ -109,6 +114,9 @@ tasks.named<JavaExec>("run") {
 //    jvmArgs = listOf("-Dlog4j.debug")
 
     args = listOf(
+//        "--dry-run",
+//        "--server",
+//        "localhost:8080",
         "--cls-app",
         "${mainInstall.destinationDir.absolutePath}/bin/cls",
         "-f",

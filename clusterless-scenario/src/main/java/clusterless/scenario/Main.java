@@ -6,6 +6,7 @@ import clusterless.scenario.conductor.TaskManager;
 import clusterless.scenario.conductor.WorkflowManager;
 import clusterless.scenario.conductor.runner.ScenarioRunner;
 import clusterless.scenario.model.Scenario;
+import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.run.Workflow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +15,7 @@ import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -30,6 +32,12 @@ import java.util.stream.Stream;
 )
 public class Main implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Main.class);
+
+    static {
+//        System.setProperty("org.springframework.boot.logging.LoggingSystem","org.springframework.boot.logging.log4j2.Log4J2LoggingSystem");
+//        System.setProperty("org.springframework.boot.logging.LoggingSystem","org.springframework.boot.logging.Slf4JLoggingSystem");
+    }
+
     private final String[] args;
     private ConfigurableApplicationContext server;
 
@@ -37,7 +45,7 @@ public class Main implements Callable<Integer> {
     Options options = new Options();
 
     @CommandLine.Option(names = "--server")
-    boolean startServer = true;
+    String serverHostPort;
 
     @CommandLine.Option(names = {"-f", "--scenarios"})
     Path scenarios;
@@ -49,7 +57,6 @@ public class Main implements Callable<Integer> {
     public void server() {
         server = ConductorApp.run();
     }
-
 
     public static void main(String[] args) {
         CommandLine commandLine = new CommandLine(new Main(args));
@@ -72,29 +79,30 @@ public class Main implements Callable<Integer> {
 
         List<Path> paths;
         try (Stream<Path> pathStream = Files.find(this.scenarios, 20, (p, a) -> p.getFileName().toString().equals("scenario.json"))) {
-            paths = pathStream.map(Path::normalize).toList();
+            paths = pathStream.map(Path::normalize).collect(Collectors.toList());
         }
 
         LOG.info("found paths: {}", paths);
 
         List<Scenario> scenarios = paths.stream()
                 .map(Main::scenario)
-                .toList();
+                .collect(Collectors.toList());
 
-        if (startServer) {
+        if (serverHostPort == null) {
             server();
         }
 
         TaskManager taskManager = null;
 
         try {
-            WorkflowManager workflowManager = new WorkflowManager();
+            WorkflowManager workflowManager = new WorkflowManager(serverHostPort);
 
             taskManager = new TaskManager(options, workflowManager);
 
             List<ScenarioRunner> runners = scenarios.stream()
+                    .filter(Scenario::enabled)
                     .map(s -> new ScenarioRunner(workflowManager, s))
-                    .toList();
+                    .collect(Collectors.toList());
 
             Set<String> started = runners.stream()
                     .map(ScenarioRunner::exec)
@@ -105,10 +113,11 @@ public class Main implements Callable<Integer> {
 
             LOG.info("started flows: {}", started.size());
 
+            long time = System.currentTimeMillis();
             while (true) {
                 List<Workflow> workflows = started.stream()
-                        .map(i -> workflowManager.workflowClient().getWorkflow(i, false))
-                        .toList();
+                        .map(i -> workflowManager.workflowClient().getWorkflow(i, true))
+                        .collect(Collectors.toList());
 
                 Set<String> completed = workflows.stream()
                         .filter(w -> w.getStatus() == Workflow.WorkflowStatus.COMPLETED)
@@ -131,6 +140,24 @@ public class Main implements Callable<Integer> {
                 if (started.isEmpty()) {
                     LOG.info("completed all flows");
                     break;
+                }
+
+                if (System.currentTimeMillis() - time > 10000) {
+                    for (Workflow workflow : workflows) {
+                        if (workflow.getStatus() == Workflow.WorkflowStatus.RUNNING) {
+                            LOG.info("workflow: {}, status: {}", workflow.getWorkflowName(), workflow.getStatus());
+                            for (Task task : workflow.getTasks()) {
+                                if (task.getStatus().isTerminal()) {
+                                    long duration = task.getEndTime() - task.getStartTime();
+                                    LOG.info("task: {}, status: {}, duration: {}", task.getReferenceTaskName(), task.getStatus(), Duration.ofMillis(duration));
+                                } else {
+                                    long duration = task.getStatus() == Task.Status.IN_PROGRESS ? System.currentTimeMillis() - task.getStartTime() : 0;
+                                    LOG.info("task: {}, status: {}, duration: {}", task.getReferenceTaskName(), task.getStatus(), Duration.ofMillis(duration));
+                                }
+                            }
+                        }
+                    }
+                    time = System.currentTimeMillis();
                 }
 
                 Thread.sleep(1000);

@@ -1,4 +1,5 @@
 {
+  "enabled": false,
   "name": "copy-chain",
   "description": "chained copy workloads",
   "projectFiles": [

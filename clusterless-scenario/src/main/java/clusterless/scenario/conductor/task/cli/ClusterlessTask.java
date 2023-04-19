@@ -1,13 +1,12 @@
-package clusterless.scenario.conductor.task;
+package clusterless.scenario.conductor.task.cli;
 
-import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
-import com.netflix.conductor.sdk.workflow.def.tasks.SimpleTask;
+import clusterless.scenario.conductor.task.BaseSimpleTask;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ClusterlessTask extends SimpleTask {
+public class ClusterlessTask extends BaseSimpleTask {
     public ClusterlessTask(String taskDefName, String taskReferenceName, Path workingDirectory, List<Path> projectFiles) {
         super(taskDefName, taskReferenceName);
 
@@ -15,10 +14,4 @@ public class ClusterlessTask extends SimpleTask {
         input("projectFiles", projectFiles.stream().map(Path::toString).collect(Collectors.joining(",")));
     }
 
-    @Override
-    protected void updateWorkflowTask(WorkflowTask workflowTask) {
-        super.updateWorkflowTask(workflowTask);
-
-        workflowTask.setRetryCount(0);
-    }
 }

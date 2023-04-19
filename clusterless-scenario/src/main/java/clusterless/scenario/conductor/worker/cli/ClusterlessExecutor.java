@@ -1,4 +1,4 @@
-package clusterless.scenario.conductor.worker;
+package clusterless.scenario.conductor.worker.cli;
 
 import clusterless.startup.Startup;
 import org.apache.logging.log4j.LogManager;

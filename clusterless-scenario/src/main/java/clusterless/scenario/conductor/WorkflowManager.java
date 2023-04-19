@@ -7,7 +7,6 @@ import com.netflix.conductor.client.http.WorkflowClient;
 
 public class WorkflowManager {
     protected int port = 8881;
-
     protected String hostPort = "localhost:%d";
 
     protected TaskClient taskClient;
@@ -17,6 +16,14 @@ public class WorkflowManager {
 
     public WorkflowManager() {
         init(api());
+    }
+
+    public WorkflowManager(String hostPort) {
+        if (hostPort == null) {
+            init(api());
+        } else {
+            init("http://" + hostPort + "/api/");
+        }
     }
 
     protected void init(String api) {

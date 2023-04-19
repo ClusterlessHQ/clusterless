@@ -1,13 +1,15 @@
 package clusterless.scenario.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import clusterless.config.Config;
 
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class Scenario {
+public class Scenario extends Config {
+
+    boolean enabled = true;
+
     String name;
     String description;
 
@@ -18,6 +20,10 @@ public class Scenario {
     List<IngressStore> ingressStores = new LinkedList<>();
 
     List<WatchedStore> watchedStores = new LinkedList<>();
+
+    public boolean enabled() {
+        return enabled;
+    }
 
     public String name() {
         return name;
