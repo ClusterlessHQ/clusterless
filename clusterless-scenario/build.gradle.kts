@@ -117,6 +117,7 @@ tasks.named<JavaExec>("run") {
 //        "--dry-run",
 //        "--server",
 //        "localhost:8080",
+//        "--disable-destroy",
         "--cls-app",
         "${mainInstall.destinationDir.absolutePath}/bin/cls",
         "-f",

@@ -1,5 +1,6 @@
 package clusterless.scenario.conductor.runner;
 
+import clusterless.scenario.Options;
 import clusterless.scenario.conductor.WorkflowManager;
 import clusterless.scenario.conductor.task.aws.S3Ingress;
 import clusterless.scenario.conductor.task.aws.S3Watcher;
@@ -22,11 +23,13 @@ import java.util.Map;
 
 public class ScenarioRunner {
     private static final Logger LOG = LogManager.getLogger(ScenarioRunner.class);
+    private final Options options;
     private final WorkflowManager workflowManager;
     private final Scenario scenario;
     private String workflowId;
 
-    public ScenarioRunner(WorkflowManager workflowManager, Scenario scenario) {
+    public ScenarioRunner(Options options, WorkflowManager workflowManager, Scenario scenario) {
+        this.options = options;
         this.workflowManager = workflowManager;
         this.scenario = scenario;
     }
@@ -175,6 +178,11 @@ public class ScenarioRunner {
     }
 
     private void applyDestroyer(List<WorkflowTask> tasks) {
+        if (options.disableDestroy()) {
+            LOG.info("scenario: {}, skipping destroyer by request", scenario.name());
+            return;
+        }
+
         if (scenario.projectFiles().isEmpty()) {
             LOG.info("scenario: {}, no project files, skipping destroyer", scenario.name());
             return;

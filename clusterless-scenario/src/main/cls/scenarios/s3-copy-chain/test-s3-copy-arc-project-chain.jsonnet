@@ -25,7 +25,7 @@ local unit = 'Twelfths';
       type: 'aws:core:s3PutListenerBoundary',
       name: 'IngressPutListener',
       dataset: {
-        name: 'ingress',
+        name: 'ingress-chain',
         version: '20220101',
         pathURI: bucketPrefix+'/ingress/',
       },
@@ -38,14 +38,14 @@ local unit = 'Twelfths';
       name: 'copyA',
       sources: {
         main: {
-          name: 'ingress',
+          name: 'ingress-chain',
           version: '20220101',
           pathURI: bucketPrefix+'/ingress/',
         },
       },
       sinks: {
         main: {
-          name: 'copy-a',
+          name: 'copy-a-chain',
           version: '20230101',
           pathURI: bucketPrefix+'/copy-a/',
         },
@@ -56,14 +56,14 @@ local unit = 'Twelfths';
       name: 'copyB',
       sources: {
         main: {
-          name: 'copy-a',
+          name: 'copy-a-chain',
           version: '20230101',
           pathURI: bucketPrefix+'/copy-a/',
         },
       },
       sinks: {
         main: {
-          name: 'copy-b',
+          name: 'copy-b-chain',
           version: '20230101',
           pathURI: bucketPrefix+'/copy-b/',
         },
@@ -79,14 +79,14 @@ local unit = 'Twelfths';
       name: 'copyC',
       sources: {
         main: {
-          name: 'copy-b',
+          name: 'copy-b-chain',
           version: '20230101',
           pathURI: bucketPrefix+'/copy-b/',
         },
       },
       sinks: {
         main: {
-          name: 'copy-c',
+          name: 'copy-c-chain',
           version: '20230101',
           pathURI: bucketPrefix+'/copy-c/',
         },

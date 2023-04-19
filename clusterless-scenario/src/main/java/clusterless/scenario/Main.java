@@ -33,11 +33,6 @@ import java.util.stream.Stream;
 public class Main implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Main.class);
 
-    static {
-//        System.setProperty("org.springframework.boot.logging.LoggingSystem","org.springframework.boot.logging.log4j2.Log4J2LoggingSystem");
-//        System.setProperty("org.springframework.boot.logging.LoggingSystem","org.springframework.boot.logging.Slf4JLoggingSystem");
-    }
-
     private final String[] args;
     private ConfigurableApplicationContext server;
 
@@ -46,6 +41,9 @@ public class Main implements Callable<Integer> {
 
     @CommandLine.Option(names = "--server")
     String serverHostPort;
+
+    @CommandLine.Option(names = "--stop-on-failure")
+    boolean stopOnFailure = false;
 
     @CommandLine.Option(names = {"-f", "--scenarios"})
     Path scenarios;
@@ -92,6 +90,8 @@ public class Main implements Callable<Integer> {
             server();
         }
 
+        int totalFailedFlows = 0;
+
         TaskManager taskManager = null;
 
         try {
@@ -101,7 +101,7 @@ public class Main implements Callable<Integer> {
 
             List<ScenarioRunner> runners = scenarios.stream()
                     .filter(Scenario::enabled)
-                    .map(s -> new ScenarioRunner(workflowManager, s))
+                    .map(s -> new ScenarioRunner(options, workflowManager, s))
                     .collect(Collectors.toList());
 
             Set<String> started = runners.stream()
@@ -109,7 +109,6 @@ public class Main implements Callable<Integer> {
                     .collect(Collectors.toSet());
 
             int totalFlows = started.size();
-            int totalFailedFlows = 0;
 
             LOG.info("started flows: {}", started.size());
 
@@ -130,10 +129,12 @@ public class Main implements Callable<Integer> {
                         .collect(Collectors.toSet());
 
                 started.removeAll(completed);
+                started.removeAll(failed);
 
-                if (!failed.isEmpty()) {
-                    totalFailedFlows += failed.size();
-                    LOG.error("flows running, {}, failed: {}", started.size(), totalFailedFlows);
+                totalFailedFlows = failed.size();
+
+                if (stopOnFailure && !failed.isEmpty()) {
+                    LOG.error("shutting down, flows running, {}, failed: {}", started.size(), totalFailedFlows);
                     break;
                 }
 
@@ -144,7 +145,9 @@ public class Main implements Callable<Integer> {
 
                 if (System.currentTimeMillis() - time > 10000) {
                     for (Workflow workflow : workflows) {
-                        if (workflow.getStatus() == Workflow.WorkflowStatus.RUNNING) {
+                        if (workflow.getStatus() == Workflow.WorkflowStatus.FAILED) {
+                            LOG.info("workflow: {}, status: {}", workflow.getWorkflowName(), workflow.getStatus());
+                        } else if (workflow.getStatus() == Workflow.WorkflowStatus.RUNNING) {
                             LOG.info("workflow: {}, status: {}", workflow.getWorkflowName(), workflow.getStatus());
                             for (Task task : workflow.getTasks()) {
                                 if (task.getStatus().isTerminal()) {
@@ -163,7 +166,7 @@ public class Main implements Callable<Integer> {
                 Thread.sleep(1000);
             }
 
-            LOG.info("started flow: {}, succeeded: {}, failed: {}", totalFlows, totalFlows - totalFailedFlows, totalFailedFlows);
+            LOG.info("started flows: {}, succeeded: {}, failed: {}", totalFlows, totalFlows - totalFailedFlows, totalFailedFlows);
 
         } finally {
             LOG.info("shutting down services");
@@ -175,10 +178,9 @@ public class Main implements Callable<Integer> {
             if (server != null) {
                 server.stop();
             }
-
         }
 
-        return 0;
+        return totalFailedFlows;
     }
 
     private static Scenario scenario(Path p) {

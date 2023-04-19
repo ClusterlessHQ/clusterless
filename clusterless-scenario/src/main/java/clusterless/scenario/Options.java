@@ -12,11 +12,18 @@ public class Options {
     @CommandLine.Option(names = "--dry-run", description = "do not execute underlying cdk binary")
     private boolean dryRun = false;
 
+    @CommandLine.Option(names = "--disable-destroy", description = "do not invoke the destroy command, speeds up repeated testing")
+    boolean disableDestroy = false;
+
     public String clsApp() {
         return clsApp;
     }
 
     public boolean dryRun() {
         return dryRun;
+    }
+
+    public boolean disableDestroy() {
+        return disableDestroy;
     }
 }
