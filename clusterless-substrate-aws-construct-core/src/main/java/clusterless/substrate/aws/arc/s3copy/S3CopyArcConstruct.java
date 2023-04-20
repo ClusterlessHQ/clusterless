@@ -15,6 +15,7 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Assets;
+import clusterless.substrate.aws.resources.Functions;
 import clusterless.substrate.aws.resources.StateURIs;
 import clusterless.substrate.aws.uri.ManifestURI;
 import clusterless.util.Env;
@@ -63,9 +64,10 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
 
         Map<String, String> environment = Env.toEnv(arcProps);
 
-        Label functionLabel = Label.of(model().name()).with("S3CopyArc");
+        String functionName = Functions.functionName(this, model().name(), "S3Copy");
+        Label functionLabel = Label.of(model().name()).with("S3Copy");
         function = Function.Builder.create(this, functionLabel.camelCase())
-                .functionName(functionLabel.lowerHyphen())
+                .functionName(functionName)
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-workload.*\\.zip$"))) // get packaged code
                 .handler(S3CopyArcEventHandler.class.getName()) // get handler class name
                 .environment(environment)

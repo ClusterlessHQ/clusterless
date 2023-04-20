@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.resources;
 
+import clusterless.model.deploy.Region;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.util.Label;
@@ -23,7 +24,7 @@ public class Rules {
     public static Label ruleName(Construct scope, String name) {
         Objects.requireNonNull(name, "name may not be null");
 
-        String region = Stack.of(scope).getRegion();
+        Region region = Region.of(Stack.of(scope).getRegion());
         Label stage = StagedApp.stagedOf(scope).stage();
         Label project = ManagedProject.projectOf(scope).name();
         String version = ManagedProject.projectOf(scope).version();

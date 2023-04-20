@@ -7,6 +7,7 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.props.Lookup;
 import clusterless.substrate.aws.resources.Assets;
+import clusterless.substrate.aws.resources.Functions;
 import clusterless.util.Env;
 import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
@@ -24,16 +25,12 @@ public abstract class ArcStateGate extends ArcStateMachineFragment {
 
         Map<String, String> environment = Env.toEnv(arcStateProps);
 
-        Label project = context.managedProject().name();
-        String version = context.managedProject().version();
-        String arcName = arc.name();
-
-        Label functionName = project.with(arcName).with(baseId).with(version);
+        String functionName = Functions.functionName(this, arc.name(), baseId);
 
         // get packaged code
         // get handler class name
         Function function = Function.Builder.create(this, baseId.with("Function").camelCase())
-                .functionName(functionName.lowerHyphen())
+                .functionName(functionName)
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-arc.*\\.zip$"))) // get packaged code
                 .handler(handlerClassName) // get handler class name
                 .environment(environment)

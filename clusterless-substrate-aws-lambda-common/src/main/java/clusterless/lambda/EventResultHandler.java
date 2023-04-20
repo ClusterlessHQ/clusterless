@@ -31,7 +31,7 @@ public abstract class EventResultHandler<E, R, O extends EventObserver> extends 
         try {
             r = handleEvent(event, context, observer());
         } catch (Exception e) {
-            logErrorAndThrow(m -> new RuntimeException(m, e), "failed executing handler: {}, with: {}", getClass().getName(), e.getMessage());
+            logErrorAndThrow(RuntimeException::new, e, "failed executing handler: {}, with: {}", getClass().getName(), e.getMessage());
         }
 
         logObject("outgoing object: {}", r);

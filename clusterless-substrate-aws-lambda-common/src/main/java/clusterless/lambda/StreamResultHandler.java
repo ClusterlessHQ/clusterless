@@ -22,6 +22,7 @@ import org.apache.logging.log4j.message.ParameterizedMessageFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -98,10 +99,17 @@ public abstract class StreamResultHandler<E, R> implements RequestStreamHandler 
         LOG.info(message, JSONUtil.writeAsStringSafe(object));
     }
 
-    protected <T> T logErrorAndThrow(Function<String, RuntimeException> exception, String format, Object... values) {
+    protected <T> T logErrorAndThrow(BiFunction<String, Throwable, RuntimeException> exceptionFactory, Throwable cause, String format, Object... values) {
+        // use the log4j message factory so that we don't introduce yet another log format
+        String message = messageFactory.newMessage(format, values).getFormattedMessage();
+        LOG.error(message, cause);
+        throw exceptionFactory.apply(message, cause);
+    }
+
+    protected <T> T logErrorAndThrow(Function<String, RuntimeException> exceptionFactory, String format, Object... values) {
         // use the log4j message factory so that we don't introduce yet another log format
         String message = messageFactory.newMessage(format, values).getFormattedMessage();
         LOG.error(message);
-        throw exception.apply(message);
+        throw exceptionFactory.apply(message);
     }
 }

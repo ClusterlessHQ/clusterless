@@ -275,7 +275,7 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public boolean copy(List<Tuple2<URI, URI>> toUris, Consumer<URI> success, BiFunction<Tuple2<URI, URI>, Response, Boolean> failure) {
+    public boolean copy(List<Tuple2<URI, URI>> toUris, Consumer<URI> success, BiFunction<Tuple2<URI, URI>, Response, Boolean> isFailure) {
         Objects.requireNonNull(toUris, "toUris");
 
         try (S3Client client = createClient()) {
@@ -283,14 +283,15 @@ public class S3 extends ClientBase<S3Client> {
                 URI from = tuple.get_1();
                 URI to = tuple.get_2();
 
+                // todo: apply retry logic here. note response knows about throttling and retryable exceptions
                 S3.Response response = copy(client, from, to);
 
                 if (response.isSuccess()) {
                     success.accept(to);
                 } else {
                     // stop on true
-                    if (failure.apply(tuple, response)) {
-                        return false; // success
+                    if (isFailure.apply(tuple, response)) {
+                        return false; // failure
                     }
                 }
             }

@@ -12,6 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.awscore.internal.AwsErrorCode;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
@@ -159,7 +162,6 @@ public abstract class ClientBase<C> {
             throw exception.apply(m, this.exception);
         }
 
-
         public String errorMessage() {
             if (exception != null) {
                 return exception.getMessage();
@@ -170,6 +172,34 @@ public abstract class ClientBase<C> {
 
         public Exception exception() {
             return exception;
+        }
+
+        public boolean isAccessDenied() {
+            if (exception instanceof AwsServiceException) {
+                AwsServiceException serviceException = (AwsServiceException) exception;
+                AwsErrorDetails awsErrorDetails = serviceException.awsErrorDetails();
+                return awsErrorDetails.errorCode().equals("AccessDenied");
+            }
+
+            return false;
+        }
+
+        public boolean isThrottled() {
+            if (exception instanceof AwsServiceException) {
+                AwsServiceException serviceException = (AwsServiceException) exception;
+                return serviceException.isThrottlingException();
+            }
+
+            return false;
+        }
+
+        public boolean isRetryable() {
+            if (exception instanceof AwsServiceException) {
+                AwsServiceException serviceException = (AwsServiceException) exception;
+                return AwsErrorCode.isRetryableErrorCode(serviceException.awsErrorDetails().errorCode());
+            }
+
+            return false;
         }
 
         public ByteBuffer objectAsBytes() {

@@ -89,9 +89,10 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
 
         Map<String, String> environment = Env.toEnv(transformProps);
 
-        Label functionLabel = Label.of(model().name()).with("TransformPutEvent");
+        String functionName = Functions.functionName(this, model().name(), "Transformer");
+        Label functionLabel = Label.of(model().name()).with("Transformer");
         Function transformEventFunction = Function.Builder.create(this, functionLabel.camelCase())
-                .functionName(functionLabel.lowerHyphen())
+                .functionName(functionName)
                 .code(Assets.find(Pattern.compile("^.*-aws-service-transform-.*\\.zip$"))) // get packaged code
                 .handler(PutEventTransformHandler.class.getName()) // get handler class name
                 .environment(environment)
