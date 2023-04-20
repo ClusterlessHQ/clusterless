@@ -5,6 +5,7 @@ import clusterless.scenario.conductor.worker.aws.S3IngressWorker;
 import clusterless.scenario.conductor.worker.aws.S3WatcherWorker;
 import clusterless.scenario.conductor.worker.cli.DeployerWorker;
 import clusterless.scenario.conductor.worker.cli.DestroyerWorker;
+import clusterless.scenario.conductor.worker.cli.VerifierWorker;
 import com.netflix.conductor.client.automator.TaskRunnerConfigurer;
 import com.netflix.conductor.client.worker.Worker;
 
@@ -19,6 +20,7 @@ public class TaskManager {
 
     public TaskManager(Options options, WorkflowManager manager) {
         List<Worker> workers = List.of(
+                new VerifierWorker(options),
                 new DeployerWorker(options),
                 new DestroyerWorker(options),
                 new S3IngressWorker(options),

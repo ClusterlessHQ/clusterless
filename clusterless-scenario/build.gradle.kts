@@ -105,7 +105,7 @@ val copyScenarios = tasks.register<Copy>("copyScenarios") {
     into(layout.buildDirectory.dir("scenarios"))
 }
 
-tasks.named<JavaExec>("run") {
+val run = tasks.named<JavaExec>("run") {
     dependsOn.add(copyScenarios)
     val mainInstall = tasks.getByPath(":clusterless-main:installDist") as Sync
 
@@ -115,6 +115,7 @@ tasks.named<JavaExec>("run") {
 
     args = listOf(
 //        "--dry-run",
+//        "--verify-on-dry-run",
 //        "--server",
 //        "localhost:8080",
 //        "--disable-destroy",
@@ -123,4 +124,8 @@ tasks.named<JavaExec>("run") {
         "-f",
         copyScenarios.get().destinationDir.absolutePath
     )
+}
+
+tasks.register("scenarios") {
+    dependsOn.add(run)
 }

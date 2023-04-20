@@ -31,7 +31,7 @@ public abstract class ClusterlessWorker implements Worker {
 
         ClusterlessExecutor deploy = ClusterlessExecutor.builder()
                 .withClsApp(options.clsApp())
-                .withDryRun(options.dryRun())
+                .withDryRun(getDryRun())
                 .withCommand(command)
                 .withWorkingDirectory(workingDirectory)
                 .withProjectFiles(projectFiles)
@@ -48,5 +48,9 @@ public abstract class ClusterlessWorker implements Worker {
         }
 
         return TaskResult.failed("exit code: " + exitCode);
+    }
+
+    protected boolean getDryRun() {
+        return options.dryRun();
     }
 }

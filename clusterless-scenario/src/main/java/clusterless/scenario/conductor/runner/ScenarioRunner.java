@@ -6,6 +6,7 @@ import clusterless.scenario.conductor.task.aws.S3Ingress;
 import clusterless.scenario.conductor.task.aws.S3Watcher;
 import clusterless.scenario.conductor.task.cli.Deployer;
 import clusterless.scenario.conductor.task.cli.Destroyer;
+import clusterless.scenario.conductor.task.cli.Verifier;
 import clusterless.scenario.model.IngressStore;
 import clusterless.scenario.model.Scenario;
 import clusterless.scenario.model.WatchedStore;
@@ -45,6 +46,7 @@ public class ScenarioRunner {
         workflowDefinition.setOwnerEmail("sample@sample.com");
         List<WorkflowTask> tasks = workflowDefinition.getTasks();
 
+        applyVerifier(tasks);
         applyDeployer(tasks);
 //        applyIngressWithWait(tasks); // waits never return
         applyIngress(tasks);
@@ -60,6 +62,16 @@ public class ScenarioRunner {
         workflowId = workflowManager.workflowClient().startWorkflow(workflowRequest);
 
         return workflowId;
+    }
+
+    private void applyVerifier(List<WorkflowTask> tasks) {
+        if (scenario.projectFiles().isEmpty()) {
+            LOG.info("scenario: {}, no project files, skipping verifier", scenario.name());
+            return;
+        }
+
+        LOG.info("scenario: {}, adding verifier: {}", scenario.name(), scenario.projectFiles());
+        tasks.addAll(new Verifier("clsVerifier", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 
     private void applyDeployer(List<WorkflowTask> tasks) {

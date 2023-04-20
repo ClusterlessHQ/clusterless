@@ -12,6 +12,9 @@ public class Options {
     @CommandLine.Option(names = "--dry-run", description = "do not execute underlying cdk binary")
     private boolean dryRun = false;
 
+    @CommandLine.Option(names = "--verify-on-dry-run", description = "execute verify")
+    private boolean verifyOnDryRun = false;
+
     @CommandLine.Option(names = "--disable-destroy", description = "do not invoke the destroy command, speeds up repeated testing")
     boolean disableDestroy = false;
 
@@ -21,6 +24,10 @@ public class Options {
 
     public boolean dryRun() {
         return dryRun;
+    }
+
+    public boolean verifyOnDryRun() {
+        return verifyOnDryRun;
     }
 
     public boolean disableDestroy() {
