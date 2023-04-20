@@ -1,6 +1,6 @@
 package clusterless.substrate.aws.store;
 
-import clusterless.util.Label;
+import clusterless.naming.Label;
 
 public enum StateStore implements Label {
     Meta("Metadata"),

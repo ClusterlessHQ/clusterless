@@ -8,12 +8,12 @@
 
 package clusterless.substrate.aws.bootstrap;
 
+import clusterless.naming.Label;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.managed.StagedStack;
 import clusterless.substrate.aws.resources.BootstrapStores;
 import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.util.ErrorsUtil;
-import clusterless.util.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

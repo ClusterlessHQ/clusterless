@@ -9,7 +9,7 @@
 package clusterless.model.state;
 
 import clusterless.model.State;
-import clusterless.util.Partition;
+import clusterless.naming.Partition;
 import clusterless.util.Strings;
 
 import java.util.Locale;

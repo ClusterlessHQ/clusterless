@@ -76,7 +76,7 @@ public class KernelTest {
            "  \"arcs\": [\n" +
            "    {\n" +
            "      \"type\": \"aws:core:s3CopyArc\",\n" +
-           "      \"name\": \"copyWorkload\",\n" +
+           "      \"name\": \"copy\",\n" +
            "      \"sources\": {\n" +
            "        \"main\": {\n" +
            "          \"name\": \"ingress\",\n" +

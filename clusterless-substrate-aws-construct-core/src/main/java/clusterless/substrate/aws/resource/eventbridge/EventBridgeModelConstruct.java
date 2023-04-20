@@ -9,9 +9,9 @@
 package clusterless.substrate.aws.resource.eventbridge;
 
 import clusterless.managed.component.ResourceComponent;
+import clusterless.naming.Label;
 import clusterless.substrate.aws.construct.ModelConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.CfnOutputProps;

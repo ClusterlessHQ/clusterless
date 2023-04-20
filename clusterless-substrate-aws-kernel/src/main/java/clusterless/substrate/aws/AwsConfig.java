@@ -10,7 +10,7 @@ package clusterless.substrate.aws;
 
 import clusterless.config.Config;
 import clusterless.config.Configuration;
-import clusterless.util.Label;
+import clusterless.naming.Label;
 
 /**
  * --require-approval     What security-sensitive changes need manual

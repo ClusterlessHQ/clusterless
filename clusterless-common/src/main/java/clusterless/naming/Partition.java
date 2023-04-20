@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.util;
+package clusterless.naming;
 
 import java.util.Arrays;
 import java.util.Locale;

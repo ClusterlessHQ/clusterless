@@ -14,11 +14,11 @@ import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Workload;
+import clusterless.naming.Label;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
 import clusterless.substrate.aws.resources.Stacks;
-import clusterless.util.Label;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 

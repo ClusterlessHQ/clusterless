@@ -10,7 +10,9 @@ package clusterless.substrate.aws.resources;
 
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
-import clusterless.util.Label;
+import clusterless.naming.Label;
+import clusterless.naming.Stage;
+import clusterless.naming.Version;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,13 +20,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Arcs {
     public static Label arcBaseName(@NotNull Deployable deployable, @NotNull Arc<?> arc) {
-        String stage = deployable.placement().stage();
+        Label stage = Stage.of(deployable.placement().stage());
         String project = deployable.project().name();
-        String version = deployable.project().version();
-
+        Label version = Version.of(deployable.project().version());
         String arcName = arc.name();
 
-        return Label.of(stage).upperOnly()
+        return stage
                 .with(project)
                 .with(arcName)
                 .with(version);

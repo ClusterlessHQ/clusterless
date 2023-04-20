@@ -9,11 +9,11 @@
 package clusterless.substrate.aws.bootstrap;
 
 import clusterless.command.BootstrapCommandOptions;
+import clusterless.naming.Label;
 import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Stacks;
-import clusterless.util.Label;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import clusterless.util.Strings;

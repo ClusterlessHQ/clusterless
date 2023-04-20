@@ -8,10 +8,10 @@
 
 package clusterless.substrate.aws.resources;
 
+import clusterless.naming.Label;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.store.StateStore;
 import clusterless.substrate.aws.store.Stores;
-import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.services.s3.Bucket;

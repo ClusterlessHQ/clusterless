@@ -6,7 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.util;
+package clusterless.naming;
+
+import clusterless.util.Strings;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -82,6 +84,10 @@ public interface Label {
         return of(of(full), of(abbr));
     }
 
+    static Label fixed(String fixed) {
+        return new Fixed(fixed);
+    }
+
     default Label abbreviated(Label abbr) {
         return new Label() {
             @Override
@@ -102,47 +108,7 @@ public interface Label {
     }
 
     default Label upperOnly() {
-        return new Label() {
-            @Override
-            public String camelCase() {
-                return Label.this.camelCase() != null ? Label.this.camelCase().toUpperCase(Locale.ROOT) : null;
-            }
-
-            @Override
-            public String lowerHyphen() {
-                return this.camelCase();
-            }
-
-            @Override
-            public String lowerHyphenPath() {
-                return this.camelCase();
-            }
-
-            @Override
-            public String lowerUnderscore() {
-                return this.camelCase();
-            }
-
-            @Override
-            public String upperUnderscore() {
-                return this.camelCase();
-            }
-
-            @Override
-            public String shortLowerHyphen() {
-                return this.camelCase();
-            }
-
-            @Override
-            public String shortLowerUnderscore() {
-                return this.camelCase();
-            }
-
-            @Override
-            public String toString() {
-                return camelCase();
-            }
-        };
+        return new Fixed(Label.this.camelCase() != null ? Label.this.camelCase().toUpperCase(Locale.ROOT) : null);
     }
 
     private static Label of(String value) {

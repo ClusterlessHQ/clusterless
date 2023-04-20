@@ -9,8 +9,8 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.model.deploy.Deployable;
+import clusterless.naming.Label;
 import clusterless.substrate.aws.resources.Stacks;
-import clusterless.util.Label;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Stack;

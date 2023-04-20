@@ -9,6 +9,7 @@
 package clusterless.util;
 
 import clusterless.json.JSONUtil;
+import clusterless.naming.Label;
 
 import java.util.Map;
 import java.util.function.Function;

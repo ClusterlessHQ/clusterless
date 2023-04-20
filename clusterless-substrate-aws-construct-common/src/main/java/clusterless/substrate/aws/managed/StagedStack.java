@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.util.Label;
+import clusterless.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Stack;

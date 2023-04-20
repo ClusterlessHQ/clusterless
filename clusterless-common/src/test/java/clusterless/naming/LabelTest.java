@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.util;
+package clusterless.naming;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static clusterless.util.LabelTest.Value.Case;
-import static clusterless.util.LabelTest.Value.Lower;
+import static clusterless.naming.LabelTest.Value.Case;
+import static clusterless.naming.LabelTest.Value.Lower;
 
 /**
  *
@@ -92,6 +92,25 @@ public class LabelTest {
         Assertions.assertEquals("LOWER/case", with.lowerHyphenPath());
         Assertions.assertEquals("LOWER/case/", with.lowerHyphenPath(true));
         Assertions.assertEquals("LOWER_case", with.lowerUnderscore());
+    }
+
+    @Test
+    void stringWithFixed() {
+        Assertions.assertEquals("LoWeR", Label.fixed("LoWeR").camelCase());
+
+        Label with = Label.fixed("LoWeR").with(Label.of("case"));
+        Assertions.assertEquals("LoWeRCase", with.camelCase());
+        Assertions.assertEquals("LoWeR-case", with.lowerHyphen());
+        Assertions.assertEquals("LoWeR/case", with.lowerHyphenPath());
+        Assertions.assertEquals("LoWeR/case/", with.lowerHyphenPath(true));
+        Assertions.assertEquals("LoWeR_case", with.lowerUnderscore());
+
+        with = Label.of("prefix").with(Label.fixed("LoWeR")).with(Label.of("case"));
+        Assertions.assertEquals("PrefixLoWeRCase", with.camelCase());
+        Assertions.assertEquals("prefix-LoWeR-case", with.lowerHyphen());
+        Assertions.assertEquals("prefix/LoWeR/case", with.lowerHyphenPath());
+        Assertions.assertEquals("prefix/LoWeR/case/", with.lowerHyphenPath(true));
+        Assertions.assertEquals("prefix_LoWeR_case", with.lowerUnderscore());
     }
 
     @Test
