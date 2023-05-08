@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
+import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import software.constructs.Construct;
@@ -27,4 +28,39 @@ public class ManagedConstruct extends Construct implements Managed {
         return context;
     }
 
+    protected void addArnFor(String resourceType, String resourceName, String value, String description) {
+        ExportRef ref = ExportRef.ref()
+                .withResourceType(resourceType)
+                .withResourceName(resourceName);
+
+        addArnFor(ref, value, description);
+    }
+
+    protected void addArnFor(ExportRef ref, String value, String description) {
+        StagedStack.stagedOf(this).addArnFor(ref, value, description);
+    }
+
+    protected void addIdFor(String resourceType, String resourceName, String value, String description) {
+        ExportRef ref = ExportRef.ref()
+                .withResourceType(resourceType)
+                .withResourceName(resourceName);
+
+        addIdFor(ref, value, description);
+    }
+
+    protected void addIdFor(ExportRef ref, String value, String description) {
+        StagedStack.stagedOf(this).addIdFor(ref, value, description);
+    }
+
+    protected void addNameFor(String resourceType, String resourceName, String value, String description) {
+        ExportRef ref = ExportRef.ref()
+                .withResourceType(resourceType)
+                .withResourceName(resourceName);
+
+        addNameFor(ref, value, description);
+    }
+
+    protected void addNameFor(ExportRef ref, String value, String description) {
+        StagedStack.stagedOf(this).addNameFor(ref, value, description);
+    }
 }

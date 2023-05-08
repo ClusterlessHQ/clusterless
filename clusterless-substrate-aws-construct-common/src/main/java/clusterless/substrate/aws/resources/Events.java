@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.resources;
 
+import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
 import clusterless.naming.Region;
 import clusterless.substrate.aws.managed.StagedApp;
@@ -20,17 +21,21 @@ import software.constructs.Construct;
  *
  */
 public class Events {
-    public static final Label ARC_EVENT_BUS_NAME = Label.of("ArcEventBusName");
+    public static final Label ARC_EVENT_BUS = Label.of("ArcEventBus");
+    public static final String EVENT_BUS = "eventBus";
 
     public static String arcEventBusName(@NotNull Construct scope) {
         return eventBusName(scope, "ArcEvents");
     }
 
     public static String arcEventBusNameRef(@NotNull Construct scope) {
-        Label stage = StagedApp.stagedOf(scope).stage();
-        return Fn.importValue(stage.with(ARC_EVENT_BUS_NAME).lowerHyphen());
-    }
+        ExportRef ref = ClsBootstrap.bootstrapBase(scope)
+                .withQualifier(ExportRef.ExportQualifier.Name)
+                .withResourceType(EVENT_BUS)
+                .withResourceName(ARC_EVENT_BUS);
 
+        return Fn.importValue(ref.exportName());
+    }
     private static String eventBusName(@NotNull Construct scope, String name) {
         Label region = Region.of(Stack.of(scope).getRegion());
         Label stage = StagedApp.stagedOf(scope).stage();

@@ -8,7 +8,8 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.naming.Label;
+import clusterless.naming.Stage;
+import clusterless.substrate.aws.resources.DeployMeta;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.AppProps;
@@ -22,14 +23,25 @@ public class StagedApp extends App {
         return (StagedApp) scope.getNode().getRoot();
     }
 
-    Label stage;
+    Stage stage;
 
-    public StagedApp(@NotNull AppProps props, @NotNull Label stage) {
+    DeployMeta deployMeta = new DeployMeta();
+
+    public StagedApp(@NotNull AppProps props, @NotNull Stage stage) {
         super(props);
         this.stage = stage;
     }
 
-    public Label stage() {
+    public Stage stage() {
         return stage;
+    }
+
+    public StagedApp setDeployMeta(DeployMeta deployMeta) {
+        this.deployMeta = deployMeta;
+        return this;
+    }
+
+    public DeployMeta deployMeta() {
+        return deployMeta;
     }
 }

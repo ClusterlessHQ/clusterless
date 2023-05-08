@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.resource.eventbridge;
+package clusterless.substrate.aws.resource.batch;
 
 import clusterless.managed.component.ProvidesComponent;
 import clusterless.managed.component.ResourceComponentService;
@@ -15,16 +15,16 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent("aws:core:eventBus")
-public class EventBridgeResourceProvider implements ResourceComponentService<ManagedComponentContext, EventBridgeResource, EventBridgeResourceConstruct> {
+@ProvidesComponent("aws:core:computeEnvironment")
+public class ComputeResourceProvider implements ResourceComponentService<ManagedComponentContext, ComputeResource, ComputeResourceConstruct> {
 
     @Override
-    public EventBridgeResourceConstruct create(ManagedComponentContext context, EventBridgeResource model) {
-        return new EventBridgeResourceConstruct(context, model);
+    public ComputeResourceConstruct create(ManagedComponentContext context, ComputeResource model) {
+        return new ComputeResourceConstruct(context, model);
     }
 
     @Override
-    public Class<EventBridgeResource> modelClass() {
-        return EventBridgeResource.class;
+    public Class<ComputeResource> modelClass() {
+        return ComputeResource.class;
     }
 }

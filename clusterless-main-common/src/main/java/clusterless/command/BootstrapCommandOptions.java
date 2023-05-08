@@ -25,7 +25,8 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
     )
     String region;
     @CommandLine.Option(
-            names = {"--stage"}
+            names = {"--stage"},
+            arity = "0..1"
     )
     String stage;
     @CommandLine.Option(

@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.resources;
 
+import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
-import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.store.StateStore;
 import clusterless.substrate.aws.store.Stores;
 import org.jetbrains.annotations.NotNull;
@@ -41,10 +41,6 @@ public class BootstrapStores {
         return fromBucket(scope, Arc);
     }
 
-    public static String arcStateStoreNameRef(@NotNull Construct scope) {
-        return bootstrapStoreNameRef(scope, Arc);
-    }
-
     public static String manifestStoreName(@NotNull Construct scope) {
         return bootstrapStoreName(scope, Manifest);
     }
@@ -54,7 +50,16 @@ public class BootstrapStores {
     }
 
     public static String manifestStoreNameRef(@NotNull Construct scope) {
-        return bootstrapStoreNameRef(scope, Manifest);
+        return importName(scope, Manifest);
+    }
+
+    private static String importName(@NotNull Construct scope, StateStore store) {
+        ExportRef ref = ClsBootstrap.bootstrapBase(scope)
+                .withQualifier(ExportRef.ExportQualifier.Name)
+                .withResourceType(store.typeKey())
+                .withResourceName(store.storeKey());
+
+        return Fn.importValue(ref.exportName());
     }
 
     @NotNull
@@ -64,10 +69,5 @@ public class BootstrapStores {
 
     private static String bootstrapStoreName(@NotNull Construct scope, StateStore bucketName) {
         return Stores.bootstrapStoreName(bucketName, StateURIs.placementFor(scope));
-    }
-
-    private static String bootstrapStoreNameRef(@NotNull Construct scope, StateStore name) {
-        Label stage = StagedApp.stagedOf(scope).stage();
-        return Fn.importValue(stage.with(name.storeNameKey()).lowerHyphen());
     }
 }

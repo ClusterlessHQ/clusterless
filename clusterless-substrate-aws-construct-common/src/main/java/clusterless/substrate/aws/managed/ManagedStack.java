@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.managed;
 
 import clusterless.model.deploy.Deployable;
+import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.resources.Stacks;
 import org.jetbrains.annotations.NotNull;
@@ -62,5 +63,12 @@ public class ManagedStack extends StagedStack implements Managed {
         if (target != this) {
             super.addDependency(target);
         }
+    }
+
+    @Override
+    protected ExportRef withContext(ExportRef ref) {
+        return super.withContext(ref)
+                .withScope(managedProject().name())
+                .withScopeVersion(managedProject().version());
     }
 }

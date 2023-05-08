@@ -84,6 +84,14 @@ public class Strings {
         return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, string);
     }
 
+    public static String camelToLowerCamel(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, string);
+    }
+
     public static String camelToLowerUnderscore(String string) {
         if (string == null) {
             return null;

@@ -45,6 +45,10 @@ public class Fixed implements Label, Serializable {
         return value();
     }
 
+    public String lowerColonPath() {
+        return value();
+    }
+
     @Override
     public String lowerUnderscore() {
         return value();

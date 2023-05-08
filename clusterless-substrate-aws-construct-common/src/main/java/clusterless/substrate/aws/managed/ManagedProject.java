@@ -10,6 +10,7 @@ package clusterless.substrate.aws.managed;
 
 import clusterless.model.deploy.Deployable;
 import clusterless.naming.Label;
+import clusterless.naming.Stage;
 import clusterless.substrate.aws.util.TagsUtil;
 import clusterless.util.OrderedMaps;
 import software.amazon.awscdk.AppProps;
@@ -41,7 +42,7 @@ public class ManagedProject extends StagedApp implements Managed {
                                 "stage", Label.of(stage).upperOnly()
                         ))
                         .build(),
-                Label.of(stage)
+                Stage.of(stage)
         );
 
         this.name = Label.of(name);

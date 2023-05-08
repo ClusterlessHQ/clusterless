@@ -14,6 +14,7 @@ import clusterless.config.CommonConfig;
 import clusterless.config.Configuration;
 import clusterless.json.JSONUtil;
 import clusterless.startup.Startup;
+import clusterless.util.Lazy;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import clusterless.util.URIs;
@@ -45,6 +46,8 @@ import java.util.stream.Collectors;
  */
 public class ProcessExec {
     private static final Logger LOG = LogManager.getLogger(ProcessExec.class);
+    public static final String CLS_CDK_COMMAND = "CLS_CDK_COMMAND";
+    public static final String CLS_CDK_OUTPUT_PATH = "CLS_CDK_OUTPUT_PATH";
 
     private Supplier<Boolean> dryRun = () -> false;
 
@@ -78,6 +81,8 @@ public class ProcessExec {
             hidden = true
     )
     private Optional<Boolean> useTempOutput;
+
+    private final Lazy<String> outputPath = Lazy.of(this::createOutputPath);
 
     public ProcessExec() {
     }
@@ -163,7 +168,7 @@ public class ProcessExec {
                         "--profile",
                         profile(),
                         "--output",
-                        createOutputPath()
+                        getOutputPath()
                 ))
         );
 
@@ -176,7 +181,12 @@ public class ProcessExec {
 
         cdkCommands.addAll(commandArgs);
 
-        return executeProcess(cdkCommands);
+        Map<String, String> environment = OrderedSafeMaps.of(
+                CLS_CDK_COMMAND, cdkCommand,
+                CLS_CDK_OUTPUT_PATH, getOutputPath()
+        );
+
+        return executeProcess(environment, cdkCommands);
     }
 
     @NotNull
@@ -191,6 +201,10 @@ public class ProcessExec {
         Startup.asPropertyArgs(apArgs, properties);
 
         return apArgs;
+    }
+
+    public String getOutputPath() {
+        return outputPath.get();
     }
 
     private String createOutputPath() {
@@ -209,23 +223,25 @@ public class ProcessExec {
     }
 
     protected Integer executeCDK(String... cdkArgs) {
-        return executeProcess(Lists.asList(cdk(), cdkArgs));
+        return executeProcess(Collections.emptyMap(), Lists.asList(cdk(), cdkArgs));
     }
 
     protected int executeProcess(String... args) {
-        return executeProcess(List.of(args));
+        return executeProcess(Collections.emptyMap(), List.of(args));
     }
 
-    protected int executeProcess(List<String> args) {
+    protected int executeProcess(Map<String, String> environment, List<String> args) {
         try {
-            return process(args);
+            return process(environment, args);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private int process(List<String> args) throws IOException, InterruptedException {
-        Map<String, String> environment = getEnvironment();
+    private int process(Map<String, String> parentEnv, List<String> args) throws IOException, InterruptedException {
+        Map<String, String> environment = getCommonEnvironment();
+
+        environment.putAll(parentEnv);
 
         if (!environment.isEmpty()) {
             LOG.info("environment: {}", environment);
@@ -252,8 +268,9 @@ public class ProcessExec {
         return exitCode;
     }
 
-    private Map<String, String> getEnvironment() {
+    private Map<String, String> getCommonEnvironment() {
         return OrderedSafeMaps.of(
+                "JSII_SILENCE_WARNING_DEPRECATED_NODE_VERSION", "true",
                 "LOCALSTACK_HOSTNAME", getLocalStackHostName(),
                 "EDGE_PORT", getLocalStackPort()
         );

@@ -13,37 +13,24 @@ import clusterless.naming.Label;
 import clusterless.substrate.aws.construct.ModelConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.CfnOutput;
-import software.amazon.awscdk.CfnOutputProps;
 import software.amazon.awscdk.services.events.EventBus;
-
-import java.util.Locale;
 
 /**
  *
  */
-public class EventBridgeModelConstruct extends ModelConstruct<EventBridgeResource> implements ResourceComponent {
+public class EventBridgeResourceConstruct extends ModelConstruct<EventBridgeResource> implements ResourceComponent {
 
     private final EventBus eventBus;
 
-    public EventBridgeModelConstruct(@NotNull ManagedComponentContext context, @NotNull EventBridgeResource model) {
+    public EventBridgeResourceConstruct(@NotNull ManagedComponentContext context, @NotNull EventBridgeResource model) {
         super(context, model, model.eventBusName());
 
         eventBus = EventBus.Builder.create(this, Label.of(model.eventBusName()).camelCase())
                 .eventBusName(model.eventBusName())
                 .build();
 
-        new CfnOutput(this, id("EventBusARN"), new CfnOutputProps.Builder()
-                .exportName(String.format("eventbus:%s:arn", model().eventBusName().toLowerCase(Locale.ROOT)))
-                .value(eventBus().getEventBusArn())
-                .description("event bus arn")
-                .build());
-
-        new CfnOutput(this, id("EventBusName"), new CfnOutputProps.Builder()
-                .exportName(String.format("eventbus:%s:name", model().eventBusName().toLowerCase(Locale.ROOT)))
-                .value(eventBus().getEventBusName())
-                .description("event bus name")
-                .build());
+        addArnFor("eventBus", model().eventBusName(), eventBus().getEventBusArn(), "event bus arn");
+        addNameFor("eventBus", model().eventBusName(), eventBus().getEventBusArn(), "event bus name");
     }
 
     public EventBus eventBus() {

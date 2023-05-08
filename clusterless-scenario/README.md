@@ -13,9 +13,9 @@ A scenario follows this simple pattern:
 
 ### Gradle
 
-> ./gradlew clean :clusterless-substrate-aws-scenario:run
+> ./gradlew clean :clusterless-scenario:run
 
 ### Console
 
-> ./gradlew clean :clusterless-substrate-aws-scenario:installDist
-> ./clusterless-substrate-aws-scenario/build/install/cls-scenario/bin/cls-scenario --help
+> ./gradlew clean :clusterless-scenario:installDist
+> ./clusterless-scenario/build/install/cls-scenario/bin/cls-scenario --help

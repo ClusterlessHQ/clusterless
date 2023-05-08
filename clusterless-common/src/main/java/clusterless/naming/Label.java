@@ -30,6 +30,12 @@ public interface Label {
         return Arrays.stream(labels).reduce(Label.NULL, Label::with);
     }
 
+    static void requireNonEmpty(Label label) {
+        if (label == null || label.isNull()) {
+            throw new NullPointerException();
+        }
+    }
+
     interface EnumLabel extends Label {
         String name();
 
@@ -172,6 +178,16 @@ public interface Label {
             }
 
             @Override
+            public String lowerCamelCase() {
+                return String.format("%s%s", Label.this.lowerCamelCase(), label.camelCase());
+            }
+
+            @Override
+            public String lowerColonPath() {
+                return String.format("%s:%s", Label.this.lowerColonPath(), label.lowerColonPath());
+            }
+
+            @Override
             public String lowerHyphen() {
                 return String.format("%s-%s", Label.this.lowerHyphen(), label.lowerHyphen());
             }
@@ -234,6 +250,14 @@ public interface Label {
      */
     default String shortCamelCase() {
         return abbreviated().camelCase();
+    }
+
+    default String lowerCamelCase() {
+        return Strings.camelToLowerCamel(camelCase());
+    }
+
+    default String lowerColonPath() {
+        return Strings.camelToLowerHyphen(camelCase());
     }
 
     default String lowerHyphen() {

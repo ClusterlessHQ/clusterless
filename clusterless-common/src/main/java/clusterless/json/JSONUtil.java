@@ -25,6 +25,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,6 +192,23 @@ public class JSONUtil {
         try {
             return OBJECT_WRITER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static void writeAsStringSafe(Path path, Object object) {
+        try {
+            String string = OBJECT_WRITER.writeValueAsString(object);
+            Files.write(path, List.of(string));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T readAsObjectSafe(Path path, Class<T> type) {
+        try {
+            return OBJECT_READER.readValue(path.toFile(), type);
+        } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }

@@ -15,15 +15,11 @@ import clusterless.substrate.aws.util.TagsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.CfnOutput;
-import software.amazon.awscdk.CfnOutputProps;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.s3.BlockPublicAccess;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketEncryption;
 import software.amazon.awscdk.services.s3.IBucket;
-
-import java.util.Locale;
 
 /**
  *
@@ -57,11 +53,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
 
         TagsUtil.applyTags(bucket, model().tags());
 
-        new CfnOutput(this, id("BucketARN"), new CfnOutputProps.Builder()
-                .exportName(String.format("s3:%s:arn", model().bucketName().toLowerCase(Locale.ROOT)))
-                .value(bucket().getBucketArn())
-                .description("s3 bucket arn")
-                .build());
+        addArnFor("s3", model().bucketName(), bucket().getBucketArn(), "s3 bucket arn");
     }
 
     public IBucket bucket() {

@@ -9,19 +9,30 @@
 package clusterless.substrate.aws.bootstrap;
 
 import clusterless.command.BootstrapCommandOptions;
-import clusterless.naming.Label;
+import clusterless.json.JSONUtil;
+import clusterless.naming.Stage;
 import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.ProcessExec;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Stacks;
+import clusterless.substrate.aws.sdk.S3;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import clusterless.util.Strings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -38,6 +49,7 @@ import java.util.concurrent.Callable;
         name = "bootstrap"
 )
 public class Bootstrap extends CommonCommand implements Callable<Integer> {
+    private static final Logger LOG = LogManager.getLogger(Bootstrap.class);
     @CommandLine.Mixin
     BootstrapCommandOptions commandOptions = new BootstrapCommandOptions();
     @CommandLine.Mixin
@@ -62,7 +74,7 @@ public class Bootstrap extends CommonCommand implements Callable<Integer> {
                 "--region",
                 region,
                 "--stage",
-                stage
+                Strings.emptyToNull(stage)
         ));
 
         if (System.getenv("CLS_SYNTH_ONLY") != null) {
@@ -72,20 +84,40 @@ public class Bootstrap extends CommonCommand implements Callable<Integer> {
 
         List<String> kernelArgs = Lists.concat(List.of("--synth"), args);
 
+        LOG.info("executing kernel with: {}", kernelArgs);
+
         processExec.setUseTempOutput(true);
         processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), "deploy", getRequireDeployApproval(), "bootstrap", kernelArgs);
+
+        Path bootstrapMetaPath = createBootstrapMetaPath(processExec.getOutputPath());
+
+        LOG.info("reading metadata from: {}", bootstrapMetaPath.toAbsolutePath());
+
+        BootstrapMeta bootstrapMeta = JSONUtil.readAsObjectSafe(bootstrapMetaPath, BootstrapMeta.class);
+
+        S3 s3 = new S3(processExec.profile(), region);
+
+        URI metaURI = S3.createS3URI(bootstrapMeta.exports().get("metadata").name(), "metadata.json");
+
+        LOG.info("putting metadata in: {}", metaURI);
+
+        s3.put(metaURI, "application/json", bootstrapMeta)
+                .isSuccessOrThrowRuntime(r -> String.format("unable to upload bootstrap metadata to: %s, %s", metaURI, r.errorMessage()));
 
         return 0;
     }
 
     private Integer synth() {
 
-        Label stage = Label.of(commandOptions.stage());
+        Stage stage = Stage.of(commandOptions.stage());
 
         AppProps props = AppProps.builder()
                 .build();
 
         StagedApp app = new StagedApp(props, stage);
+
+        BootstrapMeta deployMeta = new BootstrapMeta();
+        app.setDeployMeta(deployMeta);
 
         String stackName = Stacks.bootstrapStackName(stage);
 
@@ -102,7 +134,31 @@ public class Bootstrap extends CommonCommand implements Callable<Integer> {
 
         app.synth();
 
+        writeBootstrapMeta(deployMeta);
+
         return 0;
+    }
+
+    private static void writeBootstrapMeta(BootstrapMeta bootstrapMeta) {
+        String outputPath = System.getenv().get(ProcessExec.CLS_CDK_OUTPUT_PATH);
+
+        if (outputPath != null) {
+            Path bootstrapMetaPath = createBootstrapMetaPath(outputPath);
+            LOG.info("writing metadata to: {}", bootstrapMetaPath.toAbsolutePath());
+
+            try {
+                Files.createDirectories(bootstrapMetaPath.getParent());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+
+            JSONUtil.writeAsStringSafe(bootstrapMetaPath, bootstrapMeta);
+        }
+    }
+
+    @NotNull
+    private static Path createBootstrapMetaPath(String outputPath) {
+        return Paths.get(outputPath).resolve("bootstrap").resolve("meta.json");
     }
 
     protected String prompt(String value, String prompt) {

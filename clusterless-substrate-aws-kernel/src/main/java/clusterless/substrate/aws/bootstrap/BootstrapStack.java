@@ -8,16 +8,21 @@
 
 package clusterless.substrate.aws.bootstrap;
 
+import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
+import clusterless.substrate.aws.bootstrap.vpc.VPCConstruct;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.managed.StagedStack;
 import clusterless.substrate.aws.resources.BootstrapStores;
+import clusterless.substrate.aws.resources.ClsBootstrap;
 import clusterless.substrate.aws.resources.Events;
 import clusterless.substrate.aws.util.ErrorsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.*;
+import software.amazon.awscdk.Environment;
+import software.amazon.awscdk.RemovalPolicy;
+import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.events.EventBus;
 import software.amazon.awscdk.services.s3.BlockPublicAccess;
 import software.amazon.awscdk.services.s3.Bucket;
@@ -25,8 +30,11 @@ import software.amazon.awscdk.services.s3.BucketEncryption;
 
 import java.util.Objects;
 
-import static clusterless.substrate.aws.store.StateStore.Arc;
-import static clusterless.substrate.aws.store.StateStore.Manifest;
+import static clusterless.substrate.aws.resources.Events.ARC_EVENT_BUS;
+import static clusterless.substrate.aws.resources.Events.EVENT_BUS;
+import static clusterless.substrate.aws.resources.Vpcs.COMMON_VPC;
+import static clusterless.substrate.aws.resources.Vpcs.VPC;
+import static clusterless.substrate.aws.store.StateStore.*;
 
 /**
  * keys to consider exporting
@@ -37,17 +45,11 @@ import static clusterless.substrate.aws.store.StateStore.Manifest;
  */
 public class BootstrapStack extends StagedStack {
     private static final Logger LOG = LogManager.getLogger(BootstrapStack.class);
-    public static final String BOOTSTRAP_VERSION = "1";
-    private EventBus eventBus;
 
     public BootstrapStack(@NotNull StagedApp app, @NotNull StackProps props) {
         super(app, "ClusterlessBootstrapStack", props);
 
         constructStack(app, props);
-    }
-
-    public EventBus eventBus() {
-        return eventBus;
     }
 
     protected void constructStack(@NotNull StagedApp app, @NotNull StackProps props) {
@@ -61,28 +63,38 @@ public class BootstrapStack extends StagedStack {
 
         String arcEventBusName = Events.arcEventBusName(this);
 
-        eventBus = EventBus.Builder.create(this, "ArcEventBus")
+        EventBus.Builder.create(this, "ArcEventBus")
                 .eventBusName(arcEventBusName)
                 .build();
 
-        constructSharedBucket(metadataBucketName, stage().with("Metadata"));
-        constructSharedBucket(arcStateBucketName, stage().with("ArcState"));
-        constructSharedBucket(manifestBucketName, stage().with("Manifest"));
+        VPCConstruct vpcConstruct = new VPCConstruct(this);
 
-        createOutputFor(stage().with("BootstrapVersion"), BOOTSTRAP_VERSION, "clusterless bootstrap version");
-        createOutputFor(stage().with(Events.ARC_EVENT_BUS_NAME), arcEventBusName, "clusterless arc event bus name");
-        createOutputFor(stage().with(Arc.storeNameKey()), arcStateBucketName, "clusterless arc state bucket name");
-        createOutputFor(stage().with(Manifest.storeNameKey()), manifestBucketName, "clusterless manifest bucket name");
-    }
+        Bucket metadata = constructSharedBucket(metadataBucketName, stage().with("Metadata"));
+        Bucket arcState = constructSharedBucket(arcStateBucketName, stage().with("ArcState"));
+        Bucket manifest = constructSharedBucket(manifestBucketName, stage().with("Manifest"));
 
-    protected void createOutputFor(Label name, String value, String description) {
-        LOG.info("creating output for: {}", name);
+        BootstrapMeta bootstrapMeta = (BootstrapMeta) app.deployMeta();
 
-        new CfnOutput(this, name.camelCase(), new CfnOutputProps.Builder()
-                .exportName(name.lowerHyphen())
-                .value(value)
-                .description(description)
-                .build());
+        bootstrapMeta.setVersion(ClsBootstrap.BOOTSTRAP_VERSION);
+
+        ExportRef metaRef = ExportRef.ref().withResourceType(Meta.typeKey()).withResourceName(Meta.storeKey());
+        addNameFor(metaRef, metadataBucketName, "clusterless metadata bucket name");
+        addArnFor(metaRef, metadata.getBucketArn(), "clusterless metadata bucket arn");
+
+        ExportRef arcStateRef = ExportRef.ref().withResourceType(Arc.typeKey()).withResourceName(Arc.storeKey());
+        addNameFor(arcStateRef, arcStateBucketName, "clusterless arc state bucket name");
+        addArnFor(arcStateRef, arcState.getBucketArn(), "clusterless arc state bucket arn");
+
+        ExportRef manifestRef = ExportRef.ref().withResourceType(Manifest.typeKey()).withResourceName(Manifest.storeKey());
+        addNameFor(manifestRef, manifestBucketName, "clusterless manifest bucket name");
+        addArnFor(manifestRef, manifest.getBucketArn(), "clusterless manifest bucket arn");
+
+        ExportRef eventBusRef = ExportRef.ref().withResourceType(EVENT_BUS).withResourceName(ARC_EVENT_BUS);
+        addNameFor(eventBusRef, arcEventBusName, "clusterless arc event bus name");
+
+        ExportRef vpcRef = ExportRef.ref().withResourceType(VPC).withResourceName(COMMON_VPC);
+        addIdFor(vpcRef, vpcConstruct.vpcId(), "clusterless vpc id");
+        addArnFor(vpcRef, vpcConstruct.vpcArn(), "clusterless vpc arn");
     }
 
     private Bucket constructSharedBucket(String bucketName, Label prefix) {
@@ -97,5 +109,12 @@ public class BootstrapStack extends StagedStack {
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .autoDeleteObjects(true)
                 .build(), LOG);
+    }
+
+    @Override
+    protected ExportRef withContext(ExportRef ref) {
+        return super.withContext(ref)
+                .withScope("bootstrap")
+                .withScopeVersion(ClsBootstrap.BOOTSTRAP_VERSION);
     }
 }

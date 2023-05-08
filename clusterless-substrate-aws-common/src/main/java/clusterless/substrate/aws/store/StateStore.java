@@ -1,5 +1,6 @@
 package clusterless.substrate.aws.store;
 
+import clusterless.naming.Fixed;
 import clusterless.naming.Label;
 
 public enum StateStore implements Label {
@@ -18,7 +19,11 @@ public enum StateStore implements Label {
         return value;
     }
 
-    public Label storeNameKey() {
-        return this.with("StoreName");
+    public Fixed typeKey() {
+        return Fixed.of(lowerCamelCase());
+    }
+
+    public Label storeKey() {
+        return Label.of(this.with("Store").camelCase());
     }
 }
