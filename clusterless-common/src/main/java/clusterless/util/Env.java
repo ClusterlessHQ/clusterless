@@ -25,19 +25,34 @@ import java.util.function.Supplier;
  * This option may be easier to debug
  */
 public class Env {
+    protected static final Label CLS = Label.of("ClS");
+
     public static Map<String, String> toEnv(Object object) {
         return OrderedSafeMaps.of(
-                key(object), value(object)
+                key(object), value(object),
+                keyTyped(object), valueTyped(object)
         );
     }
 
     public static String value(Object object) {
+        return JSONUtil.writeAsStringSafe(object);
+    }
+
+    public static String valueTyped(Object object) {
         return JSONUtil.writeTypedAsStringSafe(object);
     }
 
+    public static String keyTyped(Object object) {
+        return key(object, CLS);
+    }
+
     public static String key(Object object) {
+        return key(object, null);
+    }
+
+    public static String key(Object object, Label postfix) {
         Class<?> type = object.getClass();
-        return keyNameFor(type);
+        return keyNameFor(type, postfix);
     }
 
     public static <T> T fromEnv(Class<T> type) {
@@ -50,7 +65,7 @@ public class Env {
     }
 
     public static <T> T fromEnv(Function<String, String> envMap, Class<T> type, Supplier<T> defaultValue) {
-        String key = keyNameFor(type);
+        String key = keyNameFor(type, CLS); // need the typed version to load our internal objects
         String value = envMap.apply(key);
 
         if (value == null) {
@@ -60,7 +75,7 @@ public class Env {
         return JSONUtil.readTypedObjectSafe(value, type);
     }
 
-    private static String keyNameFor(Class<?> type) {
-        return Label.of(type.getSimpleName()).upperUnderscore();
+    private static String keyNameFor(Class<?> type, Label postfix) {
+        return Label.of(type.getSimpleName()).with(postfix).upperUnderscore();
     }
 }

@@ -36,7 +36,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
 
     @SystemStub
     private EnvironmentVariables environmentVariables = new EnvironmentVariables()
-            .set(Env.key(getProps()), Env.value(getProps())) // shove the props json into an env var
+            .set(Env.keyTyped(getProps()), Env.valueTyped(getProps())) // shove the props json into an env var
             .set("AWS_ACCESS_KEY_ID", localstack.getAccessKey())
             .set("AWS_SECRET_ACCESS_KEY", localstack.getSecretKey())
             .set("AWS_DEFAULT_REGION", localstack.getRegion())

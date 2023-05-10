@@ -20,6 +20,7 @@ import software.amazon.awscdk.services.s3.BlockPublicAccess;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketEncryption;
 import software.amazon.awscdk.services.s3.IBucket;
+import software.constructs.Construct;
 
 /**
  *
@@ -53,7 +54,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
 
         TagsUtil.applyTags(bucket, model().tags());
 
-        addArnFor("s3", model().bucketName(), bucket().getBucketArn(), "s3 bucket arn");
+        addArnFor(model(), (Construct) bucket, bucket().getBucketArn(), "s3 bucket arn");
     }
 
     public IBucket bucket() {

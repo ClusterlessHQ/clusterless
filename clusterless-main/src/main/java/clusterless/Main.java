@@ -50,7 +50,9 @@ public class Main extends Startup implements Callable<Integer> {
     private String[] args;
 
     public static void main(String[] args) {
-        CommandLine commandLine = new CommandLine(new Main(args));
+        Main main = new Main(args);
+
+        CommandLine commandLine = new CommandLine(main);
 
         commandLine.addSubcommand("bootstrap", new CommandWrapper(new BootstrapCommandOptions()));
         commandLine.addSubcommand("verify", new CommandWrapper(new VerifyCommandOptions()));
@@ -58,7 +60,12 @@ public class Main extends Startup implements Callable<Integer> {
         commandLine.addSubcommand("destroy", new CommandWrapper(new DestroyCommandOptions()));
         commandLine.addSubcommand("diff", new CommandWrapper(new DiffCommandOptions()));
 
-        commandLine.parseArgs(args);
+        try {
+            commandLine.parseArgs(args);
+        } catch (CommandLine.MissingParameterException e) {
+            System.err.println(e.getMessage());
+            System.exit(-1);
+        }
 
         if (commandLine.isUsageHelpRequested()) {
             commandLine.usage(System.out);
@@ -68,7 +75,21 @@ public class Main extends Startup implements Callable<Integer> {
             return;
         }
 
-        System.exit(commandLine.execute(args));
+        int exitCode = 0;
+
+        try {
+            exitCode = commandLine.execute(args);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+
+            if (main.verbosity().level() > 0) {
+                e.printStackTrace(System.err);
+            }
+
+            System.exit(-1); // get exit code from exception
+        }
+
+        System.exit(exitCode);
     }
 
     public Main(String[] args) {

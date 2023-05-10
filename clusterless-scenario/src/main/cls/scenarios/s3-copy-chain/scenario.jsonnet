@@ -6,7 +6,7 @@ local bucketName = 'clusterless-chain-test-' + account + '-' + region;
   name: 'copy-chain',
   description: 'chained copy workloads',
   projectFiles: [
-    'test-s3-copy-arc-project-chain.json',
+    's3-copy-arc-project-chain.json',
   ],
   ingressStores: [
     {

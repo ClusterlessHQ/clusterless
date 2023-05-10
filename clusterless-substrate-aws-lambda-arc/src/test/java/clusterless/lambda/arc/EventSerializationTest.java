@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class EventSerializationTest extends LambdaHandlerTestBase {
     @SystemStub
     private EnvironmentVariables environmentVariables = new EnvironmentVariables()
-            .set(Env.key(getProps()), Env.value(getProps())); // shove the props json into an env var
+            .set(Env.keyTyped(getProps()), Env.valueTyped(getProps())); // shove the props json into an env var
 
     TestDatasets datasets;
 

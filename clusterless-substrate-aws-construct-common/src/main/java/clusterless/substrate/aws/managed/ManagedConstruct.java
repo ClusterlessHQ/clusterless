@@ -8,8 +8,9 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.naming.ExportRef;
+import clusterless.model.deploy.Resource;
 import clusterless.naming.Label;
+import clusterless.naming.Ref;
 import org.jetbrains.annotations.NotNull;
 import software.constructs.Construct;
 
@@ -28,39 +29,42 @@ public class ManagedConstruct extends Construct implements Managed {
         return context;
     }
 
-    protected void addArnFor(String resourceType, String resourceName, String value, String description) {
-        ExportRef ref = ExportRef.ref()
-                .withResourceType(resourceType)
-                .withResourceName(resourceName);
+    protected void addArnFor(Resource resource, Construct construct, String value, String description) {
+        Ref ref = Ref.ref()
+                .withResourceNs(resource.resourceNs())
+                .withResourceType(resource.resourceType())
+                .withResourceName(resource.name());
 
-        addArnFor(ref, value, description);
+        addArnFor(ref, construct, value, description);
     }
 
-    protected void addArnFor(ExportRef ref, String value, String description) {
-        StagedStack.stagedOf(this).addArnFor(ref, value, description);
+    protected void addArnFor(Ref ref, Construct construct, String value, String description) {
+        StagedStack.stagedOf(this).addArnFor(ref, construct, value, description);
     }
 
-    protected void addIdFor(String resourceType, String resourceName, String value, String description) {
-        ExportRef ref = ExportRef.ref()
-                .withResourceType(resourceType)
-                .withResourceName(resourceName);
+    protected void addIdFor(Resource resource, Construct construct, String value, String description) {
+        Ref ref = Ref.ref()
+                .withResourceNs(resource.resourceNs())
+                .withResourceType(resource.resourceType())
+                .withResourceName(resource.name());
 
-        addIdFor(ref, value, description);
+        addIdFor(ref, construct, value, description);
     }
 
-    protected void addIdFor(ExportRef ref, String value, String description) {
-        StagedStack.stagedOf(this).addIdFor(ref, value, description);
+    protected void addIdFor(Ref ref, Construct construct, String value, String description) {
+        StagedStack.stagedOf(this).addIdFor(ref, construct, value, description);
     }
 
-    protected void addNameFor(String resourceType, String resourceName, String value, String description) {
-        ExportRef ref = ExportRef.ref()
-                .withResourceType(resourceType)
-                .withResourceName(resourceName);
+    protected void addNameFor(Resource resource, Construct construct, String value, String description) {
+        Ref ref = Ref.ref()
+                .withResourceNs(resource.resourceNs())
+                .withResourceType(resource.resourceType())
+                .withResourceName(resource.name());
 
-        addNameFor(ref, value, description);
+        addNameFor(ref, construct, value, description);
     }
 
-    protected void addNameFor(ExportRef ref, String value, String description) {
-        StagedStack.stagedOf(this).addNameFor(ref, value, description);
+    protected void addNameFor(Ref ref, Construct construct, String value, String description) {
+        StagedStack.stagedOf(this).addNameFor(ref, construct, value, description);
     }
 }

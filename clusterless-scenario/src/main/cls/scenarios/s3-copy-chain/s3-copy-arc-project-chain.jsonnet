@@ -17,6 +17,7 @@ local unit = 'Twelfths';
   resources: [
     {
       type: 'aws:core:s3Bucket',
+      name: 'bucket',
       bucketName: bucketName,
     },
   ],

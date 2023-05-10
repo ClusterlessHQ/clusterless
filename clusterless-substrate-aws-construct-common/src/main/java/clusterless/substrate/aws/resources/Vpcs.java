@@ -1,7 +1,6 @@
 package clusterless.substrate.aws.resources;
 
-import clusterless.naming.ExportRef;
-import clusterless.naming.Stage;
+import clusterless.naming.Ref;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Fn;
 import software.constructs.Construct;
@@ -13,25 +12,23 @@ public class Vpcs {
     public static final String COMMON_VPC = "CommonVpc";
     public static final String VPC = "vpc";
 
-    public static String bootstrapVPCName(Stage stage) {
-        Objects.requireNonNull(stage, "stage is null");
+    public static String bootstrapVPCName(Construct scope) {
+        Objects.requireNonNull(scope, "scope is null");
 
-        return stage.asLower()
-                .with(COMMON_VPC)
-                .lowerHyphen();
+        return Resources.regionallyUniqueName(scope, COMMON_VPC);
     }
 
     public static String bootstrapVpcIdRef(@NotNull Construct scope) {
-        return importValue(scope, ExportRef.idRef());
+        return importValue(scope, Ref.idRef());
     }
 
     public static String bootstrapVpcArnRef(@NotNull Construct scope) {
-        return importValue(scope, ExportRef.arnRef());
+        return importValue(scope, Ref.arnRef());
     }
 
     @NotNull
-    private static String importValue(@NotNull Construct scope, ExportRef qualified) {
-        ExportRef ref = ClsBootstrap.bootstrapBase(scope, qualified)
+    private static String importValue(@NotNull Construct scope, Ref qualified) {
+        Ref ref = ClsBootstrap.bootstrapBase(scope, qualified)
                 .withResourceType(VPC)
                 .withResourceName(COMMON_VPC);
 

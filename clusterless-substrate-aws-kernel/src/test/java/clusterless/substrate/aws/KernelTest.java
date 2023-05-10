@@ -49,10 +49,12 @@ public class KernelTest {
            "\"resources\" : [\n" +
            "    {\n" +
            "        \"type\" : \"aws:core:s3Bucket\",\n" +
+           "        \"name\" : \"sample-bucket1\",\n" +
            "        \"bucketName\" : \"sample-bucket1\"\n" +
            "    },\n" +
            "    {\n" +
            "        \"type\" : \"aws:core:s3Bucket\",\n" +
+           "        \"name\" : \"sample-bucket2\",\n" +
            "        \"bucketName\" : \"sample-bucket2\"\n" +
            "    }\n" +
            "    ]\n" +

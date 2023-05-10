@@ -20,6 +20,7 @@ import software.amazon.awscdk.services.batch.alpha.FargateComputeEnvironment;
 import software.amazon.awscdk.services.batch.alpha.IManagedComputeEnvironment;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ec2.VpcLookupOptions;
+import software.constructs.Construct;
 
 /**
  *
@@ -29,12 +30,12 @@ public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource>
     private final IManagedComputeEnvironment computeEnvironment;
 
     public ComputeResourceConstruct(@NotNull ManagedComponentContext context, @NotNull ComputeResource model) {
-        super(context, model, model.computeName());
+        super(context, model, model.computeEnvironmentName());
 
-        String name = Resources.regionallyUniqueProjectName(this, model().computeName());
+        String name = Resources.regionallyUniqueProjectName(this, model().computeEnvironmentName());
 
         computeEnvironment = constructWithinHandler(() ->
-                        FargateComputeEnvironment.Builder.create(this, id(model().computeName()))
+                        FargateComputeEnvironment.Builder.create(this, id(model().computeEnvironmentName()))
                                 .computeEnvironmentName(name) // globally unique
                                 .replaceComputeEnvironment(false)
                                 .maxvCpus(4096)
@@ -45,10 +46,10 @@ public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource>
                                 .vpc(
                                         Vpc.fromLookup(
                                                 this,
-                                                "CommonVpc",
+                                                "VpcLookup",
                                                 VpcLookupOptions.builder()
                                                         .region(context.managedProject().getRegion())
-                                                        .vpcId(Vpcs.bootstrapVpcIdRef(this))
+                                                        .vpcName(Vpcs.bootstrapVPCName(this))
                                                         .build()
                                         )
                                 )
@@ -60,7 +61,7 @@ public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource>
 
         String computeEnvironmentArn = computeEnvironment.getComputeEnvironmentArn();
 
-        addArnFor("computeEnvironment", model.computeName(), computeEnvironmentArn, "compute environment arn");
+        addArnFor(model(), (Construct) computeEnvironment, computeEnvironmentArn, "compute environment arn");
     }
 
     public IManagedComputeEnvironment computeEnvironment() {

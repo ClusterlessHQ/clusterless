@@ -20,6 +20,8 @@ public class Verbosity {
         disable();
     }
 
+    private int level = 0;
+
     public static void setLoggingLevel(Level level) {
         Configurator.setRootLevel(level);
     }
@@ -46,7 +48,12 @@ public class Verbosity {
         setLoggingLevel(verbosity.length);
     }
 
+    public int level() {
+        return level;
+    }
+
     protected void setLoggingLevel(int level) {
+        this.level = level;
         switch (level) {
             case 0:
                 disable();

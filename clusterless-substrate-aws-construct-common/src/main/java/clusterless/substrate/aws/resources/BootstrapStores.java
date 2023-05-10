@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.resources;
 
-import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
+import clusterless.naming.Ref;
 import clusterless.substrate.aws.store.StateStore;
 import clusterless.substrate.aws.store.Stores;
 import org.jetbrains.annotations.NotNull;
@@ -54,10 +54,9 @@ public class BootstrapStores {
     }
 
     private static String importName(@NotNull Construct scope, StateStore store) {
-        ExportRef ref = ClsBootstrap.bootstrapBase(scope)
-                .withQualifier(ExportRef.ExportQualifier.Name)
+        Ref ref = ClsBootstrap.bootstrapBase(scope, Ref.nameRef())
                 .withResourceType(store.typeKey())
-                .withResourceName(store.storeKey());
+                .withResourceName("store");
 
         return Fn.importValue(ref.exportName());
     }

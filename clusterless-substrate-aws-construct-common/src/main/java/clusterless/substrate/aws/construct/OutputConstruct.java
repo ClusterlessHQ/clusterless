@@ -1,6 +1,7 @@
 package clusterless.substrate.aws.construct;
 
 import clusterless.naming.Label;
+import clusterless.naming.Ref;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -12,22 +13,22 @@ public class OutputConstruct extends Construct {
     private static final Logger LOG = LogManager.getLogger(OutputConstruct.class);
     private final String exportName;
 
-    public OutputConstruct(@NotNull Construct construct, Label name, String value, String description) {
-        super(construct, Label.of("Output").with(name).camelCase());
+    public OutputConstruct(@NotNull Construct construct, Ref ref, String value, String description) {
+        super(construct, Label.of("Output").with(ref.resourceLabel()).with(ref.qualifier()).camelCase());
 
-        exportName = createOutputFor(name, value, description);
+        exportName = createOutputFor(ref, value, description);
     }
 
     public String exportName() {
         return exportName;
     }
 
-    protected String createOutputFor(Label name, String value, String description) {
-        String exportName = name.lowerColonPath();
+    protected String createOutputFor(Ref ref, String value, String description) {
+        String exportName = ref.exportName();
 
         LOG.info("creating output for: {}", exportName);
 
-        new CfnOutput(this, name.camelCase(), new CfnOutputProps.Builder()
+        new CfnOutput(this, ref.resourceLabel().camelCase(), new CfnOutputProps.Builder()
                 .exportName(exportName)
                 .value(value)
                 .description(description)

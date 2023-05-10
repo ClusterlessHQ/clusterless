@@ -7,8 +7,10 @@
 #
 
 clusterless.substrate.aws.resource.s3.S3BucketResourceProvider
-clusterless.substrate.aws.boundary.s3put.S3PutListenerBoundaryProvider
-
+clusterless.substrate.aws.resource.batch.ComputeResourceProvider
 clusterless.substrate.aws.resource.eventbridge.EventBridgeResourceProvider
 
+clusterless.substrate.aws.boundary.s3put.S3PutListenerBoundaryProvider
+
 clusterless.substrate.aws.arc.s3copy.S3CopyArcProvider
+clusterless.substrate.aws.arc.batch.BatchExecArcProvider

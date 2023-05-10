@@ -29,8 +29,8 @@ public class EventBridgeResourceConstruct extends ModelConstruct<EventBridgeReso
                 .eventBusName(model.eventBusName())
                 .build();
 
-        addArnFor("eventBus", model().eventBusName(), eventBus().getEventBusArn(), "event bus arn");
-        addNameFor("eventBus", model().eventBusName(), eventBus().getEventBusArn(), "event bus name");
+        addArnFor(model(), eventBus(), eventBus().getEventBusArn(), "event bus arn");
+        addNameFor(model(), eventBus(), model().eventBusName(), "event bus name");
     }
 
     public EventBus eventBus() {

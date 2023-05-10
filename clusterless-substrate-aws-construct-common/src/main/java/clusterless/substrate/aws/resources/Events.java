@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.resources;
 
-import clusterless.naming.ExportRef;
 import clusterless.naming.Label;
+import clusterless.naming.Ref;
 import clusterless.naming.Region;
 import clusterless.substrate.aws.managed.StagedApp;
 import org.jetbrains.annotations.NotNull;
@@ -29,13 +29,13 @@ public class Events {
     }
 
     public static String arcEventBusNameRef(@NotNull Construct scope) {
-        ExportRef ref = ClsBootstrap.bootstrapBase(scope)
-                .withQualifier(ExportRef.ExportQualifier.Name)
+        Ref ref = ClsBootstrap.bootstrapBase(scope, Ref.nameRef())
                 .withResourceType(EVENT_BUS)
                 .withResourceName(ARC_EVENT_BUS);
 
         return Fn.importValue(ref.exportName());
     }
+
     private static String eventBusName(@NotNull Construct scope, String name) {
         Label region = Region.of(Stack.of(scope).getRegion());
         Label stage = StagedApp.stagedOf(scope).stage();

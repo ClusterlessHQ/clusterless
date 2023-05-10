@@ -8,8 +8,7 @@
 
 package clusterless.substrate.aws.managed;
 
-import clusterless.naming.ExportRef;
-import clusterless.naming.Label;
+import clusterless.naming.Ref;
 import clusterless.naming.Stage;
 import clusterless.substrate.aws.construct.OutputConstruct;
 import org.jetbrains.annotations.NotNull;
@@ -51,11 +50,15 @@ public class StagedStack extends Stack {
         return stage;
     }
 
-    protected void addNameFor(ExportRef ref, String value, String description) {
-        ExportRef.ExportQualifier qualifier = ExportRef.ExportQualifier.Name;
-        Label uniqueName = withContext(ref).withQualifier(qualifier).label();
+    protected void addNameFor(Ref ref, String value, String description) {
+        addNameFor(ref, null, value, description);
+    }
 
-        OutputConstruct outputConstruct = new OutputConstruct(this, uniqueName, value, description);
+    protected void addNameFor(Ref ref, Construct construct, String value, String description) {
+        Ref.Qualifier qualifier = Ref.Qualifier.Name;
+        Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
+
+        OutputConstruct outputConstruct = new OutputConstruct(this, qualifiedRef, value, description);
 
         if (!Token.isUnresolved(value)) {
             StagedApp.stagedOf(this)
@@ -67,13 +70,21 @@ public class StagedStack extends Stack {
                 .deployMeta()
                 .setNameRef(ref.resourceType().value(), outputConstruct.exportName());
 
+        if (construct != null) {
+            StagedApp.stagedOf(this)
+                    .addRef(qualifiedRef, construct);
+        }
     }
 
-    protected void addIdFor(ExportRef ref, String value, String description) {
-        ExportRef.ExportQualifier qualifier = ExportRef.ExportQualifier.Id;
-        Label uniqueName = withContext(ref).withQualifier(qualifier).label();
+    protected void addIdFor(Ref ref, String value, String description) {
+        addIdFor(ref, null, value, description);
+    }
 
-        OutputConstruct outputConstruct = new OutputConstruct(this, uniqueName, value, description);
+    protected void addIdFor(Ref ref, Construct construct, String value, String description) {
+        Ref.Qualifier qualifier = Ref.Qualifier.Id;
+        Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
+
+        OutputConstruct outputConstruct = new OutputConstruct(this, qualifiedRef, value, description);
 
         if (!Token.isUnresolved(value)) {
             StagedApp.stagedOf(this)
@@ -85,20 +96,33 @@ public class StagedStack extends Stack {
                 .deployMeta()
                 .setIdRef(ref.resourceType().value(), outputConstruct.exportName());
 
+        if (construct != null) {
+            StagedApp.stagedOf(this)
+                    .addRef(qualifiedRef, construct);
+        }
     }
 
-    protected void addArnFor(ExportRef ref, String value, String description) {
-        ExportRef.ExportQualifier qualifier = ExportRef.ExportQualifier.Arn;
-        Label uniqueName = withContext(ref).withQualifier(qualifier).label();
+    protected void addArnFor(Ref ref, String value, String description) {
+        addArnFor(ref, null, value, description);
+    }
 
-        OutputConstruct outputConstruct = new OutputConstruct(this, uniqueName, value, description);
+    protected void addArnFor(Ref ref, Construct construct, String value, String description) {
+        Ref.Qualifier qualifier = Ref.Qualifier.Arn;
+        Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
+
+        OutputConstruct outputConstruct = new OutputConstruct(this, qualifiedRef, value, description);
 
         StagedApp.stagedOf(this)
                 .deployMeta()
                 .setArnRef(ref.resourceType().value(), outputConstruct.exportName());
+
+        if (construct != null) {
+            StagedApp.stagedOf(this)
+                    .addRef(qualifiedRef, construct);
+        }
     }
 
-    protected ExportRef withContext(ExportRef ref) {
+    protected Ref withContext(Ref ref) {
         return ref
                 .withProvider("aws")
                 .withStage(stage());

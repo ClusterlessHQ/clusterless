@@ -13,6 +13,12 @@ import clusterless.model.deploy.Workload;
 import clusterless.model.deploy.WorkloadProps;
 import clusterless.substrate.aws.props.BatchRuntimeProps;
 
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  */
@@ -21,12 +27,36 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
     public static class BatchWorkload extends Workload<WorkloadProps> {
         BatchRuntimeProps runtimeProps = new BatchRuntimeProps();
 
+        String computeEnvironmentRef;
+
+        Path imagePath;
+
+        Map<String, String> environment = new LinkedHashMap<>();
+
+        List<String> command = new LinkedList<>();
+
         public BatchWorkload() {
             super(new WorkloadProps());
         }
 
         public BatchRuntimeProps runtimeProps() {
             return runtimeProps;
+        }
+
+        public String computeEnvironmentRef() {
+            return computeEnvironmentRef;
+        }
+
+        public Path imagePath() {
+            return imagePath;
+        }
+
+        public Map<String, String> environment() {
+            return environment;
+        }
+
+        public List<String> command() {
+            return command;
         }
     }
 

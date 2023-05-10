@@ -17,14 +17,30 @@ import java.util.Map;
  * Creates and maintains an S3 bucket and any associated metadata.
  */
 public class ComputeResource extends Resource {
-    private String computeName;
+    public enum ComputeType {
+        ec2,
+        fargate
+    }
+
+    private ComputeType computeType = ComputeType.fargate;
+
+    private boolean useSpot = false;
+    private String computeEnvironmentName;
     private Map<String, String> tags = new LinkedHashMap<>();
 
     public ComputeResource() {
     }
 
-    public String computeName() {
-        return computeName;
+    public ComputeType computeType() {
+        return computeType;
+    }
+
+    public boolean useSpot() {
+        return useSpot;
+    }
+
+    public String computeEnvironmentName() {
+        return computeEnvironmentName;
     }
 
     public Map<String, String> tags() {

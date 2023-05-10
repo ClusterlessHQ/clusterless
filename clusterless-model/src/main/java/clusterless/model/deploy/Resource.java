@@ -15,4 +15,17 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName
 public abstract class Resource extends Support {
+    String name;
+
+    public String name() {
+        return name;
+    }
+
+    public String resourceNs() {
+        return type().split(":")[1];
+    }
+
+    public String resourceType() {
+        return type().split(":")[2];
+    }
 }
