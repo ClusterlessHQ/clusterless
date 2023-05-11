@@ -6,11 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.bootstrap;
+package clusterless.substrate.aws.cdk.bootstrap;
 
 import clusterless.naming.Label;
 import clusterless.naming.Ref;
-import clusterless.substrate.aws.bootstrap.vpc.VPCConstruct;
+import clusterless.substrate.aws.cdk.bootstrap.vpc.VPCConstruct;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.managed.StagedStack;
 import clusterless.substrate.aws.resources.BootstrapStores;

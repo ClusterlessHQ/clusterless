@@ -14,5 +14,5 @@ import picocli.CommandLine;
  *
  */
 @CommandLine.Command(description = "diff the given project files with the deployed project")
-public class DiffCommandOptions extends LifecycleCommandOptions {
+public class DiffCommandOptions extends ProjectCommandOptions {
 }

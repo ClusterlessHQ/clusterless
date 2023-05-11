@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.bootstrap;
+package clusterless.substrate.aws.cdk.bootstrap;
 
 import clusterless.command.BootstrapCommandOptions;
 import clusterless.json.JSONUtil;
 import clusterless.naming.Stage;
-import clusterless.substrate.aws.CommonCommand;
-import clusterless.substrate.aws.ProcessExec;
+import clusterless.substrate.aws.cdk.CDKCommand;
+import clusterless.substrate.aws.cdk.CDKProcessExec;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Stacks;
 import clusterless.substrate.aws.sdk.S3;
@@ -48,12 +48,12 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "bootstrap"
 )
-public class Bootstrap extends CommonCommand implements Callable<Integer> {
+public class Bootstrap extends CDKCommand implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Bootstrap.class);
     @CommandLine.Mixin
     BootstrapCommandOptions commandOptions = new BootstrapCommandOptions();
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec(commandOptions);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions);
 
     @Override
     public Integer call() throws Exception {
@@ -140,7 +140,7 @@ public class Bootstrap extends CommonCommand implements Callable<Integer> {
     }
 
     private static void writeBootstrapMeta(BootstrapMeta bootstrapMeta) {
-        String outputPath = System.getenv().get(ProcessExec.CLS_CDK_OUTPUT_PATH);
+        String outputPath = System.getenv().get(CDKProcessExec.CLS_CDK_OUTPUT_PATH);
 
         if (outputPath != null) {
             Path bootstrapMetaPath = createBootstrapMetaPath(outputPath);

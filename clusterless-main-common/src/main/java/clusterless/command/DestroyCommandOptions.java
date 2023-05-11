@@ -15,5 +15,5 @@ import picocli.CommandLine;
  *
  */
 @CommandLine.Command(description = "destroy project declared by the project files")
-public class DestroyCommandOptions extends LifecycleCommandOptions {
+public class DestroyCommandOptions extends ProjectCommandOptions {
 }

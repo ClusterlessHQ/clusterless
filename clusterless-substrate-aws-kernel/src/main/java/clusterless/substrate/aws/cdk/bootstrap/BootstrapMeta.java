@@ -1,4 +1,4 @@
-package clusterless.substrate.aws.bootstrap;
+package clusterless.substrate.aws.cdk.bootstrap;
 
 import clusterless.substrate.aws.resources.DeployMeta;
 

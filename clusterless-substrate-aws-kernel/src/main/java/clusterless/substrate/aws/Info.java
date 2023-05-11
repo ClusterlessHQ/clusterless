@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws;
 
+import clusterless.substrate.aws.cdk.CDKProcessExec;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -18,7 +19,7 @@ import java.util.concurrent.Callable;
 public class Info implements Callable<Integer> {
 
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec();
+    CDKProcessExec processExec = new CDKProcessExec();
 
     public Info() {
 

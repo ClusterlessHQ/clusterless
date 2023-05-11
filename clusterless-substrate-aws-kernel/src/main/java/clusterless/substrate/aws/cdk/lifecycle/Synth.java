@@ -6,11 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.cdk;
+package clusterless.substrate.aws.cdk.lifecycle;
 
-import clusterless.command.LifecycleCommandOptions;
-import clusterless.substrate.aws.CommonCommand;
-import clusterless.substrate.aws.cdk.lifecycle.Lifecycle;
+import clusterless.command.ProjectCommandOptions;
+import clusterless.substrate.aws.cdk.CDKCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -22,10 +21,10 @@ import java.util.concurrent.Callable;
         name = "synth",
         hidden = true
 )
-public class Synth extends CommonCommand implements Callable<Integer> {
+public class Synth extends CDKCommand implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Synth.class);
     @CommandLine.Mixin
-    LifecycleCommandOptions commandOptions = new LifecycleCommandOptions();
+    ProjectCommandOptions commandOptions = new ProjectCommandOptions();
     Lifecycle lifecycle = new Lifecycle();
 
     @Override

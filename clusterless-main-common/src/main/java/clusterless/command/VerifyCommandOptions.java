@@ -15,5 +15,5 @@ import picocli.CommandLine;
  *
  */
 @CommandLine.Command(description = "verify the given project files will render into the substrate declaration format")
-public class VerifyCommandOptions extends LifecycleCommandOptions {
+public class VerifyCommandOptions extends ProjectCommandOptions {
 }

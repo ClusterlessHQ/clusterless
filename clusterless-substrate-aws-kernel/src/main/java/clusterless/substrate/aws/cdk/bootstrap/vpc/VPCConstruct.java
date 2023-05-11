@@ -1,4 +1,4 @@
-package clusterless.substrate.aws.bootstrap.vpc;
+package clusterless.substrate.aws.cdk.bootstrap.vpc;
 
 import clusterless.substrate.aws.managed.Managed;
 import clusterless.substrate.aws.resources.Resources;

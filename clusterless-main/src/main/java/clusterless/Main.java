@@ -59,6 +59,7 @@ public class Main extends Startup implements Callable<Integer> {
         commandLine.addSubcommand("deploy", new CommandWrapper(new DeployCommandOptions()));
         commandLine.addSubcommand("destroy", new CommandWrapper(new DestroyCommandOptions()));
         commandLine.addSubcommand("diff", new CommandWrapper(new DiffCommandOptions()));
+        commandLine.addSubcommand("local", new CommandWrapper(new LocalCommandOptions()));
 
         try {
             commandLine.parseArgs(args);
@@ -110,14 +111,14 @@ public class Main extends Startup implements Callable<Integer> {
     }
 
     public Integer run(CommonCommandOptions command) throws IOException {
-        if (command instanceof LifecycleCommandOptions) {
-            return run((LifecycleCommandOptions) command);
+        if (command instanceof ProjectCommandOptions) {
+            return run((ProjectCommandOptions) command);
         }
 
         return run(substratesOptions().providerNames());
     }
 
-    public Integer run(LifecycleCommandOptions command) throws IOException {
+    public Integer run(ProjectCommandOptions command) throws IOException {
 
         Loader loader = new Loader(command.projectFiles());
 

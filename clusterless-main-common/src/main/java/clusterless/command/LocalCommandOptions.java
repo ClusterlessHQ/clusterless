@@ -8,12 +8,11 @@
 
 package clusterless.command;
 
-
 import picocli.CommandLine;
 
 /**
  *
  */
-@CommandLine.Command(description = "deploy the given project files")
-public class DeployCommandOptions extends ProjectCommandOptions {
+@CommandLine.Command(description = "")
+public class LocalCommandOptions extends ProjectCommandOptions {
 }

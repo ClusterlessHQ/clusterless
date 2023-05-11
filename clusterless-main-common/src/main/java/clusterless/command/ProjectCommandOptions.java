@@ -18,7 +18,7 @@ import java.util.List;
 /**
  *
  */
-public class LifecycleCommandOptions extends CommonCommandOptions {
+public class ProjectCommandOptions extends CommonCommandOptions {
     @CommandLine.Option(
             names = {"-p", "--project"},
             description = "the files that declare the project to be deployed"

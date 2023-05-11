@@ -6,11 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.cdk;
+package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.command.VerifyCommandOptions;
-import clusterless.substrate.aws.CommonCommand;
-import clusterless.substrate.aws.ProcessExec;
+import clusterless.substrate.aws.cdk.CDKCommand;
+import clusterless.substrate.aws.cdk.CDKProcessExec;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -18,11 +18,11 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "verify"
 )
-public class Verify extends CommonCommand implements Callable<Integer> {
+public class Verify extends CDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     VerifyCommandOptions commandOptions = new VerifyCommandOptions();
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec(commandOptions);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions);
 
     public Verify() {
     }

@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.cdk;
+package clusterless.substrate.aws.cdk.lifecycle;
 
 
 import clusterless.command.DestroyCommandOptions;
-import clusterless.substrate.aws.CommonCommand;
-import clusterless.substrate.aws.ProcessExec;
+import clusterless.substrate.aws.cdk.CDKCommand;
+import clusterless.substrate.aws.cdk.CDKProcessExec;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -19,11 +19,11 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "destroy"
 )
-public class Destroy extends CommonCommand implements Callable<Integer> {
+public class Destroy extends CDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     DestroyCommandOptions commandOptions = new DestroyCommandOptions();
     @CommandLine.Mixin
-    ProcessExec processExec = new ProcessExec(commandOptions);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions);
 
     @Override
     public Integer call() throws Exception {
