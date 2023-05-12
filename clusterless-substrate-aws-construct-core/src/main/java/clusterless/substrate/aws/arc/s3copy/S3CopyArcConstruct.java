@@ -8,18 +8,13 @@
 
 package clusterless.substrate.aws.arc.s3copy;
 
-import clusterless.lambda.arc.ArcProps;
 import clusterless.lambda.workload.s3copy.S3CopyArcEventHandler;
-import clusterless.model.deploy.WorkloadProps;
-import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Label;
+import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Assets;
 import clusterless.substrate.aws.resources.Functions;
-import clusterless.substrate.aws.resources.StateURIs;
-import clusterless.substrate.aws.uri.ManifestURI;
-import clusterless.util.Env;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;
@@ -32,7 +27,6 @@ import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -44,25 +38,7 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
     public S3CopyArcConstruct(@NotNull ManagedComponentContext context, @NotNull S3CopyArc model) {
         super(context, model);
 
-        Map<String, ManifestURI> sourceManifestPaths = model.sources()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.complete, e.getValue())));
-
-        Map<String, ManifestURI> sinkManifestPaths = model.sinks()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, e.getValue())));
-
-        ArcProps<WorkloadProps> arcProps = ArcProps.builder()
-                .withSources(model().sources())
-                .withSinks(model().sinks())
-                .withSourceManifestPaths(sourceManifestPaths)
-                .withSinkManifestPaths(sinkManifestPaths)
-                .withWorkloadProps(model.workload().workloadProps())
-                .build();
-
-        Map<String, String> environment = Env.toEnv(arcProps);
+        Map<String, String> environment = new ArcEnvBuilder(placement(), model()).asEnvironment();
 
         String functionName = Functions.functionName(this, model().name(), "S3Copy");
         Label functionLabel = Label.of(model().name()).with("S3Copy");
@@ -84,11 +60,12 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
     }
 
     @Override
-    public State createState(String resultPath, State failed) {
+    public State createState(String inputPath, String resultPath, State failed) {
         LambdaInvoke invoke = LambdaInvoke.Builder.create(this, "S3CopyFunction")
                 .lambdaFunction(function())
                 .retryOnServiceExceptions(true)
                 .payloadResponseOnly(true) // sets .invocationType(LambdaInvocationType.REQUEST_RESPONSE)
+                .inputPath(inputPath)
                 .resultPath(resultPath)
                 .build();
 

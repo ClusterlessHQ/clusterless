@@ -9,7 +9,6 @@
 package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
-import clusterless.substrate.aws.event.ArcStateContext;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.JavaType;
@@ -56,7 +55,7 @@ public abstract class StreamResultHandler<E, R> implements RequestStreamHandler 
 
     protected final ObjectWriter writer;
 
-    public StreamResultHandler(Class<ArcStateContext> readerType, JavaType writerType) {
+    public StreamResultHandler(Class<E> readerType, JavaType writerType) {
         this.reader = objectReaderFor(readerType);
         this.writer = objectWriterFor(writerType);
     }

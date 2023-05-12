@@ -9,7 +9,6 @@
 package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
-import clusterless.substrate.aws.event.ArcStateContext;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.MapType;
@@ -21,7 +20,7 @@ public abstract class EventResultHandler<E, R, O extends EventObserver> extends 
         super(incoming, outgoing);
     }
 
-    public EventResultHandler(Class<ArcStateContext> incoming, JavaType outgoing) {
+    public EventResultHandler(Class<E> incoming, JavaType outgoing) {
         super(incoming, outgoing);
     }
 

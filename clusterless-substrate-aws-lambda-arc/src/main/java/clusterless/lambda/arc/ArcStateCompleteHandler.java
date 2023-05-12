@@ -11,6 +11,7 @@ package clusterless.lambda.arc;
 import clusterless.lambda.StreamResultHandler;
 import clusterless.model.manifest.ManifestState;
 import clusterless.model.state.ArcState;
+import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.uri.ManifestURI;
 import clusterless.substrate.aws.uri.StateURI;
@@ -128,10 +129,12 @@ public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext
         }
 
         return ArcStateContext.builder()
-                .withArcNotifyEvent(event.arcNotifyEvent())
+                .withArcExecContext(ArcExecContext.builder()
+                        .withArcNotifyEvent(event.arcNotifyEvent())
+                        .withRole(event.role())
+                        .build())
                 .withPreviousState(event.previousState())
                 .withCurrentState(newArcState)
-                .withRole(event.role())
                 .build();
     }
 }

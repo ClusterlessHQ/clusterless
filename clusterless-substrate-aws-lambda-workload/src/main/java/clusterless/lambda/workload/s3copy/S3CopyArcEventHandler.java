@@ -15,8 +15,8 @@ import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.model.UriType;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
+import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
-import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.sdk.ClientBase;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.util.Tuple2;
@@ -75,9 +75,9 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
     }
 
     @Override
-    protected Map<String, URI> handleEvent(ArcStateContext arcStateContext, Context context, ArcEventObserver eventObserver) {
-        String fromRole = arcStateContext.role();
-        ArcNotifyEvent notifyEvent = arcStateContext.arcNotifyEvent();
+    protected Map<String, URI> handleEvent(ArcExecContext arcExecContext, Context context, ArcEventObserver eventObserver) {
+        String fromRole = arcExecContext.role();
+        ArcNotifyEvent notifyEvent = arcExecContext.arcNotifyEvent();
         String lotId = notifyEvent.lotId();
         URI incomingManifestIdentifier = notifyEvent.manifest();
 

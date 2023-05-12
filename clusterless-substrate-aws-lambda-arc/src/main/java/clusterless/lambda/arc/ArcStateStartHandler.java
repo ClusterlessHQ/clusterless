@@ -10,6 +10,7 @@ package clusterless.lambda.arc;
 
 import clusterless.lambda.StreamResultHandler;
 import clusterless.model.state.ArcState;
+import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.util.Env;
@@ -88,7 +89,9 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
             eventObserver.applyFinalArcStates(ArcState.running, ArcState.running);
             LOG.info("lot already running: {}", lotId);
             return ArcStateContext.builder()
-                    .withArcNotifyEvent(event)
+                    .withArcExecContext(ArcExecContext.builder()
+                            .withArcNotifyEvent(event)
+                            .build())
                     .withPreviousState(ArcState.running)
                     .withCurrentState(ArcState.running)
                     .build();
@@ -99,7 +102,9 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
             LOG.info("lot already completed: {}", lotId);
             eventObserver.applyFinalArcStates(currentState.get(), currentState.get());
             return ArcStateContext.builder()
-                    .withArcNotifyEvent(event)
+                    .withArcExecContext(ArcExecContext.builder()
+                            .withArcNotifyEvent(event)
+                            .build())
                     .withPreviousState(currentState.get())
                     .withCurrentState(currentState.get())
                     .build();
@@ -139,11 +144,12 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         // list existing sink partial manifest identifiers
         eventObserver.applyFinalArcStates(currentState.orElse(null), ArcState.running);
         return ArcStateContext.builder()
-                .withArcNotifyEvent(event)
-                .withRole(roles.get(0))
+                .withArcExecContext(ArcExecContext.builder()
+                        .withArcNotifyEvent(event)
+                        .withRole(roles.get(0))
+                        .build())
                 .withPreviousState(currentState.orElse(null)) // partial or null
                 .withCurrentState(ArcState.running)
-//                .withSinkCompleteManifest()
                 .build();
     }
 }

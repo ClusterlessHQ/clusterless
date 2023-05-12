@@ -13,8 +13,8 @@
 package clusterless;
 
 import clusterless.command.*;
+import clusterless.model.Loader;
 import clusterless.model.deploy.Deployable;
-import clusterless.startup.Loader;
 import clusterless.startup.Startup;
 import clusterless.substrate.ProviderSubstratesOptions;
 import clusterless.substrate.SubstrateProvider;

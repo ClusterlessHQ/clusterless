@@ -11,13 +11,13 @@ package clusterless.substrate.aws.cdk.lifecycle;
 import clusterless.config.Configurations;
 import clusterless.managed.ModelType;
 import clusterless.managed.component.*;
+import clusterless.model.DeployableLoader;
 import clusterless.model.Model;
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Extensible;
 import clusterless.model.deploy.Workload;
 import clusterless.naming.Label;
-import clusterless.startup.Loader;
 import clusterless.substrate.aws.arc.ArcStack;
 import clusterless.substrate.aws.cdk.CDK;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
@@ -25,7 +25,6 @@ import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,9 +57,9 @@ public class Lifecycle {
         managedProject.synth();
     }
 
-    protected List<Deployable> loadProjectModels(List<File> deployFiles) throws IOException {
-        return new Loader(deployFiles)
-                .readObjects(CDK.PROVIDER, Deployable.PROVIDER_POINTER, Deployable.class, Deployable::setSourceFile);
+    public List<Deployable> loadProjectModels(List<File> deployFiles) throws IOException {
+        return new DeployableLoader(deployFiles)
+                .readObjects(CDK.PROVIDER);
     }
 
     public ManagedProject mapProject(List<Deployable> deployables) {
@@ -97,7 +96,7 @@ public class Lifecycle {
     }
 
     private void constructManagedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] independent) {
-        Map<Extensible, ComponentService<ComponentContext, Model, Component>> managed = getMangedTypesFor(Isolation.managed, independent, deployable, new LinkedHashMap<>());
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> managed = componentServices.componentServicesFor(Isolation.managed, deployable, independent);
 
         if (managed.isEmpty()) {
             LOG.info("found no managed models");
@@ -130,7 +129,7 @@ public class Lifecycle {
     }
 
     private void constructIndependentStacks(ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
-        Map<Extensible, ComponentService<ComponentContext, Model, Component>> isolated = getMangedTypesFor(Isolation.independent, isolatable, deployable, new LinkedHashMap<>());
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> isolated = componentServices.componentServicesFor(Isolation.independent, deployable, isolatable);
 
         if (isolated.isEmpty()) {
             LOG.info("found no independent models");
@@ -142,7 +141,7 @@ public class Lifecycle {
     }
 
     private void constructGroupedStack(ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
-        Map<Extensible, ComponentService<ComponentContext, Model, Component>> included = getMangedTypesFor(Isolation.grouped, includable, deployable, new LinkedHashMap<>());
+        Map<Extensible, ComponentService<ComponentContext, Model, Component>> included = componentServices.componentServicesFor(Isolation.grouped, deployable, includable);
 
         if (included.isEmpty()) {
             LOG.info("found no grouped models");
@@ -174,7 +173,7 @@ public class Lifecycle {
         Map<Extensible, ComponentService<ComponentContext, Model, Component>> map = new LinkedHashMap<>();
 
         for (Isolation isolation : Isolation.values()) {
-            getMangedTypesFor(isolation, ModelType.values(), deployableModel, map);
+            map.putAll(componentServices.componentServicesFor(isolation, deployableModel, ModelType.values()));
         }
 
         Set<String> missing = map.entrySet()
@@ -187,37 +186,6 @@ public class Lifecycle {
             missing.forEach(type -> LOG.error("unable to find component provider for: " + type));
             throw new IllegalStateException("found missing providers: " + missing);
         }
-    }
-
-    private Map<Extensible, ComponentService<ComponentContext, Model, Component>> getMangedTypesFor(Isolation isolation, ModelType[] modelTypes, Deployable deployableModel, Map<Extensible, ComponentService<ComponentContext, Model, Component>> map) {
-        EnumMap<ModelType, Map<String, ComponentService<ComponentContext, Model, Component>>> containerMap = componentServices.componentServicesFor(isolation);
-
-        for (ModelType modelType : modelTypes) {
-            if (!containerMap.containsKey(modelType)) {
-                continue;
-            }
-
-            for (Extensible extensible : getExtensiblesFor(modelType, deployableModel)) {
-                // put a null if not available
-                map.put(extensible, containerMap.get(modelType).get(extensible.type()));
-            }
-        }
-
-        return map;
-    }
-
-    @NotNull
-    private static List<Extensible> getExtensiblesFor(ModelType modelType, Deployable deployableModel) {
-        switch (modelType) {
-            case Resource:
-                return new ArrayList<>(deployableModel.resources());
-            case Boundary:
-                return new ArrayList<>(deployableModel.boundaries());
-            case Arc:
-                return new ArrayList<>(deployableModel.arcs());
-        }
-
-        return Collections.emptyList();
     }
 
     private static Set<String> verifyNonNull(String propertyName, Set<String> values) {

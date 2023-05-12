@@ -8,17 +8,12 @@
 
 package clusterless.substrate.aws.arc.batch;
 
-import clusterless.lambda.arc.ArcProps;
-import clusterless.model.deploy.WorkloadProps;
-import clusterless.model.manifest.ManifestState;
+import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Refs;
 import clusterless.substrate.aws.resources.Resources;
-import clusterless.substrate.aws.resources.StateURIs;
-import clusterless.substrate.aws.uri.ManifestURI;
-import clusterless.util.Env;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -40,10 +35,9 @@ import software.constructs.Construct;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
- *
+ * https://stackoverflow.com/questions/65835855/aws-batch-job-execution-results-in-step-function
  */
 public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     private static final Logger LOG = LogManager.getLogger(BatchExecArcConstruct.class);
@@ -53,25 +47,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     public BatchExecArcConstruct(@NotNull ManagedComponentContext context, @NotNull BatchExecArc model) {
         super(context, model);
 
-        Map<String, ManifestURI> sourceManifestPaths = model.sources()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, ManifestState.complete, e.getValue())));
-
-        Map<String, ManifestURI> sinkManifestPaths = model.sinks()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(this, e.getValue())));
-
-        ArcProps<WorkloadProps> arcProps = ArcProps.builder()
-                .withSources(model().sources())
-                .withSinks(model().sinks())
-                .withSourceManifestPaths(sourceManifestPaths)
-                .withSinkManifestPaths(sinkManifestPaths)
-                .withWorkloadProps(model.workload().workloadProps())
-                .build();
-
-        Map<String, String> environment = Env.toEnv(arcProps);
+        Map<String, String> environment = new ArcEnvBuilder(placement(), model()).asEnvironment();
 
         AssetImage image = ContainerImage.fromAsset(
                 model().workload().imagePath().toString(),
@@ -90,7 +66,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .image(image)
                 .executionRole(executionRole)
                 .environment(environment)
-                .command(List.of())
+                .command(List.of()) // TODO:
                 .cpu(.25) // vcpu - 1 vCPU is equivalent to 1,024 CPU
                 .memory(Size.gibibytes(1))
                 .build();
@@ -134,14 +110,14 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     }
 
     @Override
-    public State createState(String resultPath, State failed) {
+    public State createState(String inputPath, String resultPath, State failed) {
 
         BatchSubmitJob batchSubmitTask = BatchSubmitJob.Builder.create(this, "BatchSubmit")
                 .jobName("name")
                 .jobQueueArn(jobQueue.getJobQueueArn())
                 .resultPath(resultPath)
                 .jobDefinitionArn(jobDefinition.getJobDefinitionArn())
-//                .payload(resultPath)
+//                .payload(TaskInput.fromJsonPathAt())
                 .build();
 
         batchSubmitTask.addCatch(

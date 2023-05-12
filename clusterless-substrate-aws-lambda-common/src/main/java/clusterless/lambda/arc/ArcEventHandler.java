@@ -10,7 +10,7 @@ package clusterless.lambda.arc;
 
 import clusterless.lambda.EventResultHandler;
 import clusterless.model.deploy.WorkloadProps;
-import clusterless.substrate.aws.event.ArcStateContext;
+import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.util.Env;
 
 import java.net.URI;
@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  *
  */
-public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResultHandler<ArcStateContext, Map<String, URI>, ArcEventObserver> {
+public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResultHandler<ArcExecContext, Map<String, URI>, ArcEventObserver> {
     protected static final ArcProps<?> arcProps = Env.fromEnv(
             ArcProps.class,
             () -> ArcProps.builder().build()
@@ -31,7 +31,7 @@ public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResu
     }
 
     public ArcEventHandler() {
-        super(ArcStateContext.class, getMapTypeFor(String.class, URI.class));
+        super(ArcExecContext.class, getMapTypeFor(String.class, URI.class));
 
         logObject("using arcProps", arcProps);
     }

@@ -13,6 +13,37 @@ import picocli.CommandLine;
 /**
  *
  */
-@CommandLine.Command(description = "")
+@CommandLine.Command(description = "exec the specified arc locally for testing")
 public class LocalCommandOptions extends ProjectCommandOptions {
+    @CommandLine.Option(
+            names = {"-a", "--arc"},
+            description = "the arc name to execute",
+            required = true
+    )
+    String arc;
+    @CommandLine.Option(
+            names = {"-l", "--lot"},
+            description = "the lot id of the manifest to source",
+            required = true
+    )
+    String lotId;
+
+    @CommandLine.Option(
+            names = {"-r", "--role"},
+            description = "the dataset role to execute against",
+            required = false
+    )
+    String role;
+
+    public String arc() {
+        return arc;
+    }
+
+    public String lotId() {
+        return lotId;
+    }
+
+    public String role() {
+        return role;
+    }
 }

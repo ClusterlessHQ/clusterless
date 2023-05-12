@@ -9,9 +9,9 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.command.DeployCommandOptions;
+import clusterless.model.Loader;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Placement;
-import clusterless.startup.Loader;
 import clusterless.substrate.aws.cdk.CDK;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;

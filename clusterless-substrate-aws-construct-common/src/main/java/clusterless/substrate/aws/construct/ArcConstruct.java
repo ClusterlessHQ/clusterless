@@ -41,7 +41,7 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
         grantEach(model().sinks(), id("Sink"), b -> b.grantReadWrite(grantable));
     }
 
-    public abstract State createState(String outputPath, State failed);
+    public abstract State createState(String inputPath, String outputPath, State failed);
 
     protected void grantEach(Map<String, ? extends Dataset> sources, String id, Consumer<IBucket> grant) {
         sources.forEach((key, value) -> {

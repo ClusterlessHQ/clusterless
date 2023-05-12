@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.local;
 
 import clusterless.command.LocalCommandOptions;
-import clusterless.substrate.aws.ProcessExec;
+import clusterless.process.ProcessExec;
 
 import java.util.Map;
 
