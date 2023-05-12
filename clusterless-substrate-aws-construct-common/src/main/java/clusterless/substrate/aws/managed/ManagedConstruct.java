@@ -8,10 +8,12 @@
 
 package clusterless.substrate.aws.managed;
 
+import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Resource;
 import clusterless.naming.Label;
 import clusterless.naming.Ref;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
 
 /**
@@ -36,6 +38,19 @@ public class ManagedConstruct extends Construct implements Managed {
                 .withResourceName(resource.name());
 
         addArnFor(ref, construct, value, description);
+    }
+
+    @NotNull
+    protected Placement placement() {
+        String account = Stack.of(this).getAccount();
+        String region = Stack.of(this).getRegion();
+        Label stage = StagedApp.stagedOf(this).stage();
+
+        return Placement.Builder.builder()
+                .withAccount(account)
+                .withRegion(region)
+                .withStage(stage.lowerHyphen())
+                .build();
     }
 
     protected void addArnFor(Ref ref, Construct construct, String value, String description) {

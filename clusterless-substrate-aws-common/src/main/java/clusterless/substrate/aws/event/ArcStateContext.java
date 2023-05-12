@@ -14,16 +14,14 @@ import java.util.Map;
 public class ArcStateContext implements Struct {
     ArcState previousState;
     ArcState currentState;
-    String role;
-    ArcNotifyEvent arcNotifyEvent;
-    Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<>();
+    ArcExecContext arcExecContext = new ArcExecContext();
     Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
 
     public ArcStateContext() {
     }
 
     public static Builder builder() {
-        return Builder.anArcExecContext();
+        return Builder.anArcStateContext();
     }
 
     public ArcState previousState() {
@@ -35,15 +33,15 @@ public class ArcStateContext implements Struct {
     }
 
     public String role() {
-        return role;
+        return arcExecContext.role();
     }
 
     public ArcNotifyEvent arcNotifyEvent() {
-        return arcNotifyEvent;
+        return arcExecContext.arcNotifyEvent();
     }
 
     public Map<String, List<URI>> existingPartialManifests() {
-        return existingPartialManifests;
+        return arcExecContext.existingPartialManifests();
     }
 
     public Map<String, URI> sinkManifests() {
@@ -53,14 +51,13 @@ public class ArcStateContext implements Struct {
     public static final class Builder {
         ArcState previousState;
         ArcState currentState;
-        String role;
-        ArcNotifyEvent arcNotifyEvent;
-        Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<>();
+        ArcExecContext arcExecContext = new ArcExecContext();
+        Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
 
         private Builder() {
         }
 
-        public static Builder anArcExecContext() {
+        public static Builder anArcStateContext() {
             return new Builder();
         }
 
@@ -74,28 +71,22 @@ public class ArcStateContext implements Struct {
             return this;
         }
 
-        public Builder withRole(String role) {
-            this.role = role;
+        public Builder withArcExecContext(ArcExecContext arcExecContext) {
+            this.arcExecContext = arcExecContext;
             return this;
         }
 
-        public Builder withArcNotifyEvent(ArcNotifyEvent arcNotifyEvent) {
-            this.arcNotifyEvent = arcNotifyEvent;
-            return this;
-        }
-
-        public Builder withExistingPartialManifests(Map<String, List<URI>> existingPartialManifests) {
-            this.existingPartialManifests = existingPartialManifests;
+        public Builder withSinkManifests(Map<String, URI> sinkManifests) {
+            this.sinkManifests = sinkManifests;
             return this;
         }
 
         public ArcStateContext build() {
             ArcStateContext arcStateContext = new ArcStateContext();
-            arcStateContext.arcNotifyEvent = this.arcNotifyEvent;
+            arcStateContext.sinkManifests = this.sinkManifests;
+            arcStateContext.arcExecContext = this.arcExecContext;
             arcStateContext.previousState = this.previousState;
             arcStateContext.currentState = this.currentState;
-            arcStateContext.role = this.role;
-            arcStateContext.existingPartialManifests = this.existingPartialManifests;
             return arcStateContext;
         }
     }

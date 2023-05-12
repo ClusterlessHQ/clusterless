@@ -8,8 +8,8 @@ import clusterless.lambda.arc.ArcProps;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.ManifestState;
+import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
-import clusterless.substrate.aws.event.ArcStateContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
@@ -50,9 +50,9 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
                 .build();
     }
 
-    Stream<ArcStateContext> events() {
+    Stream<ArcExecContext> events() {
         return Stream.of(
-                ArcStateContext.builder()
+                ArcExecContext.builder()
                         .withArcNotifyEvent(
                                 ArcNotifyEvent.Builder.builder()
                                         .withDataset(datasets().sourceDatasetMap().get("main"))
@@ -60,8 +60,6 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
                                         .withLotId("20230227PT5M287")
                                         .build()
                         )
-                        .withCurrentState(null)
-                        .withPreviousState(null)
                         .withRole("main")
                         .build()
         );
@@ -78,15 +76,15 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
     }
 
     public void invoke(
-            ArcStateContext arcStateContext
+            ArcExecContext arcExecContext
     ) {
-        Assertions.assertNotNull(arcStateContext);
+        Assertions.assertNotNull(arcExecContext);
 
         S3CopyArcEventHandler handler = new S3CopyArcEventHandler();
 
         ArcEventObserver eventContext = mock();
 
-        Map<String, URI> result = handler.handleEvent(arcStateContext, context(), eventContext);
+        Map<String, URI> result = handler.handleEvent(arcExecContext, context(), eventContext);
 
         Assertions.assertFalse(result.isEmpty());
 

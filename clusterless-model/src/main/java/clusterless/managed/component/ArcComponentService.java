@@ -10,6 +10,8 @@ package clusterless.managed.component;
 
 import clusterless.managed.ModelType;
 import clusterless.model.deploy.Arc;
+import clusterless.model.deploy.Placement;
+import clusterless.model.deploy.Workload;
 
 /**
  *
@@ -18,5 +20,8 @@ import clusterless.model.deploy.Arc;
         provides = ModelType.Arc,
         isolation = Isolation.managed
 )
-public interface ArcComponentService<CC extends ComponentContext, M extends Arc, C extends ArcComponent> extends ComponentService<CC, M, C> {
+public interface ArcComponentService<CC extends ComponentContext, M extends Arc<?>, C extends ArcComponent> extends ComponentService<CC, M, C> {
+    default ArcLocalExecutor executor(Placement placement, Arc<? extends Workload<?>> arc) {
+        throw new UnsupportedOperationException("local exec is unsupported by this arc :" + arc.type());
+    }
 }

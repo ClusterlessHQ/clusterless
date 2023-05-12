@@ -26,10 +26,11 @@ import java.util.function.Supplier;
  */
 public class Env {
     protected static final Label CLS = Label.of("ClS");
+    protected static final Label JSON = Label.of("JSON");
 
     public static Map<String, String> toEnv(Object object) {
         return OrderedSafeMaps.of(
-                key(object), value(object),
+                keyJSON(object), value(object),
                 keyTyped(object), valueTyped(object)
         );
     }
@@ -48,6 +49,10 @@ public class Env {
 
     public static String key(Object object) {
         return key(object, null);
+    }
+
+    public static String keyJSON(Object object) {
+        return key(object, JSON);
     }
 
     public static String key(Object object, Label postfix) {

@@ -1,11 +1,10 @@
-package clusterless.substrate.aws;
+package clusterless.process;
 
 import clusterless.config.Configuration;
 import clusterless.json.JSONUtil;
 import clusterless.startup.Startup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,7 +25,7 @@ public abstract class ProcessExec {
         return dryRun.get();
     }
 
-    protected int executeProcess(String... args) {
+    public int executeProcess(String... args) {
         return executeProcess(Collections.emptyMap(), List.of(args));
     }
 
@@ -68,8 +67,7 @@ public abstract class ProcessExec {
         return exitCode;
     }
 
-    @NotNull
-    protected static List<String> addPropertiesToArgs(@NotNull Configuration... configs) {
+    protected static List<String> addPropertiesToArgs(Configuration... configs) {
         List<String> apArgs = new LinkedList<>();
         Map<String, String> properties = new LinkedHashMap<>();
 

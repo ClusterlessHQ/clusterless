@@ -16,6 +16,11 @@ import software.constructs.Construct;
 public class StateURIs {
     public static ManifestURI manifestPath(@NotNull ManagedConstruct managedConstruct, Dataset dataset) {
         Placement placement = placementFor(managedConstruct);
+        return manifestPath(placement, dataset);
+    }
+
+    @NotNull
+    public static ManifestURI manifestPath(Placement placement, Dataset dataset) {
         return ManifestURI.builder()
                 .withPlacement(placement)
                 .withDataset(dataset)
@@ -23,7 +28,11 @@ public class StateURIs {
     }
 
     public static ManifestURI manifestPath(@NotNull ManagedConstruct managedConstruct, ManifestState state, Dataset dataset) {
-        Placement placement = placementFor(managedConstruct);
+        return manifestPath(placementFor(managedConstruct), state, dataset);
+    }
+
+    @NotNull
+    public static ManifestURI manifestPath(Placement placement, ManifestState state, Dataset dataset) {
         return ManifestURI.builder()
                 .withPlacement(placement)
                 .withDataset(dataset)

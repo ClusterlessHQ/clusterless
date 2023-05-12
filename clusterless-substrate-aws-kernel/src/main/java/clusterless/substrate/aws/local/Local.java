@@ -9,11 +9,26 @@
 package clusterless.substrate.aws.local;
 
 import clusterless.command.LocalCommandOptions;
+import clusterless.managed.component.*;
+import clusterless.model.DeployableLoader;
+import clusterless.model.Model;
+import clusterless.model.deploy.Arc;
+import clusterless.model.deploy.Deployable;
+import clusterless.model.deploy.Placement;
+import clusterless.model.deploy.Workload;
+import clusterless.substrate.aws.cdk.CDK;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -29,8 +44,61 @@ public class Local implements Callable<Integer> {
     //    @CommandLine.Mixin
     LocalProcessExec processExec = new LocalProcessExec(commandOptions);
 
+    ComponentServices componentServices = ComponentServices.INSTANCE;
+
+    public List<Deployable> loadProjectModels(List<File> deployFiles) throws IOException {
+        return new DeployableLoader(deployFiles)
+                .readObjects(CDK.PROVIDER);
+    }
+
     @Override
     public Integer call() throws Exception {
-        return null;
+        List<Deployable> deployables = loadProjectModels(commandOptions.projectFiles());
+
+//        Map<Deployable, List<Arc<? extends Workload<? extends WorkloadProps>>>> found = new LinkedHashMap<>();
+        Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
+
+        for (Deployable deployable : deployables) {
+
+//            List<Arc<? extends Workload<? extends WorkloadProps>>> arcs = deployable.arcs().stream()
+            List<Arc<?>> arcs = deployable.arcs().stream()
+                    .filter(a -> a.name().equalsIgnoreCase(commandOptions.arc()))
+                    .collect(Collectors.toList());
+
+            if (!arcs.isEmpty()) {
+                found.put(deployable, arcs);
+            }
+        }
+
+        List<Arc<? extends Workload<?>>> arcs = found
+                .values()
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        if (arcs.isEmpty()) {
+            System.err.println("no arcs found for: " + commandOptions.arc());
+        }
+
+        if (arcs.size() > 1) {
+            System.err.println("too many arcs found for: " + commandOptions.arc() + ", found: " + arcs.stream().map(Arc::name).collect(Collectors.toList()));
+        }
+
+        Deployable deployable = found.keySet().stream().findFirst().orElseThrow();
+        Arc<? extends Workload<?>> arc = found.get(deployable).get(0);
+
+        ArcLocalExecutor executor = executorFor(deployable.placement(), arc);
+
+        return 0;
+    }
+
+    private ArcLocalExecutor executorFor(Placement placement, Arc<? extends Workload<?>> arc) {
+        Optional<ComponentService<ComponentContext, Model, Component>> componentService = componentServices.componentServicesForArc(arc);
+
+        if (componentService.isEmpty()) {
+            throw new IllegalStateException("unknown component type: " + arc.type());
+        }
+
+        return ((ArcComponentService<?, ?, ?>) componentService.get()).executor(placement, arc);
     }
 }

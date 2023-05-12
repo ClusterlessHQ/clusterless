@@ -11,7 +11,7 @@ package clusterless.managed.component;
 import clusterless.model.Model;
 
 /**
- *
+ * TODO: remove generics, the subtypes are never used
  */
 public interface ComponentService<CC extends ComponentContext, M extends Model, C extends Component> {
     C create(CC context, M model);

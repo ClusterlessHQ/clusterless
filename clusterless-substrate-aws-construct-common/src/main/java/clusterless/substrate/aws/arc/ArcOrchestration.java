@@ -87,8 +87,10 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
     }
 
     private State stateFrom(ArcComponent arcComponent, Fail fail) {
+        // TODO: see if we can simplify the createState api by using a Pass
+        //       before and after to handle the inputPath and outputPath
         return ((ArcConstruct<?>) arcComponent)
-                .createState("$.sinkManifests", fail);
+                .createState("$.arcExecContext", "$.sinkManifests", fail);
     }
 
     @NotNull

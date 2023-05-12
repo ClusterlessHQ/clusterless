@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.startup;
+package clusterless.model;
 
 import clusterless.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
