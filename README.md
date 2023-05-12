@@ -1,24 +1,39 @@
 # Clusterless
 
-A tool for deploying scalable and secure data-processing workloads for continuously arriving data, across clouds.
+## Status
+
+This project is under active development and considered alpha if not pre-alpha.
+
+Please do play around with this project in order to provide early feedback, but do expect things to change until we hit
+1.0 release.
+
+See the [ROADMAP](ROADMAP.md) for planned capabilities.
+
+## About
+
+Clusterless is a tool for deploying scalable and secure data-processing workloads for continuously arriving data, across
+clouds.
 
 By standardizing the metadata as new data arrives, workloads can be implemented behind a consistent interface, and can
-be easily deployed to listen for upstream availability events.
+be easily deployed to listen for upstream availability events and fire new events to downstream listeners.
 
-Not only can heterogeneous workloads can be chained together, they can be:
+Not only can heterogeneous workloads can be chained together via events, they can be:
 
-- back-filled - after deployment (of new dataset version)
-- replayed - to correct for changes
-- checked for gaps - due to upstream failures
+- back-filled - a new workload (or version) can run against historical data
+- replayed - a fixed workload can re-run over a range of data to correct for an error in place
+- checked for gaps - missing data can be accounted for by walking the upstream dependencies
 - enabled/disabled - trivially pause or restart event listening
+- versioned - new versions of workloads can be deployed without interfering with existing production pipelines
+- tested - either locally before deployment, or using our [scenario tool](clusterless-scenario/README.md), as part of a
+  full pipeline
 
-Where workloads can be:
+Where workloads:
 
-- reformatting (say from text to parquet)
-- repartitioning for improved accessibility and performance (group the data by new partition keys)
-- feature extraction
-- training and validation
-- GDPR support via tokenization or retention enforcement
+- reformat data (say from text to parquet)
+- repartition data for improved accessibility and performance (group the data by new partition keys)
+- perform feature extraction via custom code
+- execute training and validation (via custom Python or simply calling SageMaker)
+- enforce GDPR (privacy) compliance (via identity tokenization and retention)
 
 And can be implemented as:
 
@@ -29,8 +44,9 @@ And can be implemented as:
 Where the intent isn't to have functional parity across substrates, but to ease secure and reliable interoperability
 between them.
 
-By leveraging native pay-as-you-go primitives, no runtimes or dedicated services need to be managed. Zero data arriving,
-zero costs (other than storage).
+By leveraging native pay-as-you-go primitives, no runtimes or dedicated services need to be managed.
+
+Zero data arriving means zero costs (other than storage for historical data).
 
 Currently supported cloud substrates:
 
@@ -48,7 +64,7 @@ Install [nvm](https://github.com/nvm-sh/nvm):
 
 Install node/npm:
 
-> nvm install v19.4.0
+> nvm install v18.14.2
 
 Install the AWD CDK:
 
@@ -83,6 +99,4 @@ Add to `.envrc`:
 
 ```shell
 PATH_add ~/some_dir/clusterless/clusterless-main/build/install/cls/bin
-PATH_add ~/some_dir/clusterless/clusterless-substrate-aws-kernel/build/install/awsKernel/bin
 ```
-

@@ -1,12 +1,24 @@
 = Deployment Architecture
 
-After a substrate is initialized via bootstrapping, a "project" can be deployed into the substrate.
+After a provider region is initialized via bootstrapping, a "project" can be deployed into the substrate.
 
 A project is one or more related clusterless constructs.
 
 Projects have:
 
+- metadata
+- provider
+- region
 - name
 - version
+- constructs
 - resources
-- one or more constructs
+- arcs
+
+`resources` can be S3 buckets or Glue Databases.
+
+`arcs` listen for events about new data arriving for a given dataset, run a developer workload on the data, and then fire a new event for the change in the result dataset.
+
+`datasets` typically live in blob storage (S3).
+Data continuously arrives and is stored in a new partition in the bucket.
+Listeners are then notified a new partition has arrived.

@@ -1,6 +1,11 @@
 name: Clusterless Build
 run-name: "Push: from ${{ github.actor }}"
-on: [ push ]
+on:
+  push:
+    paths-ignore:
+      - '*.txt'
+      - '*.md'
+      - '*.adoc'
 jobs:
   run-all-tests:
     runs-on: ubuntu-latest

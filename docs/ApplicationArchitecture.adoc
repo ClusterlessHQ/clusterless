@@ -4,7 +4,7 @@
 
 Reads config and manages deployments of underlying providers.
 
-== Substrates
+== Providers
 
 A provider may be AWS, or Google, or k8s etc.
 
@@ -13,13 +13,14 @@ Each deployment in turn may have code or images it must build and deploy as part
 
 === Bootstrap
 
-Deploys a global configuration for a given substrate.
+Deploys a regional configuration and minimum services for a given substrate.
 
-For example, a docker repository may be required and may only need to be setup once and used globally within the substrate.
+For example, blob storage must be initialized to hold runtime metadata.
+Or a docker repository may be required and may only need to be setup once and used regionally within the substrate.
 
 === Resources
 
-Resources are shared static AWS resources like an Athena Database or compute configuration.
+Resources are shared static AWS resources like an AWS S3 bucket, Athena Database, or compute configuration.
 
 Resources are not globally managed, but managed locally within a given project.
 
@@ -27,7 +28,7 @@ Resources are not globally managed, but managed locally within a given project.
 
 The core code that interfaces with the underlying substrate deployment mechanism.
 
-In the case of the AWS CDK, the kernel would be run by the cdk cli to perform an deployment or update of the deployment configuration.
+In the case of the AWS CDK, the kernel would be run by the cdk cli to perform a deployment or update of the deployment configuration.
 
 The `deploy` would configure and push any boundary, barrier, and or arc stacks and related services (AWS Lambda etc).
 
@@ -35,19 +36,21 @@ The `deploy` would configure and push any boundary, barrier, and or arc stacks a
 
 ==== Boundary
 
-One or more ingress or egress boundary integrations.
+One or more ingress or egress integrations.
 
-Ingress boundary accept data, create metadata, and fire events
+Ingress boundary accept data, create metadata, and fire events.
 
-Egress boundary listen to events and make the data or metadata availble to the integration
+Egress boundary listen to events and make the data or metadata available via an integration interface.
 
 ==== Barrier
 
-Listens for multiple events and fires a downstream event when arrival conditions are met.
+Listens for multiple events from different datasets and fires a downstream event when arrival conditions are met.
 
 ==== Arc
 
 An arc listens for events and runs its workload against the data or metadata.
+
+Developers create the code deployed as a workload in an Arc.
 
 === Services
 
