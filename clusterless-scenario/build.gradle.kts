@@ -8,7 +8,7 @@
 
 plugins {
     id("clusterless.java-application-conventions")
-    id("io.github.chklauser.sjsonnet") version "1.0.0-rc.1"
+    id("io.github.chklauser.sjsonnet") version "1.0.0"
 }
 
 dependencies {
