@@ -16,7 +16,7 @@ import clusterless.naming.Label;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.StagedApp;
-import clusterless.substrate.aws.uri.ManifestURI;
+import clusterless.substrate.uri.ManifestURI;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;

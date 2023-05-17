@@ -16,10 +16,14 @@ dependencies {
     implementation(project(":clusterless-model"))
     implementation("com.google.guava:guava")
 
+    api(project(":clusterless-substrate"))
+
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    api("com.jayway.jsonpath:json-path")
 
     api("software.amazon.awssdk:s3")
     api("software.amazon.awssdk:cloudwatch")

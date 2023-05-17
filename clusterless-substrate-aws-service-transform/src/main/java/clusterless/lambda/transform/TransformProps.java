@@ -10,7 +10,7 @@ package clusterless.lambda.transform;
 
 import clusterless.model.Struct;
 import clusterless.model.deploy.Dataset;
-import clusterless.substrate.aws.uri.ManifestURI;
+import clusterless.substrate.uri.ManifestURI;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

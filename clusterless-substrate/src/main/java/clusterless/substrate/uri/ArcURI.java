@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.uri;
+package clusterless.substrate.uri;
 
 import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Project;
 import clusterless.model.state.ArcState;
 import clusterless.naming.Partition;
-import clusterless.substrate.aws.store.StateStore;
+import clusterless.substrate.store.StateStore;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 import static clusterless.util.Optionals.optional;
 import static java.util.Optional.ofNullable;
@@ -43,6 +44,9 @@ import static java.util.Optional.ofNullable;
 @JsonSerialize(using = ArcURI.Serializer.class)
 @JsonDeserialize(using = ArcURI.DeSerializer.class)
 public class ArcURI extends StateURI<ArcState, ArcURI> {
+
+    public static final String ARCS = "arcs";
+
     static class Serializer extends StdScalarSerializer<ArcURI> {
         protected Serializer() {
             super(ArcURI.class);
@@ -119,11 +123,35 @@ public class ArcURI extends StateURI<ArcState, ArcURI> {
     }
 
     @Override
+    public URI uriPrefix() {
+        Partition partition = Partition.of(ARCS)
+                .withNamedTerminal("name", ofNullable(project).map(Project::name))
+                .withNamedTerminal("version", ofNullable(project).map(Project::version))
+                .withNamedTerminal("arc", arcName)
+                .withNamedTerminal("lot", lotId) // retain case
+                .withTerminal(ofNullable(state).map(s -> s.name().concat(".arc")));
+
+        return createUri(partition.prefix());
+    }
+
+    @Override
+    public URI uriPath() {
+        String path = Partition.of(ARCS)
+                .withNamedTerminal("name", Optional.ofNullable(project).map(Project::name))
+                .withNamedTerminal("version", Optional.ofNullable(project).map(Project::version))
+                .withNamedTerminal("arc", arcName)
+                .withNamedTerminal("lot", lotId) // retain case
+                .pathUnless(ofNullable(state).map(s -> s.name().concat(".arc")));
+
+        return createUri(path);
+    }
+
+    @Override
     public URI uri() {
         require(project, "project");
         require(state != null && lotId == null, "lotId is required if state is set");
 
-        String path = Partition.of("arcs")
+        String path = Partition.of(ARCS)
                 .withNamed("name", project.name())
                 .withNamed("version", project.version())
                 .withNamed("arc", arcName)

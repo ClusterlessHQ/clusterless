@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.uri;
+package clusterless.substrate.uri;
 
 import clusterless.model.State;
 import clusterless.model.Struct;
 import clusterless.model.deploy.Placement;
-import clusterless.substrate.aws.store.StateStore;
-import clusterless.substrate.aws.store.Stores;
+import clusterless.substrate.store.StateStore;
+import clusterless.substrate.store.Stores;
 import clusterless.util.Lazy;
 
 import java.net.URI;
@@ -109,8 +109,11 @@ public abstract class StateURI<S extends State, T extends StateURI<S, T>> implem
         return !isPath();
     }
 
-    public abstract URI uri();
+    public abstract URI uriPrefix();
 
+    public abstract URI uriPath();
+
+    public abstract URI uri();
 
     public abstract String template();
 

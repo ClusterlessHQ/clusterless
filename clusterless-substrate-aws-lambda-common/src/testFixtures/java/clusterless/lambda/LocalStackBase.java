@@ -8,8 +8,8 @@
 
 package clusterless.lambda;
 
-import clusterless.substrate.aws.store.StateStore;
-import clusterless.substrate.aws.store.Stores;
+import clusterless.substrate.store.StateStore;
+import clusterless.substrate.store.Stores;
 import clusterless.util.Env;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +45,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
     @SystemStub
     private EnvironmentVariables environmentVariables = new EnvironmentVariables()
             .set(Env.keyTyped(getProps()), Env.valueTyped(getProps())) // shove the props json into an env var
+            .set(Env.keyJSON(getProps()), Env.value(getProps())) // shove the props json into an env var
             .set("AWS_ACCESS_KEY_ID", localstack.getAccessKey())
             .set("AWS_SECRET_ACCESS_KEY", localstack.getSecretKey())
             .set("AWS_DEFAULT_REGION", localstack.getRegion())

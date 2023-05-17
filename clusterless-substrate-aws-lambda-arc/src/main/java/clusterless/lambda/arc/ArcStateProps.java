@@ -12,7 +12,7 @@ import clusterless.model.Struct;
 import clusterless.model.deploy.Project;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
-import clusterless.substrate.aws.uri.ArcURI;
+import clusterless.substrate.uri.ArcURI;
 
 import java.util.Map;
 

@@ -10,7 +10,7 @@ package clusterless.lambda;
 
 import clusterless.model.deploy.*;
 import clusterless.model.manifest.ManifestState;
-import clusterless.substrate.aws.uri.ManifestURI;
+import clusterless.substrate.uri.ManifestURI;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;

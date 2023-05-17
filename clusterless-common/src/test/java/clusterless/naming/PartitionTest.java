@@ -75,4 +75,25 @@ public class PartitionTest {
         Assertions.assertEquals("case=lower/case=upper", Partition.of(Case.Lower).with(Case.Upper).partition());
         Assertions.assertEquals("case=lower/case=upper", Partition.of(Case.Lower).with(Case.Upper).with(null).partition());
     }
+
+    @Test
+    void terminal() {
+        Assertions.assertNull(Partition.namedOf("case", null).withNamedTerminal("language", null).with(null).partition());
+        Assertions.assertEquals("case=lower", Partition.namedOf("case", "lower").withNamedTerminal("language", null).withNamed("locale", "us").partition());
+        Assertions.assertEquals("case=lower", Partition.namedOf("case", "lower").withNamedTerminal("language", null).withTerminal("locale").partition());
+        Assertions.assertEquals("case=lower/locale", Partition.namedOf("case", "lower").withNamed("language", null).withTerminal("locale").partition());
+        Assertions.assertEquals("case=lower/locale/language=english", Partition.namedOf("case", "lower").withTerminal("locale").withNamed("language", "english").partition());
+        Assertions.assertEquals("case=lower", Partition.namedOf("case", "lower").withTerminal(null).withNamed("language", "english").partition());
+    }
+
+    @Test
+    void template() {
+        Assertions.assertEquals("{lower}", Partition.of("{lower}").partition());
+        Assertions.assertEquals("{lower}/{case}", Partition.of("{lower}").with("{case}").partition());
+        Assertions.assertEquals("{lower}{/case}", Partition.of("{lower}").with(Partition.literal("{/case}")).partition());
+
+        Assertions.assertEquals("{lower}", Partition.literal("{lower}").partition());
+        Assertions.assertEquals("{lower}/{case}", Partition.literal("{lower}").with("{case}").partition());
+        Assertions.assertEquals("{lower}{/case}", Partition.literal("{lower}").with(Partition.literal("{/case}")).partition());
+    }
 }

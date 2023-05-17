@@ -14,7 +14,7 @@ import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.sdk.S3;
-import clusterless.substrate.aws.uri.ManifestURI;
+import clusterless.substrate.uri.ManifestURI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

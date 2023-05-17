@@ -34,7 +34,7 @@ import static clusterless.substrate.aws.resources.Events.ARC_EVENT_BUS;
 import static clusterless.substrate.aws.resources.Events.EVENT_BUS;
 import static clusterless.substrate.aws.resources.Vpcs.COMMON_VPC;
 import static clusterless.substrate.aws.resources.Vpcs.VPC;
-import static clusterless.substrate.aws.store.StateStore.*;
+import static clusterless.substrate.store.StateStore.*;
 
 /**
  * keys to consider exporting

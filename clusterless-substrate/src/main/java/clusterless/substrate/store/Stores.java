@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.store;
+package clusterless.substrate.store;
 
 import clusterless.model.deploy.Placement;
 import clusterless.naming.Region;

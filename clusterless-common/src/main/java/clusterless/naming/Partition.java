@@ -98,6 +98,22 @@ public interface Partition {
     interface NamedPartition extends Partition {
     }
 
+    static Partition literal(String value) {
+        Partition of = of(value);
+
+        return new Partition() {
+            @Override
+            public String partition() {
+                return of.partition();
+            }
+
+            @Override
+            public boolean isLiteral() {
+                return true;
+            }
+        };
+    }
+
     static Partition of(Object value) {
         if (value == null) {
             return NULL;
@@ -146,10 +162,25 @@ public interface Partition {
         return false;
     }
 
+    default boolean isLiteral() {
+        return false;
+    }
+
     default Partition having(String... values) {
         return Arrays.stream(values)
                 .map(Partition::of)
                 .reduce(this, Partition::with);
+    }
+
+    default Partition withNamedTerminal(Object key, Object value) {
+        Partition keyPart = of(key);
+        Partition valuePart = of(value);
+
+        if (valuePart.isNull()) {
+            return this.withTerminal(null);
+        }
+
+        return with(keyPart.named(valuePart));
     }
 
     default Partition withNamed(Object key, Object value) {
@@ -165,6 +196,24 @@ public interface Partition {
 
     default NamedPartition named(Partition value) {
         return () -> String.format("%s=%s", partition(), value.partition());
+    }
+
+    default Partition withTerminal(Object object) {
+        if (object == null) {
+            return new Partition() {
+                @Override
+                public Partition with(Object object) {
+                    return Partition.super.with(null);
+                }
+
+                @Override
+                public String partition() {
+                    return Partition.this.partition();
+                }
+            };
+        }
+
+        return this.with(object);
     }
 
     default Partition with(Object object) {
@@ -206,7 +255,9 @@ public interface Partition {
             return this;
         }
 
-        return () -> String.format("%s/%s", Partition.this.partition(), partition.partition());
+        return () -> partition.isLiteral() ?
+                String.format("%s%s", Partition.this.partition(), partition.partition()) :
+                String.format("%s/%s", Partition.this.partition(), partition.partition());
     }
 
     default Partition thisIfNull(Partition partition) {

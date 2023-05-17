@@ -10,7 +10,7 @@ package clusterless.lambda.arc;
 
 import clusterless.model.state.ArcState;
 import clusterless.substrate.aws.sdk.S3;
-import clusterless.substrate.aws.uri.ArcURI;
+import clusterless.substrate.uri.ArcURI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

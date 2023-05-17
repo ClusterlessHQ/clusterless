@@ -12,6 +12,8 @@ import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Workload;
 import clusterless.model.deploy.WorkloadProps;
 import clusterless.substrate.aws.props.BatchRuntimeProps;
+import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
+import clusterless.substrate.aws.props.Memory;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -25,7 +27,13 @@ import java.util.Map;
 public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
 
     public static class BatchWorkload extends Workload<WorkloadProps> {
-        BatchRuntimeProps runtimeProps = new BatchRuntimeProps();
+        BatchRuntimeProps batchRuntimeProps = new BatchRuntimeProps();
+
+        LambdaJavaRuntimeProps lambdaRuntimeProps = new LambdaJavaRuntimeProps(
+                Memory.MEM_512MB,
+                3,
+                15
+        );
 
         String computeEnvironmentRef;
 
@@ -39,8 +47,12 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
             super(new WorkloadProps());
         }
 
-        public BatchRuntimeProps runtimeProps() {
-            return runtimeProps;
+        public BatchRuntimeProps batchRuntimeProps() {
+            return batchRuntimeProps;
+        }
+
+        public LambdaJavaRuntimeProps lambdaRuntimeProps() {
+            return lambdaRuntimeProps;
         }
 
         public String computeEnvironmentRef() {

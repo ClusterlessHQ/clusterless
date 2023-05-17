@@ -24,14 +24,16 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     @CommandLine.Option(
             names = {"-l", "--lot"},
             description = "the lot id of the manifest to source",
-            required = true
+            required = false,
+            defaultValue = "lotId"
     )
     String lotId;
 
     @CommandLine.Option(
             names = {"-r", "--role"},
             description = "the dataset role to execute against",
-            required = false
+            required = false,
+            defaultValue = "main"
     )
     String role;
 

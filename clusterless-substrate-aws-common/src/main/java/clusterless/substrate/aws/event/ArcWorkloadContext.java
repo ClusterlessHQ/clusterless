@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package clusterless.substrate.aws.event;
 
 import clusterless.model.Struct;
@@ -7,16 +15,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ArcExecContext implements Struct {
+public class ArcWorkloadContext implements Struct {
     String role;
     ArcNotifyEvent arcNotifyEvent;
-    Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<String, List<URI>>();
+    Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<>();
 
-    public ArcExecContext() {
+    public ArcWorkloadContext() {
     }
 
     public static Builder builder() {
-        return Builder.anArcExecContext();
+        return Builder.builder();
     }
 
     public String role() {
@@ -34,12 +42,12 @@ public class ArcExecContext implements Struct {
     public static final class Builder {
         String role;
         ArcNotifyEvent arcNotifyEvent;
-        Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<String, List<URI>>();
+        Map<String, List<URI>> existingPartialManifests = new LinkedHashMap<>();
 
         private Builder() {
         }
 
-        public static Builder anArcExecContext() {
+        public static Builder builder() {
             return new Builder();
         }
 
@@ -58,12 +66,12 @@ public class ArcExecContext implements Struct {
             return this;
         }
 
-        public ArcExecContext build() {
-            ArcExecContext arcExecContext = new ArcExecContext();
-            arcExecContext.arcNotifyEvent = this.arcNotifyEvent;
-            arcExecContext.role = this.role;
-            arcExecContext.existingPartialManifests = this.existingPartialManifests;
-            return arcExecContext;
+        public ArcWorkloadContext build() {
+            ArcWorkloadContext arcWorkloadContext = new ArcWorkloadContext();
+            arcWorkloadContext.arcNotifyEvent = this.arcNotifyEvent;
+            arcWorkloadContext.existingPartialManifests = this.existingPartialManifests;
+            arcWorkloadContext.role = this.role;
+            return arcWorkloadContext;
         }
     }
 }

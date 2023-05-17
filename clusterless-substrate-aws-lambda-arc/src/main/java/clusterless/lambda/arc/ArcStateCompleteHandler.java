@@ -11,10 +11,10 @@ package clusterless.lambda.arc;
 import clusterless.lambda.StreamResultHandler;
 import clusterless.model.manifest.ManifestState;
 import clusterless.model.state.ArcState;
-import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcStateContext;
-import clusterless.substrate.aws.uri.ManifestURI;
-import clusterless.substrate.aws.uri.StateURI;
+import clusterless.substrate.aws.event.ArcWorkloadContext;
+import clusterless.substrate.uri.ManifestURI;
+import clusterless.substrate.uri.StateURI;
 import clusterless.util.Env;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.logging.log4j.LogManager;
@@ -107,7 +107,7 @@ public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext
             return logErrorAndThrow(IllegalStateException::new, "unexpected result states: {}", sinkManifests);
         }
 
-        String lotId = event.arcNotifyEvent().lotId();
+        String lotId = event.arcWorkloadContext().arcNotifyEvent().lot();
 
         // push notify on each sink
         for (Map.Entry<String, URI> entry : sinkManifests.entrySet()) {
@@ -129,9 +129,9 @@ public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext
         }
 
         return ArcStateContext.builder()
-                .withArcExecContext(ArcExecContext.builder()
-                        .withArcNotifyEvent(event.arcNotifyEvent())
-                        .withRole(event.role())
+                .withArcWorkloadContext(ArcWorkloadContext.builder()
+                        .withArcNotifyEvent(event.arcWorkloadContext().arcNotifyEvent())
+                        .withRole(event.arcWorkloadContext().role())
                         .build())
                 .withPreviousState(event.previousState())
                 .withCurrentState(newArcState)

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.uri;
+package clusterless.substrate.uri;
 
 import clusterless.json.JSONUtil;
 import clusterless.model.deploy.Dataset;
@@ -95,7 +95,7 @@ public class StateURITest {
         Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/"), manifestState.uri());
 
         String template = manifestState.template();
-        Assertions.assertEquals("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot={lot}/state={state}/attempt={attempt}/manifest.json", template);
+        Assertions.assertEquals("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot={lot}/state={state}{/attempt*}/manifest.json", template);
 
         ManifestURI parsedArcState = ManifestURI.parse(template);
         Assertions.assertEquals(manifestState.uri(), parsedArcState.uri());
@@ -109,12 +109,16 @@ public class StateURITest {
 
         Assertions.assertTrue(manifestState.isIdentifier());
         Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=complete/manifest.json"), manifestState.uri());
+        Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=complete/"), manifestState.uriPath());
+        Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=complete"), manifestState.uriPrefix());
 
         // has an attempt
         manifestState = manifestState.withState(ManifestState.removed);
 
         Assertions.assertTrue(manifestState.isIdentifier());
         Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=removed/attempt=" + attempt + "/manifest.json"), manifestState.uri());
+        Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=removed/attempt=" + attempt + "/"), manifestState.uriPath());
+        Assertions.assertEquals(URI.create("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=removed/attempt=" + attempt), manifestState.uriPrefix());
 
         manifestState = manifestState.withState(ManifestState.partial);
 

@@ -9,6 +9,7 @@
 package clusterless.util;
 
 import clusterless.json.JSONUtil;
+import clusterless.naming.Fixed;
 import clusterless.naming.Label;
 
 import java.util.Map;
@@ -25,8 +26,9 @@ import java.util.function.Supplier;
  * This option may be easier to debug
  */
 public class Env {
-    protected static final Label CLS = Label.of("ClS");
-    protected static final Label JSON = Label.of("JSON");
+    public static final Label PREFIX_CLS = Fixed.of("CLS");
+    protected static final Label POSTFIX_JAVA = Fixed.of("JAVA");
+    protected static final Label POSTFIX_JSON = Fixed.of("JSON");
 
     public static Map<String, String> toEnv(Object object) {
         return OrderedSafeMaps.of(
@@ -44,7 +46,7 @@ public class Env {
     }
 
     public static String keyTyped(Object object) {
-        return key(object, CLS);
+        return key(object, POSTFIX_JAVA);
     }
 
     public static String key(Object object) {
@@ -52,7 +54,7 @@ public class Env {
     }
 
     public static String keyJSON(Object object) {
-        return key(object, JSON);
+        return key(object, POSTFIX_JSON);
     }
 
     public static String key(Object object, Label postfix) {
@@ -70,7 +72,7 @@ public class Env {
     }
 
     public static <T> T fromEnv(Function<String, String> envMap, Class<T> type, Supplier<T> defaultValue) {
-        String key = keyNameFor(type, CLS); // need the typed version to load our internal objects
+        String key = keyNameFor(type, POSTFIX_JAVA); // need the typed version to load our internal objects
         String value = envMap.apply(key);
 
         if (value == null) {
@@ -81,6 +83,6 @@ public class Env {
     }
 
     private static String keyNameFor(Class<?> type, Label postfix) {
-        return Label.of(type.getSimpleName()).with(postfix).upperUnderscore();
+        return PREFIX_CLS.with(type.getSimpleName()).with(postfix).upperUnderscore();
     }
 }

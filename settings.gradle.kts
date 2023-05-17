@@ -22,6 +22,9 @@ include("clusterless-model")
 include("clusterless-main-common")
 include("clusterless-main")
 
+// Substrate support files
+include("clusterless-substrate")
+
 // AWS Substrate
 // shared aws sdk functionality
 include("clusterless-substrate-aws-common")

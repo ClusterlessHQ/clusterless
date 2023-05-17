@@ -71,6 +71,7 @@ dependencies {
         implementation("org.apache.logging.log4j:log4j-to-slf4j:$log4j")
         implementation("org.apache.logging.log4j:log4j-web:$log4j")
 
+        implementationAndTestFixture("com.jayway.jsonpath:json-path:2.8.0")
         implementationAndTestFixture("com.google.guava:guava:31.1-jre")
 
         val jackson = "2.14.2"

@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.substrate.aws.uri;
+package clusterless.substrate.uri;
 
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.Placement;
 import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Partition;
-import clusterless.substrate.aws.store.StateStore;
+import clusterless.substrate.store.StateStore;
 import clusterless.util.Lazy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JacksonException;
@@ -29,10 +29,10 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static clusterless.util.Optionals.optional;
-import static java.util.Optional.ofNullable;
 
 /**
  * Identifier
@@ -48,6 +48,8 @@ import static java.util.Optional.ofNullable;
 @JsonSerialize(using = ManifestURI.Serializer.class)
 @JsonDeserialize(using = ManifestURI.DeSerializer.class)
 public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
+
+    public static final String DATASETS = "datasets";
 
     static class Serializer extends StdScalarSerializer<ManifestURI> {
         protected Serializer() {
@@ -131,11 +133,33 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
     }
 
     @Override
+    public URI uriPrefix() {
+        return createUri(terminalPartition().prefix());
+    }
+
+    @Override
+    public URI uriPath() {
+        return createUri(terminalPartition().path());
+    }
+
+    private Partition terminalPartition() {
+        Partition attempt = state != null && state.hasAttempts() ? Partition.namedOf("attempt", attemptId()) : Partition.NULL;
+
+
+        return Partition.of(DATASETS)
+                .withNamedTerminal("name", Optional.ofNullable(dataset).map(Dataset::name))
+                .withNamedTerminal("version", Optional.ofNullable(dataset).map(Dataset::version))
+                .withNamedTerminal("lot", lotId) // retain case
+                .withTerminal(state)
+                .withTerminal(attempt);
+    }
+
+    @Override
     public URI uri() {
         require(dataset, "dataset");
         require(lotId == null && state != null, "lotId is required if state is set");
 
-        Partition manifest = ofNullable(state).map(s -> (Partition) s).orElse(Partition.NULL);
+        Partition manifest = Optional.ofNullable(state).map(s -> (Partition) s).orElse(Partition.NULL);
 
         if (!manifest.isNull()) {
             Partition attempt = state.hasAttempts() ? Partition.namedOf("attempt", attemptId()) : Partition.NULL;
@@ -145,7 +169,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
                     .with("manifest.json");
         }
 
-        String path = Partition.of("datasets")
+        String path = Partition.of(DATASETS)
                 .withNamed("name", dataset.name())
                 .withNamed("version", dataset.version())
                 .withNamed("lot", lotId) // retain case
@@ -156,26 +180,26 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
     @Override
     public String template() {
-        // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}[/{attempt}]/manifest.{ext}
+        // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}{/attempt*}]/manifest.{ext}
 
         // bypass the named partition and store directly
-        Partition manifest = ofNullable(state).map(s -> (Partition) s).orElse(Partition.namedOf("state", "{state}"));
+        Partition manifest = Optional.ofNullable(state).map(s -> (Partition) s).orElse(Partition.namedOf("state", "{state}"));
 
         Partition attempt = state == null ?
-                Partition.of("attempt={attempt}") :
+                Partition.literal("{/attempt*}") :
                 state.hasAttempts() ? Partition.namedOf("attempt", attemptId()) : Partition.NULL;
 
         manifest = manifest
                 .with(attempt)
                 .with("manifest.json");
 
-        String path = Partition.namedOf("name", ofNullable(dataset.name()).orElse("{datasetName}"))
-                .withNamed("version", ofNullable(dataset.version()).orElse("{datasetVersion}"))
-                .withNamed("lot", ofNullable(lotId).orElse("{lot}")) // retain case
+        String path = Partition.namedOf("name", Optional.ofNullable(dataset.name()).orElse("{datasetName}"))
+                .withNamed("version", Optional.ofNullable(dataset.version()).orElse("{datasetVersion}"))
+                .withNamed("lot", Optional.ofNullable(lotId).orElse("{lot}")) // retain case
                 .with(manifest)
                 .partition();
 
-        return String.format("s3://%s/datasets/%s", storeName.get(), path);
+        return String.format("s3://%s/%s/%s", storeName.get(), DATASETS, path);
     }
 
     @JsonIgnore
@@ -188,6 +212,9 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         return this;
     }
 
+    public Dataset dataset() {
+        return dataset;
+    }
 
     protected ManifestURI setDataset(Dataset dataset) {
         this.dataset = dataset;
@@ -196,6 +223,10 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
     public ManifestURI withDataset(Dataset dataset) {
         return copy().setDataset(dataset);
+    }
+
+    public ManifestURI withAttemptId(String attemptId) {
+        return copy().setAttemptId(attemptId);
     }
 
     @Override

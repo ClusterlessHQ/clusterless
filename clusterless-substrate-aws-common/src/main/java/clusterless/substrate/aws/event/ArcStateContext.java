@@ -13,17 +13,24 @@ import clusterless.model.state.ArcState;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * The ArcExecContext is the object passed within a state machine.
  */
 public class ArcStateContext implements Struct {
+    public static final String RESPONSE_PATH = "$.workloadResponse";
+    public static final String SINK_MANIFESTS_PATH = "$.sinkManifests";
+    public static final String WORKLOAD_CONTEXT_PATH = "$.arcWorkloadContext";
+
     ArcState previousState;
     ArcState currentState;
-    ArcExecContext arcExecContext = new ArcExecContext();
+    /**
+     * Passed to all workloads
+     */
+    ArcWorkloadContext arcWorkloadContext = new ArcWorkloadContext();
     Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
+    Map<String, Object> workloadResponse = new LinkedHashMap<>(); // intermediate results of workload
 
     public ArcStateContext() {
     }
@@ -40,27 +47,24 @@ public class ArcStateContext implements Struct {
         return currentState;
     }
 
-    public String role() {
-        return arcExecContext.role();
-    }
-
-    public ArcNotifyEvent arcNotifyEvent() {
-        return arcExecContext.arcNotifyEvent();
-    }
-
-    public Map<String, List<URI>> existingPartialManifests() {
-        return arcExecContext.existingPartialManifests();
+    public ArcWorkloadContext arcWorkloadContext() {
+        return arcWorkloadContext;
     }
 
     public Map<String, URI> sinkManifests() {
         return sinkManifests;
     }
 
+    public Map<String, Object> workloadResponse() {
+        return workloadResponse;
+    }
+
     public static final class Builder {
         ArcState previousState;
         ArcState currentState;
-        ArcExecContext arcExecContext = new ArcExecContext();
+        ArcWorkloadContext arcWorkloadContext = new ArcWorkloadContext();
         Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
+        Map<String, Object> workloadResponse = new LinkedHashMap<>();
 
         private Builder() {
         }
@@ -79,8 +83,8 @@ public class ArcStateContext implements Struct {
             return this;
         }
 
-        public Builder withArcExecContext(ArcExecContext arcExecContext) {
-            this.arcExecContext = arcExecContext;
+        public Builder withArcWorkloadContext(ArcWorkloadContext arcWorkloadContext) {
+            this.arcWorkloadContext = arcWorkloadContext;
             return this;
         }
 
@@ -89,12 +93,18 @@ public class ArcStateContext implements Struct {
             return this;
         }
 
+        public Builder withWorkloadResponse(Map<String, Object> workloadResponse) {
+            this.workloadResponse = workloadResponse;
+            return this;
+        }
+
         public ArcStateContext build() {
             ArcStateContext arcStateContext = new ArcStateContext();
-            arcStateContext.sinkManifests = this.sinkManifests;
-            arcStateContext.arcExecContext = this.arcExecContext;
+            arcStateContext.arcWorkloadContext = this.arcWorkloadContext;
             arcStateContext.previousState = this.previousState;
+            arcStateContext.sinkManifests = this.sinkManifests;
             arcStateContext.currentState = this.currentState;
+            arcStateContext.workloadResponse = this.workloadResponse;
             return arcStateContext;
         }
     }

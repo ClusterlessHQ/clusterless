@@ -17,8 +17,7 @@ import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Workload;
 import clusterless.substrate.aws.cdk.CDK;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import clusterless.util.Runtimes;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -37,12 +36,8 @@ import java.util.stream.Collectors;
         name = "local"
 )
 public class Local implements Callable<Integer> {
-    private static final Logger LOG = LogManager.getLogger(Local.class);
-
     @CommandLine.Mixin
     LocalCommandOptions commandOptions = new LocalCommandOptions();
-    //    @CommandLine.Mixin
-    LocalProcessExec processExec = new LocalProcessExec(commandOptions);
 
     ComponentServices componentServices = ComponentServices.INSTANCE;
 
@@ -55,12 +50,10 @@ public class Local implements Callable<Integer> {
     public Integer call() throws Exception {
         List<Deployable> deployables = loadProjectModels(commandOptions.projectFiles());
 
-//        Map<Deployable, List<Arc<? extends Workload<? extends WorkloadProps>>>> found = new LinkedHashMap<>();
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
 
         for (Deployable deployable : deployables) {
 
-//            List<Arc<? extends Workload<? extends WorkloadProps>>> arcs = deployable.arcs().stream()
             List<Arc<?>> arcs = deployable.arcs().stream()
                     .filter(a -> a.name().equalsIgnoreCase(commandOptions.arc()))
                     .collect(Collectors.toList());
@@ -88,6 +81,14 @@ public class Local implements Callable<Integer> {
         Arc<? extends Workload<?>> arc = found.get(deployable).get(0);
 
         ArcLocalExecutor executor = executorFor(deployable.placement(), arc);
+
+        List<ArcLocalExecutor.Command> commands = executor.commands(commandOptions.role(), commandOptions.lotId());
+
+        ShellWriter shellWriter = new ShellWriter(Runtimes.current());
+
+        String script = shellWriter.toScript(commands);
+
+        System.out.println(script);
 
         return 0;
     }

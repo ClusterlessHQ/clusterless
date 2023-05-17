@@ -8,10 +8,11 @@
 
 package clusterless.substrate.aws.props;
 
+import software.amazon.awscdk.services.ecr.assets.Platform;
 import software.amazon.awscdk.services.lambda.Architecture;
 
 public class Lookup {
-    public static Architecture architecture(LambdaJavaRuntimeProps.Architecture architecture) {
+    public static Architecture architecture(clusterless.substrate.aws.props.Architecture architecture) {
         switch (architecture) {
             case ARM_64: {
                 return Architecture.ARM_64;
@@ -21,5 +22,17 @@ public class Lookup {
             }
         }
         throw new IllegalStateException("unknown architecture: " + architecture);
+    }
+
+    public static Platform platform(clusterless.substrate.aws.props.Architecture architecture) {
+        switch (architecture) {
+            case ARM_64: {
+                return Platform.LINUX_ARM64;
+            }
+            case X86_64: {
+                return Platform.LINUX_AMD64;
+            }
+        }
+        throw new IllegalStateException("unknown platform: " + architecture);
     }
 }

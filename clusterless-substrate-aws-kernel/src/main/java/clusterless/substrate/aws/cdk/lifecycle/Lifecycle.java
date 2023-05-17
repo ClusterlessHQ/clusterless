@@ -50,8 +50,10 @@ public class Lifecycle {
     }
 
     public void synthProject(List<File> projectFiles) throws IOException {
-        List<Deployable> deployableModels = loadProjectModels(projectFiles);
+        synthProjectModels(loadProjectModels(projectFiles));
+    }
 
+    public void synthProjectModels(List<Deployable> deployableModels) {
         ManagedProject managedProject = mapProject(deployableModels);
 
         managedProject.synth();

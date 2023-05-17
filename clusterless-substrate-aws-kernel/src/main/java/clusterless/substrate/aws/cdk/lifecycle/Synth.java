@@ -9,12 +9,14 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.command.ProjectCommandOptions;
+import clusterless.model.deploy.Deployable;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
@@ -33,7 +35,16 @@ public class Synth extends CDKCommand implements Callable<Integer> {
 
         lifecycle.setConfigurations(kernel.configurations());
 
-        lifecycle.synthProject(commandOptions.projectFiles());
+        List<Deployable> deployables = lifecycle.loadProjectModels(commandOptions.projectFiles());
+
+        if (commandOptions.excludeAllArcs().orElse(false)) {
+            LOG.info("exec synth without all arcs");
+            for (Deployable deployable : deployables) {
+                deployable.arcs().clear();
+            }
+        }
+
+        lifecycle.synthProjectModels(deployables);
 
         return 0;
     }

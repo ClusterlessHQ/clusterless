@@ -10,9 +10,9 @@ package clusterless.lambda.arc;
 
 import clusterless.lambda.StreamResultHandler;
 import clusterless.model.state.ArcState;
-import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcStateContext;
+import clusterless.substrate.aws.event.ArcWorkloadContext;
 import clusterless.util.Env;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.logging.log4j.LogManager;
@@ -77,7 +77,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
     }
 
     protected ArcStateContext handleEvent(ArcNotifyEvent event, Context context, ArcStateStartObserver eventObserver) {
-        String lotId = event.lotId();
+        String lotId = event.lot();
 
         // get arc state
         Optional<ArcState> currentState = arcStateManager.findStateFor(lotId);
@@ -89,7 +89,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
             eventObserver.applyFinalArcStates(ArcState.running, ArcState.running);
             LOG.info("lot already running: {}", lotId);
             return ArcStateContext.builder()
-                    .withArcExecContext(ArcExecContext.builder()
+                    .withArcWorkloadContext(ArcWorkloadContext.builder()
                             .withArcNotifyEvent(event)
                             .build())
                     .withPreviousState(ArcState.running)
@@ -102,7 +102,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
             LOG.info("lot already completed: {}", lotId);
             eventObserver.applyFinalArcStates(currentState.get(), currentState.get());
             return ArcStateContext.builder()
-                    .withArcExecContext(ArcExecContext.builder()
+                    .withArcWorkloadContext(ArcWorkloadContext.builder()
                             .withArcNotifyEvent(event)
                             .build())
                     .withPreviousState(currentState.get())
@@ -144,7 +144,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         // list existing sink partial manifest identifiers
         eventObserver.applyFinalArcStates(currentState.orElse(null), ArcState.running);
         return ArcStateContext.builder()
-                .withArcExecContext(ArcExecContext.builder()
+                .withArcWorkloadContext(ArcWorkloadContext.builder()
                         .withArcNotifyEvent(event)
                         .withRole(roles.get(0))
                         .build())

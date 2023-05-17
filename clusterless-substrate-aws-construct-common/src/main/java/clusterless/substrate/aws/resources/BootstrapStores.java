@@ -10,15 +10,15 @@ package clusterless.substrate.aws.resources;
 
 import clusterless.naming.Label;
 import clusterless.naming.Ref;
-import clusterless.substrate.aws.store.StateStore;
-import clusterless.substrate.aws.store.Stores;
+import clusterless.substrate.store.StateStore;
+import clusterless.substrate.store.Stores;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 import software.constructs.Construct;
 
-import static clusterless.substrate.aws.store.StateStore.*;
+import static clusterless.substrate.store.StateStore.*;
 
 /**
  *

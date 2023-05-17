@@ -17,6 +17,31 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class Runtimes {
+    public static String choose(String mac, String win, String linux) {
+
+        switch (current()) {
+
+            case mac:
+                return mac;
+            case win:
+                return win;
+            case linux:
+                return linux;
+        }
+
+        throw new IllegalStateException("unknown runtime: " + current());
+    }
+
+    public enum Runtime {
+        mac,
+        win,
+        linux
+    }
+
+    public static Runtime current() {
+        return isWindows() ? Runtime.win : isMacOS() ? Runtime.mac : Runtime.linux;
+    }
+
     public static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("windows");
     }
@@ -24,7 +49,6 @@ public class Runtimes {
     public static boolean isMacOS() {
         return System.getProperty("os.name").toLowerCase().contains("mac");
     }
-
 
     public static Optional<Path> findExecutable(String name) {
         String path = System.getenv("PATH");

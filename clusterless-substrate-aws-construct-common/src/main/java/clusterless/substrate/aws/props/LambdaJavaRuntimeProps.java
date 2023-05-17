@@ -8,56 +8,34 @@
 
 package clusterless.substrate.aws.props;
 
-import clusterless.model.Struct;
-
 /**
  * https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html
  * 128 MB and 10,240 MB
  */
-public class LambdaJavaRuntimeProps implements Struct {
-    public static final int MEM_128MB = 128;
-    public static final int MEM_512MB = 512;
-    public static final int MEM_1_024MB = 1_024;
-    public static final int MEM_2_048MB = 2_048;
-    public static final int MEM_5_120MB = 5_120;
-    public static final int MEM_10_240GiB = 10_240; // 128 * 80
+public class LambdaJavaRuntimeProps extends RuntimeProps {
+    public static final int MEM_DEFAULT = Memory.MEM_512MB;
+    public static final int MEM_LOWER = Memory.MEM_128MB;
+    public static final int MEM_UPPER = Memory.MEM_10_240GiB;
 
-    public static final int MEM_DEFAULT = MEM_512MB;
-    public static final int MEM_LOWER = MEM_128MB;
-    public static final int MEM_UPPER = MEM_10_240GiB;
+    private int memorySizeMB = MEM_DEFAULT;
 
-    public static boolean validMemorySizeMib(int memorySizeMiB) {
-        return MEM_LOWER <= memorySizeMiB && memorySizeMiB <= MEM_UPPER;
-    }
+    private int retryAttempts = 3;
 
-    public static Builder builder() {
-        return Builder.aLambdaJavaRuntimeProps();
-    }
+    private int timeoutMin = 5;
 
-    public enum Architecture {
-        ARM_64,
-        X86_64
-    }
-
-    int memorySizeMB = MEM_DEFAULT;
-
-    int retryAttempts = 3;
-
-    int timeoutMin = 5;
-
-    Architecture architecture = Architecture.ARM_64;
+    private Architecture architecture = Architecture.ARM_64;
 
     public LambdaJavaRuntimeProps() {
     }
 
     public LambdaJavaRuntimeProps(int memorySizeMB, int retryAttempts, int timeoutMin) {
-        this.memorySizeMB = memorySizeMB;
+        this.memorySizeMB = requireValidMemorySizeMib(memorySizeMB, MEM_LOWER, MEM_UPPER);
         this.retryAttempts = retryAttempts;
         this.timeoutMin = timeoutMin;
     }
 
     public LambdaJavaRuntimeProps(int memorySizeMB, int retryAttempts, int timeoutMin, Architecture architecture) {
-        this.memorySizeMB = memorySizeMB;
+        this.memorySizeMB = requireValidMemorySizeMib(memorySizeMB, MEM_LOWER, MEM_UPPER);
         this.retryAttempts = retryAttempts;
         this.timeoutMin = timeoutMin;
         this.architecture = architecture;
@@ -79,7 +57,12 @@ public class LambdaJavaRuntimeProps implements Struct {
         return architecture;
     }
 
+    public static Builder builder() {
+        return Builder.aLambdaJavaRuntimeProps();
+    }
+
     public static final class Builder {
+
         int memorySizeMB = MEM_DEFAULT;
         int retryAttempts = 3;
         int timeoutMin = 5;

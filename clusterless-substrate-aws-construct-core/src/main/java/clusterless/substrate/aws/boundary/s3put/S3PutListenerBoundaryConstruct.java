@@ -17,7 +17,7 @@ import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.props.Lookup;
 import clusterless.substrate.aws.resources.*;
-import clusterless.substrate.aws.uri.ManifestURI;
+import clusterless.substrate.uri.ManifestURI;
 import clusterless.temporal.IntervalUnits;
 import clusterless.util.Env;
 import clusterless.util.OrderedSafeMaps;
@@ -104,7 +104,7 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
 //                .reservedConcurrentExecutions(1) // UnreservedConcurrentExecution below its minimum value of [10].
-                .architecture(Lookup.architecture(model().runtimeProps.architecture()))
+                .architecture(Lookup.architecture(model().runtimeProps().architecture()))
                 .build();
 
         LogGroup.Builder.create(this, Label.of("LogGroup").with(functionLabel).camelCase())

@@ -15,8 +15,8 @@ import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.model.UriType;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
-import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
+import clusterless.substrate.aws.event.ArcWorkloadContext;
 import clusterless.substrate.aws.sdk.ClientBase;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.util.Tuple2;
@@ -42,43 +42,16 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
     protected ManifestReader manifestReader = new ManifestReader();
 
     protected Map<String, ManifestWriter> manifestWriters = ManifestWriter.writers(
-            arcProps.sinks(),
-            arcProps.sinkManifestPaths(),
+            arcProps().sinks(),
+            arcProps().sinkManifestPaths(),
             UriType.identifier
     );
 
     @Override
-    protected ArcEventObserver observer() {
-        return new ArcEventObserver() {
-            @Override
-            public void applyFromManifest(Manifest manifest) {
-                String name = manifest.dataset().name();
-                String version = manifest.dataset().version();
-                String lotId = manifest.lotId();
-                int size = manifest.uris().size();
-                LOG.info("manifest from dataset name: {}, version: {}, lot: {}, size: {}", name, version, lotId, size);
-            }
-
-            @Override
-            public void applyToDataset(String role, SinkDataset sinkDataset) {
-                String name = sinkDataset.name();
-                String version = sinkDataset.version();
-                URI pathURI = sinkDataset.pathURI();
-                LOG.info("writing to dataset name: {}, version: {}, with role: {} at {}", name, version, role, pathURI);
-            }
-
-            @Override
-            public void applyToManifest(String role, URI manifest) {
-                LOG.info("write manifest: {}, with role: {}", manifest, role);
-            }
-        };
-    }
-
-    @Override
-    protected Map<String, URI> handleEvent(ArcExecContext arcExecContext, Context context, ArcEventObserver eventObserver) {
-        String fromRole = arcExecContext.role();
-        ArcNotifyEvent notifyEvent = arcExecContext.arcNotifyEvent();
-        String lotId = notifyEvent.lotId();
+    protected Map<String, URI> handleEvent(ArcWorkloadContext arcWorkloadContext, Context context, ArcEventObserver eventObserver) {
+        String fromRole = arcWorkloadContext.role();
+        ArcNotifyEvent notifyEvent = arcWorkloadContext.arcNotifyEvent();
+        String lotId = notifyEvent.lot();
         URI incomingManifestIdentifier = notifyEvent.manifest();
 
         Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
@@ -91,7 +64,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
         URI fromDatasetPath = incomingManifest.dataset().pathURI();
         List<URI> fromUris = incomingManifest.uris();
 
-        for (Map.Entry<String, SinkDataset> sinkRoleEntry : arcProps.sinks().entrySet()) {
+        for (Map.Entry<String, SinkDataset> sinkRoleEntry : arcProps().sinks().entrySet()) {
 
             String toRole = sinkRoleEntry.getKey();
             SinkDataset sinkDataset = sinkRoleEntry.getValue();

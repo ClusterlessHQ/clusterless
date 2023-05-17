@@ -11,13 +11,14 @@ package clusterless.substrate.aws.boundary.s3put;
 import clusterless.lambda.transform.LotSource;
 import clusterless.model.deploy.IngressBoundary;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
+import clusterless.substrate.aws.props.Memory;
 
 /**
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
     LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
-            LambdaJavaRuntimeProps.MEM_1_024MB,
+            Memory.MEM_1_024MB,
             3,
             15
     );

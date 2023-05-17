@@ -44,7 +44,7 @@ public class ArcNotifyEventPublisher {
         // publish notification on event-bus
         ArcNotifyEvent notifyEvent = ArcNotifyEvent.Builder.builder()
                 .withDataset(dataset)
-                .withLotId(lotId)
+                .withLot(lotId)
                 .withManifest(manifestURI)
                 .build();
 

@@ -16,8 +16,8 @@ import clusterless.lambda.arc.ArcProps;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.ManifestState;
-import clusterless.substrate.aws.event.ArcExecContext;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
+import clusterless.substrate.aws.event.ArcWorkloadContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
@@ -58,14 +58,14 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
                 .build();
     }
 
-    Stream<ArcExecContext> events() {
+    Stream<ArcWorkloadContext> events() {
         return Stream.of(
-                ArcExecContext.builder()
+                ArcWorkloadContext.builder()
                         .withArcNotifyEvent(
                                 ArcNotifyEvent.Builder.builder()
                                         .withDataset(datasets().sourceDatasetMap().get("main"))
                                         .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
-                                        .withLotId("20230227PT5M287")
+                                        .withLot("20230227PT5M287")
                                         .build()
                         )
                         .withRole("main")
@@ -84,25 +84,25 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
     }
 
     public void invoke(
-            ArcExecContext arcExecContext
+            ArcWorkloadContext arcWorkloadContext
     ) {
-        Assertions.assertNotNull(arcExecContext);
+        Assertions.assertNotNull(arcWorkloadContext);
 
         S3CopyArcEventHandler handler = new S3CopyArcEventHandler();
 
-        ArcEventObserver eventContext = mock();
+        ArcEventObserver eventObserver = mock();
 
-        Map<String, URI> result = handler.handleEvent(arcExecContext, context(), eventContext);
+        Map<String, URI> result = handler.handleEvent(arcWorkloadContext, context(), eventObserver);
 
         Assertions.assertFalse(result.isEmpty());
 
-        verify(eventContext).applyFromManifest(argThat(m -> m.uris().size() == 1));
+        verify(eventObserver).applyFromManifest(argThat(m -> m.uris().size() == 1));
         SourceDataset mainSource = getProps().sources().get("main");
-        verify(eventContext).applyFromManifest(argThat(m -> m.dataset().name().equals(mainSource.name())));
-        verify(eventContext).applyFromManifest(argThat(m -> m.dataset().version().equals(mainSource.version())));
+        verify(eventObserver).applyFromManifest(argThat(m -> m.dataset().name().equals(mainSource.name())));
+        verify(eventObserver).applyFromManifest(argThat(m -> m.dataset().version().equals(mainSource.version())));
 
         SinkDataset mainSink = getProps().sinks().get("main");
-        verify(eventContext).applyToDataset(argThat(s -> s.equals("main")), argThat(d -> d.name().equals(mainSink.name())));
+        verify(eventObserver).applyToDataset(argThat(s -> s.equals("main")), argThat(d -> d.name().equals(mainSink.name())));
     }
 
     @TestFactory

@@ -21,13 +21,16 @@ import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.resources.Arcs;
 import clusterless.substrate.aws.resources.Events;
-import clusterless.substrate.aws.uri.ArcURI;
+import clusterless.substrate.uri.ArcURI;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.events.targets.SfnStateMachine;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.stepfunctions.*;
+
+import static clusterless.substrate.aws.event.ArcStateContext.SINK_MANIFESTS_PATH;
+import static clusterless.substrate.aws.event.ArcStateContext.WORKLOAD_CONTEXT_PATH;
 
 /**
  *
@@ -86,11 +89,11 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                 .build();
     }
 
-    private State stateFrom(ArcComponent arcComponent, Fail fail) {
+    private IChainable stateFrom(ArcComponent arcComponent, Fail fail) {
         // TODO: see if we can simplify the createState api by using a Pass
         //       before and after to handle the inputPath and outputPath
         return ((ArcConstruct<?>) arcComponent)
-                .createState("$.arcExecContext", "$.sinkManifests", fail);
+                .createState(WORKLOAD_CONTEXT_PATH, SINK_MANIFESTS_PATH, fail);
     }
 
     @NotNull

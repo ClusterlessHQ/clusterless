@@ -28,7 +28,7 @@ public class NotifyEventTest {
                         .withName("name")
                         .withVersion("version")
                         .build())
-                .withLotId("20220101")
+                .withLot("20220101")
                 .withManifest(URI.create("s3://foo/bar/manifest.json"))
                 .build();
 

@@ -9,9 +9,12 @@
 package clusterless.lambda.arc;
 
 import clusterless.lambda.EventResultHandler;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.WorkloadProps;
-import clusterless.substrate.aws.event.ArcExecContext;
+import clusterless.model.manifest.Manifest;
+import clusterless.substrate.aws.event.ArcWorkloadContext;
 import clusterless.util.Env;
+import clusterless.util.Lazy;
 
 import java.net.URI;
 import java.util.Map;
@@ -19,20 +22,52 @@ import java.util.Map;
 /**
  *
  */
-public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResultHandler<ArcExecContext, Map<String, URI>, ArcEventObserver> {
-    protected static final ArcProps<?> arcProps = Env.fromEnv(
-            ArcProps.class,
-            () -> ArcProps.builder().build()
-    );
+public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResultHandler<ArcWorkloadContext, Map<String, URI>, ArcEventObserver> {
+    /**
+     * Not static for tests
+     */
+    @SuppressWarnings("unchecked")
+    private final Lazy<ArcProps<?>> arcProps = Lazy.of(() -> Env.fromEnv(ArcProps.class));
+
+    @SuppressWarnings("unchecked")
+    protected ArcProps<P> arcProps() {
+        return (ArcProps<P>) arcProps.get();
+    }
 
     @SuppressWarnings("unchecked")
     protected P workloadProperties() {
-        return (P) arcProps.workloadProps();
+        return (P) arcProps.get().workloadProps();
     }
 
     public ArcEventHandler() {
-        super(ArcExecContext.class, getMapTypeFor(String.class, URI.class));
+        super(ArcWorkloadContext.class, getMapTypeFor(String.class, URI.class));
 
-        logObject("using arcProps", arcProps);
+        logObject("using arcProps: {}", arcProps.get());
+    }
+
+    protected ArcEventObserver observer() {
+        return new ArcEventObserver() {
+            @Override
+            public void applyFromManifest(Manifest manifest) {
+                String name = manifest.dataset().name();
+                String version = manifest.dataset().version();
+                String lotId = manifest.lotId();
+                int size = manifest.uris().size();
+                LOG.info("manifest from dataset name: {}, version: {}, lot: {}, size: {}", name, version, lotId, size);
+            }
+
+            @Override
+            public void applyToDataset(String role, SinkDataset sinkDataset) {
+                String name = sinkDataset.name();
+                String version = sinkDataset.version();
+                URI pathURI = sinkDataset.pathURI();
+                LOG.info("writing to dataset name: {}, version: {}, with role: {} at {}", name, version, role, pathURI);
+            }
+
+            @Override
+            public void applyToManifest(String role, URI manifest) {
+                LOG.info("write manifest: {}, with role: {}", manifest, role);
+            }
+        };
     }
 }

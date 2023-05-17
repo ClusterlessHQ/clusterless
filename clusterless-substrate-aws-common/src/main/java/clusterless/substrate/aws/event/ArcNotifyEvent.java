@@ -22,11 +22,10 @@ import java.net.URI;
 public class ArcNotifyEvent implements NotifyEvent, Struct {
     public static final String SOURCE = "clusterless.arc";
     public static final String DETAIL = "Clusterless Arc Notification";
-
     public static final String DATASET_ID = "datasetId";
 
     Dataset dataset;
-    String lotId;
+    String lot;
     URI manifest;
 
     public ArcNotifyEvent() {
@@ -35,7 +34,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
     private ArcNotifyEvent(Builder builder) {
         // dataset has subclasses with additional properties we don't need, so normalize
         dataset = builder.dataset == null ? null : new Dataset(builder.dataset);
-        lotId = builder.lotId;
+        lot = builder.lot;
         manifest = builder.manifest;
     }
 
@@ -53,8 +52,8 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
         return dataset;
     }
 
-    public String lotId() {
-        return lotId;
+    public String lot() {
+        return lot;
     }
 
     public URI manifest() {
@@ -82,7 +81,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
      */
     public static final class Builder {
         private Dataset dataset;
-        private String lotId;
+        private String lot;
         private URI manifest;
 
         private Builder() {
@@ -109,8 +108,8 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
          * @param val the {@code lotId} to set
          * @return a reference to this Builder
          */
-        public Builder withLotId(String val) {
-            lotId = val;
+        public Builder withLot(String val) {
+            lot = val;
             return this;
         }
 
@@ -139,7 +138,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
     public String toString() {
         final StringBuilder sb = new StringBuilder("ArcNotifyEvent{");
         sb.append("dataset=").append(dataset);
-        sb.append(", lotId='").append(lotId).append('\'');
+        sb.append(", lot='").append(lot).append('\'');
         sb.append(", manifest=").append(manifest);
         sb.append('}');
         return sb.toString();

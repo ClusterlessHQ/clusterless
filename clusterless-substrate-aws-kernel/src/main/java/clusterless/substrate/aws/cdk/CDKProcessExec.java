@@ -127,7 +127,12 @@ public class CDKProcessExec extends ProcessExec {
     }
 
     public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull ProjectCommandOptions commandOptions, @NotNull String cdkCommand, @NotNull List<String> cdkCommandArgs) {
-        List<String> kernelArgs = List.of("--project", filesAsArg(commandOptions.projectFiles()));
+
+        List<String> kernelArgs = new LinkedList<>();
+
+        kernelArgs.addAll(List.of("--project", filesAsArg(commandOptions.projectFiles())));
+        kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-all-arcs", commandOptions.excludeAllArcs().map(b -> Boolean.toString(b)).orElse(null))));
+        kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-arc", commandOptions.excludeArcNames().isEmpty() ? null : String.join(",", commandOptions.excludeArcNames()))));
 
         return executeCDKApp(commonConfig, awsConfig, cdkCommand, cdkCommandArgs, "synth", kernelArgs);
     }

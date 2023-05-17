@@ -15,7 +15,7 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.model.state.ArcState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcStateContext;
-import clusterless.substrate.aws.uri.ArcURI;
+import clusterless.substrate.uri.ArcURI;
 import clusterless.util.Env;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -76,7 +76,7 @@ public class EventSerializationTest extends LambdaHandlerTestBase {
         ArcNotifyEvent arcNotifyEvent = ArcNotifyEvent.Builder.builder()
                 .withDataset(datasets().sourceDatasetMap().get("main"))
                 .withManifest(datasets().manifestIdentifierMap(lotId, datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
-                .withLotId(lotId)
+                .withLot(lotId)
                 .build();
 
         InputStream inputStream = new StringInputStream(JSONUtil.writeAsStringSafe(arcNotifyEvent));
@@ -89,7 +89,7 @@ public class EventSerializationTest extends LambdaHandlerTestBase {
         ArcStateContext startContext = JSONUtil.readObjectSafe(outputStream.toByteArray(), ArcStateContext.class);
 
         Assertions.assertNotNull(startContext);
-        Assertions.assertEquals(arcNotifyEvent.toString(), startContext.arcNotifyEvent().toString());
+        Assertions.assertEquals(arcNotifyEvent.toString(), startContext.arcWorkloadContext().arcNotifyEvent().toString());
 
         startContext.sinkManifests().put("main", datasets().manifestIdentifierMap(lotId, datasets().sinkDatasetMap(), ManifestState.complete).get("main").uri());
 
@@ -106,6 +106,6 @@ public class EventSerializationTest extends LambdaHandlerTestBase {
         ArcStateContext completeContext = JSONUtil.readObjectSafe(outputStream.toByteArray(), ArcStateContext.class);
 
         Assertions.assertNotNull(completeContext);
-        Assertions.assertEquals(arcNotifyEvent.toString(), completeContext.arcNotifyEvent().toString());
+        Assertions.assertEquals(arcNotifyEvent.toString(), completeContext.arcWorkloadContext().arcNotifyEvent().toString());
     }
 }

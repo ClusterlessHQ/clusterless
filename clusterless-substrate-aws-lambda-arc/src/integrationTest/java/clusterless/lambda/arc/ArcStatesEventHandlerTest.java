@@ -15,7 +15,7 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.model.state.ArcState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcStateContext;
-import clusterless.substrate.aws.uri.ArcURI;
+import clusterless.substrate.uri.ArcURI;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
@@ -66,7 +66,7 @@ public class ArcStatesEventHandlerTest extends LocalStackBase {
                 ArcNotifyEvent.Builder.builder()
                         .withDataset(datasets().sourceDatasetMap().get("main"))
                         .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
-                        .withLotId("20230227PT5M287")
+                        .withLot("20230227PT5M287")
                         .build()
         );
     }
@@ -92,7 +92,7 @@ public class ArcStatesEventHandlerTest extends LocalStackBase {
         ArcStateContext startContext = startHandler.handleEvent(arcNotifyEvent, context(), startObserver);
 
         Assertions.assertEquals(ArcState.running, startContext.currentState());
-        Assertions.assertEquals(arcNotifyEvent, startContext.arcNotifyEvent());
+        Assertions.assertEquals(arcNotifyEvent, startContext.arcWorkloadContext().arcNotifyEvent());
 
         verify(startObserver).applyRoles(List.of("main"));
         verify(startObserver).applyFinalArcStates(null, ArcState.running);
@@ -106,7 +106,7 @@ public class ArcStatesEventHandlerTest extends LocalStackBase {
         ArcStateContext completeContext = completeHandler.handleEvent(startContext, context(), completeObserver);
 
         Assertions.assertEquals(ArcState.complete, completeContext.currentState());
-        Assertions.assertEquals(arcNotifyEvent.toString(), completeContext.arcNotifyEvent().toString());
+        Assertions.assertEquals(arcNotifyEvent.toString(), completeContext.arcWorkloadContext().arcNotifyEvent().toString());
     }
 
     @TestFactory

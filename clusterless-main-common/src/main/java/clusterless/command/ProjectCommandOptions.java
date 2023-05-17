@@ -14,6 +14,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -25,8 +26,30 @@ public class ProjectCommandOptions extends CommonCommandOptions {
     )
     List<File> projectFiles = new ArrayList<>();
 
+    @CommandLine.Option(
+            names = {"--exclude-arc"},
+            description = "exclude the named arc from the deployment"
+    )
+    List<String> excludeArcNames = new ArrayList<>();
+
+    @CommandLine.Option(
+            names = "--exclude-all-arcs",
+            description = "exclude all arcs from the deployment, only deploy resources and boundaries",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1"
+    )
+    Optional<Boolean> excludeAllArcs;
+
     public List<File> projectFiles() {
         return projectFiles;
     }
 
+    public List<String> excludeArcNames() {
+        return excludeArcNames;
+    }
+
+    public Optional<Boolean> excludeAllArcs() {
+        return excludeAllArcs;
+    }
 }
