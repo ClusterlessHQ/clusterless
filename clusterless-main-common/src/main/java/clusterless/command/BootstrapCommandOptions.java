@@ -15,18 +15,25 @@ import picocli.CommandLine;
  */
 @CommandLine.Command(description = "initialize the given environment")
 public class BootstrapCommandOptions extends CommonCommandOptions {
-
     @CommandLine.Option(
-            names = {"--account"}
+            names = {"--destroy"},
+            description = "remove the bootstrap for the given placement"
+    )
+    boolean destroy = false;
+    @CommandLine.Option(
+            names = {"--account"},
+            description = "aws account"
     )
     String account;
     @CommandLine.Option(
-            names = {"--region"}
+            names = {"--region"},
+            description = "aws region"
     )
     String region;
     @CommandLine.Option(
             names = {"--stage"},
-            arity = "0..1"
+            arity = "0..1",
+            description = "optional stage prefix to use within the cloud placement"
     )
     String stage;
     @CommandLine.Option(
@@ -34,6 +41,10 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
             hidden = true
     )
     boolean synth = false;
+
+    public boolean destroy() {
+        return destroy;
+    }
 
     public String account() {
         return account;

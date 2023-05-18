@@ -64,6 +64,7 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
     }
 
     private Integer exec() {
+        boolean destroyBootstrap = commandOptions.destroy();
         String account = prompt(commandOptions.account(), "Enter AWS account id to bootstrap: ");
         String region = prompt(commandOptions.region(), "Enter region to bootstrap: ");
         String stage = prompt(commandOptions.stage(), "Enter stage to bootstrap (hit enter for none): ");
@@ -87,7 +88,15 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
         LOG.info("executing kernel with: {}", kernelArgs);
 
         processExec.setUseTempOutput(true);
-        processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), "deploy", getRequireDeployApproval(), "bootstrap", kernelArgs);
+
+        String cdkCommand = destroyBootstrap ? "destroy" : "deploy";
+        List<String> approvals = destroyBootstrap ? getRequireDestroyApproval() : getRequireDeployApproval();
+
+        processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), cdkCommand, approvals, "bootstrap", kernelArgs);
+
+        if (destroyBootstrap) {
+            return 0;
+        }
 
         Path bootstrapMetaPath = createBootstrapMetaPath(processExec.getOutputPath());
 
