@@ -9,16 +9,21 @@
 package clusterless.scenario.conductor.worker.cli;
 
 import clusterless.scenario.Options;
-import clusterless.scenario.conductor.task.cli.Destroyer;
+import clusterless.scenario.conductor.task.cli.VerifierProject;
 
-public class DestroyerWorker extends ClusterlessWorker {
+public class VerifierProjectWorker extends ClusterlessProjectWorker {
 
-    public DestroyerWorker(Options options) {
-        super("destroy", options);
+    public VerifierProjectWorker(Options options) {
+        super("verify", options);
     }
 
     @Override
     public String getTaskDefName() {
-        return Destroyer.CLS_PROJECT_DESTROYER;
+        return VerifierProject.CLS_PROJECT_VERIFIER;
+    }
+
+    @Override
+    protected boolean getDryRun() {
+        return (!super.getDryRun() || !options.verifyOnDryRun()) && super.getDryRun();
     }
 }

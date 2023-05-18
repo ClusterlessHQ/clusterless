@@ -9,16 +9,16 @@
 package clusterless.scenario.conductor.worker.cli;
 
 import clusterless.scenario.Options;
-import clusterless.scenario.conductor.task.cli.Deployer;
+import clusterless.scenario.conductor.task.cli.DestroyerProject;
 
-public class DeployerWorker extends ClusterlessWorker {
+public class DestroyerProjectWorker extends ClusterlessProjectWorker {
 
-    public DeployerWorker(Options options) {
-        super("deploy", options);
+    public DestroyerProjectWorker(Options options) {
+        super("destroy", options);
     }
 
     @Override
     public String getTaskDefName() {
-        return Deployer.CLS_PROJECT_DEPLOYER;
+        return DestroyerProject.CLS_PROJECT_DESTROYER;
     }
 }

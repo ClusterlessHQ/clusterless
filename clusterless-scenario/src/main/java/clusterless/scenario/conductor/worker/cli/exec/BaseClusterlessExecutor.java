@@ -6,20 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.scenario.conductor.worker.cli;
+package clusterless.scenario.conductor.worker.cli.exec;
 
 import clusterless.startup.Startup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class ClusterlessExecutor {
-    private static final Logger LOG = LogManager.getLogger(ClusterlessExecutor.class);
-
+public abstract class BaseClusterlessExecutor {
+    private static final Logger LOG = LogManager.getLogger(ClusterlessProjectExecutor.class);
     private static final Map<String, String> properties = new LinkedHashMap<>();
 
     static {
@@ -28,22 +28,14 @@ public class ClusterlessExecutor {
         properties.put("aws.cdk.requireDestroyApproval", "false");
     }
 
-    private final String clsApp;
-    private final boolean dryRun;
-    private final String command;
-    private final String workingDirectory;
-    private final String projectFiles;
+    protected final String clsApp;
+    protected final boolean dryRun;
+    protected final String workingDirectory;
 
-    protected ClusterlessExecutor(String clsApp, boolean dryRun, String command, String workingDirectory, String projectFiles) {
+    public BaseClusterlessExecutor(String clsApp, boolean dryRun, String workingDirectory) {
         this.clsApp = clsApp;
         this.dryRun = dryRun;
-        this.command = command;
         this.workingDirectory = workingDirectory;
-        this.projectFiles = projectFiles;
-    }
-
-    public static Builder builder() {
-        return Builder.aClusterlessExecutor();
     }
 
     private Map<String, String> getEnvironment() {
@@ -51,19 +43,13 @@ public class ClusterlessExecutor {
     }
 
     public int exec() {
-        //cls deploy -p test-s3-copy-arc-project-chain.json
         List<String> args = new LinkedList<>();
 
         args.add(clsApp);
 
         Startup.asPropertyArgs(args, properties);
 
-        args.addAll(List.of(
-                command,
-                "-p",
-                projectFiles,
-                "-v"
-        ));
+        createCommand(args);
 
         if (dryRun) {
             args.add("--dry-run");
@@ -81,6 +67,9 @@ public class ClusterlessExecutor {
 
         try {
             Path cwd = Paths.get(workingDirectory);
+
+            Files.createDirectories(cwd);
+
             Path outPath = cwd.resolve("out.log");
             Path errorPath = cwd.resolve("err.log");
 
@@ -104,47 +93,5 @@ public class ClusterlessExecutor {
         }
     }
 
-    public static final class Builder {
-        private String clsApp;
-        private boolean dryRun;
-        private String command;
-        private String workingDirectory;
-        private String projectFiles;
-
-        private Builder() {
-        }
-
-        public static Builder aClusterlessExecutor() {
-            return new Builder();
-        }
-
-        public Builder withClsApp(String clsApp) {
-            this.clsApp = clsApp;
-            return this;
-        }
-
-        public Builder withDryRun(boolean dryRun) {
-            this.dryRun = dryRun;
-            return this;
-        }
-
-        public Builder withCommand(String command) {
-            this.command = command;
-            return this;
-        }
-
-        public Builder withWorkingDirectory(String workingDirectory) {
-            this.workingDirectory = workingDirectory;
-            return this;
-        }
-
-        public Builder withProjectFiles(String projectFiles) {
-            this.projectFiles = projectFiles;
-            return this;
-        }
-
-        public ClusterlessExecutor build() {
-            return new ClusterlessExecutor(clsApp, dryRun, command, workingDirectory, projectFiles);
-        }
-    }
+    protected abstract void createCommand(List<String> args);
 }

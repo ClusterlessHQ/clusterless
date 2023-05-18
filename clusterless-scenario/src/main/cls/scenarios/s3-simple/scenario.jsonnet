@@ -6,6 +6,9 @@ local project = import 's3-copy-arc.jsonnet';
   projectFiles: [
     's3-copy-arc.json',
   ],
+  placements: [
+    project.placement,
+  ],
   ingressStores: [
     {
       region: project.placement.region,

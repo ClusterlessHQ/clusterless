@@ -13,20 +13,16 @@ import clusterless.config.Config;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Scenario extends Config {
-
     boolean enabled = true;
-
     String name;
     String description;
-
     List<Path> projectFiles = new LinkedList<>();
-
     Path projectDirectory;
-
+    List<Map<String, String>> placements = new LinkedList<>();
     List<IngressStore> ingressStores = new LinkedList<>();
-
     List<WatchedStore> watchedStores = new LinkedList<>();
 
     public boolean enabled() {
@@ -51,6 +47,15 @@ public class Scenario extends Config {
 
     public Scenario setProjectDirectory(Path projectDirectory) {
         this.projectDirectory = projectDirectory;
+        return this;
+    }
+
+    public List<Map<String, String>> placements() {
+        return placements;
+    }
+
+    public Scenario setPlacements(List<Map<String, String>> placements) {
+        this.placements = placements;
         return this;
     }
 

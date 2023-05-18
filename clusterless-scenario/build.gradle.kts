@@ -89,7 +89,7 @@ sjsonnet {
         sources.from(file("src/main/cls/scenarios"))
             .filter { f -> f.extension == "jsonnet" }
         externalVariables.putAll(
-            properties.filter { p -> p.key.startsWith("aws.") }.toMap()
+            properties.filter { p -> p.key.startsWith("scenario.") }.toMap()
         )
     }
 }

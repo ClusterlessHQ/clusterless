@@ -11,9 +11,7 @@ package clusterless.scenario.conductor;
 import clusterless.scenario.Options;
 import clusterless.scenario.conductor.worker.aws.S3IngressWorker;
 import clusterless.scenario.conductor.worker.aws.S3WatcherWorker;
-import clusterless.scenario.conductor.worker.cli.DeployerWorker;
-import clusterless.scenario.conductor.worker.cli.DestroyerWorker;
-import clusterless.scenario.conductor.worker.cli.VerifierWorker;
+import clusterless.scenario.conductor.worker.cli.*;
 import com.netflix.conductor.client.automator.TaskRunnerConfigurer;
 import com.netflix.conductor.client.worker.Worker;
 
@@ -22,15 +20,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TaskManager {
-
     private final TaskRunnerConfigurer configurer;
     private final int threadCount = 10;
 
     public TaskManager(Options options, WorkflowManager manager) {
         List<Worker> workers = List.of(
-                new VerifierWorker(options),
-                new DeployerWorker(options),
-                new DestroyerWorker(options),
+                new DeployerBootstrapWorker(options),
+                new DestroyerBootstrapWorker(options),
+                new VerifierProjectWorker(options),
+                new DeployerProjectWorker(options),
+                new DestroyerProjectWorker(options),
                 new S3IngressWorker(options),
                 new S3WatcherWorker(options)
         );

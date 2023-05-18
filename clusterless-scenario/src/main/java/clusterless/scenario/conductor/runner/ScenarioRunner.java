@@ -12,9 +12,9 @@ import clusterless.scenario.Options;
 import clusterless.scenario.conductor.WorkflowManager;
 import clusterless.scenario.conductor.task.aws.S3Ingress;
 import clusterless.scenario.conductor.task.aws.S3Watcher;
-import clusterless.scenario.conductor.task.cli.Deployer;
-import clusterless.scenario.conductor.task.cli.Destroyer;
-import clusterless.scenario.conductor.task.cli.Verifier;
+import clusterless.scenario.conductor.task.cli.DeployerProject;
+import clusterless.scenario.conductor.task.cli.DestroyerProject;
+import clusterless.scenario.conductor.task.cli.VerifierProject;
 import clusterless.scenario.model.IngressStore;
 import clusterless.scenario.model.Scenario;
 import clusterless.scenario.model.WatchedStore;
@@ -79,7 +79,7 @@ public class ScenarioRunner {
         }
 
         LOG.info("scenario: {}, adding verifier: {}", scenario.name(), scenario.projectFiles());
-        tasks.addAll(new Verifier("clsVerifier", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
+        tasks.addAll(new VerifierProject("clsVerifier", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 
     private void applyDeployer(List<WorkflowTask> tasks) {
@@ -89,7 +89,7 @@ public class ScenarioRunner {
         }
 
         LOG.info("scenario: {}, adding deployer: {}", scenario.name(), scenario.projectFiles());
-        tasks.addAll(new Deployer("clsDeployer", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
+        tasks.addAll(new DeployerProject("clsDeployer", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 
     private void applyIngress(List<WorkflowTask> tasks) {
@@ -209,6 +209,6 @@ public class ScenarioRunner {
         }
 
         LOG.info("scenario: {}, adding destroyer: {}", scenario.name(), scenario.projectFiles());
-        tasks.addAll(new Destroyer("clsDestroyer", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
+        tasks.addAll(new DestroyerProject("clsDestroyer", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 }

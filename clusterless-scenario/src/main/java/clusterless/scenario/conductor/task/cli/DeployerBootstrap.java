@@ -9,13 +9,12 @@
 package clusterless.scenario.conductor.task.cli;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Map;
 
-public class Destroyer extends ClusterlessTask {
+public class DeployerBootstrap extends ClusterlessBootstrapTask {
+    public static final String CLS_PLACEMENT_DEPLOY = "clsPlacementDeploy";
 
-    public static final String CLS_PROJECT_DESTROYER = "clsProjectDestroyer";
-
-    public Destroyer(String taskDefName, Path workingDirectory, List<Path> projectFiles) {
-        super(CLS_PROJECT_DESTROYER, taskDefName, workingDirectory, projectFiles);
+    public DeployerBootstrap(String taskReferenceName, Path workingDirectory, Map<String, String> placement) {
+        super(CLS_PLACEMENT_DEPLOY, taskReferenceName, workingDirectory, placement);
     }
 }

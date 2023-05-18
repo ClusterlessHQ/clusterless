@@ -1,5 +1,6 @@
-local account = std.extVar('aws.account');
-local region = std.extVar('aws.region');
+local stage = std.extVar('scenario.stage');
+local account = std.extVar('scenario.aws.account');
+local region = std.extVar('scenario.aws.region');
 local bucketName = 'clusterless-chain-test-' + account + '-' + region;
 local bucketPrefix = 's3://'+bucketName;
 local unit = 'Twelfths';
@@ -10,6 +11,7 @@ local unit = 'Twelfths';
     version: '20230101-00',
   },
   placement: {
+    stage: stage,
     provider: 'aws',
     account: account,
     region: region,

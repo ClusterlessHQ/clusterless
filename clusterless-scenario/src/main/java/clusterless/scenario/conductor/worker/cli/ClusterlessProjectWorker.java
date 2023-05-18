@@ -9,6 +9,7 @@
 package clusterless.scenario.conductor.worker.cli;
 
 import clusterless.scenario.Options;
+import clusterless.scenario.conductor.worker.cli.exec.ClusterlessProjectExecutor;
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
@@ -18,12 +19,12 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class ClusterlessWorker implements Worker {
-    private static final Logger LOG = LogManager.getLogger(ClusterlessWorker.class);
+public abstract class ClusterlessProjectWorker implements Worker {
+    private static final Logger LOG = LogManager.getLogger(ClusterlessProjectWorker.class);
     private final String command;
     protected final Options options;
 
-    public ClusterlessWorker(String command, Options options) {
+    public ClusterlessProjectWorker(String command, Options options) {
         this.command = command;
         this.options = options;
     }
@@ -37,7 +38,7 @@ public abstract class ClusterlessWorker implements Worker {
         String workingDirectory = Objects.toString(inputData.get("workingDirectory"), null);
         String projectFiles = Objects.toString(inputData.get("projectFiles"), null);
 
-        ClusterlessExecutor deploy = ClusterlessExecutor.builder()
+        ClusterlessProjectExecutor deploy = ClusterlessProjectExecutor.Builder.builder()
                 .withClsApp(options.clsApp())
                 .withDryRun(getDryRun())
                 .withCommand(command)
