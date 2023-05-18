@@ -1,6 +1,4 @@
-local account = std.extVar('aws.account');
-local region = std.extVar('aws.region');
-local bucketName = 'clusterless-chain-test-' + account + '-' + region;
+local project = import 's3-copy-arc-project-chain.jsonnet';
 
 {
   name: 'copy-chain',
@@ -10,16 +8,16 @@ local bucketName = 'clusterless-chain-test-' + account + '-' + region;
   ],
   ingressStores: [
     {
-      region: region,
-      path: 's3://' + bucketName + '/ingress/',
+      region: project.placement.region,
+      path: project.arcs[0].sources.main.pathURI,
       uploadDelaySec: 60 * 5,
       objectCount: 3,
     },
   ],
   watchedStores: [
     {
-      region: region,
-      path: 's3://' + bucketName + '/copy-c/',
+      region: project.placement.region,
+      path: project.arcs[2].sinks.main.pathURI,
       objectCount: 3,
     },
   ],
