@@ -12,7 +12,6 @@ import clusterless.lambda.workload.s3copy.S3CopyArcEventHandler;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
-import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.props.Lookup;
 import clusterless.substrate.aws.resources.Assets;
@@ -21,13 +20,12 @@ import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
-import software.amazon.awscdk.services.stepfunctions.CatchProps;
-import software.amazon.awscdk.services.stepfunctions.Errors;
 import software.amazon.awscdk.services.stepfunctions.IChainable;
+import software.amazon.awscdk.services.stepfunctions.TaskStateBase;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
@@ -62,7 +60,7 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
     }
 
     @Override
-    public IChainable createState(String inputPath, String resultPath, IChainable failed) {
+    public IChainable createState(String inputPath, String resultPath, IChainable failed, Consumer<TaskStateBase> taskAmendments) {
         LambdaInvoke invoke = LambdaInvoke.Builder.create(this, "S3CopyFunction")
                 .lambdaFunction(function())
                 .retryOnServiceExceptions(true)
@@ -71,13 +69,7 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
                 .resultPath(resultPath)
                 .build();
 
-        invoke.addCatch(
-                failed,
-                CatchProps.builder()
-                        .resultPath(ArcStateContext.ERROR_PATH)
-                        .errors(List.of(Errors.ALL))
-                        .build()
-        );
+        taskAmendments.accept(invoke);
 
         return invoke;
     }

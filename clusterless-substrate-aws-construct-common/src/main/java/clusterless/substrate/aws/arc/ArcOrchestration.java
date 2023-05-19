@@ -16,6 +16,7 @@ import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.state.ArcCompleteStateGate;
 import clusterless.substrate.aws.arc.state.ArcStartStateGate;
 import clusterless.substrate.aws.construct.ArcConstruct;
+import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
@@ -28,6 +29,8 @@ import software.amazon.awscdk.services.events.targets.SfnStateMachine;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.stepfunctions.*;
+
+import java.util.List;
 
 import static clusterless.substrate.aws.event.ArcStateContext.SINK_MANIFESTS_PATH;
 import static clusterless.substrate.aws.event.ArcStateContext.WORKLOAD_CONTEXT_PATH;
@@ -95,7 +98,21 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
         // TODO: see if we can simplify the createState api by using a Pass
         //       before and after to handle the inputPath and outputPath
         return ((ArcConstruct<?>) arcComponent)
-                .createState(WORKLOAD_CONTEXT_PATH, SINK_MANIFESTS_PATH, fail);
+                .createState(
+                        WORKLOAD_CONTEXT_PATH,
+                        SINK_MANIFESTS_PATH,
+                        fail,
+                        taskStateBase -> taskStateBase.addCatch(
+                                Pass.Builder.create(this, taskStateBase.getId() + "Catch")
+                                        .comment("Task threw an error")
+                                        .build()
+                                        .next(fail),
+                                CatchProps.builder()
+                                        .resultPath(ArcStateContext.ERROR_PATH)
+                                        .errors(List.of(Errors.ALL))
+                                        .build()
+                        )
+                );
     }
 
     @NotNull

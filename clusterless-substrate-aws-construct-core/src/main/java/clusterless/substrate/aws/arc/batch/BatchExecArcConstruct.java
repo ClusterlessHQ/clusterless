@@ -38,15 +38,12 @@ import software.amazon.awscdk.services.stepfunctions.tasks.BatchSubmitJob;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 import software.constructs.Construct;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * https://stackoverflow.com/questions/65835855/aws-batch-job-execution-results-in-step-function
- */
 public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     private static final Logger LOG = LogManager.getLogger(BatchExecArcConstruct.class);
     private final Label regionalName;
@@ -74,7 +71,6 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         payloadCommand = new BatchPayloadCommand(model().workload().command());
 
-        // https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
         LogGroup logGroup = LogGroup.Builder.create(this, Label.of("LogGroup").with(model().name()).camelCase())
                 .logGroupName("/aws/batch/" + regionalName.lowerHyphen()) // part of the ARN
                 .removalPolicy(removalPolicy)
@@ -88,6 +84,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
         jobRole.addToPrincipalPolicy(Policies.createCloudWatchPolicyStatement()); // allow workload to push metrics
         grantManifestAndDatasetPermissionsTo(jobRole);
 
+        // https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
         EcsFargateContainerDefinition container = EcsFargateContainerDefinition.Builder.create(this, "FargateContainer")
                 .image(image)
                 .jobRole(jobRole)
@@ -160,7 +157,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     }
 
     @Override
-    public IChainable createState(String inputPath, String resultPath, IChainable failed) {
+    public IChainable createState(String inputPath, String resultPath, IChainable failed, Consumer<TaskStateBase> taskAmendments) {
         TaskInput payload = TaskInput.fromObject(
                 payloadCommand.payload()
                         .entrySet()
@@ -178,13 +175,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .payload(payload)
                 .build();
 
-        batchSubmitTask.addCatch(
-                failed,
-                CatchProps.builder()
-                        .resultPath(ArcStateContext.ERROR_PATH)
-                        .errors(List.of(Errors.ALL))
-                        .build()
-        );
+        taskAmendments.accept(batchSubmitTask);
 
         // add lambda to scrape manifests
         LambdaInvoke invoke = LambdaInvoke.Builder.create(this, "BatchResults")
@@ -195,14 +186,9 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .resultPath(resultPath)
                 .build();
 
-        invoke.addCatch(
-                failed,
-                CatchProps.builder()
-                        .resultPath(ArcStateContext.ERROR_PATH)
-                        .errors(List.of(Errors.ALL))
-                        .build()
-        );
+        taskAmendments.accept(invoke);
 
-        return Chain.start(batchSubmitTask).next(invoke);
+        return Chain.start(batchSubmitTask)
+                .next(invoke);
     }
 }

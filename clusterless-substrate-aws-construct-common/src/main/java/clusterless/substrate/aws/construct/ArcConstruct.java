@@ -20,6 +20,7 @@ import software.amazon.awscdk.services.iam.IGrantable;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 import software.amazon.awscdk.services.stepfunctions.IChainable;
+import software.amazon.awscdk.services.stepfunctions.TaskStateBase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
         grantEach(model().sinks(), id("Sink"), b -> b.grantReadWrite(grantable));
     }
 
-    public abstract IChainable createState(String inputPath, String outputPath, IChainable failed);
+    public abstract IChainable createState(String inputPath, String outputPath, IChainable failed, Consumer<TaskStateBase> taskAmendments);
 
     protected void grantEach(Map<String, ? extends Dataset> sources, String id, Consumer<IBucket> grant) {
         sources.forEach((key, value) -> {
