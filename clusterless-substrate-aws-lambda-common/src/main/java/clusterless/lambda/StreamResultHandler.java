@@ -94,8 +94,13 @@ public abstract class StreamResultHandler<E, R> implements RequestStreamHandler 
 
     public abstract R handleRequest(E event, Context context);
 
-    protected void logObject(String message, Object object) {
+    protected void logInfoObject(String message, Object object) {
         LOG.info(message, JSONUtil.writeAsStringSafe(object));
+    }
+
+    protected void logInfo(String format, Object... values) {
+        // use the log4j message factory so that we don't introduce yet another log format
+        LOG.info(format, values);
     }
 
     protected <T> T logErrorAndThrow(BiFunction<String, Throwable, RuntimeException> exceptionFactory, Throwable cause, String format, Object... values) {

@@ -31,8 +31,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,6 +97,7 @@ public class EventSerializationTest extends LambdaHandlerTestBase {
 
         arcStateManager = mock();
         when(arcStateManager.setStateFor(anyString(), eq(ArcState.complete))).thenReturn(Optional.of(ArcState.running));
+        when(arcStateManager.setStateFor(anyString(), eq(ArcState.complete), any())).thenReturn(Optional.of(ArcState.running));
 
         Map<String, ArcNotifyEventPublisher> eventPublishers = Map.of("main", mock(ArcNotifyEventPublisher.class));
 

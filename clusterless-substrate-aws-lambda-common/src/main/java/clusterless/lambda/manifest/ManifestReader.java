@@ -34,7 +34,7 @@ public class ManifestReader {
         }
 
         try {
-            return manifestReader.readValue(response.inputStream());
+            return manifestReader.readValue(response.asInputStream());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

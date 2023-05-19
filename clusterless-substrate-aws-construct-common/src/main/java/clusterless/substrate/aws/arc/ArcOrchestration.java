@@ -69,14 +69,16 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
     }
 
     public void buildOrchestrationWith(ArcComponent arcComponent) {
+        ArcCompleteStateGate completeStateGate = new ArcCompleteStateGate(context(), arc, arcStateProps, runtimeProps);
+
         Chain rootChain = Chain.start(pass("CurrentStateChoice", "$.detail"))
                 // confirm the state is valid and forward to the workload
                 .next(new ArcStartStateGate(context(), arc, arcStateProps, runtimeProps))
                 .next(
                         startGateResultChoice(
-                                Chain.start(stateFrom(arcComponent, fail("Failed", "Failed with unhandled error")))
+                                Chain.start(stateFrom(arcComponent, completeStateGate))
                                         // publish new events on complete of workload
-                                        .next(new ArcCompleteStateGate(context(), arc, arcStateProps, runtimeProps))
+                                        .next(completeStateGate)
                                         .next(completeGateResultChoice())
                         )
                 );
@@ -89,7 +91,7 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                 .build();
     }
 
-    private IChainable stateFrom(ArcComponent arcComponent, Fail fail) {
+    private IChainable stateFrom(ArcComponent arcComponent, IChainable fail) {
         // TODO: see if we can simplify the createState api by using a Pass
         //       before and after to handle the inputPath and outputPath
         return ((ArcConstruct<?>) arcComponent)
@@ -130,12 +132,36 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
     private Choice completeGateResultChoice() {
         return Choice.Builder.create(this, "StateComplete")
                 .build()
+                // "Error"
                 .when(
+                        Condition.and(
+                                Condition.isPresent("$.workloadError.Error"),
+                                Condition.stringEquals("$.currentState", ArcState.partial.name())
+                        ),
+                        fail("PartialWithError", "Only partial data was created, due to an error, see arc state")
+                ).when(
+                        Condition.and(
+                                Condition.isPresent("$.workloadError.Error"),
+                                Condition.stringEquals("$.currentState", ArcState.missing.name())
+                        ),
+                        fail("MissingWithError", "No data was created, due to an error, see arc state")
+                ).when(
+                        Condition.and(
+                                Condition.isPresent("$.workloadError.Error")
+                        ),
+                        fail("UnknownError", "Unknown error state")
+                ).when(
                         Condition.and(
                                 Condition.isPresent("$.currentState"),
                                 Condition.stringEquals("$.currentState", ArcState.partial.name())
                         ),
-                        succeed("Partial", "Only partial data was handled")
+                        succeed("Partial", "Only partial data was created, possibly due to an internal error")
+                ).when(
+                        Condition.and(
+                                Condition.isPresent("$.currentState"),
+                                Condition.stringEquals("$.currentState", ArcState.missing.name())
+                        ),
+                        succeed("Missing", "No data was created, possibly due to an error")
                 ).when(
                         Condition.and(
                                 Condition.isPresent("$.currentState"),

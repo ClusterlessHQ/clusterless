@@ -19,6 +19,7 @@ import java.util.Map;
  * The ArcExecContext is the object passed within a state machine.
  */
 public class ArcStateContext implements Struct {
+    public static final String ERROR_PATH = "$.workloadError";
     public static final String RESPONSE_PATH = "$.workloadResponse";
     public static final String SINK_MANIFESTS_PATH = "$.sinkManifests";
     public static final String WORKLOAD_CONTEXT_PATH = "$.arcWorkloadContext";
@@ -31,12 +32,13 @@ public class ArcStateContext implements Struct {
     ArcWorkloadContext arcWorkloadContext = new ArcWorkloadContext();
     Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
     Map<String, Object> workloadResponse = new LinkedHashMap<>(); // intermediate results of workload
+    Map<String, Object> workloadError = new LinkedHashMap<>(); // error results of workload
 
     public ArcStateContext() {
     }
 
     public static Builder builder() {
-        return Builder.anArcStateContext();
+        return Builder.builder();
     }
 
     public ArcState previousState() {
@@ -59,17 +61,22 @@ public class ArcStateContext implements Struct {
         return workloadResponse;
     }
 
+    public Map<String, Object> workloadError() {
+        return workloadError;
+    }
+
     public static final class Builder {
         ArcState previousState;
         ArcState currentState;
         ArcWorkloadContext arcWorkloadContext = new ArcWorkloadContext();
         Map<String, URI> sinkManifests = new LinkedHashMap<>(); // result of the arc workload
-        Map<String, Object> workloadResponse = new LinkedHashMap<>();
+        Map<String, Object> workloadResponse = new LinkedHashMap<>(); // intermediate results of workload
+        Map<String, Object> workloadError = new LinkedHashMap<>(); // error results of workload
 
         private Builder() {
         }
 
-        public static Builder anArcStateContext() {
+        public static Builder builder() {
             return new Builder();
         }
 
@@ -98,13 +105,19 @@ public class ArcStateContext implements Struct {
             return this;
         }
 
+        public Builder withWorkloadError(Map<String, Object> workloadError) {
+            this.workloadError = workloadError;
+            return this;
+        }
+
         public ArcStateContext build() {
             ArcStateContext arcStateContext = new ArcStateContext();
+            arcStateContext.workloadError = this.workloadError;
             arcStateContext.arcWorkloadContext = this.arcWorkloadContext;
+            arcStateContext.workloadResponse = this.workloadResponse;
+            arcStateContext.currentState = this.currentState;
             arcStateContext.previousState = this.previousState;
             arcStateContext.sinkManifests = this.sinkManifests;
-            arcStateContext.currentState = this.currentState;
-            arcStateContext.workloadResponse = this.workloadResponse;
             return arcStateContext;
         }
     }

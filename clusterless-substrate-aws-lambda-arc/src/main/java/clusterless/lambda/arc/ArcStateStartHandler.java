@@ -67,11 +67,11 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
 
     @Override
     public ArcStateContext handleRequest(ArcNotifyEvent event, Context context) {
-        logObject("incoming arc event: {}", event);
+        logInfoObject("incoming arc event: {}", event);
 
         ArcStateContext arcStateContext = handleEvent(event, context, observer());
 
-        logObject("outgoing arc context: {}", arcStateContext);
+        logInfoObject("outgoing arc context: {}", arcStateContext);
 
         return arcStateContext;
     }
@@ -98,7 +98,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
         }
 
         // if already completed, punt back up to the state machine
-        if (currentState.isPresent() && (currentState.get() == ArcState.complete || currentState.get() == ArcState.missing)) {
+        if (currentState.isPresent() && (currentState.get() == ArcState.complete)) {
             LOG.info("lot already completed: {}", lotId);
             eventObserver.applyFinalArcStates(currentState.get(), currentState.get());
             return ArcStateContext.builder()

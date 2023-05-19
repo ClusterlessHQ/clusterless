@@ -32,7 +32,7 @@ public abstract class EventResultHandler<E, R, O extends EventObserver> extends 
 
     @Override
     public R handleRequest(E event, Context context) {
-        logObject("incoming event: {}", event);
+        logInfoObject("incoming event: {}", event);
 
         R r = null;
         try {
@@ -41,7 +41,7 @@ public abstract class EventResultHandler<E, R, O extends EventObserver> extends 
             logErrorAndThrow(RuntimeException::new, e, "failed executing handler: {}, with: {}", getClass().getName(), e.getMessage());
         }
 
-        logObject("outgoing object: {}", r);
+        logInfoObject("outgoing object: {}", r);
 
         return r;
     }

@@ -16,8 +16,6 @@ import clusterless.substrate.aws.event.ArcWorkloadContext;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.uri.ManifestURI;
 import com.amazonaws.services.lambda.runtime.Context;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -26,8 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BatchResultHandler extends ArcEventHandler<WorkloadProps> {
-    private static final Logger LOG = LogManager.getLogger(BatchResultHandler.class);
-
     protected static final S3 s3 = new S3();
 
     @Override
@@ -36,6 +32,8 @@ public class BatchResultHandler extends ArcEventHandler<WorkloadProps> {
         Map<String, URI> result = new LinkedHashMap<>();
 
         String lot = workloadContext.arcNotifyEvent().lot();
+
+        logInfo("handling lot: {}", lot);
 
         Map<String, ManifestURI> manifestPaths = arcProps().sinkManifestPaths();
 

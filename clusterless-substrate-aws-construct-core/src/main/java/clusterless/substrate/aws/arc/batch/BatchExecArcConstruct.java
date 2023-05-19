@@ -160,7 +160,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     }
 
     @Override
-    public IChainable createState(String inputPath, String resultPath, State failed) {
+    public IChainable createState(String inputPath, String resultPath, IChainable failed) {
         TaskInput payload = TaskInput.fromObject(
                 payloadCommand.payload()
                         .entrySet()
@@ -181,6 +181,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
         batchSubmitTask.addCatch(
                 failed,
                 CatchProps.builder()
+                        .resultPath(ArcStateContext.ERROR_PATH)
                         .errors(List.of(Errors.ALL))
                         .build()
         );
@@ -197,6 +198,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
         invoke.addCatch(
                 failed,
                 CatchProps.builder()
+                        .resultPath(ArcStateContext.ERROR_PATH)
                         .errors(List.of(Errors.ALL))
                         .build()
         );

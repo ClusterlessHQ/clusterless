@@ -81,7 +81,7 @@ member objects in the dataset lot.
 The parent process will produce a new logical dataset lot, this dataset lot is simply the sum of all the physical parts
 produced by the child processes when handling the source dataset lot partitions.
 
-If one of the children fail, the over all process also fails, and the arc fails. But the other children may succeed.
+If one of the children fail, the overall process also fails, and the arc fails. But the other children may succeed.
 
 If the failure was transient, the whole arc should be replayed, but only the child processes associated with failed
 partitions should be executed, the successful partitions should be skipped. Any data created by the failed partition
@@ -159,7 +159,7 @@ graph LR;
     missing-->running;
 ```
 
-Arc state for a given lot is a roll up of lot workload states, or specifically the manifest states for a given lot.
+Arc state for a given lot is a rollup of lot workload states, or specifically the manifest states for a given lot.
 Where the manifest state is a function of the workload that created it.
 
 #### Manifest States

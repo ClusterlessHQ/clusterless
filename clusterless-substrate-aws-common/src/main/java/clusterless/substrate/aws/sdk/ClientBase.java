@@ -202,11 +202,15 @@ public abstract class ClientBase<C> {
             return false;
         }
 
-        public ByteBuffer objectAsBytes() {
+        public GetObjectResponse asGetObjectResponse() {
+            return objectAsBytes.response();
+        }
+
+        public ByteBuffer asByteBuffer() {
             return objectAsBytes.asByteBuffer();
         }
 
-        public InputStream inputStream() {
+        public InputStream asInputStream() {
             return objectAsBytes.asInputStream();
         }
     }

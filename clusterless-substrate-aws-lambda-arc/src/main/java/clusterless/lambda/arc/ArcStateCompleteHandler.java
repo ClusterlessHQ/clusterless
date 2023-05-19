@@ -17,11 +17,9 @@ import clusterless.substrate.uri.ManifestURI;
 import clusterless.substrate.uri.StateURI;
 import clusterless.util.Env;
 import com.amazonaws.services.lambda.runtime.Context;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -31,8 +29,6 @@ import java.util.stream.Collectors;
  *
  */
 public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext, ArcStateContext> {
-    private static final Logger LOG = LogManager.getLogger(ArcStateCompleteHandler.class);
-
     protected static final ArcStateProps arcStateProps = Env.fromEnv(
             ArcStateProps.class,
             () -> ArcStateProps.builder()
@@ -62,44 +58,69 @@ public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext
             public void applySinkManifests(Map<String, URI> sinkStates) {
 
             }
+
+            @Override
+            public void applyWorkloadError(Map<String, Object> workloadError) {
+
+            }
         };
     }
 
     @Override
     public ArcStateContext handleRequest(ArcStateContext event, Context context) {
-        logObject("incoming arc event: {}", event);
+        logInfoObject("incoming arc event: {}", event);
 
         ArcStateContext arcStateContext = handleEvent(event, context, observer());
 
-        logObject("outgoing arc context: {}", arcStateContext);
+        logInfoObject("outgoing arc context: {}", arcStateContext);
 
         return arcStateContext;
     }
 
-    protected ArcStateContext handleEvent(ArcStateContext event, Context context, ArcStateCompleteObserver eventObserver) {
-        // check status
-        Map<String, URI> sinkManifests = event.sinkManifests();
+    protected ArcStateContext handleEvent(ArcStateContext stateContext, Context context, ArcStateCompleteObserver eventObserver) {
+        Map<String, Object> workloadError = stateContext.workloadError();
 
-        if (sinkManifests == null || sinkManifests.isEmpty()) {
-            return logErrorAndThrow(IllegalStateException::new, "workload sink states is empty");
+        boolean hasWorkloadError = false;
+        if (workloadError != null && !workloadError.isEmpty()) {
+            eventObserver.applyWorkloadError(workloadError);
+            hasWorkloadError = true;
         }
 
-        eventObserver.applySinkManifests(sinkManifests);
+        boolean hasSinkManifests = false;
+        Map<String, URI> sinkManifests = stateContext.sinkManifests();
+        Set<ManifestState> sinkStates = Collections.emptySet();
+        if (sinkManifests != null && !sinkManifests.isEmpty()) {
+            eventObserver.applySinkManifests(sinkManifests);
+            hasSinkManifests = true;
+            sinkStates = sinkManifests.values()
+                    .stream()
+                    .map(ManifestURI::parse)
+                    .map(StateURI::state)
+                    .collect(Collectors.toSet());
+        }
 
-        List<ManifestURI> manifestURIS = sinkManifests.values().stream().map(ManifestURI::parse).collect(Collectors.toList());
-
-        Set<ManifestState> states = manifestURIS.stream().map(StateURI::state).collect(Collectors.toSet());
-
+        //- `running` - the workload is currently processing, prevents concurrent executions
+        //- `complete` - the workload completed successfully, prevents duplicate executions
+        //- `partial` - the workload failed and any artifacts should be removed/ignored, allows for
+        //              retries via a new running state
+        //- `missing` - if a partial is cleaned up, the arc state may be considered intentionally
+        //              missing and eligible for a retry
         ArcState newArcState = null;
 
-        if (states.contains(ManifestState.partial)) {
-            LOG.info("workload had partial results, marking partial");
+        if (!hasSinkManifests && !hasWorkloadError) {
+            // no manifest was written by the workload, but it was successful
+            logErrorAndThrow(IllegalStateException::new, "workload sink manifests is missing/empty");
+        } else if (!hasSinkManifests) {
+            logInfo("workload had no results due to failure, marking missing");
+            newArcState = ArcState.missing;
+        } else if (sinkStates.contains(ManifestState.partial)) {
+            logInfo("workload had partial results, marking partial");
             newArcState = ArcState.partial;
-        } else if (states.size() == 1 && states.contains(ManifestState.empty)) {
-            LOG.info("workload has empty results, marking complete");
+        } else if (sinkStates.size() == 1 && sinkStates.contains(ManifestState.empty)) {
+            logInfo("workload has empty results, marking complete");
             newArcState = ArcState.complete;
-        } else if (states.contains(ManifestState.complete)) {
-            LOG.info("workload has complete results");
+        } else if (sinkStates.contains(ManifestState.complete)) {
+            logInfo("workload has complete results");
             newArcState = ArcState.complete;
         }
 
@@ -107,34 +128,38 @@ public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext
             return logErrorAndThrow(IllegalStateException::new, "unexpected result states: {}", sinkManifests);
         }
 
-        String lotId = event.arcWorkloadContext().arcNotifyEvent().lot();
+        String lotId = stateContext.arcWorkloadContext().arcNotifyEvent().lot();
 
-        // push notify on each sink
-        for (Map.Entry<String, URI> entry : sinkManifests.entrySet()) {
-            String role = entry.getKey();
-            URI manifestURI = entry.getValue();
+        if (newArcState == ArcState.complete) {
+            // push notify on each sink
+            for (Map.Entry<String, URI> entry : sinkManifests.entrySet()) {
+                String role = entry.getKey();
+                URI manifestURI = entry.getValue();
 
-            eventPublishers.get(role).publishEvent(lotId, manifestURI);
+                // TODO: add status of arc
+                eventPublishers.get(role).publishEvent(lotId, manifestURI);
+            }
         }
 
         // change state to complete/partial
-        Optional<ArcState> priorArcState = arcStateManager.setStateFor(lotId, newArcState);
+        Optional<ArcState> priorArcState = arcStateManager.setStateFor(lotId, newArcState, hasWorkloadError ? workloadError : null);
 
         // confirm there isn't some race condition
         // todo: create new exception to capture in state machine
         // this should always be running state
-        ArcState currentState = event.currentState();
+        ArcState currentState = stateContext.currentState();
         if (currentState == ArcState.running && currentState != priorArcState.orElse(null)) {
-            return logErrorAndThrow(IllegalStateException::new, "unexpected state change from: {}, to: {}", currentState, priorArcState.orElse(null));
+            return logErrorAndThrow(IllegalStateException::new, "inconsistent state expected: {}, found: {}", currentState, priorArcState.orElse(null));
         }
 
         return ArcStateContext.builder()
                 .withArcWorkloadContext(ArcWorkloadContext.builder()
-                        .withArcNotifyEvent(event.arcWorkloadContext().arcNotifyEvent())
-                        .withRole(event.arcWorkloadContext().role())
+                        .withArcNotifyEvent(stateContext.arcWorkloadContext().arcNotifyEvent())
+                        .withRole(stateContext.arcWorkloadContext().role())
                         .build())
-                .withPreviousState(event.previousState())
+                .withPreviousState(stateContext.previousState())
                 .withCurrentState(newArcState)
+                .withWorkloadError(stateContext.workloadError())
                 .build();
     }
 }

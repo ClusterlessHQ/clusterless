@@ -11,12 +11,14 @@ package clusterless.substrate.aws.sdk;
 import clusterless.json.JSONUtil;
 import clusterless.util.Tuple2;
 import clusterless.util.URIs;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
  *
  */
 public class S3 extends ClientBase<S3Client> {
+
+    public static final int MAX_PAYLOAD = 1024 * 1024;
+
     public static URI createS3URI(String bucket, String key) {
         return URIs.create("s3", bucket, key);
     }
@@ -116,6 +121,16 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
+    public Response put(URI identifier, String contentType, ByteBuffer byteBuffer) {
+        Objects.requireNonNull(identifier, "identifier");
+        Objects.requireNonNull(contentType, "contentType");
+        Objects.requireNonNull(byteBuffer, "byteBuffer");
+
+        RequestBody requestBody = RequestBody.fromByteBuffer(byteBuffer);
+
+        return put(identifier, contentType, requestBody);
+    }
+
     public Response put(URI identifier, String contentType, Object value) {
         Objects.requireNonNull(identifier, "identifier");
         Objects.requireNonNull(contentType, "contentType");
@@ -131,6 +146,13 @@ public class S3 extends ClientBase<S3Client> {
         Objects.requireNonNull(contentType, "contentType");
         Objects.requireNonNull(body, "body");
 
+        RequestBody requestBody = body.isEmpty() ? RequestBody.empty() : RequestBody.fromString(body);
+
+        return put(identifier, contentType, requestBody);
+    }
+
+    @NotNull
+    private ClientBase<S3Client>.Response put(URI identifier, String contentType, RequestBody requestBody) {
         String bucketName = identifier.getHost();
         String key = URIs.asKey(identifier);
 
@@ -141,7 +163,7 @@ public class S3 extends ClientBase<S3Client> {
                 .build();
 
         try (S3Client client = createClient()) {
-            return new Response(client.putObject(putObjectRequest, RequestBody.fromString(body)));
+            return new Response(client.putObject(putObjectRequest, requestBody));
         } catch (Exception exception) {
             return new Response(exception);
         }
@@ -189,6 +211,43 @@ public class S3 extends ClientBase<S3Client> {
                 .bucket(bucketName)
                 .key(key)
                 .build();
+    }
+
+    public Response moveAppendLine(URI fromIdentifier, URI toIdentifier, String append) {
+        Objects.requireNonNull(fromIdentifier, "fromIdentifier");
+        Objects.requireNonNull(toIdentifier, "toIdentifier");
+        Objects.requireNonNull(append, "append");
+
+        try (S3Client client = createClient()) {
+            Response getResponse = get(fromIdentifier);
+
+            if (!getResponse.isSuccess()) {
+                return getResponse;
+            }
+
+            if (getResponse.asGetObjectResponse().contentLength() < MAX_PAYLOAD) {
+                ByteBuffer byteBuffer = getResponse.asByteBuffer();
+                String newLine = byteBuffer.capacity() != 0 ? "\n" : "";
+                ByteBuffer buffer = ByteBuffer.allocate(byteBuffer.capacity() + append.length() + newLine.length());
+                buffer.put(byteBuffer);
+                buffer.put(newLine.getBytes());
+                buffer.put(append.getBytes());
+                String contentType = getResponse.asGetObjectResponse().contentType();
+                Response putResponse = put(toIdentifier, contentType, buffer);
+
+                if (!putResponse.isSuccess()) {
+                    return putResponse;
+                }
+            } else {
+                ClientBase<S3Client>.Response response = copy(client, fromIdentifier, toIdentifier);
+
+                if (!response.isSuccess()) {
+                    return response;
+                }
+            }
+
+            return remove(client, fromIdentifier);
+        }
     }
 
     public Response move(URI fromIdentifier, URI toIdentifier) {

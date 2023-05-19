@@ -42,7 +42,7 @@ public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResu
     public ArcEventHandler() {
         super(ArcWorkloadContext.class, getMapTypeFor(String.class, URI.class));
 
-        logObject("using arcProps: {}", arcProps.get());
+        logInfoObject("using arcProps: {}", arcProps.get());
     }
 
     protected ArcEventObserver observer() {

@@ -8,6 +8,7 @@
 
 package clusterless.lambda.arc;
 
+import clusterless.json.JSONUtil;
 import clusterless.model.state.ArcState;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.uri.ArcURI;
@@ -41,6 +42,10 @@ public class ArcStateManager {
      * @return
      */
     public Optional<ArcState> setStateFor(String lotId, ArcState newState) {
+        return setStateFor(lotId, newState, null);
+    }
+
+    public Optional<ArcState> setStateFor(String lotId, ArcState newState, Object payload) {
         Optional<ArcState> currentState = findStateFor(lotId);
 
         if (currentState.isPresent() && currentState.get() == newState) {
@@ -55,9 +60,13 @@ public class ArcStateManager {
 
         LOG.info("setting arc state to: {}", newStateIdentifier);
 
+        String body = payload == null ? "" : JSONUtil.writeAsStringSafe(payload);
         if (currentStateIdentifier == null) {
-            s3.put(newStateIdentifier, "application/txt", "")
+            s3.put(newStateIdentifier, "application/txt", body)
                     .isSuccessOrThrow(e -> new RuntimeException("unable to set state at: " + newStateIdentifier, e));
+        } else if (payload != null) {
+            s3.moveAppendLine(currentStateIdentifier, newStateIdentifier, body)
+                    .isSuccessOrThrow(e -> new RuntimeException("unable to move state at: " + currentStateIdentifier + ", to: " + newStateIdentifier, e));
         } else {
             s3.move(currentStateIdentifier, newStateIdentifier)
                     .isSuccessOrThrow(e -> new RuntimeException("unable to move state at: " + currentStateIdentifier + ", to: " + newStateIdentifier, e));
