@@ -20,7 +20,11 @@ dependencies {
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
     val cdkVersion = "2.80.0"
     api("software.amazon.awscdk:aws-cdk-lib:$cdkVersion")
-    api("software.amazon.awscdk:batch-alpha:$cdkVersion-alpha.0")
+    api("software.amazon.awscdk:batch-alpha:$cdkVersion-alpha.0") {
+        exclude(group = "software.amazon.awscdk", module = "cdk-asset-awscli-v1")
+        exclude(group = "software.amazon.awscdk", module = "cdk-asset-kubectl-v20")
+        exclude(group = "software.amazon.awscdk", module = "cdk-asset-node-proxy-agent-v5")
+    }
     // https://mvnrepository.com/artifact/software.constructs/constructs
     val constructsVersion = "10.2.31"
     api("software.constructs:constructs:$constructsVersion")
