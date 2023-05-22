@@ -68,7 +68,7 @@ Install node/npm:
 
 Install the AWD CDK:
 
-> npm install -g aws-cdk
+> npm install -g aws-cdk@2.80.0
 
 Install Java 19 via [sdkman](https://sdkman.io):
 

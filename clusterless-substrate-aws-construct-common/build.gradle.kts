@@ -18,9 +18,10 @@ dependencies {
     api(project(":clusterless-substrate-aws-lambda-arc"))
 
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
-    val cdkVersion = "2.78.0"
+    val cdkVersion = "2.80.0"
     api("software.amazon.awscdk:aws-cdk-lib:$cdkVersion")
     api("software.amazon.awscdk:batch-alpha:$cdkVersion-alpha.0")
     // https://mvnrepository.com/artifact/software.constructs/constructs
-    api("software.constructs:constructs:10.2.15")
+    val constructsVersion = "10.2.31"
+    api("software.constructs:constructs:$constructsVersion")
 }
