@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - 'wip-*'
+      - '!*-scenarios'
     paths-ignore:
       - '*.txt'
       - '*.md'
       - '*.adoc'
 jobs:
   run-all-tests-and-release:
+    concurrency: scenarios-us-west-2
     runs-on: ubuntu-latest
 
     steps:
@@ -43,6 +45,16 @@ jobs:
           AWS_DEFAULT_REGION: us-west-2
         run: |
           ./gradlew --no-daemon --info --stacktrace scenarios
+
+      - name: Archive Scenario Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: scenario-results
+          path: |
+            clusterless-scenario/build/scenarios/*
+            !clusterless-scenario/build/scenarios/**/cdk.out
+          retention-days: 5
 
       - name: Release
         env:

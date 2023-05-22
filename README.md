@@ -66,9 +66,15 @@ Install node/npm:
 
 > nvm install v18.14.2
 
-Install the AWD CDK:
+Install the AWS CDK:
 
 > npm install -g aws-cdk@2.80.0
+
+after install, make sure to bootstrap your account and region:
+
+https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html#bootstrapping-howto
+
+> cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1 aws://ACCOUNT-NUMBER-2/REGION-2 ...
 
 Install Java 19 via [sdkman](https://sdkman.io):
 
