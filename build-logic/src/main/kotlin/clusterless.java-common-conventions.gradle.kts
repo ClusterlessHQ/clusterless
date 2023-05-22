@@ -5,13 +5,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+import java.io.FileInputStream
+import java.util.*
+
+/*
+ * Copyright (c) 2023 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 plugins {
     java
     idea
     `java-test-fixtures`
 }
 
-version = "1.0-wip"
+val versionProperties = Properties().apply {
+    load(FileInputStream(File(rootProject.rootDir, "version.properties")))
+}
+
+val release = false;
+val buildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "dev"
+val wipReleases = "wip-${buildNumber}"
+
+version = if (release)
+    "${versionProperties["clusterless.release.major"]}-${versionProperties["clusterless.release.minor"]}"
+else "${versionProperties["clusterless.release.major"]}-${wipReleases}"
 
 repositories {
     mavenCentral()

@@ -39,3 +39,9 @@ jobs:
           AWS_DEFAULT_REGION: us-west-2
         run: |
           ./gradlew --no-daemon --info --stacktrace check scenarios
+
+      - name: Release
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew --no-daemon --info --stacktrace release

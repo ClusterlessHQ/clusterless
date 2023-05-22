@@ -6,8 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import org.jreleaser.model.Distribution
+import org.jreleaser.model.Stereotype
+
+/*
+ * Copyright (c) 2023 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 plugins {
     id("clusterless.java-application-conventions")
+    id("org.jreleaser") version "1.6.0"
 }
 
 dependencies {
@@ -37,4 +49,48 @@ distributions {
             }
         }
     }
+}
+
+jreleaser {
+    project {
+        description.set("Clusterless is a framework for building serverless data oriented applications.")
+        authors.add("Chris K Wensel")
+        copyright.set("Chris K Wensel")
+        license.set("MPL-2.0")
+        stereotype.set(Stereotype.CLI)
+
+        links {
+            homepage.set("https://github.com/ClusterlessHQ")
+        }
+        inceptionYear.set("2023")
+        gitRootSearch.set(true)
+    }
+
+    release {
+        github {
+            overwrite.set(true)
+            sign.set(false)
+            repoOwner.set("ClusterlessHQ")
+            name.set("clusterless")
+            username.set("cwensel")
+            branch.set("wip-1.0")
+            changelog.enabled.set(false)
+            milestone.close.set(false)
+        }
+    }
+
+    distributions {
+        create("cls") {
+            distributionType.set(Distribution.DistributionType.JAVA_BINARY)
+            artifact {
+                path.set(file("build/distributions/{{distributionName}}-{{projectVersion}}.zip"))
+            }
+        }
+    }
+}
+
+tasks.register("release") {
+    dependsOn("jreleaserConfig")
+    dependsOn("jreleaserAssemble")
+    dependsOn("jreleaserRelease")
 }
