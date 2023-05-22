@@ -2,6 +2,8 @@ name: Clusterless Build
 run-name: "Push: from ${{ github.actor }}"
 on:
   push:
+    branches:
+      - 'wip-*'
     paths-ignore:
       - '*.txt'
       - '*.md'
