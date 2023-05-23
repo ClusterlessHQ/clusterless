@@ -76,23 +76,24 @@ public class ManagedProject extends StagedApp implements Managed {
     protected void applyTags() {
         // apply tags to all constructs
         TagsUtil.applyTags(this, OrderedMaps.of(
-                "tag:prefix:project", name().lowerHyphen(),
-                "tag:prefix:version", version()
+                "cls:project:name", name().lowerHyphen(),
+                "cls:project:version", version(),
+                "cls:project:stage", stage().camelCase()
         ), TagProps.builder()
                 .applyToLaunchedInstances(true)
                 .priority(100)
                 .build());
 
         // apply tags only to the stack constructs
-        TagsUtil.applyTags(this, OrderedMaps.of(
-                "tag:prefix:commit", "none"
-        ), TagProps.builder()
-                .includeResourceTypes(List.of(
-                        "aws:ckd:stack",
-                        "AWS::CloudFormation::Stack"
-                ))
-                .applyToLaunchedInstances(true)
-                .priority(100)
-                .build());
+//        TagsUtil.applyTags(this, OrderedMaps.of(
+//                "tag:prefix:commit", "none"
+//        ), TagProps.builder()
+//                .includeResourceTypes(List.of(
+//                        "aws:ckd:stack",
+//                        "AWS::CloudFormation::Stack"
+//                ))
+//                .applyToLaunchedInstances(true)
+//                .priority(100)
+//                .build());
     }
 }
