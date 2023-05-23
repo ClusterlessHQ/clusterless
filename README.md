@@ -67,7 +67,7 @@ Install [nvm](https://github.com/nvm-sh/nvm):
 
 Install node/npm:
 
-> nvm install v18.14.2
+> nvm install --lts
 
 Install the AWS CDK:
 
