@@ -14,6 +14,7 @@ import clusterless.model.deploy.Dataset;
 import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.construct.IngressBoundaryConstruct;
+import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.props.Lookup;
 import clusterless.substrate.aws.resources.*;
@@ -33,7 +34,6 @@ import software.amazon.awscdk.services.events.Rule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
-import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
@@ -103,15 +103,10 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
                 .runtime(Runtime.JAVA_11)
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
-//                .reservedConcurrentExecutions(1) // UnreservedConcurrentExecution below its minimum value of [10].
                 .architecture(Lookup.architecture(model().runtimeProps().architecture()))
                 .build();
 
-        LogGroup.Builder.create(this, Label.of("LogGroup").with(functionLabel).camelCase())
-                .logGroupName("/aws/lambda/" + transformEventFunction.getFunctionName())
-                .removalPolicy(removalPolicy)
-                .retention(retentionDays)
-                .build();
+        new LambdaLogGroupConstruct(this, functionLabel, transformEventFunction);
 
         // todo: allow access to cloudwatch
 

@@ -13,8 +13,6 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.Resources;
 import clusterless.substrate.aws.resources.Vpcs;
 import clusterless.substrate.aws.util.TagsUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.batch.alpha.FargateComputeEnvironment;
 import software.amazon.awscdk.services.batch.alpha.IManagedComputeEnvironment;
@@ -26,7 +24,6 @@ import software.constructs.Construct;
  *
  */
 public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource> {
-    private static final Logger LOG = LogManager.getLogger(ComputeResourceConstruct.class);
     private final IManagedComputeEnvironment computeEnvironment;
 
     public ComputeResourceConstruct(@NotNull ManagedComponentContext context, @NotNull ComputeResource model) {

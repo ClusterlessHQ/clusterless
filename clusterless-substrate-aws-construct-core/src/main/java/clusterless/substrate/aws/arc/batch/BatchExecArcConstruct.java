@@ -12,6 +12,7 @@ import clusterless.lambda.workload.batch.BatchResultHandler;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
+import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.StagedApp;
@@ -129,6 +130,8 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .memorySize(model().workload().lambdaRuntimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().workload().lambdaRuntimeProps().timeoutMin()))
                 .build();
+
+        new LambdaLogGroupConstruct(this, functionLabel, function, retentionDays, removalPolicy);
 
         grantManifestRead(function());
     }
