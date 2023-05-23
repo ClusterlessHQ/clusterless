@@ -66,10 +66,14 @@ jreleaser {
         gitRootSearch.set(true)
     }
 
+    signing {
+        armored.set(true)
+    }
+
     release {
         github {
             overwrite.set(true)
-            sign.set(false)
+            sign.set(true)
             repoOwner.set("ClusterlessHQ")
             name.set("clusterless")
             username.set("cwensel")
