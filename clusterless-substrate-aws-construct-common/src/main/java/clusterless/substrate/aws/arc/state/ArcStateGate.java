@@ -12,6 +12,7 @@ import clusterless.lambda.arc.ArcStateProps;
 import clusterless.model.deploy.Arc;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.ArcStateMachineFragment;
+import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.props.Lookup;
@@ -37,7 +38,8 @@ public abstract class ArcStateGate extends ArcStateMachineFragment {
 
         // get packaged code
         // get handler class name
-        Function function = Function.Builder.create(this, baseId.with("Function").camelCase())
+        Label functionLabel = baseId.with("Function");
+        Function function = Function.Builder.create(this, functionLabel.camelCase())
                 .functionName(functionName)
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-arc.*\\.zip$"))) // get packaged code
                 .handler(handlerClassName) // get handler class name
@@ -47,6 +49,8 @@ public abstract class ArcStateGate extends ArcStateMachineFragment {
                 .memorySize(runtimeProps.memorySizeMB())
                 .timeout(Duration.minutes(runtimeProps.timeoutMin()))
                 .build();
+
+        new LambdaLogGroupConstruct(this, functionLabel, function);
 
         grantPermissionsTo(function);
 

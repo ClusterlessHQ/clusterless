@@ -197,7 +197,7 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                 .camelCase();
 
         LogGroup logGroup = LogGroup.Builder.create(this, baseId)
-                .logGroupName("/aws/vendedlogs/states/" + stateMachineName)
+                .logGroupName("/aws/vendedlogs/states/" + stateMachineName.lowerHyphen())
                 .removalPolicy(RemovalPolicy.DESTROY)
                 .retention(RetentionDays.ONE_DAY)
                 .build();
