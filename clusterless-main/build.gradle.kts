@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import org.jreleaser.model.Active
 import org.jreleaser.model.Distribution
 import org.jreleaser.model.Stereotype
 
@@ -68,6 +69,9 @@ jreleaser {
 
     signing {
         armored.set(true)
+        enabled.set(true)
+        active.set(Active.ALWAYS)
+        verify.set(false)
     }
 
     release {
