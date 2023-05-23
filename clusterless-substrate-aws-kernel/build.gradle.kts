@@ -32,7 +32,7 @@ distributions {
                 into("etc")
             }
             val serviceTransform: Zip =
-                tasks.findByPath(":clusterless-substrate-aws-service-transform:packageAll") as Zip
+                tasks.findByPath(":clusterless-substrate-aws-lambda-transform:packageAll") as Zip
             from(serviceTransform.archiveFile) {
                 into("assets")
             }

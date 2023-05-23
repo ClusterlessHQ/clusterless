@@ -11,11 +11,10 @@ plugins {
 }
 
 dependencies {
-
     api(project(":clusterless-common"))
     api(project(":clusterless-model"))
     api(project(":clusterless-substrate-aws-common"))
-    api(project(":clusterless-substrate-aws-lambda-arc"))
+    api(project(":clusterless-substrate-aws-lambda-arc-model"))
 
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
     val cdkVersion = "2.80.0"

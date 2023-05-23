@@ -8,7 +8,6 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
-import clusterless.lambda.transform.PutEventTransformHandler;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.manifest.ManifestState;
@@ -97,8 +96,8 @@ public class S3PutListenerBoundaryConstruct extends IngressBoundaryConstruct<S3P
         Label functionLabel = Label.of(model().name()).with("Int");
         Function transformEventFunction = Function.Builder.create(this, functionLabel.camelCase())
                 .functionName(functionName)
-                .code(Assets.find(Pattern.compile("^.*-aws-service-transform-.*\\.zip$"))) // get packaged code
-                .handler(PutEventTransformHandler.class.getName()) // get handler class name
+                .code(Assets.find(Pattern.compile("^.*-aws-lambda-transform-.*\\.zip$"))) // get packaged code
+                .handler("clusterless.lambda.transform.PutEventTransformHandler") // get handler class name
                 .environment(environment)
                 .runtime(Runtime.JAVA_11)
                 .memorySize(model().runtimeProps().memorySizeMB())

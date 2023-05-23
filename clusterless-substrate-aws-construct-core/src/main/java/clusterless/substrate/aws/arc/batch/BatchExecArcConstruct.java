@@ -8,7 +8,6 @@
 
 package clusterless.substrate.aws.arc.batch;
 
-import clusterless.lambda.workload.batch.BatchResultHandler;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
@@ -124,7 +123,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .functionName(functionName)
                 .architecture(Lookup.architecture(model().workload().lambdaRuntimeProps().architecture()))
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-workload.*\\.zip$"))) // get packaged code
-                .handler(BatchResultHandler.class.getName()) // get handler class name
+                .handler("clusterless.lambda.workload.batch.BatchResultHandler") // get handler class name
                 .environment(environment)
                 .runtime(Runtime.JAVA_11)
                 .memorySize(model().workload().lambdaRuntimeProps().memorySizeMB())

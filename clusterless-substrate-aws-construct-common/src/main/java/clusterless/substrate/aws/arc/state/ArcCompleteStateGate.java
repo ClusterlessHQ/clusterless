@@ -8,7 +8,6 @@
 
 package clusterless.substrate.aws.arc.state;
 
-import clusterless.lambda.arc.ArcStateCompleteHandler;
 import clusterless.lambda.arc.ArcStateProps;
 import clusterless.model.deploy.Arc;
 import clusterless.naming.Label;
@@ -19,7 +18,7 @@ import software.amazon.awscdk.services.iam.IGrantable;
 
 public class ArcCompleteStateGate extends ArcStateGate {
     public ArcCompleteStateGate(@NotNull ManagedComponentContext context, Arc<?> arc, ArcStateProps arcStateProps, LambdaJavaRuntimeProps runtimeProps) {
-        super(context, Label.of("ArcComplete"), arc, arcStateProps, ArcStateCompleteHandler.class.getName(), runtimeProps);
+        super(context, Label.of("ArcComplete"), arc, arcStateProps, "clusterless.lambda.arc.ArcStateCompleteHandler", runtimeProps);
     }
 
     @Override

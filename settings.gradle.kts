@@ -40,13 +40,16 @@ include("clusterless-substrate-aws-construct-core")
 include("clusterless-substrate-aws-lambda-common")
 
 // lambdas for arc management
+include("clusterless-substrate-aws-lambda-arc-model")
 include("clusterless-substrate-aws-lambda-arc")
 
 // service lambdas
-include("clusterless-substrate-aws-service-transform")
+include("clusterless-substrate-aws-lambda-transform")
+include("clusterless-substrate-aws-lambda-transform-model")
 
 // core lambda workloads
 include("clusterless-substrate-aws-lambda-workload")
+include("clusterless-substrate-aws-lambda-workload-model")
 
 // test scenarios
 include("clusterless-scenario")

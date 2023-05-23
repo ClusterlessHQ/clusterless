@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-common"))
     implementation(project(":clusterless-substrate-aws-lambda-common"))
+    implementation(project(":clusterless-substrate-aws-lambda-transform-model"))
 
     testImplementation(testFixtures(project(":clusterless-substrate-aws-lambda-common")))
 }

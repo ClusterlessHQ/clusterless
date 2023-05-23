@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-common"))
     implementation(project(":clusterless-substrate-aws-lambda-common"))
+    implementation(project(":clusterless-substrate-aws-lambda-arc-model"))
 
     implementation("software.amazon.awssdk:s3")
 
