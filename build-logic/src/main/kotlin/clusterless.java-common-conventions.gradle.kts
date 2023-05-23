@@ -103,7 +103,8 @@ dependencies {
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jackson")
 
-        val awsSdk = "2.19.29"
+        // https://mvnrepository.com/artifact/software.amazon.awssdk
+        val awsSdk = "2.20.69"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:eventbridge:$awsSdk")
