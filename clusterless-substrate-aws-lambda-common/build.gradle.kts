@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":clusterless-model"))
     implementation(project(":clusterless-substrate-aws-common"))
 
+    api(project(":clusterless-substrate-aws-lambda-common-model"))
+
     implementation("com.google.guava:guava")
 
     implementation("com.fasterxml.jackson.core:jackson-core")

@@ -37,6 +37,7 @@ include("clusterless-substrate-aws-construct-common")
 include("clusterless-substrate-aws-construct-core")
 
 // common lambda apis
+include("clusterless-substrate-aws-lambda-common-model")
 include("clusterless-substrate-aws-lambda-common")
 
 // lambdas for arc management

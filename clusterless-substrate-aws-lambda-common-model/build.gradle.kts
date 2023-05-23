@@ -8,16 +8,11 @@
 
 plugins {
     id("clusterless.java-library-conventions")
+    id("clusterless.java-override-conventions-jdk11")
 }
 
 dependencies {
     implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
-    implementation(project(":clusterless-substrate-aws-construct-common"))
-
-    // here the constructs and lambda implementations intersect
-    // this is relatively brittle as the lambda classes are hard coded strings
-    implementation(project(":clusterless-substrate-aws-lambda-common-model"))
-    implementation(project(":clusterless-substrate-aws-lambda-transform-model"))
-    implementation(project(":clusterless-substrate-aws-lambda-workload-model"))
+    implementation(project(":clusterless-substrate-aws-common"))
 }
