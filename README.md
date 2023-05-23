@@ -9,6 +9,9 @@ Please do play around with this project in order to provide early feedback, but 
 
 See the [ROADMAP](ROADMAP.md) for planned capabilities.
 
+For example scenarios, see the [clusterless-aws-example](https://github.com/ClusterlessHQ/clusterless-aws-examples)
+repo.
+
 ## About
 
 Clusterless is a tool for deploying scalable and secure data-processing workloads for continuously arriving data, across
@@ -76,26 +79,50 @@ https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html#bootstrapping-howto
 
 > cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1 aws://ACCOUNT-NUMBER-2/REGION-2 ...
 
-Install Java 19 via [sdkman](https://sdkman.io):
+Install Java 11 via [sdkman](https://sdkman.io):
 
 > sdk install java 22.3.r11-grl
 
-## Building
+## Installing Clusterless
 
-To build the command line tools:
+The Clusterless CLI app `cls` is downloadable from GitHub releases:
 
-> ./gradlew installDist
+- https://github.com/ClusterlessHQ/clusterless/releases
 
-This will create the root main CLI interface and any substrate interfaces, [see below](#optional) for the paths.
+The `bin` folder will have:
 
-Currently available are:
-
-- `cls` - the root cli interface
+- `cls` - the root CLI interface
 - `cls-aws` - the AWS interface only used as an escape hatch and testing
 
 ## Running
 
 > cls --help
+
+Every region must be bootstrapped by the `cls` app before it can be used:
+
+> cls bootstrap help
+
+To bootstrap a region:
+
+> cls bootstrap --region us-east-1 --account 123456789012 --profile my-profile --stage DEV
+
+If any arguments are missing, `cls` will prompt for them.
+
+Note the `--stage` option creates a namespace for all resources, so you can have multiple environments in the same
+account.
+
+## Building (optional)
+
+To build the CLI app locally from source, clone the repo and run:
+
+> ./gradlew installDist
+
+This will create the main CLI interface and any substrate interfaces, [see below](#optional) for the paths.
+
+Currently available are:
+
+- `cls` - the root cli interface
+- `cls-aws` - the AWS interface only used as an escape hatch and testing
 
 ## Optional
 

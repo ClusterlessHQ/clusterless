@@ -12,6 +12,7 @@ Most things in the cli have yet to be implemented.
 
 1. Packaging
    1. Downloadable/installable self-contained binary
+      1. https://github.com/ClusterlessHQ/clusterless/releases
 2. Improved S3CopyArc
    1. Object renaming
    2. Basic static partitioning
@@ -33,5 +34,5 @@ Most things in the cli have yet to be implemented.
 9. Parallelized workloads
    1. Workloads can be parallelized on source partitions
 10. Pluggable modules for providing third-party services
-11. Localstack support for faster testing AWS features
+11. Localstack support for faster testing AWS scenarios
 12. Alternate substrates/providers
