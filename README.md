@@ -2,10 +2,12 @@
 
 ## Status
 
-This project is under active development and considered alpha if not pre-alpha.
+This project is under active development and many features are considered alpha.
 
 Please do play around with this project in order to provide early feedback, but do expect things to change until we hit
 1.0 release.
+
+Draft documentation can be found here: https://docs.clusterless.io/
 
 See the [ROADMAP](ROADMAP.md) for planned capabilities.
 
