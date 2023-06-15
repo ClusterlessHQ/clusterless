@@ -69,7 +69,6 @@ jreleaser {
 
     signing {
         armored.set(true)
-        enabled.set(true)
         active.set(Active.ALWAYS)
         verify.set(false)
     }
@@ -77,7 +76,7 @@ jreleaser {
     release {
         github {
             overwrite.set(true)
-            sign.set(true)
+            sign.set(false)
             repoOwner.set("ClusterlessHQ")
             name.set("clusterless")
             username.set("cwensel")
@@ -98,6 +97,7 @@ jreleaser {
 }
 
 tasks.register("release") {
+    dependsOn("distZip")
     dependsOn("jreleaserConfig")
     dependsOn("jreleaserAssemble")
     dependsOn("jreleaserRelease")
