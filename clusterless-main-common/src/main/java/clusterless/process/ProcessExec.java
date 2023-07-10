@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 public abstract class ProcessExec {
     private static final Logger LOG = LogManager.getLogger(ProcessExec.class);
     protected Supplier<Boolean> dryRun = () -> false;
+    protected Supplier<Boolean> retry = () -> false;
 
     public ProcessExec() {
     }
@@ -29,8 +30,17 @@ public abstract class ProcessExec {
         this.dryRun = dryRun;
     }
 
+    public ProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry) {
+        this.dryRun = dryRun;
+        this.retry = retry;
+    }
+
     public boolean dryRun() {
         return dryRun.get();
+    }
+
+    public boolean retry() {
+        return retry.get();
     }
 
     public int executeProcess(String... args) {
@@ -39,7 +49,15 @@ public abstract class ProcessExec {
 
     protected int executeProcess(Map<String, String> environment, List<String> args) {
         try {
-            return process(environment, args);
+            int exitCode = process(environment, args);
+
+            if (retry() && exitCode != 0) {
+                LOG.warn("got exit code: {}, for command: {}, retrying in 15 seconds", exitCode, args);
+                Thread.sleep(15 * 1000);
+                exitCode = process(environment, args);
+            }
+
+            return exitCode;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

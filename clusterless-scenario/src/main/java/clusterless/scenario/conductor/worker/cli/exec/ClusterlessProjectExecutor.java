@@ -8,16 +8,23 @@
 
 package clusterless.scenario.conductor.worker.cli.exec;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ClusterlessProjectExecutor extends BaseClusterlessExecutor {
     protected final String command;
     protected final String projectFiles;
+    protected final List<String> extraArgs;
 
     protected ClusterlessProjectExecutor(String clsApp, boolean dryRun, String command, String workingDirectory, String projectFiles) {
+        this(clsApp, dryRun, command, workingDirectory, projectFiles, Collections.emptyList());
+    }
+
+    protected ClusterlessProjectExecutor(String clsApp, boolean dryRun, String command, String workingDirectory, String projectFiles, List<String> extraArgs) {
         super(clsApp, dryRun, workingDirectory);
         this.command = command;
         this.projectFiles = projectFiles;
+        this.extraArgs = extraArgs;
     }
 
     @Override
@@ -29,6 +36,8 @@ public class ClusterlessProjectExecutor extends BaseClusterlessExecutor {
                 projectFiles,
                 "-v"
         ));
+
+        args.addAll(extraArgs);
     }
 
     public static final class Builder {
@@ -37,6 +46,7 @@ public class ClusterlessProjectExecutor extends BaseClusterlessExecutor {
         private String command;
         private String workingDirectory;
         private String projectFiles;
+        protected List<String> extraArgs = Collections.emptyList();
 
         private Builder() {
         }
@@ -70,8 +80,13 @@ public class ClusterlessProjectExecutor extends BaseClusterlessExecutor {
             return this;
         }
 
+        public Builder withExtraArgs(List<String> extraArgs) {
+            this.extraArgs = extraArgs;
+            return this;
+        }
+
         public ClusterlessProjectExecutor build() {
-            return new ClusterlessProjectExecutor(clsApp, dryRun, command, workingDirectory, projectFiles);
+            return new ClusterlessProjectExecutor(clsApp, dryRun, command, workingDirectory, projectFiles, extraArgs);
         }
     }
 }

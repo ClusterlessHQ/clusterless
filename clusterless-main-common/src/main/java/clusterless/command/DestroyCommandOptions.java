@@ -16,4 +16,10 @@ import picocli.CommandLine;
  */
 @CommandLine.Command(description = "destroy project declared by the project files")
 public class DestroyCommandOptions extends ProjectCommandOptions {
+    @CommandLine.Option(names = "--retry", description = "retry the operation")
+    private boolean retry = false;
+
+    public boolean retry() {
+        return retry;
+    }
 }

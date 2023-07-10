@@ -16,6 +16,7 @@ import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,10 +24,12 @@ public abstract class ClusterlessProjectWorker implements Worker {
     private static final Logger LOG = LogManager.getLogger(ClusterlessProjectWorker.class);
     private final String command;
     protected final Options options;
+    private final String[] extraArgs;
 
-    public ClusterlessProjectWorker(String command, Options options) {
+    public ClusterlessProjectWorker(String command, Options options, String... extraArgs) {
         this.command = command;
         this.options = options;
+        this.extraArgs = extraArgs;
     }
 
     @Override
@@ -44,6 +47,7 @@ public abstract class ClusterlessProjectWorker implements Worker {
                 .withCommand(command)
                 .withWorkingDirectory(workingDirectory)
                 .withProjectFiles(projectFiles)
+                .withExtraArgs(List.of(extraArgs))
                 .build();
 
         LOG.info("worker executing command: {}", command);

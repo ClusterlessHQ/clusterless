@@ -14,7 +14,7 @@ import clusterless.scenario.conductor.task.cli.DestroyerProject;
 public class DestroyerProjectWorker extends ClusterlessProjectWorker {
 
     public DestroyerProjectWorker(Options options) {
-        super("destroy", options);
+        super("destroy", options, "--retry");
     }
 
     @Override
