@@ -104,10 +104,11 @@ dependencies {
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jackson")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
-        val awsSdk = "2.20.69"
+        val awsSdk = "2.20.98"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:eventbridge:$awsSdk")
+        implementationAndTestFixture("software.amazon.awssdk:sqs:$awsSdk")
 
         // https://github.com/aws/aws-lambda-java-libs
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.2")
@@ -138,7 +139,7 @@ dependencies {
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-jupiter:$systemStubs")
         testImplementationAndTestFixture("org.mockito:mockito-inline:5.1.1")
 
-        val testContainers = "1.17.6"
+        val testContainers = "1.18.3"
         testImplementationAndTestFixture("org.testcontainers:testcontainers:$testContainers")
         testImplementationAndTestFixture("org.testcontainers:junit-jupiter:$testContainers")
         testImplementationAndTestFixture("org.testcontainers:localstack:$testContainers")
