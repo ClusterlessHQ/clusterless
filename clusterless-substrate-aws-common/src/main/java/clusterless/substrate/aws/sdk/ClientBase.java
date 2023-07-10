@@ -10,6 +10,7 @@ package clusterless.substrate.aws.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
@@ -37,11 +38,11 @@ public abstract class ClientBase<C> {
     protected static final String defaultRegion = System.getenv("AWS_DEFAULT_REGION");
     protected static final String defaultProfile = System.getenv("AWS_PROFILE");
 
+    protected URI endpointOverride = Optional.ofNullable(System.getenv().get(getEndpointEnvVar()))
+            .map(URI::create)
+            .orElse(null);
     protected final DefaultCredentialsProvider credentialsProvider;
-
     protected final String region;
-    protected URI endpointOverride = Optional.ofNullable(System.getenv().get("AWS_S3_ENDPOINT"))
-            .map(URI::create).orElse(null);
 
     public ClientBase() {
         this(defaultProfile, defaultRegion);
@@ -60,6 +61,9 @@ public abstract class ClientBase<C> {
                 .build();
         this.region = region == null ? defaultRegion : region;
     }
+
+    @NotNull
+    protected abstract String getEndpointEnvVar();
 
     protected boolean isSuccess(Response response) {
         return response.exception == null && response.sdkHttpResponse.isSuccessful();
@@ -80,9 +84,9 @@ public abstract class ClientBase<C> {
 
     protected void logEndpointOverride() {
         if (endpointOverride != null) {
-            LOG.info("client using endpoint override: {}", endpointOverride);
+            LOG.info("{}: client using endpoint override: {}", getClass().getSimpleName(), endpointOverride);
         } else if (localStackEnabled) {
-            LOG.warn("s3 client not using endpoint override");
+            LOG.warn("{}: client not using endpoint override", getClass().getSimpleName());
         }
     }
 

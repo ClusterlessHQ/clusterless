@@ -8,6 +8,8 @@
 
 package clusterless.temporal;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,10 +33,38 @@ public class IntervalBuilder {
     }
 
     public String truncateAndFormat(OffsetDateTime time) {
-        return lotFormatter.format(time.truncatedTo(lotUnit));
+        return format(truncate(time));
     }
 
     public String truncateAndFormat(Instant instant) {
-        return lotFormatter.format(instant.truncatedTo(lotUnit));
+        return format(truncate(instant));
+    }
+
+    @NotNull
+    public String format(OffsetDateTime truncate) {
+        return lotFormatter.format(truncate);
+    }
+
+    @NotNull
+    public String format(Instant truncate) {
+        return lotFormatter.format(truncate);
+    }
+
+    @NotNull
+    public OffsetDateTime truncate(OffsetDateTime time) {
+        return time.truncatedTo(lotUnit);
+    }
+
+    @NotNull
+    public Instant truncate(Instant instant) {
+        return instant.truncatedTo(lotUnit);
+    }
+
+    public OffsetDateTime previous(OffsetDateTime time) {
+        return time.minus(lotUnit.getDuration());
+    }
+
+    public Instant previous(Instant instant) {
+        return instant.minus(lotUnit.getDuration());
     }
 }

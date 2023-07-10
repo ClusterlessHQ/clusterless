@@ -44,4 +44,8 @@ public class TestLots {
         return lotStream(size)
                 .collect(Collectors.toList());
     }
+
+    public String format(OffsetDateTime dateTime) {
+        return intervalBuilder.truncateAndFormat(dateTime);
+    }
 }

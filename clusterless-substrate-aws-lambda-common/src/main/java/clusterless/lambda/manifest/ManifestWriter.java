@@ -26,7 +26,7 @@ import java.util.Map;
 public class ManifestWriter {
     private static final Logger LOG = LogManager.getLogger(ManifestWriter.class);
 
-    protected static final S3 s3 = new S3();
+    protected final S3 s3 = new S3();
     private final ManifestURI sinkManifestPath;
     private final Dataset sinkDataset;
     private final UriType uriType;

@@ -50,6 +50,11 @@ public abstract class LambdaHandlerTestBase {
         return "forwarding-bus";
     }
 
+    @NotNull
+    protected String sqsQueueName() {
+        return "event-queue";
+    }
+
     protected Context context() {
         return null;
     }

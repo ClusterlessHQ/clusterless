@@ -10,6 +10,7 @@ package clusterless.lambda;
 
 import clusterless.substrate.aws.sdk.EventBus;
 import clusterless.substrate.aws.sdk.S3;
+import clusterless.substrate.aws.sdk.SQS;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +18,7 @@ public class BootstrapMachine {
     private static final Logger LOG = LogManager.getLogger(BootstrapMachine.class);
     S3 s3 = new S3();
     EventBus eventBus = new EventBus();
+    SQS sqs = new SQS();
 
     public BootstrapMachine() {
     }
@@ -47,6 +49,21 @@ public class BootstrapMachine {
                 .isSuccessOrThrowRuntime();
 
         LOG.info("created eventbus: {}", eventBusName);
+
+        return this;
+    }
+
+    public BootstrapMachine applySQSQueue(String sqsQueueName) {
+        if (sqsQueueName == null) {
+            return this;
+        }
+
+        LOG.info("creating sqs queue: {}", sqsQueueName);
+
+        sqs.create(sqsQueueName)
+                .isSuccessOrThrowRuntime();
+
+        LOG.info("created sqs queue: {}", sqsQueueName);
 
         return this;
     }

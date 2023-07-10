@@ -102,6 +102,11 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
 
         LOG.info("reading metadata from: {}", bootstrapMetaPath.toAbsolutePath());
 
+        if (commandOptions.dryRun()) {
+            LOG.info("dry run, skipping metadata upload");
+            return 0;
+        }
+
         BootstrapMeta bootstrapMeta = JSONUtil.readAsObjectSafe(bootstrapMetaPath, BootstrapMeta.class);
 
         S3 s3 = new S3(processExec.profile(), region);

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class ArcNotifyEventPublisher {
     private static final Logger LOG = LogManager.getLogger(ArcNotifyEventPublisher.class);
-    protected static final EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
     private final String eventBusName;
     private final Dataset dataset;
 

@@ -147,7 +147,7 @@ public class URIs {
             return null;
         }
 
-        if (key.endsWith("/")) {
+        if (key.charAt(key.length() - 1) == '/') {
             return key;
         }
 

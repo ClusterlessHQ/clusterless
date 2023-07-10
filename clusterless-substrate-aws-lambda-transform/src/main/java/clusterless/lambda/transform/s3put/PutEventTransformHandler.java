@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda.transform;
+package clusterless.lambda.transform.s3put;
 
 import clusterless.lambda.EventHandler;
 import clusterless.lambda.arc.ArcNotifyEventPublisher;
 import clusterless.lambda.manifest.ManifestWriter;
-import clusterless.lambda.transform.json.AWSEvent;
+import clusterless.lambda.transform.json.object.AWSEvent;
 import clusterless.model.UriType;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.temporal.IntervalBuilder;
@@ -30,13 +30,13 @@ import java.util.List;
 public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTransformObserver> {
     private static final Logger LOG = LogManager.getLogger(PutEventTransformHandler.class);
     protected static final S3 s3 = new S3();
-    protected static final TransformProps transformProps = Env.fromEnv(
-            TransformProps.class,
-            () -> TransformProps.builder()
+
+    protected final S3PutTransformProps transformProps = Env.fromEnv(
+            S3PutTransformProps.class,
+            () -> S3PutTransformProps.builder()
                     .build()
     );
-
-    protected static final IntervalBuilder intervalBuilder = new IntervalBuilder(transformProps.lotUnit());
+    protected final IntervalBuilder intervalBuilder = new IntervalBuilder(transformProps.lotUnit());
 
     protected ManifestWriter manifestWriter = new ManifestWriter(
             transformProps.manifestCompletePath(),
@@ -125,7 +125,7 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
         arcNotifyEventPublisher.publishEvent(lotId, manifestURI);
     }
 
-    private static String fromModifiedTime(URI objectPath) {
+    private String fromModifiedTime(URI objectPath) {
         S3.Response response = s3.exists(objectPath);
 
         if (!s3.exists(response)) {

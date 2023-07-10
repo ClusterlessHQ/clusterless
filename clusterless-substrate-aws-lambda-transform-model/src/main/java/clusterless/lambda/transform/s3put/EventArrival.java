@@ -6,13 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda.transform;
+package clusterless.lambda.transform.s3put;
 
-/**
- *
- */
-public enum LotSource {
-    eventTime,
-    objectModifiedTime,
-    keyTimestampRegex
+public enum EventArrival {
+    infrequent,
+    frequent,
+    veryFrequent
 }

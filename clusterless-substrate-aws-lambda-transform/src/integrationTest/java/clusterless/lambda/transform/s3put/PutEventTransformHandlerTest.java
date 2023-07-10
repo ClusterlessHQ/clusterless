@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.lambda.transform;
+package clusterless.lambda.transform.s3put;
 
 import clusterless.json.JSONUtil;
 import clusterless.lambda.LocalStackBase;
 import clusterless.lambda.TestDatasets;
 import clusterless.lambda.TestLots;
-import clusterless.lambda.transform.json.AWSEvent;
+import clusterless.lambda.transform.json.object.AWSEvent;
 import clusterless.model.manifest.ManifestState;
 import clusterless.temporal.IntervalUnit;
 import com.adelean.inject.resources.junit.jupiter.GivenJsonResource;
@@ -46,8 +46,8 @@ public class PutEventTransformHandlerTest extends LocalStackBase {
     }
 
     @Override
-    protected TransformProps getProps() {
-        return TransformProps.builder()
+    protected S3PutTransformProps getProps() {
+        return S3PutTransformProps.builder()
                 .withLotSource(LotSource.eventTime)
                 .withManifestCompletePath(datasets().manifestPathList(ManifestState.complete).get(0))
                 .withManifestPartialPath(datasets().manifestPathList(ManifestState.partial).get(0))
@@ -72,8 +72,8 @@ public class PutEventTransformHandlerTest extends LocalStackBase {
 
         handler.handleEvent(event, context(), eventContext);
 
-        verify(eventContext).applyIdentifierURI(URI.create("s3://DOC-EXAMPLE-BUCKET1/project/version/y=2023/m=12/d=31/data.json"));
         verify(eventContext).applyLotId(lotId);
+        verify(eventContext).applyIdentifierURI(URI.create("s3://DOC-EXAMPLE-BUCKET1/project/version/y=2023/m=12/d=31/data.json"));
         verify(eventContext).applyDatasetItemsSize(1);
         verify(eventContext).applyManifestURI(datasets().manifestPathList(ManifestState.complete).get(0).withLot(lotId).uri());
     }

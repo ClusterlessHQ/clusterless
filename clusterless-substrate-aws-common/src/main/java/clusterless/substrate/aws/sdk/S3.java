@@ -51,6 +51,22 @@ public class S3 extends ClientBase<S3Client> {
         super(profile, region);
     }
 
+    @NotNull
+    protected String getEndpointEnvVar() {
+        return "AWS_S3_ENDPOINT";
+    }
+
+    @Override
+    protected S3Client createClient(String region) {
+        logEndpointOverride();
+
+        return S3Client.builder()
+                .region(Region.of(region))
+                .credentialsProvider(credentialsProvider)
+                .endpointOverride(endpointOverride)
+                .build();
+    }
+
     public Response exists(String bucketName) {
         return exists(region, bucketName);
     }
@@ -382,18 +398,6 @@ public class S3 extends ClientBase<S3Client> {
 
     public Instant lastModified(Response response) {
         return ((HeadObjectResponse) response.awsResponse).lastModified();
-    }
-
-    @Override
-    protected S3Client createClient(String region) {
-
-        logEndpointOverride();
-
-        return S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(credentialsProvider)
-                .endpointOverride(endpointOverride)
-                .build();
     }
 
     private static boolean hasNoAwsResponse(ClientBase<S3Client>.Response response) {

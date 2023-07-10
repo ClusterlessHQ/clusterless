@@ -9,7 +9,7 @@
 plugins {
     id("clusterless.java-library-conventions")
     id("clusterless.java-override-conventions-jdk11")
-    id("org.openapi.generator") version "6.5.0"
+    id("org.openapi.generator") version "6.6.0"
 }
 
 val generatedRoot = "$buildDir/generated/openapi"
@@ -37,34 +37,62 @@ dependencies {
     implementation(project(":clusterless-substrate-aws-lambda-common"))
     implementation(project(":clusterless-substrate-aws-lambda-transform-model"))
 
+    implementation("com.amazonaws:aws-lambda-java-events")
+    implementation("com.amazonaws:aws-lambda-java-serialization")
+
     testImplementation(testFixtures(project(":clusterless-substrate-aws-lambda-common")))
 }
 
-openApiGenerate {
-    generatorName.set("java")
-    inputSpec.set("$projectDir/src/main/json/ObjectCreated.json")
-    outputDir.set(generatedRoot)
-    modelPackage.set("clusterless.lambda.transform.json")
+val openApiGenerateObjectCreated =
+    tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("openApiGenerateObjectCreated") {
+        generatorName.set("java")
+        inputSpec.set("$projectDir/src/main/json/ObjectCreated.json")
+        outputDir.set(generatedRoot)
+        modelPackage.set("clusterless.lambda.transform.json.object")
 
-    configOptions.put("library", "native")
-    configOptions.put("serializationLibrary", "jackson")
-    configOptions.put("dateLibrary", "java8")
+        configOptions.put("library", "native")
+        configOptions.put("serializationLibrary", "jackson")
+        configOptions.put("dateLibrary", "java8")
 
-    globalProperties.put("modelDocs", "false")
+        globalProperties.put("modelDocs", "false")
 
-    globalProperties.put("apis", "false")
-    globalProperties.put("invokers", "false")
-    globalProperties.put("models", "")
+        globalProperties.put("apis", "false")
+        globalProperties.put("invokers", "false")
+        globalProperties.put("models", "")
 
-    generateModelTests.set(false)
-    skipValidateSpec.set(false)
+        generateModelTests.set(false)
+        skipValidateSpec.set(false)
 //    logToStderr = true
 //    generateAliasAsModel = false
-    enablePostProcessFile.set(false)
+        enablePostProcessFile.set(false)
+    }
+val openApiGenerateScheduledEvent =
+    tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("openApiGenerateScheduledEvent") {
+        generatorName.set("java")
+        inputSpec.set("$projectDir/src/main/json/ScheduledJson.json")
+        outputDir.set(generatedRoot)
+        modelPackage.set("clusterless.lambda.transform.json.event")
+
+        configOptions.put("library", "native")
+        configOptions.put("serializationLibrary", "jackson")
+        configOptions.put("dateLibrary", "java8")
+
+        globalProperties.put("modelDocs", "false")
+
+        globalProperties.put("apis", "false")
+        globalProperties.put("invokers", "false")
+        globalProperties.put("models", "")
+
+        generateModelTests.set(false)
+        skipValidateSpec.set(false)
+//    logToStderr = true
+//    generateAliasAsModel = false
+        enablePostProcessFile.set(false)
 }
 
 tasks.compileJava {
-    dependsOn.add(tasks.openApiGenerate)
+    dependsOn.add(openApiGenerateObjectCreated)
+    dependsOn.add(openApiGenerateScheduledEvent)
 }
 
 tasks.register<Zip>("packageAll") {

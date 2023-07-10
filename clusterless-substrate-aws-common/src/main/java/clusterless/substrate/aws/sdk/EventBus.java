@@ -10,6 +10,7 @@ package clusterless.substrate.aws.sdk;
 
 import clusterless.json.JSONUtil;
 import clusterless.substrate.aws.event.NotifyEvent;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.CreateEventBusRequest;
@@ -21,6 +22,11 @@ import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
  */
 public class EventBus extends ClientBase<EventBridgeClient> {
     public EventBus() {
+    }
+
+    @NotNull
+    protected String getEndpointEnvVar() {
+        return "AWS_EVENTS_ENDPOINT";
     }
 
     @Override

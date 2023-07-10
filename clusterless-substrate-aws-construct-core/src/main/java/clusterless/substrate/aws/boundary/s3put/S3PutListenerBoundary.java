@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
-import clusterless.lambda.transform.LotSource;
+import clusterless.lambda.transform.s3put.EventArrival;
 import clusterless.model.deploy.IngressBoundary;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.props.Memory;
@@ -17,28 +17,27 @@ import clusterless.substrate.aws.props.Memory;
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
+    EventArrival eventArrival = EventArrival.infrequent;
     LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
             Memory.MEM_1_024MB,
             3,
             15
     );
 
-    LotSource lotSource = LotSource.objectModifiedTime;
-
-    String keyRegex;
+    Infrequent infrequent = new Infrequent();
 
     public S3PutListenerBoundary() {
+    }
+
+    public EventArrival eventArrival() {
+        return eventArrival;
     }
 
     public LambdaJavaRuntimeProps runtimeProps() {
         return runtimeProps;
     }
 
-    public LotSource lotSource() {
-        return lotSource;
-    }
-
-    public String keyRegex() {
-        return keyRegex;
+    public Infrequent infrequent() {
+        return infrequent;
     }
 }

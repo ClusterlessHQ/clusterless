@@ -27,6 +27,7 @@ dependencies {
 
     api("software.amazon.awssdk:s3")
     api("software.amazon.awssdk:eventbridge")
+    api("software.amazon.awssdk:sqs")
 
     implementation("org.apache.logging.log4j:log4j-slf4j-impl") // awssdk
 }

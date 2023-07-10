@@ -28,12 +28,13 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
         System.setProperty("clusterless.localstack.enabled", "true");
     }
 
-    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:1.4.0");
+    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:2.1.0");
 
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withServices(
                     LocalStackContainer.Service.S3,
+                    LocalStackContainer.Service.SQS,
                     LocalStackContainer.EnabledService.named("events")
             );
 
@@ -49,7 +50,9 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
             .set("AWS_ACCESS_KEY_ID", localstack.getAccessKey())
             .set("AWS_SECRET_ACCESS_KEY", localstack.getSecretKey())
             .set("AWS_DEFAULT_REGION", localstack.getRegion())
-            .set("AWS_S3_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.S3).toString());
+            .set("AWS_S3_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.S3).toString())
+            .set("AWS_EVENTS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("events")).toString())
+            .set("AWS_SQS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
 
     @BeforeEach
     public void bootstrap() {
@@ -57,6 +60,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Manifest, defaultPlacement()))
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Arc, defaultPlacement()))
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Meta, defaultPlacement()))
-                .applyEventbus(eventBusName());
+                .applyEventbus(eventBusName())
+                .applySQSQueue(sqsQueueName());
     }
 }
