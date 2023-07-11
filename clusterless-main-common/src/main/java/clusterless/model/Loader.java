@@ -32,15 +32,12 @@ public class Loader {
 
     public Loader(List<File> projectFiles) throws IOException {
         this.projectFiles = projectFiles;
+
         if (projectFiles.isEmpty()) {
             throw new IllegalArgumentException("no project deploy files declared");
         }
 
-        if (projectFiles.size() == 1 && projectFiles.get(0).toString().equals("-")) {
-            arrayNode = JSONUtil.createArrayNode().add(JSONUtil.readTree(System.in));
-        } else {
-            arrayNode = JSONUtil.readTrees(projectFiles);
-        }
+        arrayNode = JSONUtil.readTrees(projectFiles);
     }
 
     public List<String> getStringsAt(String pointer) {

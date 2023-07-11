@@ -9,6 +9,7 @@
 package clusterless.command;
 
 
+import clusterless.util.StdInToFileConverter;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -22,7 +23,8 @@ import java.util.Optional;
 public class ProjectCommandOptions extends CommonCommandOptions {
     @CommandLine.Option(
             names = {"-p", "--project"},
-            description = "the files that declare the project to be deployed"
+            description = "the files that declare the project to be deployed, or `-` to read from stdin",
+            converter = StdInToFileConverter.class
     )
     List<File> projectFiles = new ArrayList<>();
 

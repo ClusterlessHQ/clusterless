@@ -20,11 +20,14 @@ import clusterless.substrate.ProviderSubstratesOptions;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.util.ExecutionExceptionHandler;
 import clusterless.util.ExitCodeExceptionMapper;
+import clusterless.util.ParameterExceptionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -65,22 +68,8 @@ public class Main extends Startup implements Callable<Integer> {
 
         commandLine
                 .setExitCodeExceptionMapper(new ExitCodeExceptionMapper())
-                .setExecutionExceptionHandler(new ExecutionExceptionHandler(main));
-
-        try {
-            commandLine.parseArgs(args);
-        } catch (CommandLine.MissingParameterException | CommandLine.UnmatchedArgumentException e) {
-            commandLine.getErr().println(commandLine.getColorScheme().errorText(e.getMessage()));
-            System.exit(CommandLine.ExitCode.USAGE);
-        }
-
-        if (commandLine.isUsageHelpRequested()) {
-            commandLine.usage(System.out);
-            System.exit(CommandLine.ExitCode.OK);
-        } else if (commandLine.isVersionHelpRequested()) {
-            commandLine.printVersionHelp(System.out);
-            System.exit(CommandLine.ExitCode.OK);
-        }
+                .setExecutionExceptionHandler(new ExecutionExceptionHandler(main))
+                .setParameterExceptionHandler(new ParameterExceptionHandler(main));
 
         System.exit(commandLine.execute(args));
     }
@@ -103,7 +92,7 @@ public class Main extends Startup implements Callable<Integer> {
             return run((ProjectCommandOptions) command);
         }
 
-        return run(substratesOptions().providerNames());
+        return run(substratesOptions().providerNames(), args);
     }
 
     public Integer run(ProjectCommandOptions command) throws IOException {
@@ -115,10 +104,12 @@ public class Main extends Startup implements Callable<Integer> {
         LOG.info("files: {}", command.projectFiles());
         LOG.info("declared: {}", declaredProviders);
 
-        return run(declaredProviders);
+        String[] argsArray = replaceWithTemp(command);
+
+        return run(declaredProviders, argsArray);
     }
 
-    public int run(Collection<String> declaredProviders) {
+    public int run(Collection<String> declaredProviders, String[] args) {
         Map<String, SubstrateProvider> substrates = substratesOptions().requestedProvider();
 
         LOG.info("available: {}", substrates.keySet());
@@ -139,5 +130,22 @@ public class Main extends Startup implements Callable<Integer> {
         }
 
         return result;
+    }
+
+    @NotNull
+    private String[] replaceWithTemp(ProjectCommandOptions command) {
+        List<String> args = Arrays.asList(this.args);
+
+        int i = args.indexOf("-p");
+
+        if (i == -1) {
+            i = args.indexOf("--project");
+        }
+
+        if (i != -1 && "-".equals(args.get(i + 1))) {
+            args.set(i + 1, command.projectFiles().get(0).toString());
+        }
+
+        return args.toArray(new String[0]);
     }
 }
