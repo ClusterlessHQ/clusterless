@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 )
 @JsonTypeIdResolver(ExtensibleResolver.class)
 public abstract class Extensible extends Model {
-
     String type;
+    boolean exclude = false;
 
     public Extensible() {
         type = resolveType(this);
@@ -54,6 +54,13 @@ public abstract class Extensible extends Model {
 
     public String type() {
         return type;
+    }
+
+    /**
+     * @return true if this object should be excluded when creating constructs
+     */
+    public boolean exclude() {
+        return exclude;
     }
 
     public Class<? extends Model> modelType() {

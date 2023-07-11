@@ -116,6 +116,11 @@ public class Lifecycle {
                 throw new IllegalStateException(message);
             }
 
+            if (arc.exclude()) {
+                LOG.info("excluding arc type: {}", arc.type());
+                continue;
+            }
+
             // construct a stack for every arc
             ArcStack stack = new ArcStack(configurations, managedProject, deployable, arc);
 
@@ -128,6 +133,7 @@ public class Lifecycle {
 
             stack.applyArcWorkloadComponent(construct);
         }
+
     }
 
     private void constructIndependentStacks(ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
@@ -164,6 +170,12 @@ public class Lifecycle {
     private static void construct(ComponentContext context, Map<Extensible, ComponentService<ComponentContext, Model, Component>> containers) {
         containers.entrySet().stream().filter(e -> e.getValue() != null).forEach(e -> {
             Extensible extensible = e.getKey();
+
+            if (extensible.exclude()) {
+                LOG.info("excluding {} type: {}", extensible.label(), extensible.type());
+                return;
+            }
+
             ComponentService<ComponentContext, Model, Component> modelComponentService = e.getValue();
             LOG.info("creating {} construct: {}", extensible.label(), extensible.type());
             modelComponentService.create(context, extensible);
