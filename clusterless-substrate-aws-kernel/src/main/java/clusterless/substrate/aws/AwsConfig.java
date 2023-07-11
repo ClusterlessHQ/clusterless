@@ -11,6 +11,7 @@ package clusterless.substrate.aws;
 import clusterless.config.Config;
 import clusterless.config.Configuration;
 import clusterless.naming.Label;
+import clusterless.util.Strings;
 
 /**
  * --require-approval     What security-sensitive changes need manual
@@ -24,6 +25,11 @@ public class AwsConfig extends Configuration {
             never,
             any_change,
             broadening;
+
+            public String camelCase() {
+                // allows any_change to retain the underscore when serialized
+                return Strings.lowerUnderscoreToCamelCase(name());
+            }
 
             public String value() {
                 return lowerHyphen();

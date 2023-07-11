@@ -11,9 +11,24 @@ package clusterless.command;
 
 import picocli.CommandLine;
 
+import java.util.Optional;
+
 /**
  *
  */
 @CommandLine.Command(description = "deploy the given project files")
 public class DeployCommandOptions extends ProjectCommandOptions {
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @CommandLine.Option(
+            names = "--approve",
+            description = "approve changes to be deployed",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1"
+    )
+    Optional<Boolean> approve;
+
+    public Optional<Boolean> approve() {
+        return approve;
+    }
 }

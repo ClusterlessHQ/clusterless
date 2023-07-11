@@ -75,7 +75,7 @@ public class Deploy extends CDKCommand implements Callable<Integer> {
                 getProviderConfig(),
                 commandOptions,
                 "deploy",
-                getRequireDeployApproval()
+                getRequireDeployApproval(commandOptions.approve().orElse(null))
         );
     }
 }
