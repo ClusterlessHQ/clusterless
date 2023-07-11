@@ -18,6 +18,8 @@ import clusterless.model.deploy.Deployable;
 import clusterless.startup.Startup;
 import clusterless.substrate.ProviderSubstratesOptions;
 import clusterless.substrate.SubstrateProvider;
+import clusterless.util.ExecutionExceptionHandler;
+import clusterless.util.ExitCodeExceptionMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -61,36 +63,26 @@ public class Main extends Startup implements Callable<Integer> {
         commandLine.addSubcommand("diff", new CommandWrapper(new DiffCommandOptions()));
         commandLine.addSubcommand("local", new CommandWrapper(new LocalCommandOptions()));
 
+        commandLine
+                .setExitCodeExceptionMapper(new ExitCodeExceptionMapper())
+                .setExecutionExceptionHandler(new ExecutionExceptionHandler(main));
+
         try {
             commandLine.parseArgs(args);
-        } catch (CommandLine.MissingParameterException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
+        } catch (CommandLine.MissingParameterException | CommandLine.UnmatchedArgumentException e) {
+            commandLine.getErr().println(commandLine.getColorScheme().errorText(e.getMessage()));
+            System.exit(CommandLine.ExitCode.USAGE);
         }
 
         if (commandLine.isUsageHelpRequested()) {
             commandLine.usage(System.out);
-            return;
+            System.exit(CommandLine.ExitCode.OK);
         } else if (commandLine.isVersionHelpRequested()) {
             commandLine.printVersionHelp(System.out);
-            return;
+            System.exit(CommandLine.ExitCode.OK);
         }
 
-        int exitCode = 0;
-
-        try {
-            exitCode = commandLine.execute(args);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-
-            if (main.verbosity().level() > 0) {
-                e.printStackTrace(System.err);
-            }
-
-            System.exit(-1); // get exit code from exception
-        }
-
-        System.exit(exitCode);
+        System.exit(commandLine.execute(args));
     }
 
     public Main(String[] args) {
@@ -99,10 +91,6 @@ public class Main extends Startup implements Callable<Integer> {
 
     public ProviderSubstratesOptions substratesOptions() {
         return providerSubstratesOptions;
-    }
-
-    public CommandLine.IExitCodeExceptionMapper getExitCodeExceptionMapper() {
-        return new ExitCodeExceptionMapper();
     }
 
     @Override

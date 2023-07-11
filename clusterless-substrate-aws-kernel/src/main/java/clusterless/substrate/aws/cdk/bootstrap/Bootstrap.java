@@ -16,6 +16,7 @@ import clusterless.substrate.aws.cdk.CDKProcessExec;
 import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.resources.Stacks;
 import clusterless.substrate.aws.sdk.S3;
+import clusterless.util.ExitCodeException;
 import clusterless.util.Lists;
 import clusterless.util.OrderedSafeMaps;
 import clusterless.util.Strings;
@@ -92,7 +93,18 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
         String cdkCommand = destroyBootstrap ? "destroy" : "deploy";
         List<String> approvals = destroyBootstrap ? getRequireDestroyApproval() : getRequireDeployApproval();
 
-        processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), cdkCommand, approvals, "bootstrap", kernelArgs);
+        int exitCode = processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), cdkCommand, approvals, "bootstrap", kernelArgs);
+
+        if (!destroyBootstrap && exitCode != 0) {
+            String message = String.format("unable to bootstrap clusterless, confirm the AWS cdk has been bootstrapped in the target account/region, try: cdk bootstrap aws://%s/%s", account, region);
+            LOG.error(message);
+            throw new ExitCodeException(message, exitCode);
+        }
+
+        if (destroyBootstrap && exitCode != 0) {
+            LOG.error("unable to destroy bootstrap clusterless, see logs for details");
+            throw new ExitCodeException("unable to destroy bootstrap clusterless, see logs for details", exitCode);
+        }
 
         if (destroyBootstrap) {
             return 0;

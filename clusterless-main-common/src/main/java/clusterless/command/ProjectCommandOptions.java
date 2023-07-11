@@ -32,6 +32,7 @@ public class ProjectCommandOptions extends CommonCommandOptions {
     )
     List<String> excludeArcNames = new ArrayList<>();
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--exclude-all-arcs",
             description = "exclude all arcs from the deployment, only deploy resources and boundaries",

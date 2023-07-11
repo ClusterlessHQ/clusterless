@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless;
+package clusterless.util;
 
 import picocli.CommandLine;
 
@@ -25,6 +25,10 @@ public class ExitCodeExceptionMapper implements CommandLine.IExitCodeExceptionMa
             return FILE_NOT_FOUND;
         }
 
-        return 255;
+        if (exception instanceof ExitCodeException) {
+            return ((ExitCodeException) exception).exitCode();
+        }
+
+        return CommandLine.ExitCode.SOFTWARE;
     }
 }

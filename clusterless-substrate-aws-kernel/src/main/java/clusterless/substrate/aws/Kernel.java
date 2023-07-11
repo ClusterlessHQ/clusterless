@@ -18,6 +18,8 @@ import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.aws.cdk.bootstrap.Bootstrap;
 import clusterless.substrate.aws.cdk.lifecycle.*;
 import clusterless.substrate.aws.local.Local;
+import clusterless.util.ExecutionExceptionHandler;
+import clusterless.util.ExitCodeExceptionMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -83,6 +85,8 @@ public class Kernel extends Startup implements SubstrateProvider {
         LOG.info("kernel: {} ", Arrays.toString(args));
 
         return new CommandLine(this)
+                .setExitCodeExceptionMapper(new ExitCodeExceptionMapper())
+                .setExecutionExceptionHandler(new ExecutionExceptionHandler(this))
                 .setCaseInsensitiveEnumValuesAllowed(true)
                 .execute(args);
     }
