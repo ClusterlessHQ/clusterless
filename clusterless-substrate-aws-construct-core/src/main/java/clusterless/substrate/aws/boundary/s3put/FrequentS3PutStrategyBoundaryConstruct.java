@@ -87,7 +87,7 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
         FrequentS3PutTransformProps transformProps = FrequentS3PutTransformProps.builder()
                 .withEventBusName(eventBusRef)
                 .withSqsQueueName(queueName)
-                .withSqsWaitTimeSeconds(model().frequent().queueFetchWaitSeconds())
+                .withSqsWaitTimeSeconds(model().frequent().queueFetchWaitSec())
                 .withDataset(Dataset.Builder.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())

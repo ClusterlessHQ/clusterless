@@ -9,7 +9,6 @@
 package clusterless.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.base.Stopwatch;
 
 public abstract class EventHandler<E, O extends EventObserver> extends StreamHandler<E> {
     public EventHandler(Class<E> type) {
@@ -20,14 +19,9 @@ public abstract class EventHandler<E, O extends EventObserver> extends StreamHan
 
     @Override
     public void handleRequest(E event, Context context) {
-        Stopwatch stopwatch = Stopwatch.createStarted();
         logObjectInfo("incoming event: {}", event);
 
         handleEvent(event, context, observer());
-
-        stopwatch.stop();
-
-        LOG.info("event handled duration: {}", stopwatch.elapsed());
     }
 
     protected abstract void handleEvent(E event, Context context, O eventObserver);

@@ -11,9 +11,9 @@ package clusterless.substrate.aws.boundary.s3put;
 import clusterless.model.Struct;
 
 public class Frequent implements Struct {
-    int queueFetchWaitSeconds = 0;
+    int queueFetchWaitSec = 0;
 
-    public int queueFetchWaitSeconds() {
-        return queueFetchWaitSeconds;
+    public int queueFetchWaitSec() {
+        return queueFetchWaitSec;
     }
 }

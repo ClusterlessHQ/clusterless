@@ -9,9 +9,11 @@
 package clusterless.lambda;
 
 import clusterless.json.JSONUtil;
+import clusterless.util.Memory;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.common.base.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,9 +40,18 @@ public abstract class StreamHandler<E> implements RequestStreamHandler {
     }
 
     public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
-        handleRequest(reader.readValue(input), context);
+        Stopwatch stopwatch = Stopwatch.createStarted();
 
-        output.write(_JsonNull);
+        try {
+            handleRequest(reader.readValue(input), context);
+
+            output.write(_JsonNull);
+        } finally {
+            stopwatch.stop();
+
+            LOG.info("memory: {}", Memory.memoryUsage());
+            LOG.info("duration: {}", stopwatch.elapsed());
+        }
     }
 
     public abstract void handleRequest(E event, Context context);
