@@ -13,7 +13,8 @@ import clusterless.model.deploy.Dataset;
 import clusterless.substrate.uri.ManifestURI;
 
 public class FrequentS3PutTransformProps extends TransformProps {
-    String sqsQueueName;
+    protected String sqsQueueName;
+    protected int sqsWaitTimeSeconds = 0;
 
     public static Builder builder() {
         return Builder.builder();
@@ -23,26 +24,31 @@ public class FrequentS3PutTransformProps extends TransformProps {
         return sqsQueueName;
     }
 
+    public int sqsWaitTimeSeconds() {
+        return sqsWaitTimeSeconds;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("FrequentS3PutTransformProps{");
-        sb.append("sqsQueueName='").append(sqsQueueName).append('\'');
-        sb.append(", lotUnit='").append(lotUnit).append('\'');
-        sb.append(", manifestCompletePath=").append(manifestCompletePath);
-        sb.append(", manifestPartialPath=").append(manifestPartialPath);
-        sb.append(", dataset=").append(dataset);
-        sb.append(", eventBusName='").append(eventBusName).append('\'');
-        sb.append('}');
-        return sb.toString();
+        String sb = "FrequentS3PutTransformProps{" + "sqsQueueName='" + sqsQueueName + '\'' +
+                    ", sqsWaitTimeSeconds=" + sqsWaitTimeSeconds +
+                    ", lotUnit='" + lotUnit + '\'' +
+                    ", manifestCompletePath=" + manifestCompletePath +
+                    ", manifestPartialPath=" + manifestPartialPath +
+                    ", dataset=" + dataset +
+                    ", eventBusName='" + eventBusName + '\'' +
+                    '}';
+        return sb;
     }
 
     public static final class Builder {
-        String lotUnit;
-        ManifestURI manifestCompletePath;
-        ManifestURI manifestPartialPath;
-        Dataset dataset;
-        String eventBusName;
-        String sqsQueueName;
+        protected String lotUnit;
+        protected ManifestURI manifestCompletePath;
+        protected ManifestURI manifestPartialPath;
+        protected Dataset dataset;
+        protected String eventBusName;
+        protected String sqsQueueName;
+        protected int sqsWaitTimeSeconds = 0;
 
         private Builder() {
         }
@@ -81,14 +87,20 @@ public class FrequentS3PutTransformProps extends TransformProps {
             return this;
         }
 
+        public Builder withSqsWaitTimeSeconds(int sqsWaitTimeSeconds) {
+            this.sqsWaitTimeSeconds = sqsWaitTimeSeconds;
+            return this;
+        }
+
         public FrequentS3PutTransformProps build() {
             FrequentS3PutTransformProps frequentS3PutTransformProps = new FrequentS3PutTransformProps();
-            frequentS3PutTransformProps.lotUnit = this.lotUnit;
-            frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
-            frequentS3PutTransformProps.eventBusName = this.eventBusName;
             frequentS3PutTransformProps.dataset = this.dataset;
-            frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
             frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;
+            frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
+            frequentS3PutTransformProps.lotUnit = this.lotUnit;
+            frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
+            frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
+            frequentS3PutTransformProps.eventBusName = this.eventBusName;
             return frequentS3PutTransformProps;
         }
     }

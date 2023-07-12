@@ -45,7 +45,7 @@ public abstract class StreamHandler<E> implements RequestStreamHandler {
 
     public abstract void handleRequest(E event, Context context);
 
-    protected void logObject(String message, Object object) {
+    protected void logObjectInfo(String message, Object object) {
         LOG.info(message, JSONUtil.writeAsStringSafe(object));
     }
 }

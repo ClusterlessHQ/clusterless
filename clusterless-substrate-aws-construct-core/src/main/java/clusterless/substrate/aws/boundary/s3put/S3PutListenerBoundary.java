@@ -23,8 +23,8 @@ public class S3PutListenerBoundary extends IngressBoundary {
             3,
             15
     );
-
     Infrequent infrequent = new Infrequent();
+    Frequent frequent = new Frequent();
 
     public S3PutListenerBoundary() {
     }
@@ -39,5 +39,9 @@ public class S3PutListenerBoundary extends IngressBoundary {
 
     public Infrequent infrequent() {
         return infrequent;
+    }
+
+    public Frequent frequent() {
+        return frequent;
     }
 }

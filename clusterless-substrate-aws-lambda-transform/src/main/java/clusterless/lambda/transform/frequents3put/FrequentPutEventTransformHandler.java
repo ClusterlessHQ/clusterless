@@ -22,12 +22,14 @@ import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
 import com.amazonaws.services.lambda.runtime.serialization.PojoSerializer;
 import com.amazonaws.services.lambda.runtime.serialization.events.LambdaEventSerializers;
+import com.google.common.base.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageSystemAttributeName;
 
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
@@ -115,11 +117,18 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
 
         String queueUrl = sqs.queueUrl(urlResponse);
 
+        LOG.info("using queue: {}", queueUrl);
+
         Set<String> skipped = new LinkedHashSet<>();
         List<URI> uris = new LinkedList<>();
 
+        Stopwatch getStopwatch = Stopwatch.createUnstarted();
+        Stopwatch deleteStopwatch = Stopwatch.createUnstarted();
+
         while (true) {
-            SQS.Response messagesResponse = sqs.get(queueUrl, 20);
+            getStopwatch.start();
+            SQS.Response messagesResponse = sqs.get(queueUrl, transformProps.sqsWaitTimeSeconds());
+            getStopwatch.stop();
 
             messagesResponse.isSuccessOrThrowRuntime(
                     r -> String.format("unable to retrieve messages from queue: %s, %s", queueUrl, r.errorMessage())
@@ -135,7 +144,7 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
                         .collect(Collectors.toList());
             }
 
-            LOG.info("from: {}, received new messages: {}", queueUrl, messages.size());
+            LOG.info("received new messages: {}", messages.size());
 
             if (messages.isEmpty()) {
                 break;
@@ -149,7 +158,7 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
 
                 if (messageSentTime.isAfter(filterTime)) {
                     skipped.add(message.messageId());
-                    LOG.info("from: {}:{}, message sent time: {}, filter time: {}, skipping", queueUrl, message.messageId(), messageSentTime, filterTime);
+                    LOG.info("{}, message sent time: {}, filter time: {}, skipping", message.messageId(), messageSentTime, filterTime);
                     continue;
                 }
 
@@ -158,7 +167,7 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
                 S3Event s3Event = serializer.fromJson(message.body());
                 List<S3EventNotification.S3EventNotificationRecord> records = s3Event.getRecords();
 
-                LOG.info("from: {}:{}, received records: {}", queueUrl, message.messageId(), records.size());
+                LOG.info("{}, received records: {}", message.messageId(), records.size());
 
                 records.stream()
                         .map(S3EventNotification.S3EventNotificationRecord::getS3)
@@ -168,14 +177,20 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
                         .forEach(uris::add);
             }
 
-            LOG.info("from: {}, deleting messages: {}", queueUrl, deleteMessages.size());
+            LOG.info("deleting messages: {}", deleteMessages.size());
 
             if (!deleteMessages.isEmpty()) {
+                deleteStopwatch.start();
                 sqs.delete(queueUrl, deleteMessages).isSuccessOrThrowRuntime(
                         r -> String.format("unable to delete messages from queue: %s, %s", queueUrl, r.errorMessage())
                 );
+                deleteStopwatch.stop();
             }
         }
+
+        Duration getElapsed = getStopwatch.elapsed();
+        Duration deleteElapsed = deleteStopwatch.elapsed();
+        LOG.info("durations for, get: {}, delete: {}, total: {}", getElapsed, deleteElapsed, getElapsed.plus(deleteElapsed));
 
         eventObserver.applyDatasetItemsSize(uris.size());
 
