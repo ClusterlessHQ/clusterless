@@ -13,7 +13,6 @@ import clusterless.managed.component.ArcLocalExecutor;
 import clusterless.model.deploy.Placement;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.event.ArcWorkloadContext;
-import clusterless.util.Runtimes;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +68,7 @@ public class BatchExecArcLocalExecutor implements ArcLocalExecutor {
         localComments.put("CLS_ARC_PROPS_JAVA", "same as CLS_ARC_PROPS_JSON but for loading into an Java object via Jackson");
 
         addProvided(localComments, localEnvironment);
-//        addHelper(localComments, localEnvironment);
+        addHelper(localComments, localEnvironment);
 
         BatchPayloadCommand payloadCommand = new BatchPayloadCommand(arc.workload().command());
 
@@ -94,14 +93,7 @@ public class BatchExecArcLocalExecutor implements ArcLocalExecutor {
     }
 
     private static void addHelper(Map<String, String> localComments, Map<String, String> localEnvironment) {
-        localComments.put("CLS_ATTEMPT", "use for manifest {attempt} value, 0 padding added to JOB_ATTEMPT");
-        localEnvironment.put("CLS_ATTEMPT", "${AWS_BATCH_JOB_ID}-$(printf %03d ${AWS_BATCH_JOB_ATTEMPT})");
-
-        // millis on linux: echo $(($(date +%s%N)/1000000)) or echo $(date +%s%3N)
-        //        on osx echo $(date +%s000)
-        localComments.put("CLS_TIMESTAMP", "may not work on Alpine Linux");
-        localEnvironment.put("CLS_TIMESTAMP", Runtimes.choose("$(date +%s000)", "0000000000000", "$(date +%s%3N"));
-        localComments.put("CLS_OBJECT_GUID", "use as prefix to any stored object name");
-        localEnvironment.put("CLS_OBJECT_GUID", "${CLS_ATTEMPT}-${CLS_TIMESTAMP}");
+        localComments.put("CLS_LOCAL", "provided to flag execution within the local environment");
+        localEnvironment.put("CLS_LOCAL", "true");
     }
 }
