@@ -178,4 +178,11 @@ public class URIsTest {
 
         Assertions.assertEquals(expectedTo, actualTo);
     }
+
+    @Test
+    public void selectEncode() {
+        Assertions.assertEquals("foo/bar", URIs.encodeOnly("", "foo/bar"));
+        Assertions.assertEquals("foo/%7Bbar%7D", URIs.encodeOnly("{}", "foo/{bar}"));
+        Assertions.assertEquals("foo/%7Bb+a+r%7D", URIs.encodeOnly("{} ", "foo/{b a r}"));
+    }
 }

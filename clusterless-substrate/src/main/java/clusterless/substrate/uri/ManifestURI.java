@@ -14,6 +14,7 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Partition;
 import clusterless.substrate.store.StateStore;
 import clusterless.util.Lazy;
+import clusterless.util.URIs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -28,11 +29,13 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static clusterless.util.Optionals.optional;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Identifier
@@ -58,7 +61,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
         @Override
         public void serialize(ManifestURI value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            gen.writeString(value.template());
+            gen.writeString(value.templateEncoded());
         }
     }
 
@@ -116,6 +119,8 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
     public static ManifestURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
+
+        template = URLDecoder.decode(template, UTF_8);
 
         // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}[/{attempt}]/manifest.{ext}
         String[] split = template.split("/");
@@ -181,7 +186,19 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
     @Override
     public String template() {
         // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}{/attempt*}]/manifest.{ext}
+        String path = templatePath();
 
+        return String.format("s3://%s/%s/%s", storeName.get(), DATASETS, path);
+    }
+
+    public String templateEncoded() {
+        // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}{/attempt*}]/manifest.{ext}
+        String path = URIs.encodeOnly("{} ", templatePath());
+
+        return String.format("s3://%s/%s/%s", storeName.get(), DATASETS, path);
+    }
+
+    protected String templatePath() {
         // bypass the named partition and store directly
         Partition manifest = Optional.ofNullable(state).map(s -> (Partition) s).orElse(Partition.namedOf("state", "{state}"));
 
@@ -198,8 +215,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
                 .withNamed("lot", Optional.ofNullable(lotId).orElse("{lot}")) // retain case
                 .with(manifest)
                 .partition();
-
-        return String.format("s3://%s/%s/%s", storeName.get(), DATASETS, path);
+        return path;
     }
 
     @JsonIgnore

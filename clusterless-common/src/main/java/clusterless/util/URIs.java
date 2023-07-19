@@ -14,9 +14,12 @@ import com.google.common.base.Strings;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  *
@@ -199,5 +202,17 @@ public class URIs {
         }
 
         return copyAppend(toBase, fromPath.substring(fromBasePath.length()));
+    }
+
+    public static String encodeOnly(String chars, String path) {
+        if (chars.isEmpty()) {
+            return path;
+        }
+
+        for (String c : chars.split("")) {
+            String encode = URLEncoder.encode(c, UTF_8);
+            path = path.replace(c, encode);
+        }
+        return path;
     }
 }
