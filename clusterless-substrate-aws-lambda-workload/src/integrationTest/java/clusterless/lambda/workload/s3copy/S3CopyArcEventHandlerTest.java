@@ -53,7 +53,7 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
                 .withSources(datasets().sourceDatasetMap())
                 .withSourceManifestPaths(datasets().sourceManifestPathMap())
                 .withSinks(datasets().sinkDatasetMap())
-                .withSinkManifestPaths(datasets().sinkManifestPathMap())
+                .withSinkManifestTemplates(datasets().sinkManifestPathMap())
                 .withWorkloadProps(new S3CopyProps())
                 .build();
     }

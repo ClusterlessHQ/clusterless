@@ -46,7 +46,7 @@ public class ManagedConstruct extends Construct implements Managed {
         String region = Stack.of(this).getRegion();
         Label stage = StagedApp.stagedOf(this).stage();
 
-        return Placement.Builder.builder()
+        return Placement.builder()
                 .withAccount(account)
                 .withRegion(region)
                 .withStage(stage.lowerHyphen())

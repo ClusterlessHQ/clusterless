@@ -24,7 +24,7 @@ public abstract class LambdaHandlerTestBase {
 
     public Placement defaultPlacement() {
         if (placement == null) {
-            placement = Placement.Builder.builder()
+            placement = Placement.builder()
                     .withStage("prod")
                     .withRegion(defaultRegion())
                     .withAccount("0000000000")

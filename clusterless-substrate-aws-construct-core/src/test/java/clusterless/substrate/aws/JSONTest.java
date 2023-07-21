@@ -72,7 +72,7 @@ public class JSONTest {
                 .withSources(arc.sources())
                 .withSinks(arc.sinks())
                 .withSourceManifestPaths(null)
-                .withSinkManifestPaths(null)
+                .withSinkManifestTemplates(null)
                 .withWorkloadProps(arc.workload().workloadProps()) // generally a subclass of WorkloadProps
                 .build();
 

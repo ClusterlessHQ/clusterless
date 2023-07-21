@@ -61,7 +61,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
         @Override
         public void serialize(ManifestURI value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            gen.writeString(value.templateEncoded());
+            gen.writeString(value.template());
         }
     }
 
@@ -128,7 +128,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         int index = 4; // start after arcs
         return new ManifestURI()
                 .setStoreName(value(split, 2))
-                .setDataset(Dataset.Builder.builder()
+                .setDataset(Dataset.builder()
                         .withName(value(split, index++))
                         .withVersion(value(split, index++))
                         .build())

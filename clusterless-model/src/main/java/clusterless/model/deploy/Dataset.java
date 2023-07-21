@@ -39,6 +39,10 @@ public class Dataset extends Model {
         pathURI = builder.pathURI;
     }
 
+    public static Builder builder() {
+        return Builder.builder();
+    }
+
     public String name() {
         return name;
     }
@@ -61,13 +65,10 @@ public class Dataset extends Model {
         return sb.toString();
     }
 
-    /**
-     * {@code Dataset} builder static inner class.
-     */
     public static final class Builder {
-        private String name;
-        private String version;
-        private URI pathURI;
+        String name;
+        String version;
+        URI pathURI;
 
         private Builder() {
         }
@@ -76,46 +77,27 @@ public class Dataset extends Model {
             return new Builder();
         }
 
-        /**
-         * Sets the {@code name} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code name} to set
-         * @return a reference to this Builder
-         */
-        public Builder withName(String val) {
-            name = val;
+        public Builder withName(String name) {
+            this.name = name;
             return this;
         }
 
-        /**
-         * Sets the {@code version} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code version} to set
-         * @return a reference to this Builder
-         */
-        public Builder withVersion(String val) {
-            version = val;
+        public Builder withVersion(String version) {
+            this.version = version;
             return this;
         }
 
-        /**
-         * Sets the {@code pathURI} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code pathURI} to set
-         * @return a reference to this Builder
-         */
-        public Builder withPathURI(URI val) {
-            pathURI = val;
+        public Builder withPathURI(URI pathURI) {
+            this.pathURI = pathURI;
             return this;
         }
 
-        /**
-         * Returns a {@code Dataset} built from the parameters previously set.
-         *
-         * @return a {@code Dataset} built with parameters of this {@code Dataset.Builder}
-         */
         public Dataset build() {
-            return new Dataset(this);
+            Dataset dataset = new Dataset();
+            dataset.version = this.version;
+            dataset.name = this.name;
+            dataset.pathURI = this.pathURI;
+            return dataset;
         }
     }
 }

@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class TestDatasets {
-    public static Placement defaultPlacement = Placement.Builder.builder()
+    public static Placement defaultPlacement = Placement.builder()
             .withAccount("00000000")
             .withRegion("us-west-2")
             .withProvider("aws")
@@ -188,7 +188,7 @@ public class TestDatasets {
 
     @NotNull
     public static Dataset datasetFor(String name) {
-        return Dataset.Builder.builder()
+        return Dataset.builder()
                 .withName(name)
                 .withVersion(version())
                 .withPathURI(datasetPath(name))

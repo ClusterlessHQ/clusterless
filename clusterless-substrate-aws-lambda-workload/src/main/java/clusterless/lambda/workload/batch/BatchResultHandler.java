@@ -35,7 +35,7 @@ public class BatchResultHandler extends ArcEventHandler<WorkloadProps> {
 
         logInfo("handling lot: {}", lot);
 
-        Map<String, ManifestURI> manifestPaths = arcProps().sinkManifestPaths();
+        Map<String, ManifestURI> manifestPaths = arcProps().sinkManifestTemplates();
 
         for (Map.Entry<String, ManifestURI> entry : manifestPaths.entrySet()) {
             // find successful manifests

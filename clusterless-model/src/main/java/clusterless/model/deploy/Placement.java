@@ -31,6 +31,10 @@ public class Placement implements Struct {
         region = builder.region;
     }
 
+    public static Builder builder() {
+        return Builder.builder();
+    }
+
     public String provider() {
         return provider;
     }
@@ -71,14 +75,11 @@ public class Placement implements Struct {
         return sb.toString();
     }
 
-    /**
-     * {@code Placement} builder static inner class.
-     */
     public static final class Builder {
-        private String provider;
-        private String stage;
-        private String account;
-        private String region;
+        String provider;
+        String stage;
+        String account;
+        String region;
 
         private Builder() {
         }
@@ -87,57 +88,33 @@ public class Placement implements Struct {
             return new Builder();
         }
 
-        /**
-         * Sets the {@code provider} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code provider} to set
-         * @return a reference to this Builder
-         */
-        public Builder withProvider(String val) {
-            provider = val;
+        public Builder withProvider(String provider) {
+            this.provider = provider;
             return this;
         }
 
-        /**
-         * Sets the {@code stage} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code stage} to set
-         * @return a reference to this Builder
-         */
-        public Builder withStage(String val) {
-            stage = val;
+        public Builder withStage(String stage) {
+            this.stage = stage;
             return this;
         }
 
-        /**
-         * Sets the {@code account} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code account} to set
-         * @return a reference to this Builder
-         */
-        public Builder withAccount(String val) {
-            account = val;
+        public Builder withAccount(String account) {
+            this.account = account;
             return this;
         }
 
-        /**
-         * Sets the {@code region} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code region} to set
-         * @return a reference to this Builder
-         */
-        public Builder withRegion(String val) {
-            region = val;
+        public Builder withRegion(String region) {
+            this.region = region;
             return this;
         }
 
-        /**
-         * Returns a {@code Placement} built from the parameters previously set.
-         *
-         * @return a {@code Placement} built with parameters of this {@code Placement.Builder}
-         */
         public Placement build() {
-            return new Placement(this);
+            Placement placement = new Placement();
+            placement.account = this.account;
+            placement.provider = this.provider;
+            placement.region = this.region;
+            placement.stage = this.stage;
+            return placement;
         }
     }
 }

@@ -64,7 +64,7 @@ public class StateURIs {
         String region = Stack.of(scope).getRegion();
         Label stage = StagedApp.stagedOf(scope).stage();
 
-        return Placement.Builder.builder()
+        return Placement.builder()
                 .withAccount(account)
                 .withRegion(region)
                 .withStage(stage.lowerHyphen())

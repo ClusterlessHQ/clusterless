@@ -43,7 +43,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
 
     protected Map<String, ManifestWriter> manifestWriters = ManifestWriter.writers(
             arcProps().sinks(),
-            arcProps().sinkManifestPaths(),
+            arcProps().sinkManifestTemplates(),
             UriType.identifier
     );
 

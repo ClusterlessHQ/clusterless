@@ -88,7 +88,7 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
                 .withEventBusName(eventBusRef)
                 .withSqsQueueName(queueName)
                 .withSqsWaitTimeSeconds(model().frequent().queueFetchWaitSec())
-                .withDataset(Dataset.Builder.builder()
+                .withDataset(Dataset.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())
                         .withPathURI(listenURI)

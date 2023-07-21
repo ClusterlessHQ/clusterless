@@ -23,7 +23,7 @@ public interface ArcLocalExecutor {
         List<String> command = new LinkedList<>();
 
         public static Builder builder() {
-            return Builder.aCommand();
+            return Builder.builder();
         }
 
         public String headerComment() {
@@ -56,7 +56,7 @@ public interface ArcLocalExecutor {
             private Builder() {
             }
 
-            public static Builder aCommand() {
+            public static Builder builder() {
                 return new Builder();
             }
 
@@ -89,8 +89,8 @@ public interface ArcLocalExecutor {
                 Command command = new Command();
                 command.headerComment = this.headerComment;
                 command.command = this.command;
-                command.environmentComments = this.environmentComments;
                 command.commandComment = this.commandComment;
+                command.environmentComments = this.environmentComments;
                 command.environment = this.environment;
                 return command;
             }

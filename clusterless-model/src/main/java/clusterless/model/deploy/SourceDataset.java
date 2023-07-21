@@ -20,84 +20,50 @@ public class SourceDataset extends Dataset {
     public SourceDataset() {
     }
 
-    private SourceDataset(Builder builder) {
-        name = builder.name;
-        version = builder.version;
-        pathURI = builder.pathURI;
-        subscribe = builder.subscribe;
-    }
-
     public boolean subscribe() {
         return subscribe;
     }
 
-    /**
-     * {@code SourceDataset} builder static inner class.
-     */
     public static final class Builder {
-        private String name;
-        private String version;
-        private URI pathURI;
-        private boolean subscribe;
+        String name;
+        String version;
+        URI pathURI;
+        boolean subscribe = true;
 
         private Builder() {
         }
 
         public static Builder builder() {
-            return new Builder();
+            return new SourceDataset.Builder();
         }
 
-        /**
-         * Sets the {@code name} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code name} to set
-         * @return a reference to this Builder
-         */
-        public Builder withName(String val) {
-            name = val;
+        public Builder withName(String name) {
+            this.name = name;
             return this;
         }
 
-        /**
-         * Sets the {@code version} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code version} to set
-         * @return a reference to this Builder
-         */
-        public Builder withVersion(String val) {
-            version = val;
+        public Builder withVersion(String version) {
+            this.version = version;
             return this;
         }
 
-        /**
-         * Sets the {@code pathURI} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code pathURI} to set
-         * @return a reference to this Builder
-         */
-        public Builder withPathURI(URI val) {
-            pathURI = val;
+        public Builder withPathURI(URI pathURI) {
+            this.pathURI = pathURI;
             return this;
         }
 
-        /**
-         * Sets the {@code subscribe} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code subscribe} to set
-         * @return a reference to this Builder
-         */
-        public Builder withSubscribe(boolean val) {
-            subscribe = val;
+        public Builder withSubscribe(boolean subscribe) {
+            this.subscribe = subscribe;
             return this;
         }
 
-        /**
-         * Returns a {@code SourceDataset} built from the parameters previously set.
-         *
-         * @return a {@code SourceDataset} built with parameters of this {@code SourceDataset.Builder}
-         */
         public SourceDataset build() {
-            return new SourceDataset(this);
+            SourceDataset sourceDataset = new SourceDataset();
+            sourceDataset.version = this.version;
+            sourceDataset.name = this.name;
+            sourceDataset.subscribe = this.subscribe;
+            sourceDataset.pathURI = this.pathURI;
+            return sourceDataset;
         }
     }
 }

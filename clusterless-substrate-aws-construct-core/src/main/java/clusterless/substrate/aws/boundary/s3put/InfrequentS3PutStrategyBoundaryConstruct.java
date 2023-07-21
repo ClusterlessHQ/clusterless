@@ -74,7 +74,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
 
         S3PutTransformProps transformProps = S3PutTransformProps.builder()
                 .withEventBusName(eventBusRef)
-                .withDataset(Dataset.Builder.builder()
+                .withDataset(Dataset.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())
                         .withPathURI(listenURI)

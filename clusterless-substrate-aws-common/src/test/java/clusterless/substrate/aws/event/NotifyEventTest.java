@@ -24,7 +24,7 @@ public class NotifyEventTest {
     @Test
     void arcNotifyEvent() throws IOException {
         ArcNotifyEvent event = ArcNotifyEvent.Builder.builder()
-                .withDataset(Dataset.Builder.builder()
+                .withDataset(Dataset.builder()
                         .withName("name")
                         .withVersion("version")
                         .build())

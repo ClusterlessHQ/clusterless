@@ -56,7 +56,7 @@ public class BatchArcEventHandlerTest extends LocalStackBase {
                 .withSources(datasets().sourceDatasetMap())
                 .withSourceManifestPaths(datasets().sourceManifestPathMap())
                 .withSinks(datasets().sinkDatasetMap())
-                .withSinkManifestPaths(datasets().sinkManifestPathMap())
+                .withSinkManifestTemplates(datasets().sinkManifestPathMap())
                 .withWorkloadProps(new WorkloadProps())
                 .build();
     }
@@ -84,7 +84,7 @@ public class BatchArcEventHandlerTest extends LocalStackBase {
                 .applyBucketsFrom(props.sources())
                 .applyBucketsFrom(props.sinks())
                 .buildSources(props.sourceManifestPaths(), props.sources())
-                .buildSinks(props.sinkManifestPaths(), props.sinks(), ManifestState.complete);
+                .buildSinks(props.sinkManifestTemplates(), props.sinks(), ManifestState.complete);
 
 //        new CreateDataMachine(PARTIAL_LOT)
 //                .applyBucketsFrom(props.sources())

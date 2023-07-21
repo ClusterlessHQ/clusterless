@@ -23,7 +23,7 @@ public class StateURITest {
     @Test
     void arcState() {
         ArcURI arcState = ArcURI.builder()
-                .withPlacement(Placement.Builder.builder()
+                .withPlacement(Placement.builder()
                         .withAccount("00000000")
                         .withRegion("us-west-2")
                         .withProvider("aws")
@@ -77,13 +77,13 @@ public class StateURITest {
     @Test
     void arcManifest() {
         ManifestURI manifestState = ManifestURI.builder()
-                .withPlacement(Placement.Builder.builder()
+                .withPlacement(Placement.builder()
                         .withAccount("00000000")
                         .withRegion("us-west-2")
                         .withProvider("aws")
                         .withStage("prod")
                         .build())
-                .withDataset(Dataset.Builder.builder()
+                .withDataset(Dataset.builder()
                         .withName("test-dataset")
                         .withVersion("20230101")
                         .build())

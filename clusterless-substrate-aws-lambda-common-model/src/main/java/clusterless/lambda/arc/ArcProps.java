@@ -24,7 +24,7 @@ public class ArcProps<P extends WorkloadProps> implements Struct {
     Map<String, SinkDataset> sinks;
 
     Map<String, ManifestURI> sourceManifestPaths;
-    Map<String, ManifestURI> sinkManifestPaths;
+    Map<String, ManifestURI> sinkManifestTemplates;
 
     P workloadProps;
 
@@ -32,7 +32,7 @@ public class ArcProps<P extends WorkloadProps> implements Struct {
     }
 
     public static <P extends WorkloadProps> Builder<P> builder() {
-        return Builder.anArcProps();
+        return Builder.builder();
     }
 
     public Map<String, SourceDataset> sources() {
@@ -47,8 +47,8 @@ public class ArcProps<P extends WorkloadProps> implements Struct {
         return sourceManifestPaths;
     }
 
-    public Map<String, ManifestURI> sinkManifestPaths() {
-        return sinkManifestPaths;
+    public Map<String, ManifestURI> sinkManifestTemplates() {
+        return sinkManifestTemplates;
     }
 
     public P workloadProps() {
@@ -59,14 +59,14 @@ public class ArcProps<P extends WorkloadProps> implements Struct {
         Map<String, SourceDataset> sources;
         Map<String, SinkDataset> sinks;
         Map<String, ManifestURI> sourceManifestPaths;
-        Map<String, ManifestURI> sinkManifestPaths;
+        Map<String, ManifestURI> sinkManifestTemplates;
         P workloadProps;
 
         private Builder() {
         }
 
-        private static <P extends WorkloadProps> Builder<P> anArcProps() {
-            return new Builder<>();
+        public static <P extends WorkloadProps> Builder<P> builder() {
+            return new Builder<P>();
         }
 
         public Builder<P> withSources(Map<String, SourceDataset> sources) {
@@ -84,8 +84,8 @@ public class ArcProps<P extends WorkloadProps> implements Struct {
             return this;
         }
 
-        public Builder<P> withSinkManifestPaths(Map<String, ManifestURI> sinkManifestPaths) {
-            this.sinkManifestPaths = sinkManifestPaths;
+        public Builder<P> withSinkManifestTemplates(Map<String, ManifestURI> sinkManifestTemplates) {
+            this.sinkManifestTemplates = sinkManifestTemplates;
             return this;
         }
 
@@ -95,11 +95,11 @@ public class ArcProps<P extends WorkloadProps> implements Struct {
         }
 
         public ArcProps<P> build() {
-            ArcProps<P> arcProps = new ArcProps<>();
-            arcProps.sources = this.sources;
+            ArcProps<P> arcProps = new ArcProps<P>();
+            arcProps.sinkManifestTemplates = this.sinkManifestTemplates;
             arcProps.sinks = this.sinks;
+            arcProps.sources = this.sources;
             arcProps.workloadProps = this.workloadProps;
-            arcProps.sinkManifestPaths = this.sinkManifestPaths;
             arcProps.sourceManifestPaths = this.sourceManifestPaths;
             return arcProps;
         }

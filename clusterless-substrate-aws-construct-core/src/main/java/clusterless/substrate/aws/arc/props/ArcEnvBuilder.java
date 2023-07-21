@@ -64,7 +64,7 @@ public class ArcEnvBuilder {
                 .withSources(model.sources())
                 .withSinks(model.sinks())
                 .withSourceManifestPaths(sourceManifestPaths)
-                .withSinkManifestPaths(sinkManifestPaths)
+                .withSinkManifestTemplates(sinkManifestPaths)
                 .withWorkloadProps(model.workload().workloadProps())
                 .build();
     }
