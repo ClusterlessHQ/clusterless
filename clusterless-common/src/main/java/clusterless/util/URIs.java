@@ -15,8 +15,6 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -62,6 +60,12 @@ public class URIs {
     }
 
     public static URI copyWith(URI uri, String path) {
+        if (Strings.isNullOrEmpty(path)) {
+            path = "/";
+        } else if (path.charAt(0) != '/') {
+            path = "/" + path;
+        }
+
         try {
             return new URI(uri.getScheme(), uri.getAuthority(), path, null, null);
         } catch (URISyntaxException e) {
@@ -106,35 +110,6 @@ public class URIs {
                         .having(appends)
                         .partition()
         );
-    }
-
-    public static String normalizeX(String path, String... appends) {
-        String first = Strings.nullToEmpty(path);
-
-        Path head = Paths.get(first);
-        String second = first;
-
-        for (String append : appends) {
-            second = Strings.nullToEmpty(append);
-
-            if (second.charAt(0) == '/') {
-                second = second.substring(1);
-            }
-
-            head = head.resolve(second);
-        }
-
-        return normalize(head, second);
-    }
-
-    private static String normalize(Path head, String second) {
-        String result = head.normalize().toString();
-
-        if (result.length() > 1 && second.endsWith("/")) {
-            return result + "/";
-        }
-
-        return result;
     }
 
     /**
