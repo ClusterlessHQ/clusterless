@@ -10,6 +10,8 @@ package clusterless.command;
 
 import picocli.CommandLine;
 
+import java.util.Optional;
+
 /**
  *
  */
@@ -42,6 +44,16 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
     )
     boolean synth = false;
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @CommandLine.Option(
+            names = "--approve",
+            description = "approve changes to be deployed",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1"
+    )
+    Optional<Boolean> approve;
+
     public boolean destroy() {
         return destroy;
     }
@@ -60,5 +72,9 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
 
     public boolean synth() {
         return synth;
+    }
+
+    public Optional<Boolean> approve() {
+        return approve;
     }
 }
