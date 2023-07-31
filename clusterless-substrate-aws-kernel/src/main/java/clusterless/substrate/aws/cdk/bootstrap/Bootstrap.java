@@ -91,7 +91,7 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
         processExec.setUseTempOutput(true);
 
         String cdkCommand = destroyBootstrap ? "destroy" : "deploy";
-        List<String> approvals = destroyBootstrap ? getRequireDestroyApproval() : getRequireDeployApproval(commandOptions.approve().orElse(null));
+        List<String> approvals = destroyBootstrap ? getRequireDestroyApproval(commandOptions.approve().orElse(null)) : getRequireDeployApproval(commandOptions.approve().orElse(null));
 
         int exitCode = processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), cdkCommand, approvals, "bootstrap", kernelArgs);
 

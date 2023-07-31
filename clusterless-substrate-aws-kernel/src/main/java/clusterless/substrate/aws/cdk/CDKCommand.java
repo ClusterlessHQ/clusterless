@@ -38,8 +38,8 @@ public class CDKCommand extends CommonCommand {
     }
 
     @NotNull
-    protected List<String> getRequireDestroyApproval() {
-        if (!getProviderConfig().cdk().requireDestroyApproval()) {
+    protected List<String> getRequireDestroyApproval(Boolean approve) {
+        if ((approve != null && approve) || !getProviderConfig().cdk().requireDestroyApproval()) {
             return List.of(
                     "--force"
             );

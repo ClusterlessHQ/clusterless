@@ -32,7 +32,7 @@ public class Destroy extends CDKCommand implements Callable<Integer> {
                 getProviderConfig(),
                 commandOptions,
                 "destroy",
-                getRequireDestroyApproval()
+                getRequireDestroyApproval(commandOptions.approve().orElse(null))
         );
     }
 }

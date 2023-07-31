@@ -11,6 +11,8 @@ package clusterless.command;
 
 import picocli.CommandLine;
 
+import java.util.Optional;
+
 /**
  *
  */
@@ -19,7 +21,21 @@ public class DestroyCommandOptions extends ProjectCommandOptions {
     @CommandLine.Option(names = "--retry", description = "retry the operation")
     private boolean retry = false;
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @CommandLine.Option(
+            names = "--approve",
+            description = "approve changes to be deployed",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1"
+    )
+    Optional<Boolean> approve;
+
     public boolean retry() {
         return retry;
+    }
+
+    public Optional<Boolean> approve() {
+        return approve;
     }
 }
