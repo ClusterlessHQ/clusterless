@@ -289,12 +289,26 @@ public class S3 extends ClientBase<S3Client> {
         return list(path, null);
     }
 
+    public Response listThisOrChildObjects(URI path) {
+        Objects.requireNonNull(path, "path");
+
+        String bucketName = path.getHost();
+        String key = URIs.asKey(path);
+
+        return list(null, bucketName, key);
+    }
+
     protected ClientBase<S3Client>.Response list(URI path, String delimiter) {
         Objects.requireNonNull(path, "path");
 
         String bucketName = path.getHost();
         String key = URIs.asKeyPath(path);
 
+        return list(delimiter, bucketName, key);
+    }
+
+    @NotNull
+    private ClientBase<S3Client>.Response list(String delimiter, String bucketName, String key) {
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
                 .prefix(key)

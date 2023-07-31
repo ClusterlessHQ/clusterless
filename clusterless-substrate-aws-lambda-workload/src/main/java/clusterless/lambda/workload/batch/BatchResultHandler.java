@@ -15,12 +15,14 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcWorkloadContext;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.uri.ManifestURI;
+import clusterless.util.URIs;
 import com.amazonaws.services.lambda.runtime.Context;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class BatchResultHandler extends ArcEventHandler<WorkloadProps> {
@@ -48,10 +50,19 @@ public class BatchResultHandler extends ArcEventHandler<WorkloadProps> {
                         .withState(state)
                         .uri();
 
-                S3.Response response = s3.exists(uri);
+                LOG.info("checking for manifest: {}", uri);
 
-                if (s3.exists(response)) {
-                    result.put(role, uri);
+                S3.Response response = s3.listThisOrChildObjects(uri);
+
+                List<String> children = s3.listChildren(response);
+                if (!children.isEmpty()) {
+                    Optional<String> first = children.stream().filter(child -> child.endsWith(".json")).findFirst();
+
+                    if (first.isEmpty()) {
+                        logErrorAndThrow(RuntimeException::new, "no json manifest found in: {}", children.stream().limit(5).collect(Collectors.joining(",")));
+                    }
+
+                    result.put(role, URIs.copyWith(uri, first.orElseThrow()));
                     eventObserver.applyToManifest(role, uri);
                     break;
                 }
