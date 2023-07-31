@@ -8,6 +8,8 @@
 
 package clusterless.managed.component;
 
+import clusterless.model.manifest.ManifestState;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,5 +99,5 @@ public interface ArcLocalExecutor {
         }
     }
 
-    List<Command> commands(String role, String lotId);
+    List<Command> commands(String role, String lotId, ManifestState manifestState);
 }

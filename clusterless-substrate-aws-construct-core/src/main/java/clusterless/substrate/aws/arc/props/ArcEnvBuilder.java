@@ -78,10 +78,10 @@ public class ArcEnvBuilder {
     }
 
     @NotNull
-    public ArcWorkloadContext execContext(String role, String lotId) {
+    public ArcWorkloadContext execContext(String role, String lotId, ManifestState manifestState) {
         URI manifest = arcProps.sourceManifestPaths()
                 .get(role)
-                .withState(ManifestState.complete)
+                .withState(manifestState)
                 .withLot(lotId)
                 .uri();
 

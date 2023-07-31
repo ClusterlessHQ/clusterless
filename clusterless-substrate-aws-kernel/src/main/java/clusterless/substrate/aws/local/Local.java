@@ -82,7 +82,7 @@ public class Local implements Callable<Integer> {
 
         ArcLocalExecutor executor = executorFor(deployable.placement(), arc);
 
-        List<ArcLocalExecutor.Command> commands = executor.commands(commandOptions.role(), commandOptions.lotId());
+        List<ArcLocalExecutor.Command> commands = executor.commands(commandOptions.role(), commandOptions.lotId(), commandOptions.manifestState());
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());
 

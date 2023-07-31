@@ -8,6 +8,7 @@
 
 package clusterless.command;
 
+import clusterless.model.manifest.ManifestState;
 import picocli.CommandLine;
 
 /**
@@ -37,6 +38,12 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     )
     String role;
 
+    @CommandLine.Option(
+            names = {"-s", "--manifest-state"},
+            description = "manifest state"
+    )
+    ManifestState manifestState = ManifestState.complete;
+
     public String arc() {
         return arc;
     }
@@ -47,5 +54,9 @@ public class LocalCommandOptions extends ProjectCommandOptions {
 
     public String role() {
         return role;
+    }
+
+    public ManifestState manifestState() {
+        return manifestState;
     }
 }
