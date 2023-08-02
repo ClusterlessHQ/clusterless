@@ -42,7 +42,7 @@ public class ComponentServices {
             Optional<ProvidesComponent> typeOf = Annotations.find(s.type(), ProvidesComponent.class);
             Isolation isolation = provides.orElseThrow().isolation();
             ModelType model = provides.orElseThrow().provides();
-            String type = typeOf.orElseThrow().value();
+            String type = typeOf.orElseThrow().type();
 
             LOG.info("loading component service provider: {} {} {}", isolation, model, type);
 

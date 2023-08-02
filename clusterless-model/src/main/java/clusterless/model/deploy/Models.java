@@ -27,8 +27,8 @@ public class Models {
     static {
         add(Deployable.class);
         add(Arc.class);
-        add(SinkDataset.class);
         add(SourceDataset.class);
+        add(SinkDataset.class);
     }
 
     public static Collection<String> names() {

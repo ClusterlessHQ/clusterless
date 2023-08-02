@@ -10,7 +10,9 @@ package clusterless.printer;
 
 import picocli.CommandLine;
 
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Writer;
 import java.util.Collection;
 
 /**
@@ -30,5 +32,9 @@ public class Printer {
 
     public void println(String string) {
         out.println(string);
+    }
+
+    public Writer writer() {
+        return new OutputStreamWriter(out);
     }
 }

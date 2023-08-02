@@ -10,10 +10,14 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.s3put.LotSource;
 import clusterless.model.Struct;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Infrequent implements Struct {
     LotSource lotSource = LotSource.objectModifiedTime;
+
+    @JsonIgnore
     String keyRegex;
+    boolean enableEventBridge = false;
 
     public LotSource lotSource() {
         return lotSource;
@@ -21,5 +25,9 @@ public class Infrequent implements Struct {
 
     public String keyRegex() {
         return keyRegex;
+    }
+
+    public boolean enableEventBridge() {
+        return enableEventBridge;
     }
 }

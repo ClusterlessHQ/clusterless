@@ -15,7 +15,16 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent("aws:core:computeEnvironment")
+@ProvidesComponent(
+        type = "aws:core:computeEnvironment",
+        synopsis = "Create an AWS Batch Compute environment to execute Docker images within.",
+        description = """
+                When using an aws:core:batchExecArc, a compute environment is required to execute the Docker image.
+                Currently only Fargate is supported.
+                                
+                computeEnvironmentName: The unique name of the compute environment to create
+                """
+)
 public class ComputeResourceProvider implements ResourceComponentService<ManagedComponentContext, ComputeResource, ComputeResourceConstruct> {
 
     @Override

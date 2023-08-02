@@ -19,5 +19,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ProvidesComponent {
-    String value();
+    String type();
+
+    String description() default "";
+
+    String synopsis() default "";
 }

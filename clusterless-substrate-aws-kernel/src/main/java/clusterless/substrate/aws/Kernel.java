@@ -10,7 +10,11 @@ package clusterless.substrate.aws;
 
 import clusterless.config.ConfigManager;
 import clusterless.config.Configuration;
+import clusterless.managed.component.Component;
+import clusterless.managed.component.ComponentContext;
+import clusterless.managed.component.ComponentService;
 import clusterless.managed.component.ComponentServices;
+import clusterless.model.Model;
 import clusterless.model.Struct;
 import clusterless.startup.Startup;
 import clusterless.substrate.ProviderSubstratesOptions;
@@ -73,6 +77,13 @@ public class Kernel extends Startup implements SubstrateProvider {
         return ComponentServices.INSTANCE.componentServices().entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().modelClass()));
+    }
+
+    @Override
+    public Map<String, ComponentService<ComponentContext, Model, Component>> components() {
+        return ComponentServices.INSTANCE.componentServices().entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override

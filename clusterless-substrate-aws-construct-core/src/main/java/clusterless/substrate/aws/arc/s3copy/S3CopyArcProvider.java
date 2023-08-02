@@ -15,7 +15,14 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent("aws:core:s3CopyArc")
+@ProvidesComponent(
+        type = "aws:core:s3CopyArc",
+        synopsis = "The AWS S3 Copy Arc component copies data from one S3 bucket to another S3 bucket.",
+        description = """
+                All data in the source manifest will be copied to the specified dataset.
+                                
+                workloadProps.failArcOnPartialPercent: The percentage of files that can fail before the Arc fails. Default is 0.0."""
+)
 public class S3CopyArcProvider implements ArcComponentService<ManagedComponentContext, S3CopyArc, S3CopyArcConstruct> {
 
     @Override

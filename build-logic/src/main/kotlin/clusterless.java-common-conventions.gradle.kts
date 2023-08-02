@@ -76,6 +76,7 @@ dependencies {
 
         implementation("org.jetbrains:annotations:24.0.0")
         implementation("info.picocli:picocli:4.7.1")
+        implementation("com.github.jknack:handlebars:4.3.1")
 
         val log4j = "2.20.0"
         implementation("org.apache.logging.log4j:log4j-api:$log4j")

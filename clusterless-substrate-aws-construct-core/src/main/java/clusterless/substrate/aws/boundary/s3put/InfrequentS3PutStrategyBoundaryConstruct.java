@@ -115,7 +115,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
         // note that multiple boundaries can share the same bucket, if they all enable eventbridge, there can be
         // a type of race condition in cloudformation.
         // it's best this is enabled once during a deploy
-        if (model().enableEventBridge()) {
+        if (model().infrequent.enableEventBridge()) {
             // todo: inject warning about
             //  Custom::S3BucketNotifications
             // Received response status [FAILED] from custom resource. Message returned: Error: An error occurred (OperationAborted) when calling the PutBucketNotificationConfiguration operation: A conflicting conditional operation is currently in progress against this resource. Please try again.. See the details in CloudWatch Log

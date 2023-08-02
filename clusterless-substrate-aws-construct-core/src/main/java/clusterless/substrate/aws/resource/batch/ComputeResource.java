@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.resource.batch;
 
 import clusterless.model.deploy.Resource;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,10 +23,14 @@ public class ComputeResource extends Resource {
         fargate
     }
 
+    @JsonIgnore
     private ComputeType computeType = ComputeType.fargate;
 
+    @JsonIgnore
     private boolean useSpot = false;
     private String computeEnvironmentName;
+
+    @JsonIgnore
     private Map<String, String> tags = new LinkedHashMap<>();
 
     public ComputeResource() {

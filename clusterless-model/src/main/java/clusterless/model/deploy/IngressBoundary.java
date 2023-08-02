@@ -18,13 +18,7 @@ public class IngressBoundary extends Boundary {
     @JsonProperty(required = true)
     private String lotUnit;
 
-    private boolean enableEventBridge = false;
-
     public String lotUnit() {
         return lotUnit;
-    }
-
-    public boolean enableEventBridge() {
-        return enableEventBridge;
     }
 }

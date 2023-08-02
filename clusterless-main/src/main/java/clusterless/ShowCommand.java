@@ -9,14 +9,8 @@
 package clusterless;
 
 import clusterless.command.CommonCommandOptions;
-import clusterless.json.JSONUtil;
-import clusterless.model.Struct;
-import clusterless.model.deploy.Models;
-import clusterless.substrate.SubstrateProvider;
 import picocli.CommandLine;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -25,10 +19,10 @@ import java.util.concurrent.Callable;
  */
 @CommandLine.Command(
         name = "show",
-        description = "display details about providers and models",
+        description = "display details about providers and components",
         subcommands = {
-                ShowCommand.ShowProviders.class,
-                ShowCommand.ShowModel.class
+                ShowProviders.class,
+                ShowComponents.class
         }
 )
 public class ShowCommand {
@@ -43,11 +37,33 @@ public class ShowCommand {
 
     public static class BaseShow implements Callable<Integer> {
         static class Exclusive {
-            @CommandLine.Option(names = "--list", arity = "0")
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+            @CommandLine.Option(
+                    names = "--list",
+                    arity = "0",
+                    description = "list all names"
+            )
             Optional<Boolean> list;
 
-            @CommandLine.Option(names = "--print", arity = "1")
-            Optional<String> name;
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+            @CommandLine.Option(
+                    names = "--describe-all",
+                    arity = "0",
+                    description = "print description of all elements"
+            )
+            Optional<Boolean> all;
+
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+            @CommandLine.Option(
+                    names = "--template",
+                    arity = "1",
+                    description = "print the json template of element"
+            )
+            Optional<String> template;
+
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+            @CommandLine.Option(names = "--describe", arity = "1")
+            Optional<String> component;
 
             public Exclusive() {
             }
@@ -61,77 +77,33 @@ public class ShowCommand {
 
         @Override
         public Integer call() throws Exception {
-            if (exclusive.list.isPresent() && exclusive.list.get()) {
+            if (exclusive.all.isPresent() && exclusive.all.get()) {
+                return handleDescribeAll();
+            } else if (exclusive.list.isPresent() && exclusive.list.get()) {
                 return handleList();
-            } else if (exclusive.name.isPresent()) {
-                return handleName();
+            } else if (exclusive.template.isPresent()) {
+                return handleTemplte();
+            } else if (exclusive.component.isPresent()) {
+                return handleDescribe();
             }
 
-            return 0;
-        }
-
-        protected Integer handleName() throws Exception {
             return 0;
         }
 
         protected Integer handleList() throws Exception {
             return 0;
         }
-    }
 
-    @CommandLine.Command(name = "provider", description = "show all available providers")
-    public static class ShowProviders extends BaseShow implements Callable<Integer> {
-
-        @Override
-        public Integer handleList() throws Exception {
-            showCommand.main.printer().println(showCommand.main.substratesOptions().availableNames());
-            return 0;
-        }
-    }
-
-    @CommandLine.Command(
-            name = "model"
-    )
-    public static class ShowModel extends BaseShow {
-
-        public ShowModel() {
-        }
-
-        protected Integer handleName() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-            Class<? extends Struct> modelClass = Models.get(exclusive.name.get());
-
-            if (modelClass != null) {
-                return printModel(modelClass);
-            }
-
-            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
-            for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-                modelClass = entry.getValue().models().get(exclusive.name.get());
-
-                if (modelClass != null) {
-                    return printModel(modelClass);
-                }
-            }
-
-            throw new IllegalArgumentException("no model found for: " + exclusive.name.get());
-        }
-
-        protected Integer handleList() {
-            showCommand.main.printer().println(Models.names());
-
-            Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
-
-            for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-                showCommand.main.printer().println(entry.getValue().models().keySet());
-            }
-
+        protected Integer handleTemplte() throws Exception {
             return 0;
         }
 
-        private int printModel(Class<? extends Struct> modelClass) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-            showCommand.main.printer().println(JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance()));
+        protected Integer handleDescribeAll() throws Exception {
+            return 0;
+        }
+
+        protected Integer handleDescribe() throws Exception {
             return 0;
         }
     }
-
 }

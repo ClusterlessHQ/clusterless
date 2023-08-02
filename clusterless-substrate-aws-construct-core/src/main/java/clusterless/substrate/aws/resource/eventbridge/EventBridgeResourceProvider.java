@@ -15,7 +15,13 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent("aws:core:eventBus")
+@ProvidesComponent(
+        type = "aws:core:eventBus",
+        synopsis = "Create an AWS EventBridge EventBus.",
+        description = """
+                eventBusName: The unique name of the event bus to create
+                """
+)
 public class EventBridgeResourceProvider implements ResourceComponentService<ManagedComponentContext, EventBridgeResource, EventBridgeResourceConstruct> {
 
     @Override

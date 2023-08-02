@@ -15,7 +15,36 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 /**
  *
  */
-@ProvidesComponent("aws:core:s3Bucket")
+@ProvidesComponent(
+        type = "aws:core:s3Bucket",
+        synopsis = "Create an AWS S3 Bucket.",
+        description = """
+                A simple way to create a managed S3 buckets within a project.
+                                
+                The bucket will be configured with the following:
+                    .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)
+                    .encryption(BucketEncryption.S3_MANAGED)
+                    .enforceSsl(true)
+                                
+                bucketName: a globally unique name
+                    The unique name of the S3 bucket to create.
+                                
+                versioned: true|false
+                    Whether this bucket should have versioning turned on or not.
+                                
+                enableEventBridge: true|false
+                    Whether this bucket should send notifications to Amazon EventBridge or not.
+                    As of CDK 2.64.0 a lambda is installed: https://github.com/aws/aws-cdk/issues/24086
+                    
+                removeOnDestroy: true|false
+                    Configured with the following:
+                        .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
+                        .autoDeleteObjects(removeOnDestroy) // cdk adds a lambda if true
+                                    
+                tags: { key: value, ... }
+                    Tags to apply to the bucket.
+                """
+)
 public class S3BucketResourceProvider implements ResourceComponentService<ManagedComponentContext, S3BucketResource, S3BucketResourceConstruct> {
 
     @Override

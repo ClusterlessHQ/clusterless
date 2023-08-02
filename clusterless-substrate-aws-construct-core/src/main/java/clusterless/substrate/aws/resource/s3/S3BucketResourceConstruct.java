@@ -47,7 +47,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
                 .versioned(model().versioned())
                 .bucketName(model().bucketName())
                 .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
-                .autoDeleteObjects(removeOnDestroy) // adds a lambda if true
+                .autoDeleteObjects(removeOnDestroy) // cdk adds a lambda if true
                 // as of 2.64.0 a lambda is installed -> https://github.com/aws/aws-cdk/issues/24086
                 .eventBridgeEnabled(model().enableEventBridge())
                 .build());
