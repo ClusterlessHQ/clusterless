@@ -22,7 +22,6 @@ import clusterless.util.Env;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
 import java.util.Map;
@@ -44,7 +43,7 @@ public abstract class ArcStateGate extends ArcStateMachineFragment {
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-arc.*\\.zip$"))) // get packaged code
                 .handler(handlerClassName) // get handler class name
                 .environment(environment)
-                .runtime(Runtime.JAVA_11)
+                .runtime(Functions.defaultJVM())
                 .architecture(Lookup.architecture(runtimeProps.architecture()))
                 .memorySize(runtimeProps.memorySizeMB())
                 .timeout(Duration.minutes(runtimeProps.timeoutMin()))

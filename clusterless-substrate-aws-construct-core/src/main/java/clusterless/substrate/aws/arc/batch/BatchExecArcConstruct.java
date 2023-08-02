@@ -30,7 +30,6 @@ import software.amazon.awscdk.services.iam.IRole;
 import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.stepfunctions.*;
@@ -125,7 +124,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-workload.*\\.zip$"))) // get packaged code
                 .handler("clusterless.lambda.workload.batch.BatchResultHandler") // get handler class name
                 .environment(environment)
-                .runtime(Runtime.JAVA_11)
+                .runtime(Functions.defaultJVM())
                 .memorySize(model().workload().lambdaRuntimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().workload().lambdaRuntimeProps().timeoutMin()))
                 .build();

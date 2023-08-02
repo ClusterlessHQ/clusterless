@@ -33,7 +33,6 @@ import software.amazon.awscdk.services.events.IEventBus;
 import software.amazon.awscdk.services.events.Rule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
 import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 
@@ -95,7 +94,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-transform-.*\\.zip$"))) // get packaged code
                 .handler("clusterless.lambda.transform.s3put.PutEventTransformHandler") // get handler class name
                 .environment(environment)
-                .runtime(Runtime.JAVA_11)
+                .runtime(Functions.defaultJVM())
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
                 .architecture(Lookup.architecture(model().runtimeProps().architecture()))

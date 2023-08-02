@@ -14,11 +14,16 @@ import clusterless.naming.Version;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.StagedApp;
 import software.amazon.awscdk.Stack;
+import software.amazon.awscdk.services.lambda.Runtime;
 import software.constructs.Construct;
 
 import java.util.Objects;
 
 public class Functions {
+    public static Runtime defaultJVM() {
+        return Runtime.JAVA_17;
+    }
+
     public static String functionName(Construct scope, String modelName, String functionName) {
         Objects.requireNonNull(modelName, "modelName may not be null");
         Objects.requireNonNull(functionName, "functionName may not be null");

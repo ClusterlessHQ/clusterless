@@ -73,7 +73,7 @@ Install node/npm:
 
 Install the AWS CDK:
 
-> npm install -g aws-cdk@2.80.0
+> npm install -g aws-cdk@2.89.0
 
 after install, make sure to bootstrap your account and region:
 

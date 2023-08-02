@@ -19,7 +19,6 @@ import clusterless.substrate.aws.resources.Functions;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.stepfunctions.IChainable;
 import software.amazon.awscdk.services.stepfunctions.TaskStateBase;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
@@ -50,7 +49,7 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
                         .architecture()))
                 .handler("clusterless.lambda.workload.s3copy.S3CopyArcEventHandler") // get handler class name
                 .environment(environment)
-                .runtime(Runtime.JAVA_11)
+                .runtime(Functions.defaultJVM())
                 .memorySize(model()
                         .workload()
                         .runtimeProps()

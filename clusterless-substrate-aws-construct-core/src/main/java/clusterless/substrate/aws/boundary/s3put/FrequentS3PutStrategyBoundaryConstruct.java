@@ -29,7 +29,6 @@ import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.events.*;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
 import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 import software.amazon.awscdk.services.s3.NotificationKeyFilter;
@@ -107,7 +106,7 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-transform-.*\\.zip$"))) // get packaged code
                 .handler("clusterless.lambda.transform.frequents3put.FrequentPutEventTransformHandler") // get handler class name
                 .environment(environment)
-                .runtime(Runtime.JAVA_11)
+                .runtime(Functions.defaultJVM())
                 .memorySize(model().runtimeProps().memorySizeMB())
                 .timeout(Duration.minutes(model().runtimeProps().timeoutMin()))
                 .architecture(Lookup.architecture(model().runtimeProps().architecture()))
