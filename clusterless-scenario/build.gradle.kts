@@ -53,6 +53,8 @@ dependencies {
         exclude("log4j:log4j")
         exclude("org.slf4j:slf4j-log4j12")
     }
+    // java 17 drops it, this replaces it
+    implementation("org.openjdk.nashorn:nashorn-core:15.4")
 
     implementation("javax.validation:validation-api:2.0.1.Final")
 

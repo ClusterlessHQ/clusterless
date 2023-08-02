@@ -81,9 +81,9 @@ https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html#bootstrapping-howto
 
 > cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1 aws://ACCOUNT-NUMBER-2/REGION-2 ...
 
-Install Java 11 via [sdkman](https://sdkman.io):
+Install Java 17 via [sdkman](https://sdkman.io):
 
-> sdk install java 22.3.r11-grl
+> sdk install java 17.0.8-graalce
 
 ## Installing Clusterless
 
@@ -133,6 +133,6 @@ Use [direnv](https://direnv.net) to simplify managing paths:
 Add to `.envrc`:
 
 ```shell
-use sdk java 22.3.r11-grl
+use sdk java 17.0.8-graalce
 PATH_add ~/some_dir/clusterless/clusterless-main/build/install/cls/bin
 ```
