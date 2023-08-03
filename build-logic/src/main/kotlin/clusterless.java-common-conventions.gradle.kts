@@ -19,9 +19,16 @@ val versionProperties = Properties().apply {
     load(FileInputStream(File(rootProject.rootDir, "version.properties")))
 }
 
-val release = false;
+val release = false; // test if release branch
 val buildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "dev"
 val wipReleases = "wip-${buildNumber}"
+
+
+val versionLabel = if (release)
+    "${versionProperties["clusterless.release.major"]}-${versionProperties["clusterless.release.minor"]}"
+else "${versionProperties["clusterless.release.major"]}-wip"
+
+ext.set("versionLabel", versionLabel)
 
 version = if (release)
     "${versionProperties["clusterless.release.major"]}-${versionProperties["clusterless.release.minor"]}"

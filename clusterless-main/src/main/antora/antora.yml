@@ -1,0 +1,6 @@
+name: reference
+title: Clusterless Reference
+version: {{projectVersion}}
+start_page: reference::index.adoc
+nav:
+  - modules/components/nav.adoc

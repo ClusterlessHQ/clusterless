@@ -96,3 +96,63 @@ tasks.register("release") {
     dependsOn("distZip")
     dependsOn("jreleaserRelease")
 }
+
+tasks.register<Exec>("generateComponentDocs") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "component",
+        "--describe-all",
+        "--output",
+        "${buildDir}/generated-docs/modules/components"
+    )
+}
+
+tasks.register<Exec>("generateComponentIndex") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "component",
+        "--list",
+        "--output",
+        "${buildDir}/generated-docs/modules/components/"
+    )
+}
+
+tasks.register<Exec>("generateComponentPartial") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "component",
+        "--list",
+        "--output",
+        "${buildDir}/generated-docs/modules/components/partials",
+        "--name",
+        "components.adoc",
+        "--template",
+        "components-list-partial-adoc"
+    )
+}
+
+tasks.register<Copy>("generateDocs") {
+    dependsOn("generateComponentDocs")
+    dependsOn("generateComponentIndex")
+    dependsOn("generateComponentPartial")
+
+    from("src/main/antora") {
+        filter {
+            it.replace("{{projectVersion}}", project.ext["versionLabel"].toString())
+        }
+    }
+    from("${buildDir}/generated-docs/")
+    into("${buildDir}/docs/")
+}
