@@ -15,32 +15,52 @@ import clusterless.managed.component.ComponentService;
 import clusterless.managed.component.ProvidesComponent;
 import clusterless.model.Model;
 import clusterless.model.Struct;
+import clusterless.naming.Label;
 import clusterless.substrate.SubstrateProvider;
 import clusterless.util.Annotations;
-import com.github.jknack.handlebars.Context;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Options;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.context.MapValueResolver;
-import com.github.jknack.handlebars.helper.StringHelpers;
+import clusterless.util.ExitCodeException;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.BiFunction;
-
-import static com.github.jknack.handlebars.internal.lang3.Validate.notNull;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @CommandLine.Command(
         name = "component"
 )
 public class ShowComponents extends ShowCommand.BaseShow {
+
+    interface Handler {
+        int handle(String name, ComponentService<ComponentContext, Model, Component> service, Class<? extends Struct> structClass);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @CommandLine.Option(
+            names = "--output",
+            arity = "1",
+            description = "write out the documentation",
+            hidden = true
+    )
+    Optional<String> output;
+
+    @CommandLine.Option(
+            names = "--template",
+            arity = "1",
+            description = "the documentation template to use",
+            hidden = true
+    )
+    Optional<String> template;
+
+    @CommandLine.Option(
+            names = "--name",
+            arity = "1",
+            description = "the documentation file name to use",
+            hidden = true
+    )
+    Optional<String> name;
 
     public ShowComponents() {
     }
@@ -48,8 +68,43 @@ public class ShowComponents extends ShowCommand.BaseShow {
     protected Integer handleList() {
         Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
 
+        Set<String> ordered = new TreeSet<>();
+
         for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-            showCommand.main.printer().println(entry.getValue().models().keySet());
+            ordered.addAll(entry.getValue().models().keySet());
+        }
+
+        if (output.isPresent()) {
+            try {
+                Path path = Paths.get(output.get());
+                path.toFile().mkdirs();
+
+                File file = path
+                        .resolve(name.orElse("nav.adoc"))
+                        .toFile();
+
+                Writer writer = new FileWriter(file);
+
+                List<Map<String, String>> components = new ArrayList<>();
+
+                ordered.forEach(c -> components.add(Map.of(
+                        "name", c,
+                        "filename", createFileName(c)
+                )));
+
+                Map<String, Object> params = Map.of(
+                        "title", "Clusterless Components",
+                        "components", components
+                );
+
+                String partial = template.orElse("components-list-adoc");
+                showCommand.main.printer().writeWithTemplate("/templates/" + partial, params, writer);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            showCommand.main.printer().println(ordered);
         }
 
         return 0;
@@ -59,45 +114,78 @@ public class ShowComponents extends ShowCommand.BaseShow {
     protected Integer handleDescribeAll() {
         Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
 
-        boolean first = true;
         for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
             Set<String> names = new TreeSet<>(entry.getValue().models().keySet());
             for (String component : names) {
-                first = delimit(first);
-                handle(this::printDescription, component);
+                handle(component, this::printDescription);
             }
         }
         return 0;
     }
 
-    protected Integer handleTemplte() {
-        return handle(this::printModel, exclusive.template.orElseThrow());
+    protected Integer handleTemplate() {
+        return handle(exclusive.template.orElseThrow(), this::printModel);
     }
 
     @Override
     protected Integer handleDescribe() {
-        return handle(this::printDescription, exclusive.component.orElseThrow());
+        return handle(exclusive.component.orElseThrow(), this::printDescription);
     }
 
-    private int handle(BiFunction<ComponentService<ComponentContext, Model, Component>, Class<? extends Struct>, Integer> func, String name) {
+    private int handle(String name, Handler func) {
         Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
         for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
             ComponentService<ComponentContext, Model, Component> componentService = entry.getValue().components().get(name);
 
             if (componentService != null) {
-                return func.apply(componentService, componentService.modelClass());
+                return func.handle(name, componentService, componentService.modelClass());
             }
         }
 
-        throw new IllegalArgumentException("no model found for: " + name);
+        throw new ExitCodeException("no model found for: " + name, 1);
     }
 
-    protected int printModel(ComponentService<ComponentContext, Model, Component> componentService, Class<? extends Struct> modelClass) {
+    protected int printModel(String name, ComponentService<ComponentContext, Model, Component> componentService, Class<? extends Struct> modelClass) {
         showCommand.main.printer().println(getModel(modelClass));
         return 0;
     }
 
-    protected int printDescription(ComponentService<ComponentContext, Model, Component> componentService, Class<? extends Struct> modelClass) {
+    protected int printDescription(String name, ComponentService<ComponentContext, Model, Component> componentService, Class<? extends Struct> modelClass) {
+        try {
+            Writer writer = showCommand.main.printer().writer();
+            String template = "/templates/components-cli";
+
+            if (output.isPresent()) {
+                template = "/templates/components-adoc";
+                Path path = Paths.get(output.get()).resolve("pages");
+                path.toFile().mkdirs();
+
+                File file = path
+                        .resolve(createFileName(name))
+                        .toFile();
+
+                writer = new FileWriter(file);
+            }
+
+            printDescriptionUsing(componentService, modelClass, template, writer);
+
+            writer.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        return 0;
+    }
+
+    @NotNull
+    private static String createFileName(String name) {
+        return Label.of(name)
+                .lowerHyphen()
+                .replace(":", "-")
+                .concat(".adoc");
+    }
+
+    protected void printDescriptionUsing(ComponentService<ComponentContext, Model, Component> componentService, Class<? extends Struct> modelClass, String template, Writer writer) {
         Class<?> componentClass = componentService.getClass();
         Optional<ProvidesComponent> providesComponent = Annotations.find(componentClass, ProvidesComponent.class);
 
@@ -105,69 +193,14 @@ public class ShowComponents extends ShowCommand.BaseShow {
             throw new IllegalStateException("component does not have a ProvidesComponent annotation: " + componentClass.getName());
         }
 
-        String template = """
-                Name:
-                    {{name}}
-                                    
-                Synopsis:
-                {{{indent synopsis 4}}}
-                {{#description~}}
-                Description:
-                {{{indent description 4}}}
-                {{/description~}}
-                Template:
-                {{{model}}}
-                """;
-
-        Map<Object, Object> params = Map.of(
+        Map<String, Object> params = Map.of(
                 "name", providesComponent.get().type(),
                 "synopsis", providesComponent.get().synopsis(),
                 "description", providesComponent.get().description(),
                 "model", getModel(modelClass)
         );
 
-        write(template, params);
-        return 0;
-    }
-
-    private void write(String template, Map<Object, Object> params) {
-        try {
-            Context context = Context
-                    .newBuilder(params)
-                    .resolver(
-                            MapValueResolver.INSTANCE
-                    )
-                    .build();
-
-            Handlebars handlebars = new Handlebars()
-                    .prettyPrint(false);
-
-            StringHelpers.register(handlebars);
-
-            handlebars.registerHelper("indent", this::indent);
-
-            Template compile = handlebars.compileInline(template);
-
-            Writer writer = showCommand.main.printer().writer();
-            compile.apply(context, writer);
-            writer.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    protected CharSequence indent(final Object value, final Options options) {
-        Integer width = options.param(0, 4);
-        notNull(width, "found 'null', expected 'indent'");
-        return value.toString().trim().indent(width);
-    }
-
-    private boolean delimit(boolean first) {
-        if (!first) {
-            showCommand.main.printer().println("========================================");
-        }
-
-        return false;
+        showCommand.main.printer().writeWithTemplate(template, params, writer);
     }
 
     protected static String getModel(Class<? extends Struct> modelClass) {

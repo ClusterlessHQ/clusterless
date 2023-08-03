@@ -55,7 +55,7 @@ public class ShowCommand {
 
             @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
             @CommandLine.Option(
-                    names = "--template",
+                    names = "--model",
                     arity = "1",
                     description = "print the json template of element"
             )
@@ -82,7 +82,7 @@ public class ShowCommand {
             } else if (exclusive.list.isPresent() && exclusive.list.get()) {
                 return handleList();
             } else if (exclusive.template.isPresent()) {
-                return handleTemplte();
+                return handleTemplate();
             } else if (exclusive.component.isPresent()) {
                 return handleDescribe();
             }
@@ -94,7 +94,7 @@ public class ShowCommand {
             return 0;
         }
 
-        protected Integer handleTemplte() throws Exception {
+        protected Integer handleTemplate() throws Exception {
             return 0;
         }
 

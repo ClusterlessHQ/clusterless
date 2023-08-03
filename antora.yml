@@ -1,0 +1,10 @@
+name: clusterless
+title: Clusterless Reference
+version: wip-1.0
+ext:
+  collector:
+    run:
+      command: ./gradlew generateDocs -i
+    scan:
+      dir: clusterless-main/build/docs
+

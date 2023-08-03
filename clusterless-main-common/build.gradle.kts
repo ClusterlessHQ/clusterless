@@ -15,4 +15,5 @@ dependencies {
     implementation(project(":clusterless-model"))
 
     implementation("info.picocli:picocli")
+    implementation("com.github.jknack:handlebars")
 }

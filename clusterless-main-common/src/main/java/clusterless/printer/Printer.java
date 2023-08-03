@@ -8,19 +8,38 @@
 
 package clusterless.printer;
 
+import com.github.jknack.handlebars.Context;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Options;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.context.MapValueResolver;
+import com.github.jknack.handlebars.helper.StringHelpers;
 import picocli.CommandLine;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.Writer;
+import java.io.*;
 import java.util.Collection;
+import java.util.Map;
+
+import static com.github.jknack.handlebars.internal.lang3.Validate.notNull;
 
 /**
  *
  */
 public class Printer {
-    @CommandLine.Option(names = {"-j", "--json"}, description = "print results as json")
+    @CommandLine.Option(
+            names = {"-j", "--json"},
+            description = "print results as json",
+            hidden = true
+    )
     boolean json = false;
+    private static final Handlebars handlebars = new Handlebars()
+            .prettyPrint(false);
+
+    static {
+        StringHelpers.register(handlebars);
+        handlebars.registerHelper("indent", Printer::indent);
+    }
+
     private PrintStream out = System.out;
 
     public Printer() {
@@ -36,5 +55,29 @@ public class Printer {
 
     public Writer writer() {
         return new OutputStreamWriter(out);
+    }
+
+    public void writeWithTemplate(String template, Map<String, Object> params, Writer writer) {
+        try {
+            Context context = Context
+                    .newBuilder(params)
+                    .resolver(
+                            MapValueResolver.INSTANCE
+                    )
+                    .build();
+
+            Template compile = handlebars.compile(template);
+
+            compile.apply(context, writer);
+            writer.flush();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    protected static CharSequence indent(final Object value, final Options options) {
+        Integer width = options.param(0, 4);
+        notNull(width, "found 'null', expected 'indent'");
+        return value.toString().trim().indent(width);
     }
 }
