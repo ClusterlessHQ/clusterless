@@ -152,6 +152,9 @@ tasks.register<Copy>("generateDocs") {
         filter {
             it.replace("{{projectVersion}}", project.ext["versionLabel"].toString())
         }
+        rename{
+            it.replace(".adoc.template", ".adoc")
+        }
     }
     from("${buildDir}/generated-docs/")
     into("${buildDir}/docs/")

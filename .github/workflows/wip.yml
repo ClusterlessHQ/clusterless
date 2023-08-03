@@ -9,6 +9,8 @@ on:
       - '*.txt'
       - '*.md'
       - '*.adoc'
+      - '*.template'
+      - '*.hbs'
 jobs:
   run-all-tests-and-release:
     concurrency: scenarios-us-west-2
