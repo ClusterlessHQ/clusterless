@@ -1,19 +1,29 @@
 = Clusterless Reference
 
+[#commands]
 == Command Line
 
 The Clusterless application is a command line utility named `cls` that provides a
-number of commands.
+number of commands for deploying and managing pipelines.
 
 [source,shell]
 ----
 $ cls help
 ----
 
+* xref:reference:commands:cls.adoc[]
+* xref:reference:commands:cls-help.adoc[]
+
+NOTE: See the sidebar for a comprehensive list of commands.
+
+[#configuration]
+
+[#providers]
 == Providers
 
 Currently, only Amazon Web Services (AWS) is supported.
 
+[#components]
 == Components
 
 Components are either:
@@ -26,6 +36,7 @@ All components:
 
 include::reference:components:partial$components.adoc[]
 
+[#models]
 == Models
 
 The Clusterless project file has a number of JSON objects or models that need to be provided in order to create a valid
