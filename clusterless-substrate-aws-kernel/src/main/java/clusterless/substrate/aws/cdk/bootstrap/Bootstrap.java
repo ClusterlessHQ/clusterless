@@ -54,7 +54,7 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     BootstrapCommandOptions commandOptions = new BootstrapCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry);
 
     @Override
     public Integer call() throws Exception {

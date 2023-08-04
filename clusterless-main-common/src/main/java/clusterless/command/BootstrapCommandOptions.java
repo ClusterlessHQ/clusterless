@@ -44,6 +44,11 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
     )
     boolean synth = false;
 
+    @CommandLine.Option(
+            names = "--retry",
+            description = "retry the destroy operation")
+    private boolean retry = false;
+
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--approve",
@@ -76,5 +81,10 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
 
     public Optional<Boolean> approve() {
         return approve;
+    }
+
+    public boolean retry() {
+        // only enable retry if destroy is enabled
+        return destroy && retry;
     }
 }

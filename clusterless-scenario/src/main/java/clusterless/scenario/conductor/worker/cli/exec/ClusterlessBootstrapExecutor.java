@@ -35,7 +35,8 @@ public class ClusterlessBootstrapExecutor extends BaseClusterlessExecutor {
                 "--stage",
                 placement.get("stage"),
                 "-v",
-                destroy ? "--destroy" : null
+                destroy ? "--destroy" : null,
+                destroy ? "--retry" : null
         ));
     }
 

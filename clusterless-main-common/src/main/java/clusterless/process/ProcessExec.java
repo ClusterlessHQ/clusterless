@@ -55,6 +55,12 @@ public abstract class ProcessExec {
                 LOG.warn("got exit code: {}, for command: {}, retrying in 15 seconds", exitCode, args);
                 Thread.sleep(15 * 1000);
                 exitCode = process(environment, args);
+
+                if (retry() && exitCode != 0) {
+                    LOG.warn("got exit code: {}, for command: {}, retrying in 30 seconds", exitCode, args);
+                    Thread.sleep(30 * 1000);
+                    exitCode = process(environment, args);
+                }
             }
 
             return exitCode;
