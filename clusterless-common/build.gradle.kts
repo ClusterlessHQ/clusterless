@@ -8,7 +8,6 @@
 
 plugins {
     id("clusterless.java-library-conventions")
-    id("clusterless.java-override-conventions-jdk11")
 }
 
 dependencies {

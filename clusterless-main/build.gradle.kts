@@ -32,6 +32,8 @@ val awsKernelInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:instal
 
 tasks.getAt("installDist").dependsOn(awsKernelInstall)
 
+val versionBranch = project.ext["versionBranch"].toString()
+
 distributions {
     main {
         distributionBaseName.set("clusterless")
@@ -73,7 +75,7 @@ jreleaser {
             repoOwner.set("ClusterlessHQ")
             name.set("clusterless")
             username.set("cwensel")
-            branch.set("wip-1.0")
+            branch.set(versionBranch)
             changelog.enabled.set(false)
             milestone.close.set(false)
         }

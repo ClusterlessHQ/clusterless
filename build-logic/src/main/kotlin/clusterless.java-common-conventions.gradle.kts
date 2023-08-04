@@ -23,16 +23,24 @@ val release = false; // test if release branch
 val buildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "dev"
 val wipReleases = "wip-${buildNumber}"
 
-
 val versionLabel = if (release)
     "${versionProperties["clusterless.release.major"]}-${versionProperties["clusterless.release.minor"]}"
-else "${versionProperties["clusterless.release.major"]}-wip"
+else
+    "${versionProperties["clusterless.release.major"]}-wip"
 
-ext.set("versionLabel", versionLabel)
+project.extra.set("versionLabel", versionLabel)
+
+val versionBranch = if (release)
+    "${versionProperties["clusterless.release.major"]}"
+else
+    "wip-${versionProperties["clusterless.release.major"]}"
+
+project.extra.set("versionBranch", versionBranch)
 
 version = if (release)
     "${versionProperties["clusterless.release.major"]}-${versionProperties["clusterless.release.minor"]}"
-else "${versionProperties["clusterless.release.major"]}-${wipReleases}"
+else
+    "${versionProperties["clusterless.release.major"]}-${wipReleases}"
 
 repositories {
     mavenCentral()
