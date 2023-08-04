@@ -149,15 +149,66 @@ tasks.register<Copy>("generateDocs") {
     dependsOn("generateComponentDocs")
     dependsOn("generateComponentIndex")
     dependsOn("generateComponentPartial")
+    dependsOn("generateCLIDocs")
+    dependsOn("generateCLIIndex")
 
     from("src/main/antora") {
         filter {
             it.replace("{{projectVersion}}", project.ext["versionLabel"].toString())
         }
-        rename{
+        rename {
             it.replace(".adoc.template", ".adoc")
         }
     }
-    from("${buildDir}/generated-docs/")
+    from("${buildDir}/generated-docs/") {
+        filter {
+            it.lineSequence().filterNot { line ->
+                line.startsWith("// ") ||
+                        line.startsWith(":doctype:")
+            }.joinToString("\n")
+        }
+    }
     into("${buildDir}/docs/")
+}
+
+val picoliExecution by configurations.creating() {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+dependencies {
+    picoliExecution("info.picocli:picocli-codegen:4.7.4")
+}
+
+tasks.register<JavaExec>("generateCLIDocs") {
+    dependsOn("jar")
+
+    classpath = picoliExecution.asFileTree
+    mainClass.set("picocli.codegen.docgen.manpage.ManPageGenerator")
+
+    args = listOf(
+        "--outdir",
+        "build/generated-docs/modules/commands/pages",
+        "clusterless.Main"
+    )
+}
+
+tasks.register("generateCLIIndex") {
+    dependsOn("generateCLIDocs")
+
+    doLast {
+        val names = fileTree("build/generated-docs/modules/commands/pages")
+            .map {
+                it.name
+            }.sortedBy { it.substringBefore(".") }
+            .toList()
+        println(names)
+        file("build/generated-docs/modules/commands").mkdirs()
+        file("build/generated-docs/modules/commands/nav.adoc")
+            .writeText(
+                """
+.Commands
+${names.joinToString("\n") { "* xref:${it}[]" }}
+""".trimIndent()
+            )
+    }
 }

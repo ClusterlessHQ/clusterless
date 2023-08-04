@@ -40,7 +40,13 @@ import java.util.concurrent.Callable;
         subcommands = {
                 CommandLine.HelpCommand.class,
                 ConfigCommand.class,
-                ShowCommand.class
+                ShowCommand.class,
+                BootstrapCommand.class,
+                DeployCommand.class,
+                DestroyCommand.class,
+                DiffCommand.class,
+                LocalCommand.class,
+                VerifyCommand.class
         }
 )
 public class Main extends Startup implements Callable<Integer> {
@@ -59,13 +65,6 @@ public class Main extends Startup implements Callable<Integer> {
 
         CommandLine commandLine = new CommandLine(main);
 
-        commandLine.addSubcommand("bootstrap", new CommandWrapper(new BootstrapCommandOptions()));
-        commandLine.addSubcommand("verify", new CommandWrapper(new VerifyCommandOptions()));
-        commandLine.addSubcommand("deploy", new CommandWrapper(new DeployCommandOptions()));
-        commandLine.addSubcommand("destroy", new CommandWrapper(new DestroyCommandOptions()));
-        commandLine.addSubcommand("diff", new CommandWrapper(new DiffCommandOptions()));
-        commandLine.addSubcommand("local", new CommandWrapper(new LocalCommandOptions()));
-
         commandLine
                 .setExitCodeExceptionMapper(new ExitCodeExceptionMapper())
                 .setExecutionExceptionHandler(new ExecutionExceptionHandler(main))
@@ -76,6 +75,10 @@ public class Main extends Startup implements Callable<Integer> {
 
     public Main(String[] args) {
         this.args = args;
+    }
+
+    // allows doc generation
+    public Main() {
     }
 
     public ProviderSubstratesOptions substratesOptions() {

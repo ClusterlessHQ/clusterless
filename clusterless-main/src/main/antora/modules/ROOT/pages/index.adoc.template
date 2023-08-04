@@ -2,9 +2,13 @@
 
 == Command Line
 
-The Clusterless application is a command line utility named `cls`.
+The Clusterless application is a command line utility named `cls` that provides a
+number of commands.
 
-`cls --help` is the starting point for the usage documentation.
+[source,shell]
+----
+$ cls help
+----
 
 == Providers
 
@@ -24,4 +28,5 @@ include::reference:components:partial$components.adoc[]
 
 == Models
 
-The Clusterless project file has a number of JSON objects or models that need to be provided in order to create a valid clusterless deployable project.
+The Clusterless project file has a number of JSON objects or models that need to be provided in order to create a valid
+clusterless deployable project.

@@ -93,7 +93,7 @@ public class ShowComponents extends ShowCommand.BaseShow {
                 )));
 
                 Map<String, Object> params = Map.of(
-                        "title", "Clusterless Components",
+                        "title", "Components",
                         "components", components
                 );
 

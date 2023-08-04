@@ -3,4 +3,5 @@ title: Clusterless Reference
 version: {{projectVersion}}
 start_page: reference::index.adoc
 nav:
+  - modules/commands/nav.adoc
   - modules/components/nav.adoc

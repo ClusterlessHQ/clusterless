@@ -90,7 +90,7 @@ dependencies {
         // manage dependency versions here
 
         implementation("org.jetbrains:annotations:24.0.0")
-        implementation("info.picocli:picocli:4.7.1")
+        implementation("info.picocli:picocli:4.7.4")
         implementation("com.github.jknack:handlebars:4.3.1")
 
         val log4j = "2.20.0"
