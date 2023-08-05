@@ -5,3 +5,4 @@ start_page: reference::index.adoc
 nav:
   - modules/commands/nav.adoc
   - modules/components/nav.adoc
+  - modules/models/nav.adoc

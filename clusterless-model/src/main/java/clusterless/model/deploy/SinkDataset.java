@@ -8,13 +8,33 @@
 
 package clusterless.model.deploy;
 
+import clusterless.managed.component.DocumentsModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.net.URI;
 
 /**
  *
  */
+@DocumentsModel(
+        synopsis = "The sink dataset descriptor.",
+        description = """
+                Where the outgoing data will be located.
+                  
+                This dataset does not need to exist, this arc is responsible for creating it.
+                                
+                name: The name of the dataset. Required.
+                                
+                version: The version of the dataset. Required.
+                         It's recommended to use a date for the version, such as "20230101".
+                         
+                pathURI: The prefix URI of the dataset. Required.
+                         The URI must be a valid URI and must be accessible. This is typically a S3 URI.
+                """
+)
 public class SinkDataset extends Dataset {
 
+    @JsonIgnore
     boolean publish = true;
 
     public SinkDataset() {

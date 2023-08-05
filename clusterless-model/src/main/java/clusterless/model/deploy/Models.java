@@ -10,32 +10,34 @@ package clusterless.model.deploy;
 
 import clusterless.model.Struct;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Convenience for identifying model types that should be printed out as templates.
  */
 public class Models {
+    public static final List<String> names = new LinkedList<>();
     public static final Map<String, Class<? extends Struct>> models = new LinkedHashMap<>();
 
     private static void add(Class<? extends Struct> type) {
-        models.put(type.getSimpleName(), type);
+        names.add(type.getSimpleName());
+        models.put(type.getSimpleName().toLowerCase(), type);
     }
 
     static {
         add(Deployable.class);
+        add(Project.class);
+        add(Placement.class);
         add(Arc.class);
         add(SourceDataset.class);
         add(SinkDataset.class);
     }
 
     public static Collection<String> names() {
-        return models.keySet();
+        return names;
     }
 
     public static Class<? extends Struct> get(String name) {
-        return models.get(name);
+        return models.get(name.toLowerCase());
     }
 }

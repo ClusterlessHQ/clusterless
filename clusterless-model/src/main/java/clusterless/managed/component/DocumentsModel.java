@@ -18,9 +18,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface ProvidesComponent {
-    String type();
-
+public @interface DocumentsModel {
     String synopsis() default "";
 
     String description() default "";

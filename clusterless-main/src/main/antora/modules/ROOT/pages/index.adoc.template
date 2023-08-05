@@ -41,3 +41,5 @@ include::reference:components:partial$components.adoc[]
 
 The Clusterless project file has a number of JSON objects or models that need to be provided in order to create a valid
 clusterless deployable project.
+
+include::reference:models:partial$models.adoc[]

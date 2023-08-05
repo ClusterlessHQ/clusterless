@@ -14,6 +14,7 @@ import clusterless.managed.component.ComponentContext;
 import clusterless.managed.component.ComponentService;
 import clusterless.managed.component.ComponentServices;
 import clusterless.model.Model;
+import clusterless.model.deploy.Arc;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -49,6 +50,9 @@ public class ExtensibleResolver extends TypeIdResolverBase {
         reverseMap = serviceMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(e -> e.getValue().modelClass(), Map.Entry::getKey));
+
+        // allows for a model template to be generated for documentation
+        reverseMap.put(Arc.class, "arc");
     }
 
     @Override

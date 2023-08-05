@@ -54,7 +54,12 @@ public class Printer {
     }
 
     public Writer writer() {
-        return new OutputStreamWriter(out);
+        return new OutputStreamWriter(out) {
+            @Override
+            public void close() throws IOException {
+                // do nothing
+            }
+        };
     }
 
     public void writeWithTemplate(String template, Map<String, Object> params, Writer writer) {

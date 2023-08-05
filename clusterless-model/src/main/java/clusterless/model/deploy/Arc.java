@@ -8,6 +8,7 @@
 
 package clusterless.model.deploy;
 
+import clusterless.managed.component.DocumentsModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedHashMap;
@@ -16,6 +17,26 @@ import java.util.Map;
 /**
  *
  */
+@DocumentsModel(
+        synopsis = "The arc descriptor.",
+        description = """
+                Declares the arc to be deployed, the workload, and any workload properties.
+
+                type: The component of the Arc to be deployed. Required.
+                      Such as, "aws:core:s3CopyArc" for the S3CopyArc component. 
+                                
+                name: The name of the arc. Required.
+                                
+                sources: The source datasets of the arc. Required.
+                         The dataset name is the key, the SourceDataset descriptor is the value.
+                                
+                sinks: The sink datasets of the arc. Required.
+                       The dataset name is the key, the SinkDataset descriptor is the value.
+                                
+                workload: The workload to be deployed. Optional.
+                          See the documentation for the arc component for details.
+                """
+)
 public class Arc<W extends Workload<?>> extends Extensible {
     @JsonProperty(required = true)
     String name;

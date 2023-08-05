@@ -141,7 +141,53 @@ tasks.register<Exec>("generateComponentPartial") {
         "--name",
         "components.adoc",
         "--template",
-        "components-list-partial-adoc"
+        "elements-list-partial-adoc"
+    )
+}
+
+tasks.register<Exec>("generateModelDocs") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "model",
+        "--describe-all",
+        "--output",
+        "${buildDir}/generated-docs/modules/models"
+    )
+}
+
+tasks.register<Exec>("generateModelIndex") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "model",
+        "--list",
+        "--output",
+        "${buildDir}/generated-docs/modules/models/"
+    )
+}
+
+tasks.register<Exec>("generateModelPartial") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "model",
+        "--list",
+        "--output",
+        "${buildDir}/generated-docs/modules/models/partials",
+        "--name",
+        "models.adoc",
+        "--template",
+        "elements-list-partial-adoc"
     )
 }
 
@@ -149,6 +195,9 @@ tasks.register<Copy>("generateDocs") {
     dependsOn("generateComponentDocs")
     dependsOn("generateComponentIndex")
     dependsOn("generateComponentPartial")
+    dependsOn("generateModelDocs")
+    dependsOn("generateModelIndex")
+    dependsOn("generateModelPartial")
     dependsOn("generateCLIDocs")
     dependsOn("generateCLIIndex")
 

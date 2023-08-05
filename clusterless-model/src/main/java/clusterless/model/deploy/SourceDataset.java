@@ -8,11 +8,33 @@
 
 package clusterless.model.deploy;
 
+import clusterless.managed.component.DocumentsModel;
+
 import java.net.URI;
 
 /**
  *
  */
+@DocumentsModel(
+        synopsis = "The source dataset descriptor.",
+        description = """
+                Where the incoming data is located.
+                                
+                This dataset (name and version) must already exist, it should be produced by an upstream 
+                IngressBoundary or Arc.
+                                
+                name: The name of the dataset. Required.
+                                
+                version: The version of the dataset. Required.
+                         It's recommended to use a date for the version, such as "20230101".
+                         
+                pathURI: The prefix URI of the dataset. Required.
+                         The URI must be a valid URI and must be accessible. This is typically a S3 URI.
+                                
+                subscribe: Whether the dataset should be subscribed to. Optional.
+                           Defaults to true. Use this to disable receiving events from the dataset.
+                """
+)
 public class SourceDataset extends Dataset {
 
     boolean subscribe = true;

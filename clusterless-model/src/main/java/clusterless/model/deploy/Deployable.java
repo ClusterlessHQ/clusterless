@@ -8,6 +8,7 @@
 
 package clusterless.model.deploy;
 
+import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,6 +17,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@DocumentsModel(
+        synopsis = "A deployable project, the base of a project file",
+        description = """
+                Use this model to define a deployable project.
+                                
+                > cls show model --model deployable > project.json
+                                
+                A project is a collection of resources, boundaries, barriers, and arcs deployed into
+                a providers placement environment.
+                """
+)
 public class Deployable extends Model {
 
     public static final String PROVIDER_POINTER = "/placement/provider";

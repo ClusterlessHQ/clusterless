@@ -19,10 +19,11 @@ import java.util.concurrent.Callable;
  */
 @CommandLine.Command(
         name = "show",
-        description = "display details about providers and components",
+        description = "display details about providers, components, and project models",
         subcommands = {
                 ShowProviders.class,
-                ShowComponents.class
+                ShowComponents.class,
+                ShowModels.class
         }
 )
 public class ShowCommand {
@@ -59,11 +60,11 @@ public class ShowCommand {
                     arity = "1",
                     description = "print the json template of element"
             )
-            Optional<String> template;
+            Optional<String> model;
 
             @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
             @CommandLine.Option(names = "--describe", arity = "1")
-            Optional<String> component;
+            Optional<String> name;
 
             public Exclusive() {
             }
@@ -81,9 +82,9 @@ public class ShowCommand {
                 return handleDescribeAll();
             } else if (exclusive.list.isPresent() && exclusive.list.get()) {
                 return handleList();
-            } else if (exclusive.template.isPresent()) {
-                return handleTemplate();
-            } else if (exclusive.component.isPresent()) {
+            } else if (exclusive.model.isPresent()) {
+                return handleModel();
+            } else if (exclusive.name.isPresent()) {
                 return handleDescribe();
             }
 
@@ -94,7 +95,7 @@ public class ShowCommand {
             return 0;
         }
 
-        protected Integer handleTemplate() throws Exception {
+        protected Integer handleModel() throws Exception {
             return 0;
         }
 

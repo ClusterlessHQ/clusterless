@@ -8,6 +8,7 @@
 
 package clusterless.model.deploy;
 
+import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Struct;
 
 import java.util.Objects;
@@ -15,6 +16,17 @@ import java.util.Objects;
 /**
  *
  */
+@DocumentsModel(
+        synopsis = "The project descriptor.",
+        description = """
+                Names the project to be deployed
+
+                name: The name of the project. Required.
+                                
+                version: The version of the project. Required.
+                         It's recommended to use a date for the version, such as "20230101".
+                """
+)
 public class Project implements Struct {
     String name;
     String version;
