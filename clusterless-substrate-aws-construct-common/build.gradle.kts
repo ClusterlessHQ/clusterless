@@ -18,7 +18,7 @@ dependencies {
 
     // update .github actions when updating this version
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
-    val cdkVersion = "2.89.0"
+    val cdkVersion = "2.90.0"
     api("software.amazon.awscdk:aws-cdk-lib:$cdkVersion")
     api("software.amazon.awscdk:batch-alpha:$cdkVersion-alpha.0")
     api("software.amazon.awscdk:glue-alpha:$cdkVersion-alpha.0")

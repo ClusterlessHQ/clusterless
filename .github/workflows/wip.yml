@@ -6,11 +6,11 @@ on:
       - 'wip-*'
       - '!*-scenarios'
     paths-ignore:
-      - '*.txt'
-      - '*.md'
-      - '*.adoc'
-      - '*.template'
-      - '*.hbs'
+      - '**.txt'
+      - '**.md'
+      - '**.adoc'
+      - '**.template'
+      - '**.hbs'
 jobs:
   run-all-tests-and-release:
     concurrency: scenarios-us-west-2
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Install CDK
-        run: npm install -g aws-cdk@2.89.0
+        run: npm install -g aws-cdk@2.90.0
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
