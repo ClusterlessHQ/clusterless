@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
                 Verify.class,
                 Diff.class,
                 Deploy.class,
+                Import.class,
                 Destroy.class,
                 Synth.class,
                 Local.class,

@@ -8,43 +8,15 @@
 
 package clusterless.substrate.aws.cdk;
 
-import clusterless.substrate.aws.AwsConfig;
-import clusterless.substrate.aws.CommonCommand;
-import org.jetbrains.annotations.NotNull;
+public enum CDKCommand {
+    Deploy,
+    Destroy,
+    Diff,
+    Verify,
+    Synth,
+    Import;
 
-import java.util.Collections;
-import java.util.List;
-
-/**
- *
- */
-public class CDKCommand extends CommonCommand {
-
-    @NotNull
-    protected List<String> getRequireDeployApproval() {
-        return getRequireDeployApproval(null);
-    }
-
-    protected List<String> getRequireDeployApproval(Boolean approve) {
-        AwsConfig.CDK.Approval approval = getProviderConfig().cdk().requireDeployApproval();
-
-        if (approve != null) {
-            approval = approve ? AwsConfig.CDK.Approval.never : AwsConfig.CDK.Approval.broadening;
-        }
-
-        return List.of(
-                "--require-approval", approval.value()
-        );
-    }
-
-    @NotNull
-    protected List<String> getRequireDestroyApproval(Boolean approve) {
-        if ((approve != null && approve) || !getProviderConfig().cdk().requireDestroyApproval()) {
-            return List.of(
-                    "--force"
-            );
-        }
-
-        return Collections.emptyList();
+    public String command() {
+        return name().toLowerCase();
     }
 }

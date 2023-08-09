@@ -44,6 +44,21 @@ public class ProjectCommandOptions extends CommonCommandOptions {
     )
     Optional<Boolean> excludeAllArcs;
 
+    @CommandLine.Option(
+            names = {"--only-resource"},
+            description = "only deploy the named resource"
+    )
+    List<String> onlyResourceNames = new ArrayList<>();
+
+    @CommandLine.Option(
+            names = "--exclude-all-tags",
+            description = "exclude all tags from the deployment",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1"
+    )
+    Optional<Boolean> excludeAllTags;
+
     public List<File> projectFiles() {
         return projectFiles;
     }
@@ -54,5 +69,18 @@ public class ProjectCommandOptions extends CommonCommandOptions {
 
     public Optional<Boolean> excludeAllArcs() {
         return excludeAllArcs;
+    }
+
+    public List<String> onlyResourceNames() {
+        return onlyResourceNames;
+    }
+
+    public Optional<Boolean> excludeAllTags() {
+        return excludeAllTags;
+    }
+
+    public ProjectCommandOptions setExcludeAllTags(boolean excludeAllTags) {
+        this.excludeAllTags = Optional.of(excludeAllTags);
+        return this;
     }
 }

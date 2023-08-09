@@ -11,6 +11,7 @@ package clusterless.substrate.aws.cdk.bootstrap;
 import clusterless.command.BootstrapCommandOptions;
 import clusterless.json.JSONUtil;
 import clusterless.naming.Stage;
+import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
 import clusterless.substrate.aws.managed.StagedApp;
@@ -49,7 +50,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "bootstrap"
 )
-public class Bootstrap extends CDKCommand implements Callable<Integer> {
+public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Bootstrap.class);
     @CommandLine.Mixin
     BootstrapCommandOptions commandOptions = new BootstrapCommandOptions();
@@ -90,7 +91,7 @@ public class Bootstrap extends CDKCommand implements Callable<Integer> {
 
         processExec.setUseTempOutput(true);
 
-        String cdkCommand = destroyBootstrap ? "destroy" : "deploy";
+        CDKCommand cdkCommand = destroyBootstrap ? CDKCommand.Destroy : CDKCommand.Deploy;
         List<String> approvals = destroyBootstrap ? getRequireDestroyApproval(commandOptions.approve().orElse(null)) : getRequireDeployApproval(commandOptions.approve().orElse(null));
 
         int exitCode = processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), cdkCommand, approvals, "bootstrap", kernelArgs);

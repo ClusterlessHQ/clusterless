@@ -9,7 +9,7 @@
 package clusterless.substrate.aws;
 
 import clusterless.config.CommonConfig;
-import clusterless.substrate.aws.cdk.CDK;
+import clusterless.substrate.aws.cdk.Provider;
 import picocli.CommandLine;
 
 public class CommonCommand {
@@ -21,6 +21,6 @@ public class CommonCommand {
     }
 
     protected AwsConfig getProviderConfig() {
-        return kernel.configurations().get(CDK.PROVIDER);
+        return kernel.configurations().get(Provider.NAME);
     }
 }

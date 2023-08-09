@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.command.DiffCommandOptions;
+import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
 import picocli.CommandLine;
@@ -18,7 +19,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "diff"
 )
-public class Diff extends CDKCommand implements Callable<Integer> {
+public class Diff extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     DiffCommandOptions commandOptions = new DiffCommandOptions();
     @CommandLine.Mixin
@@ -26,6 +27,6 @@ public class Diff extends CDKCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, "diff");
+        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, CDKCommand.Diff);
     }
 }

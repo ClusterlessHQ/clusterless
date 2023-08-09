@@ -45,6 +45,7 @@ import java.util.concurrent.Callable;
                 DeployCommand.class,
                 DestroyCommand.class,
                 DiffCommand.class,
+                ImportCommand.class,
                 LocalCommand.class,
                 VerifyCommand.class
         }

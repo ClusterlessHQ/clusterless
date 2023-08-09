@@ -10,6 +10,7 @@ package clusterless.substrate.aws.cdk.lifecycle;
 
 
 import clusterless.command.DestroyCommandOptions;
+import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
 import picocli.CommandLine;
@@ -19,7 +20,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "destroy"
 )
-public class Destroy extends CDKCommand implements Callable<Integer> {
+public class Destroy extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     DestroyCommandOptions commandOptions = new DestroyCommandOptions();
     @CommandLine.Mixin
@@ -31,7 +32,7 @@ public class Destroy extends CDKCommand implements Callable<Integer> {
                 getCommonConfig(),
                 getProviderConfig(),
                 commandOptions,
-                "destroy",
+                CDKCommand.Destroy,
                 getRequireDestroyApproval(commandOptions.approve().orElse(null))
         );
     }

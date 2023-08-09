@@ -43,7 +43,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
         bucket = constructWithinHandler(() -> Bucket.Builder.create(this, id(model().bucketName()))
                 .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)
                 .encryption(BucketEncryption.S3_MANAGED)
-                .enforceSsl(true)
+                .enforceSsl(true) // adds a bucket policy on aws:SecureTransport
                 .versioned(model().versioned())
                 .bucketName(model().bucketName())
                 .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)

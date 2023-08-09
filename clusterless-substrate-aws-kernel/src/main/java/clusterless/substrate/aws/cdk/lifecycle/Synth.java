@@ -10,7 +10,8 @@ package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.command.ProjectCommandOptions;
 import clusterless.model.deploy.Deployable;
-import clusterless.substrate.aws.cdk.CDKCommand;
+import clusterless.substrate.aws.cdk.BaseCDKCommand;
+import clusterless.substrate.aws.util.TagsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -23,7 +24,7 @@ import java.util.concurrent.Callable;
         name = "synth",
         hidden = true
 )
-public class Synth extends CDKCommand implements Callable<Integer> {
+public class Synth extends BaseCDKCommand implements Callable<Integer> {
     private static final Logger LOG = LogManager.getLogger(Synth.class);
     @CommandLine.Mixin
     ProjectCommandOptions commandOptions = new ProjectCommandOptions();
@@ -42,6 +43,27 @@ public class Synth extends CDKCommand implements Callable<Integer> {
             for (Deployable deployable : deployables) {
                 deployable.arcs().clear();
             }
+        }
+
+        for (String excludeArcName : commandOptions.excludeArcNames()) {
+            LOG.info("exec synth without arc: {}", excludeArcName);
+            for (Deployable deployable : deployables) {
+                deployable.arcs().removeIf(arc -> arc.name().equals(excludeArcName));
+            }
+        }
+
+        for (String onlyResourceName : commandOptions.onlyResourceNames()) {
+            LOG.info("exec synth only resource: {}", onlyResourceName);
+            for (Deployable deployable : deployables) {
+                deployable.arcs().clear();
+                deployable.boundaries().clear();
+                deployable.barriers().clear();
+                deployable.resources().removeIf(arc -> !arc.name().equals(onlyResourceName));
+            }
+        }
+
+        if (commandOptions.excludeAllTags().orElse(false)) {
+            TagsUtil.disable();
         }
 
         lifecycle.synthProjectModels(deployables);

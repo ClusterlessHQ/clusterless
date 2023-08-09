@@ -14,10 +14,7 @@ import clusterless.config.CommonConfig;
 import clusterless.process.ProcessExec;
 import clusterless.startup.Startup;
 import clusterless.substrate.aws.AwsConfig;
-import clusterless.util.Lazy;
-import clusterless.util.Lists;
-import clusterless.util.OrderedSafeMaps;
-import clusterless.util.URIs;
+import clusterless.util.*;
 import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -127,22 +124,24 @@ public class CDKProcessExec extends ProcessExec {
         return cdk();
     }
 
-    public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull ProjectCommandOptions commandOptions, @NotNull String cdkCommand) {
+    public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull ProjectCommandOptions commandOptions, @NotNull CDKCommand cdkCommand) {
         return executeLifecycleProcess(commonConfig, awsConfig, commandOptions, cdkCommand, Collections.emptyList());
     }
 
-    public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull ProjectCommandOptions commandOptions, @NotNull String cdkCommand, @NotNull List<String> cdkCommandArgs) {
+    public Integer executeLifecycleProcess(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull ProjectCommandOptions commandOptions, @NotNull CDKCommand cdkCommand, @NotNull List<String> cdkCommandArgs) {
 
         List<String> kernelArgs = new LinkedList<>();
 
         kernelArgs.addAll(List.of("--project", filesAsArg(commandOptions.projectFiles())));
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-all-arcs", commandOptions.excludeAllArcs().map(b -> Boolean.toString(b)).orElse(null))));
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-arc", commandOptions.excludeArcNames().isEmpty() ? null : String.join(",", commandOptions.excludeArcNames()))));
+        kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--only-resource", commandOptions.onlyResourceNames().isEmpty() ? null : String.join(",", commandOptions.onlyResourceNames()))));
+        kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-all-tags", commandOptions.excludeAllTags().map(b -> Boolean.toString(b)).orElse(null))));
 
         return executeCDKApp(commonConfig, awsConfig, cdkCommand, cdkCommandArgs, "synth", kernelArgs);
     }
 
-    public Integer executeCDKApp(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull String cdkCommand, @NotNull List<String> commandArgs, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
+    public Integer executeCDKApp(@NotNull CommonConfig commonConfig, @NotNull AwsConfig awsConfig, @NotNull CDKCommand cdkCommand, @NotNull List<String> commandArgs, @NotNull String kernelCommand, @NotNull List<String> kernelArgs) {
         List<String> cdkCommands = new LinkedList<>();
 
         cdkCommands.add(
@@ -172,16 +171,16 @@ public class CDKProcessExec extends ProcessExec {
         );
 
         cdkCommands.addAll(
-                List.of(
-                        cdkCommand,
-                        "--all" // deploy all stacks
+                SafeList.of(
+                        cdkCommand.command(),
+                        cdkCommand != CDKCommand.Import ? "--all" : null // deploy all stacks
                 )
         );
 
         cdkCommands.addAll(commandArgs);
 
         Map<String, String> environment = OrderedSafeMaps.of(
-                CLS_CDK_COMMAND, cdkCommand,
+                CLS_CDK_COMMAND, cdkCommand.command(),
                 CLS_CDK_OUTPUT_PATH, getOutputPath()
         );
 

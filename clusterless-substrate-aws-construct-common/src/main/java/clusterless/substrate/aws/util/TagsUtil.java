@@ -8,6 +8,8 @@
 
 package clusterless.substrate.aws.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.TagProps;
 import software.amazon.awscdk.Tags;
 import software.constructs.IConstruct;
@@ -18,12 +20,20 @@ import java.util.Map;
  *
  */
 public class TagsUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(TagsUtil.class);
+    private static boolean enabled = true;
+
+    public static void disable() {
+        LOG.info("globally disabling tags");
+        enabled = false;
+    }
+
     public static void applyTags(IConstruct target, Map<String, String> tagMap) {
         applyTags(target, tagMap, null);
     }
 
     public static void applyTags(IConstruct target, Map<String, String> tagMap, TagProps tagProps) {
-        if (tagMap == null || tagMap.isEmpty()) {
+        if (!enabled || tagMap == null || tagMap.isEmpty()) {
             return;
         }
 

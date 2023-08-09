@@ -11,6 +11,6 @@ package clusterless.substrate.aws.cdk;
 /**
  *
  */
-public class CDK {
-    public static final String PROVIDER = "aws";
+public class Provider {
+    public static final String NAME = "aws";
 }

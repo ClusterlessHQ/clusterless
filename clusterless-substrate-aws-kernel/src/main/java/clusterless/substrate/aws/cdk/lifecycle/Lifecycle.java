@@ -19,7 +19,7 @@ import clusterless.model.deploy.Extensible;
 import clusterless.model.deploy.Workload;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.ArcStack;
-import clusterless.substrate.aws.cdk.CDK;
+import clusterless.substrate.aws.cdk.Provider;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
@@ -61,7 +61,7 @@ public class Lifecycle {
 
     public List<Deployable> loadProjectModels(List<File> deployFiles) throws IOException {
         return new DeployableLoader(deployFiles)
-                .readObjects(CDK.PROVIDER);
+                .readObjects(Provider.NAME);
     }
 
     public ManagedProject mapProject(List<Deployable> deployables) {

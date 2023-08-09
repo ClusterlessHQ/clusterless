@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.command.VerifyCommandOptions;
+import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
 import picocli.CommandLine;
@@ -18,7 +19,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "verify"
 )
-public class Verify extends CDKCommand implements Callable<Integer> {
+public class Verify extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     VerifyCommandOptions commandOptions = new VerifyCommandOptions();
     @CommandLine.Mixin
@@ -29,6 +30,6 @@ public class Verify extends CDKCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, "synth");
+        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, CDKCommand.Synth);
     }
 }

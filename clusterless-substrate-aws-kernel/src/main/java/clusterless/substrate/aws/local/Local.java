@@ -16,7 +16,7 @@ import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Workload;
-import clusterless.substrate.aws.cdk.CDK;
+import clusterless.substrate.aws.cdk.Provider;
 import clusterless.util.Runtimes;
 import picocli.CommandLine;
 
@@ -43,7 +43,7 @@ public class Local implements Callable<Integer> {
 
     public List<Deployable> loadProjectModels(List<File> deployFiles) throws IOException {
         return new DeployableLoader(deployFiles)
-                .readObjects(CDK.PROVIDER);
+                .readObjects(Provider.NAME);
     }
 
     @Override
