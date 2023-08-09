@@ -6,6 +6,7 @@ Things not yet implemented.
 
 Most things in the cli have yet to be implemented.
 
+- https://docs.clusterless.io/reference/1.0-wip/index.html#commands
 - [CommandLineUsage](docs/CommandLineUsage.adoc)
 
 # Capabilities
@@ -26,7 +27,9 @@ Most things in the cli have yet to be implemented.
    3. AWS Sagemaker training/validation
 6. Common data processing workloads
    1. Data reformatting (from text/json to binary/parquet)
+      2. https://github.com/ClusterlessHQ/tessellate
    2. Dynamic data repartitioning (partitions based on data like timestamps)
+      3. https://github.com/ClusterlessHQ/tessellate
    3. Predicate/duplicate index creation and data filtering
 7. Join Barrier implementations
 8. Scheduled arc executions

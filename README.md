@@ -1,18 +1,46 @@
 # Clusterless
 
+```text
+                                       ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐                                
+                                        Project A                                               
+                                       │      _                │                                
+                                             ╱ ╲      .─────.             ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
+┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐     ╔══╬═══▶▕   ▏═══▶(|||||||)═╬═════╗     Project C           │
+ Ingress Project                    ║        ╲ ╱      `─────'        ║    │    _                
+│                             │     ║  │      ▔                │     ║        ╱ ╲      .─────. │
+   ════▶╔ ═ ═ ╗                     ║      Workload                  ╚════╬═▶▕   ▏═══▶(|||||||) 
+│          _                  │     ║  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘              ╲ ╱      `─────' │
+        ║ ╱#╲ ║      .─────.        ║                                     │    ▔                
+│  ════▶ ▕###▏ ════▶(|||||||)═╬═════╣                                          ▲               │
+        ║ ╲#╱ ║      `─────'        ║                                     └ ─ ─║─ ─ ─ ─ ─ ─ ─ ─ 
+│          ▔         Dataset  │     ║                                          ║                
+   ════▶╚ ═ ═ ╝                     ║  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ╬ ─ ─ ─          
+│      Boundary               │     ║         _                     _          ║      │         
+ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─      ║  │     ╱ ╲      .─────.      ╱ ╲      .─────.             
+                                    ╚══════▶▕   ▏═══▶(|||||||)═══▶▕   ▏═══▶(|||||||)  │         
+                                       │     ╲ ╱      `─────'      ╲ ╱      `─────'             
+                                              ▔                     ▔                 │         
+                                       │Project B                                               
+                                        ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+```
+
 ## Status
 
-This project is under active development and many features are considered alpha.
-
-Please do play around with this project in order to provide early feedback, but do expect things to change until we hit
-1.0 release.
+This project is under active development, some apis are experimental and may change between releases.
 
 Draft documentation can be found here: https://docs.clusterless.io/
 
+- [CLI usage](https://docs.clusterless.io/reference/1.0-wip/index.html#commands)
+- [Project components](https://docs.clusterless.io/reference/1.0-wip/index.html#components)
+- [Project file format](https://docs.clusterless.io/reference/1.0-wip/index.html#models)
+
 See the [ROADMAP](ROADMAP.md) for planned capabilities.
 
-For example scenarios, see the [clusterless-aws-example](https://github.com/ClusterlessHQ/clusterless-aws-examples)
-repo.
+For example scenarios, see
+
+- [clusterless-aws-example](https://github.com/ClusterlessHQ/clusterless-aws-examples) - simple examples to start with
+- [aws-s3-log-pipeline](https://github.com/ClusterlessHQ/aws-s3-log-pipeline) - end-to-end sample pipeline for
+  processing AWS S3 access logs
 
 ## About
 
@@ -57,8 +85,6 @@ Currently supported cloud substrates:
 
 - AWS
 
-See the [docs](docs) folder for wip documentation.
-
 ## Prerequisites
 
 _If you already have Node and npm, skip to the AWS CDK install._
@@ -99,6 +125,28 @@ The `bin` folder will have:
 ## Running
 
 > cls --help
+
+```text
+Usage: cls [-hVv] [-D=<String=String>]... [-P=<providerNames>]... [COMMAND]
+  -D, --property=<String=String>
+                  key=value properties, will be passed down
+  -h, --help      Show this help message and exit.
+  -P, --providers=<providerNames>
+                  provider substrates to target
+  -v, --verbose   Specify multiple -v options to increase verbosity.
+                  For example, `-v -v -v` or `-vvv`
+  -V, --version   Print version information and exit.
+Commands:
+  help       Display help information about the specified command.
+  config     manage local and global configuration settings
+  show       display details about providers, components, and project models
+  bootstrap  initialize a cloud provider placement
+  deploy     deploy a project into a declared placement
+  destroy    destroy a project deployed a declared placement
+  diff       compare local project changes with a deployed a declared placement
+  local      support for executing workloads locally
+  verify     verify project changes with a provider
+```
 
 Every region must be bootstrapped by the `cls` app before it can be used:
 

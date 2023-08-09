@@ -1,5 +1,7 @@
 = Command Line Usage
 
+Proposed commands for the cli.
+
 The command line:
 
 ====
