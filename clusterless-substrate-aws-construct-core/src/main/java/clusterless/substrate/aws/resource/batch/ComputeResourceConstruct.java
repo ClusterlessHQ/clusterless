@@ -58,7 +58,7 @@ public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource>
 
         String computeEnvironmentArn = computeEnvironment.getComputeEnvironmentArn();
 
-        addArnFor(model(), (Construct) computeEnvironment, computeEnvironmentArn, "compute environment arn");
+        addArnRefFor(model(), (Construct) computeEnvironment, computeEnvironmentArn, "compute environment arn");
     }
 
     public IManagedComputeEnvironment computeEnvironment() {

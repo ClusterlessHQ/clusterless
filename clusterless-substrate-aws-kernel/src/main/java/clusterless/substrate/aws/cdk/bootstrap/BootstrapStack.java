@@ -78,24 +78,24 @@ public class BootstrapStack extends StagedStack {
         bootstrapMeta.setVersion(ClsBootstrap.BOOTSTRAP_VERSION);
 
         Ref metaRef = Ref.ref().withResourceType(Meta.typeKey()).withResourceName("store");
-        addNameFor(metaRef, metadataBucketName, "clusterless metadata bucket name");
-        addArnFor(metaRef, metadata.getBucketArn(), "clusterless metadata bucket arn");
+        addNameRefFor(metaRef, metadataBucketName, "clusterless metadata bucket name");
+        addArnRef(metaRef, metadata.getBucketArn(), "clusterless metadata bucket arn");
 
         Ref arcStateRef = Ref.ref().withResourceType(Arc.typeKey()).withResourceName("store");
-        addNameFor(arcStateRef, arcStateBucketName, "clusterless arc state bucket name");
-        addArnFor(arcStateRef, arcState.getBucketArn(), "clusterless arc state bucket arn");
+        addNameRefFor(arcStateRef, arcStateBucketName, "clusterless arc state bucket name");
+        addArnRef(arcStateRef, arcState.getBucketArn(), "clusterless arc state bucket arn");
 
         Ref manifestRef = Ref.ref().withResourceType(Manifest.typeKey()).withResourceName("store");
-        addNameFor(manifestRef, manifestBucketName, "clusterless manifest bucket name");
-        addArnFor(manifestRef, manifest.getBucketArn(), "clusterless manifest bucket arn");
+        addNameRefFor(manifestRef, manifestBucketName, "clusterless manifest bucket name");
+        addArnRef(manifestRef, manifest.getBucketArn(), "clusterless manifest bucket arn");
 
         Ref eventBusRef = Ref.ref().withResourceType(EVENT_BUS).withResourceName(ARC_EVENT_BUS);
-        addNameFor(eventBusRef, arcEventBusName, "clusterless arc event bus name");
+        addNameRefFor(eventBusRef, arcEventBusName, "clusterless arc event bus name");
 
         Ref vpcRef = Ref.ref().withResourceType(VPC).withResourceName(COMMON_VPC);
-        addIdFor(vpcRef, vpcConstruct.vpcId(), "clusterless vpc id");
-        addArnFor(vpcRef, vpcConstruct.vpcArn(), "clusterless vpc arn");
-        addNameFor(vpcRef, vpcConstruct.vpcName(), "clusterless vpc name");
+        addIdRefFor(vpcRef, vpcConstruct.vpcId(), "clusterless vpc id");
+        addArnRef(vpcRef, vpcConstruct.vpcArn(), "clusterless vpc arn");
+        addNameRefFor(vpcRef, vpcConstruct.vpcName(), "clusterless vpc name");
     }
 
     private Bucket constructSharedBucket(String bucketName, Label prefix) {

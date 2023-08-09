@@ -93,7 +93,7 @@ public class StagedApp extends App {
         }
 
         if (resourceType == null) {
-            throw new IllegalArgumentException("too many constructs found for: " + relativeTypeRef + ", available: " + results.stream().map(Map.Entry::getKey).collect(Collectors.toList()));
+            throw new IllegalArgumentException("too many constructs found for: " + relativeTypeRef + ", available: " + results.stream().map(Map.Entry::getKey).toList());
         }
 
         results = results
@@ -110,7 +110,7 @@ public class StagedApp extends App {
         }
 
         if (resourceNs == null) {
-            throw new IllegalArgumentException("too many constructs found for: " + relativeTypeRef + ", available: " + results.stream().map(Map.Entry::getKey).collect(Collectors.toList()));
+            throw new IllegalArgumentException("too many constructs found for: " + relativeTypeRef + ", available: " + results.stream().map(Map.Entry::getKey).toList());
         }
 
         results = results
@@ -127,7 +127,7 @@ public class StagedApp extends App {
         }
 
         if (provider == null) {
-            throw new IllegalArgumentException("too many constructs found for: " + relativeTypeRef + ", available: " + results.stream().map(Map.Entry::getKey).collect(Collectors.toList()));
+            throw new IllegalArgumentException("too many constructs found for: " + relativeTypeRef + ", available: " + results.stream().map(Map.Entry::getKey).toList());
         }
 
         results = results

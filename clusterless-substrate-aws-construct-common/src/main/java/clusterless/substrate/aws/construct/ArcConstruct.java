@@ -17,12 +17,10 @@ import clusterless.substrate.aws.resources.BootstrapStores;
 import clusterless.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.iam.IGrantable;
-import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 import software.amazon.awscdk.services.stepfunctions.IChainable;
 import software.amazon.awscdk.services.stepfunctions.TaskStateBase;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -32,7 +30,6 @@ import java.util.function.Consumer;
 public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> implements ArcComponent {
 
     private final Lazy<IBucket> manifestBucket = Lazy.of(() -> BootstrapStores.manifestBucket(this));
-    private final Map<String, IBucket> buckets = new HashMap<>(); // cache the construct to prevent collisions
 
     public ArcConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
         super(context, model, model.name());
@@ -56,11 +53,6 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
             String bucketName = value.pathURI().getHost();
             grant.accept(getBucketFor(baseId, bucketName));
         });
-    }
-
-    @NotNull
-    protected IBucket getBucketFor(String baseId, String bucketName) {
-        return buckets.computeIfAbsent(bucketName, k -> Bucket.fromBucketName(this, baseId, k));
     }
 
     protected void grantManifestRead(@NotNull IGrantable grantee) {

@@ -12,9 +12,13 @@ import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Resource;
 import clusterless.naming.Label;
 import clusterless.naming.Ref;
+import clusterless.substrate.aws.resources.Refs;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  *
@@ -31,15 +35,6 @@ public class ManagedConstruct extends Construct implements Managed {
         return context;
     }
 
-    protected void addArnFor(Resource resource, Construct construct, String value, String description) {
-        Ref ref = Ref.ref()
-                .withResourceNs(resource.resourceNs())
-                .withResourceType(resource.resourceType())
-                .withResourceName(resource.name());
-
-        addArnFor(ref, construct, value, description);
-    }
-
     @NotNull
     protected Placement placement() {
         String account = Stack.of(this).getAccount();
@@ -53,33 +48,56 @@ public class ManagedConstruct extends Construct implements Managed {
                 .build();
     }
 
-    protected void addArnFor(Ref ref, Construct construct, String value, String description) {
-        StagedStack.stagedOf(this).addArnFor(ref, construct, value, description);
-    }
-
-    protected void addIdFor(Resource resource, Construct construct, String value, String description) {
+    protected void addArnRefFor(Resource resource, Construct construct, String value, String description) {
         Ref ref = Ref.ref()
                 .withResourceNs(resource.resourceNs())
                 .withResourceType(resource.resourceType())
                 .withResourceName(resource.name());
 
-        addIdFor(ref, construct, value, description);
+        addArnRefFor(ref, construct, value, description);
     }
 
-    protected void addIdFor(Ref ref, Construct construct, String value, String description) {
-        StagedStack.stagedOf(this).addIdFor(ref, construct, value, description);
+    protected void addArnRefFor(Ref ref, Construct construct, String value, String description) {
+        StagedStack.stagedOf(this)
+                .addArnRef(ref, construct, value, description);
     }
 
-    protected void addNameFor(Resource resource, Construct construct, String value, String description) {
+    protected void addIdRefFor(Resource resource, Construct construct, String value, String description) {
         Ref ref = Ref.ref()
                 .withResourceNs(resource.resourceNs())
                 .withResourceType(resource.resourceType())
                 .withResourceName(resource.name());
 
-        addNameFor(ref, construct, value, description);
+        addIdRefFor(ref, construct, value, description);
     }
 
-    protected void addNameFor(Ref ref, Construct construct, String value, String description) {
-        StagedStack.stagedOf(this).addNameFor(ref, construct, value, description);
+    protected void addIdRefFor(Ref ref, Construct construct, String value, String description) {
+        StagedStack.stagedOf(this).addIdRefFor(ref, construct, value, description);
+    }
+
+    protected void addNameRefFor(Resource resource, Construct construct, String value, String description) {
+        Ref ref = Ref.ref()
+                .withResourceNs(resource.resourceNs())
+                .withResourceType(resource.resourceType())
+                .withResourceName(resource.name());
+
+        addNameRefFor(ref, construct, value, description);
+    }
+
+    protected void addNameRefFor(Ref ref, Construct construct, String value, String description) {
+        StagedStack.stagedOf(this)
+                .addNameRefFor(ref, construct, value, description);
+    }
+
+    protected <T> T resolveArnRef(String ref, Function<String, T> resolver) {
+        Construct construct = StagedApp.stagedOf(this).resolveRef(ref);
+
+        if (construct != null) {
+            return (T) construct;
+        }
+
+        Optional<String> arn = Refs.resolveArn(this, ref);
+
+        return resolver.apply(arn.orElseThrow(() -> new IllegalArgumentException("ref or arn are required" + ref)));
     }
 }

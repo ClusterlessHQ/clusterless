@@ -15,7 +15,10 @@ import clusterless.model.deploy.Extensible;
 import clusterless.model.deploy.WorkloadProps;
 import clusterless.substrate.aws.arc.s3copy.S3CopyArc;
 import clusterless.substrate.aws.boundary.s3put.S3PutListenerBoundary;
+import clusterless.substrate.aws.resource.batch.ComputeResource;
 import clusterless.substrate.aws.resource.eventbridge.EventBridgeResource;
+import clusterless.substrate.aws.resource.glue.database.GlueDatabaseResource;
+import clusterless.substrate.aws.resource.glue.table.GlueTableResource;
 import clusterless.substrate.aws.resource.s3.S3BucketResource;
 import clusterless.util.Env;
 import org.junit.jupiter.api.Assertions;
@@ -35,7 +38,10 @@ public class JSONTest {
             S3PutListenerBoundary.class,
             S3CopyArc.class,
             EventBridgeResource.class,
-            S3BucketResource.class
+            S3BucketResource.class,
+            ComputeResource.class,
+            GlueDatabaseResource.class,
+            GlueTableResource.class
     })
     void serialize(Class<? extends Extensible> originalClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 

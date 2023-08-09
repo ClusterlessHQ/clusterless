@@ -50,11 +50,11 @@ public class StagedStack extends Stack {
         return stage;
     }
 
-    protected void addNameFor(Ref ref, String value, String description) {
-        addNameFor(ref, null, value, description);
+    protected void addNameRefFor(Ref ref, String value, String description) {
+        addNameRefFor(ref, null, value, description);
     }
 
-    protected void addNameFor(Ref ref, Construct construct, String value, String description) {
+    protected void addNameRefFor(Ref ref, Construct construct, String value, String description) {
         Ref.Qualifier qualifier = Ref.Qualifier.Name;
         Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
 
@@ -76,11 +76,11 @@ public class StagedStack extends Stack {
         }
     }
 
-    protected void addIdFor(Ref ref, String value, String description) {
-        addIdFor(ref, null, value, description);
+    protected void addIdRefFor(Ref ref, String value, String description) {
+        addIdRefFor(ref, null, value, description);
     }
 
-    protected void addIdFor(Ref ref, Construct construct, String value, String description) {
+    protected void addIdRefFor(Ref ref, Construct construct, String value, String description) {
         Ref.Qualifier qualifier = Ref.Qualifier.Id;
         Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
 
@@ -102,11 +102,11 @@ public class StagedStack extends Stack {
         }
     }
 
-    protected void addArnFor(Ref ref, String value, String description) {
-        addArnFor(ref, null, value, description);
+    protected void addArnRef(Ref ref, String value, String description) {
+        addArnRef(ref, null, value, description);
     }
 
-    protected void addArnFor(Ref ref, Construct construct, String value, String description) {
+    protected void addArnRef(Ref ref, Construct construct, String value, String description) {
         Ref.Qualifier qualifier = Ref.Qualifier.Arn;
         Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
 

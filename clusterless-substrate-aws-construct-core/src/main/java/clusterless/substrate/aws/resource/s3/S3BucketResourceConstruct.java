@@ -54,7 +54,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
 
         TagsUtil.applyTags(bucket, model().tags());
 
-        addArnFor(model(), (Construct) bucket, bucket().getBucketArn(), "s3 bucket arn");
+        addArnRefFor(model(), (Construct) bucket, bucket().getBucketArn(), "s3 bucket arn");
     }
 
     public IBucket bucket() {

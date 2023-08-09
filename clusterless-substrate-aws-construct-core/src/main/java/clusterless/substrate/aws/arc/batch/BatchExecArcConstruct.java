@@ -14,9 +14,11 @@ import clusterless.substrate.aws.construct.ArcConstruct;
 import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.managed.StagedApp;
 import clusterless.substrate.aws.props.Lookup;
-import clusterless.substrate.aws.resources.*;
+import clusterless.substrate.aws.resources.Assets;
+import clusterless.substrate.aws.resources.Functions;
+import clusterless.substrate.aws.resources.Policies;
+import clusterless.substrate.aws.resources.Resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -35,10 +37,8 @@ import software.amazon.awscdk.services.logs.RetentionDays;
 import software.amazon.awscdk.services.stepfunctions.*;
 import software.amazon.awscdk.services.stepfunctions.tasks.BatchSubmitJob;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
-import software.constructs.Construct;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -140,21 +140,16 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
     @NotNull
     protected IManagedComputeEnvironment resolveComputeEnvironment(String computeEnvironmentRef) {
-        Construct construct = StagedApp.stagedOf(this).resolveRef(computeEnvironmentRef);
 
-        if (construct != null) {
-            return (IManagedComputeEnvironment) construct;
-        }
+        LOG.info("resolving computeEnvironment ref: {}", computeEnvironmentRef);
 
-        Optional<String> computeEnvironmentArn = Refs.resolveArn(this, computeEnvironmentRef);
-
-        LOG.info("using computeEnvironment arn: {}", computeEnvironmentArn);
-
-        return FargateComputeEnvironment.fromFargateComputeEnvironmentArn(
-                this,
-                "ComputeEnvironment",
-                computeEnvironmentArn.orElseThrow(() -> new IllegalStateException("computeEnvironment ref or arn are required"))
-        );
+        return resolveArnRef(computeEnvironmentRef, arn -> {
+            LOG.info("using computeEnvironment arn: {}", arn);
+            return FargateComputeEnvironment.fromFargateComputeEnvironmentArn(
+                    this,
+                    "ComputeEnvironment",
+                    arn);
+        });
     }
 
     @Override

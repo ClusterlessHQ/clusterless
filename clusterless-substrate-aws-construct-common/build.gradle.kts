@@ -21,6 +21,7 @@ dependencies {
     val cdkVersion = "2.89.0"
     api("software.amazon.awscdk:aws-cdk-lib:$cdkVersion")
     api("software.amazon.awscdk:batch-alpha:$cdkVersion-alpha.0")
+    api("software.amazon.awscdk:glue-alpha:$cdkVersion-alpha.0")
     // https://mvnrepository.com/artifact/software.constructs/constructs
     val constructsVersion = "10.2.69"
     api("software.constructs:constructs:$constructsVersion")
