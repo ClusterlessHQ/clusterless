@@ -16,8 +16,6 @@ import clusterless.substrate.aws.util.TagsUtil;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.batch.alpha.FargateComputeEnvironment;
 import software.amazon.awscdk.services.batch.alpha.IManagedComputeEnvironment;
-import software.amazon.awscdk.services.ec2.Vpc;
-import software.amazon.awscdk.services.ec2.VpcLookupOptions;
 import software.constructs.Construct;
 
 /**
@@ -32,26 +30,19 @@ public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource>
         String name = Resources.regionallyUniqueProjectName(this, model().computeEnvironmentName());
 
         computeEnvironment = constructWithinHandler(() ->
-                        FargateComputeEnvironment.Builder.create(this, id(model().computeEnvironmentName()))
-                                .computeEnvironmentName(name) // globally unique
-                                .replaceComputeEnvironment(false)
-                                .maxvCpus(4096)
-                                .spot(false)
+                {
+                    return FargateComputeEnvironment.Builder.create(this, id(model().computeEnvironmentName()))
+                            .computeEnvironmentName(name) // globally unique
+                            .replaceComputeEnvironment(false)
+                            .maxvCpus(4096)
+                            .spot(false)
 //                        .terminateOnUpdate(false)
 //                        .updateTimeout()
 //                        .vpcSubnets()
-                                .vpc(
-                                        Vpc.fromLookup(
-                                                this,
-                                                "VpcLookup",
-                                                VpcLookupOptions.builder()
-                                                        .region(context.managedProject().getRegion())
-                                                        .vpcName(Vpcs.bootstrapVPCName(this))
-                                                        .build()
-                                        )
-                                )
-                                .enabled(true)
-                                .build()
+                            .vpc(Vpcs.lookupVpc(this, context))
+                            .enabled(true)
+                            .build();
+                }
         );
 
         TagsUtil.applyTags(computeEnvironment, model().tags());

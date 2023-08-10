@@ -22,17 +22,20 @@ public abstract class ProcessExec {
     private static final Logger LOG = LogManager.getLogger(ProcessExec.class);
     protected Supplier<Boolean> dryRun = () -> false;
     protected Supplier<Boolean> retry = () -> false;
+    protected Supplier<Integer> verbosity = () -> 0;
 
     public ProcessExec() {
     }
 
-    public ProcessExec(Supplier<Boolean> dryRun) {
+    public ProcessExec(Supplier<Boolean> dryRun, Supplier<Integer> verbosity) {
         this.dryRun = dryRun;
+        this.verbosity = verbosity;
     }
 
-    public ProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry) {
+    public ProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry, Supplier<Integer> verbosity) {
         this.dryRun = dryRun;
         this.retry = retry;
+        this.verbosity = verbosity;
     }
 
     public boolean dryRun() {

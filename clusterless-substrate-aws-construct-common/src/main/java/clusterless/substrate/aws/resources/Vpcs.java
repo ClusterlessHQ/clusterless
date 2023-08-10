@@ -9,16 +9,46 @@
 package clusterless.substrate.aws.resources;
 
 import clusterless.naming.Ref;
+import clusterless.substrate.aws.managed.ManagedComponentContext;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Fn;
+import software.amazon.awscdk.services.ec2.IVpc;
+import software.amazon.awscdk.services.ec2.Vpc;
+import software.amazon.awscdk.services.ec2.VpcLookupOptions;
 import software.constructs.Construct;
 
 import java.util.Objects;
 
 public class Vpcs {
+    private static final Logger LOG = LoggerFactory.getLogger(Vpcs.class);
 
     public static final String COMMON_VPC = "CommonVpc";
     public static final String VPC = "vpc";
+
+    public static @NotNull IVpc lookupVpc(Construct scope, @NotNull ManagedComponentContext context) {
+        // need to be careful where we look up region, as it may not be set yet
+        return lookupVpc(scope, context.deployable().placement().region());
+    }
+
+    public static @NotNull IVpc lookupVpc(Construct scope, String region) {
+        String vpcName = Vpcs.bootstrapVPCName(scope);
+        LOG.info("looking up vpc: {}, in region: {}", vpcName, region);
+
+        IVpc vpcLookup = Vpc.fromLookup(
+                scope,
+                "VpcLookup",
+                VpcLookupOptions.builder()
+                        .region(region)
+                        .vpcName(vpcName)
+                        .build()
+        );
+
+        LOG.info("found vpc id: {}", vpcLookup.getVpcId());
+
+        return vpcLookup;
+    }
 
     public static String bootstrapVPCName(Construct scope) {
         Objects.requireNonNull(scope, "scope is null");

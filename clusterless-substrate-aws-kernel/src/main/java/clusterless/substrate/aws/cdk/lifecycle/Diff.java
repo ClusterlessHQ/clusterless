@@ -23,7 +23,7 @@ public class Diff extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     DiffCommandOptions commandOptions = new DiffCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions, this::verbosityLevel);
 
     @Override
     public Integer call() throws Exception {

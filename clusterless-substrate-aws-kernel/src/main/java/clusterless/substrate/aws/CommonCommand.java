@@ -23,4 +23,8 @@ public class CommonCommand {
     protected AwsConfig getProviderConfig() {
         return kernel.configurations().get(Provider.NAME);
     }
+
+    protected int verbosityLevel() {
+        return kernel.verbosity().level();
+    }
 }

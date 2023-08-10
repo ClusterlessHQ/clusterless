@@ -12,8 +12,6 @@ import clusterless.command.DeployCommandOptions;
 import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -22,11 +20,10 @@ import java.util.concurrent.Callable;
         name = "deploy"
 )
 public class Deploy extends BaseCDKCommand implements Callable<Integer> {
-    private static final Logger LOG = LogManager.getLogger(Deploy.class);
     @CommandLine.Mixin
     DeployCommandOptions commandOptions = new DeployCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions, this::verbosityLevel);
 
     @Override
     public Integer call() throws Exception {

@@ -24,7 +24,7 @@ public class Destroy extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     DestroyCommandOptions commandOptions = new DestroyCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry, this::verbosityLevel);
 
     @Override
     public Integer call() throws Exception {

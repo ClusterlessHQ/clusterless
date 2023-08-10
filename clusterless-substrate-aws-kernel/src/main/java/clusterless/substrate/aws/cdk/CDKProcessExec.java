@@ -82,12 +82,12 @@ public class CDKProcessExec extends ProcessExec {
     public CDKProcessExec() {
     }
 
-    public CDKProcessExec(CommonCommandOptions commandOptions) {
-        super(commandOptions::dryRun);
+    public CDKProcessExec(CommonCommandOptions commandOptions, Supplier<Integer> verbosity) {
+        super(commandOptions::dryRun, verbosity);
     }
 
-    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry) {
-        super(dryRun, retry);
+    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry, Supplier<Integer> verbosity) {
+        super(dryRun, retry, verbosity);
     }
 
     public String cdk() {
@@ -137,6 +137,7 @@ public class CDKProcessExec extends ProcessExec {
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-arc", commandOptions.excludeArcNames().isEmpty() ? null : String.join(",", commandOptions.excludeArcNames()))));
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--only-resource", commandOptions.onlyResourceNames().isEmpty() ? null : String.join(",", commandOptions.onlyResourceNames()))));
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-all-tags", commandOptions.excludeAllTags().map(b -> Boolean.toString(b)).orElse(null))));
+        kernelArgs.addAll(SafeList.of(verbosity.get() == 0 ? null : String.format("-%s", "v".repeat(verbosity.get()))));
 
         return executeCDKApp(commonConfig, awsConfig, cdkCommand, cdkCommandArgs, "synth", kernelArgs);
     }
