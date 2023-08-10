@@ -90,7 +90,7 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                 .stateMachineName(stateMachineName.lowerHyphen())
                 .stateMachineType(StateMachineType.STANDARD)
                 .logs(createLogOptions())
-                .definition(rootChain)
+                .definitionBody(DefinitionBody.fromChainable(rootChain))
                 .build();
     }
 
