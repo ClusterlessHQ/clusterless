@@ -19,13 +19,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 public abstract class LambdaHandlerTestBase {
     private Placement placement;
     private Project project;
 
-    protected static String loadGradleProperties(String key) {
+    protected static Optional<String> loadGradleProperties(String key) {
         Properties properties = new Properties();
         try {
             properties.load(new FileReader("%s/.gradle/gradle.properties".formatted(System.getProperty("user.home"))));
@@ -33,7 +34,7 @@ public abstract class LambdaHandlerTestBase {
             throw new UncheckedIOException(e);
         }
 
-        return properties.getProperty(key);
+        return Optional.ofNullable(properties.getProperty(key));
     }
 
     protected String defaultRegion() {

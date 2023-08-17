@@ -35,7 +35,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withEnv("LOCALSTACK_API_KEY", Optional.ofNullable(System.getenv("LOCALSTACK_API_KEY"))
-                    .orElse(loadGradleProperties("localstack.api.key")))
+                    .or(() -> loadGradleProperties("localstack.api.key")).orElseThrow())
             .withServices(
                     LocalStackContainer.Service.S3,
                     LocalStackContainer.Service.SQS,
