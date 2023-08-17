@@ -37,6 +37,8 @@ jobs:
         run: echo "${{ vars.GRADLE_PROPERTIES }}" > gradle.properties
 
       - name: Run Tests
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           ./gradlew --no-daemon --info --stacktrace check
 
