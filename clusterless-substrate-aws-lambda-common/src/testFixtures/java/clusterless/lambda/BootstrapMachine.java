@@ -9,16 +9,21 @@
 package clusterless.lambda;
 
 import clusterless.substrate.aws.sdk.EventBus;
+import clusterless.substrate.aws.sdk.Glue;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.aws.sdk.SQS;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import software.amazon.awssdk.services.glue.model.Column;
+
+import java.util.List;
 
 public class BootstrapMachine {
     private static final Logger LOG = LogManager.getLogger(BootstrapMachine.class);
     S3 s3 = new S3();
     EventBus eventBus = new EventBus();
     SQS sqs = new SQS();
+    Glue glue = new Glue();
 
     public BootstrapMachine() {
     }
@@ -64,6 +69,24 @@ public class BootstrapMachine {
                 .isSuccessOrThrowRuntime();
 
         LOG.info("created sqs queue: {}", sqsQueueName);
+
+        return this;
+    }
+
+    public BootstrapMachine applyGlueDatabase(String glueDatabase, String glueTable, String location, List<Column> columns, List<Column> columnList) {
+        if (glueDatabase == null) {
+            return this;
+        }
+
+        LOG.info("creating glue database: {}", glueDatabase);
+
+        glue.createDatabase(glueDatabase)
+                .isSuccessOrThrowRuntime();
+
+        glue.createTable(glueDatabase, glueTable, location, columns, columnList)
+                .isSuccessOrThrowRuntime();
+
+        LOG.info("created glue database: {}", glueDatabase);
 
         return this;
     }

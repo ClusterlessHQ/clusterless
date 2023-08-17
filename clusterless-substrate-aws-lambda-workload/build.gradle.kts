@@ -19,6 +19,7 @@ dependencies {
 
     implementation("software.amazon.awssdk:s3")
     implementation("software.amazon.awssdk:eventbridge")
+    implementation("software.amazon.awssdk:glue")
 
     // https://docs.aws.amazon.com/lambda/latest/dg/java-package.html#java-package-libraries
     implementation("com.amazonaws:aws-lambda-java-core")

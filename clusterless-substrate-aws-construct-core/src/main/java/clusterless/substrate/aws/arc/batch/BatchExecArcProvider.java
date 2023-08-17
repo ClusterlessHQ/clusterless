@@ -56,7 +56,6 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
                 """
 )
 public class BatchExecArcProvider implements ArcComponentService<ManagedComponentContext, BatchExecArc, BatchExecArcConstruct> {
-
     @Override
     public BatchExecArcConstruct create(ManagedComponentContext context, BatchExecArc model) {
         return new BatchExecArcConstruct(context, model);

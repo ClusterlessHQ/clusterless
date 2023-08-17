@@ -9,15 +9,12 @@
 package clusterless.substrate.aws.arc.s3copy;
 
 import clusterless.naming.Label;
+import clusterless.substrate.aws.arc.common.WorkloadManagedConstruct;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
-import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
-import clusterless.substrate.aws.props.Lookup;
-import clusterless.substrate.aws.resources.Assets;
-import clusterless.substrate.aws.resources.Functions;
+import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.stepfunctions.IChainable;
 import software.amazon.awscdk.services.stepfunctions.TaskStateBase;
@@ -25,12 +22,13 @@ import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 /**
  *
  */
 public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
+    private final Label baseId = Label.of("Func");
+    private final String handler = "clusterless.lambda.workload.s3copy.S3CopyArcEventHandler";
     private final Function function;
 
     public S3CopyArcConstruct(@NotNull ManagedComponentContext context, @NotNull S3CopyArc model) {
@@ -38,29 +36,13 @@ public class S3CopyArcConstruct extends ArcConstruct<S3CopyArc> {
 
         Map<String, String> environment = new ArcEnvBuilder(placement(), model()).asEnvironment();
 
-        String functionName = Functions.functionName(this, model().name(), "S3Copy");
-        Label functionLabel = Label.of(model().name()).with("S3Copy");
-        function = Function.Builder.create(this, functionLabel.camelCase())
-                .functionName(functionName)
-                .code(Assets.find(Pattern.compile("^.*-aws-lambda-workload.*\\.zip$"))) // get packaged code
-                .architecture(Lookup.architecture(model()
-                        .workload()
-                        .runtimeProps()
-                        .architecture()))
-                .handler("clusterless.lambda.workload.s3copy.S3CopyArcEventHandler") // get handler class name
-                .environment(environment)
-                .runtime(Functions.defaultJVM())
-                .memorySize(model()
-                        .workload()
-                        .runtimeProps()
-                        .memorySizeMB())
-                .timeout(Duration.minutes(model()
-                        .workload()
-                        .runtimeProps()
-                        .timeoutMin()))
-                .build();
+        Label modelName = Label.of(model().name());
+        LambdaJavaRuntimeProps lambdaJavaRuntimeProps = model()
+                .workload()
+                .runtimeProps();
 
-        new LambdaLogGroupConstruct(this, functionLabel, function);
+        function = new WorkloadManagedConstruct(context, baseId, modelName, handler, lambdaJavaRuntimeProps, environment)
+                .function();
 
         grantManifestAndDatasetPermissionsTo(function());
     }

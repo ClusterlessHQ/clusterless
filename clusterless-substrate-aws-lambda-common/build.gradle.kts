@@ -27,6 +27,7 @@ dependencies {
     api("software.amazon.awssdk:s3")
     api("software.amazon.awssdk:cloudwatch")
     api("software.amazon.awssdk:eventbridge")
+    api("software.amazon.awssdk:glue")
 
     api("com.amazonaws:aws-lambda-java-core")
     api("com.amazonaws:aws-lambda-java-log4j2")

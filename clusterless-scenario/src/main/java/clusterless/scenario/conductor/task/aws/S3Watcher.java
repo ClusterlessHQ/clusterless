@@ -9,10 +9,10 @@
 package clusterless.scenario.conductor.task.aws;
 
 import clusterless.json.JSONUtil;
-import clusterless.scenario.conductor.task.BaseSimpleTask;
+import clusterless.scenario.conductor.task.WatcherTask;
 import clusterless.scenario.model.WatchedStore;
 
-public class S3Watcher extends BaseSimpleTask {
+public class S3Watcher extends WatcherTask {
 
     public static final String AWS_S_3_WATCHER = "awsS3Watcher";
 

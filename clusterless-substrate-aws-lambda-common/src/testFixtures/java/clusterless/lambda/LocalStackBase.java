@@ -21,6 +21,8 @@ import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
+import java.util.Optional;
+
 @Testcontainers
 @ExtendWith(SystemStubsExtension.class)
 public abstract class LocalStackBase extends LambdaHandlerTestBase {
@@ -28,14 +30,17 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
         System.setProperty("clusterless.localstack.enabled", "true");
     }
 
-    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:2.1.0");
+    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack-pro:2.2.0");
 
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
+            .withEnv("LOCALSTACK_API_KEY", Optional.ofNullable(System.getenv("LOCALSTACK_API_KEY"))
+                    .orElse(loadGradleProperties("localstack.api.key")))
             .withServices(
                     LocalStackContainer.Service.S3,
                     LocalStackContainer.Service.SQS,
-                    LocalStackContainer.EnabledService.named("events")
+                    LocalStackContainer.EnabledService.named("events"),
+                    LocalStackContainer.EnabledService.named("glue")
             );
 
     @Override
@@ -52,6 +57,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
             .set("AWS_DEFAULT_REGION", localstack.getRegion())
             .set("AWS_S3_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.S3).toString())
             .set("AWS_EVENTS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("events")).toString())
+            .set("AWS_GLUE_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("glue")).toString())
             .set("AWS_SQS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
 
     @BeforeEach
@@ -61,6 +67,8 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Arc, defaultPlacement()))
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Meta, defaultPlacement()))
                 .applyEventbus(eventBusName())
-                .applySQSQueue(sqsQueueName());
+                .applySQSQueue(sqsQueueName())
+                .applyBucket(glueDatabaseName())
+                .applyGlueDatabase(glueDatabaseName(), glueTableName(), "s3://%s".formatted(glueDatabaseName()), glueTableColumns(), glueTablePartitions());
     }
 }

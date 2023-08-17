@@ -9,6 +9,7 @@
 package clusterless.scenario.conductor;
 
 import clusterless.scenario.Options;
+import clusterless.scenario.conductor.worker.aws.GlueWatcherWorker;
 import clusterless.scenario.conductor.worker.aws.S3IngressWorker;
 import clusterless.scenario.conductor.worker.aws.S3WatcherWorker;
 import clusterless.scenario.conductor.worker.cli.*;
@@ -31,7 +32,8 @@ public class TaskManager {
                 new DeployerProjectWorker(options),
                 new DestroyerProjectWorker(options),
                 new S3IngressWorker(options),
-                new S3WatcherWorker(options)
+                new S3WatcherWorker(options),
+                new GlueWatcherWorker(options)
         );
 
         Map<String, Integer> counts = workers.stream().map(Worker::getTaskDefName).collect(Collectors.toMap(k -> k, v -> threadCount));

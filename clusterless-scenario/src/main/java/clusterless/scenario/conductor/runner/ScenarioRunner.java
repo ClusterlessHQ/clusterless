@@ -10,6 +10,8 @@ package clusterless.scenario.conductor.runner;
 
 import clusterless.scenario.Options;
 import clusterless.scenario.conductor.WorkflowManager;
+import clusterless.scenario.conductor.task.WatcherTask;
+import clusterless.scenario.conductor.task.aws.GlueWatcher;
 import clusterless.scenario.conductor.task.aws.S3Ingress;
 import clusterless.scenario.conductor.task.aws.S3Watcher;
 import clusterless.scenario.conductor.task.cli.DeployerProject;
@@ -24,6 +26,7 @@ import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
 import com.netflix.conductor.sdk.workflow.def.tasks.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -169,8 +172,8 @@ public class ScenarioRunner {
         List<String> join = new LinkedList<>();
         int count = 0;
         for (WatchedStore watchedStore : scenario.watchedStores()) {
-            String referenceName = "watcher_" + count;
-            S3Watcher watcher = new S3Watcher(referenceName, watchedStore);
+            String referenceName = "watcher_%s_%d".formatted(watchedStore.watchType(), count);
+            WatcherTask watcher = createWatcherFor(watchedStore, referenceName);
             forkedTasks[count++] = new Task<?>[]{watcher};
             join.add(referenceName);
         }
@@ -191,9 +194,22 @@ public class ScenarioRunner {
         LOG.info("scenario: {}, adding sequential watched stores: {}", scenario.name(), scenario.watchedStores().size());
         int count = 0;
         for (WatchedStore watchedStore : scenario.watchedStores()) {
-            String referenceName = "watcher_" + count;
-            S3Watcher watcher = new S3Watcher(referenceName, watchedStore);
+            String referenceName = "watcher_%s_%d".formatted(watchedStore.watchType(), count);
+            WatcherTask watcher = createWatcherFor(watchedStore, referenceName);
             tasks.addAll(watcher.getWorkflowDefTasks());
+        }
+    }
+
+    @NotNull
+    private static WatcherTask createWatcherFor(WatchedStore watchedStore, String referenceName) {
+        switch (watchedStore.watchType()) {
+            case s3 -> {
+                return new S3Watcher(referenceName, watchedStore);
+            }
+            case glue -> {
+                return new GlueWatcher(referenceName, watchedStore);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + watchedStore.watchType());
         }
     }
 

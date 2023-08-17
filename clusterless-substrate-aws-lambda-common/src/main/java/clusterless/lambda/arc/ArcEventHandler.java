@@ -15,6 +15,8 @@ import clusterless.model.manifest.Manifest;
 import clusterless.substrate.aws.event.ArcWorkloadContext;
 import clusterless.util.Env;
 import clusterless.util.Lazy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Map;
@@ -23,6 +25,7 @@ import java.util.Map;
  *
  */
 public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResultHandler<ArcWorkloadContext, Map<String, URI>, ArcEventObserver> {
+    private static final Logger LOG = LoggerFactory.getLogger(ArcEventHandler.class);
     /**
      * Not static for tests
      */
@@ -49,10 +52,10 @@ public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResu
         return new ArcEventObserver() {
             @Override
             public void applyFromManifest(Manifest manifest) {
-                String name = manifest.dataset().name();
-                String version = manifest.dataset().version();
+                String name = manifest.dataset() != null ? manifest.dataset().name() : null;
+                String version = manifest.dataset() != null ? manifest.dataset().version() : null;
                 String lotId = manifest.lotId();
-                int size = manifest.uris().size();
+                int size = manifest.uris() != null ? manifest.uris().size() : 0;
                 LOG.info("manifest from dataset name: {}, version: {}, lot: {}, size: {}", name, version, lotId, size);
             }
 

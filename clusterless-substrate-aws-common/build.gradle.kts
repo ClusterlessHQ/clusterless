@@ -24,9 +24,11 @@ dependencies {
 
     api("com.jayway.jsonpath:json-path")
 
-    api("software.amazon.awssdk:s3")
-    api("software.amazon.awssdk:eventbridge")
-    api("software.amazon.awssdk:sqs")
+    implementation("software.amazon.awssdk:s3")
+    implementation("software.amazon.awssdk:eventbridge")
+    implementation("software.amazon.awssdk:sqs")
+    implementation("software.amazon.awssdk:glue")
+    implementation("software.amazon.awssdk:athena")
 
     implementation("org.apache.logging.log4j:log4j-slf4j-impl") // awssdk
 }

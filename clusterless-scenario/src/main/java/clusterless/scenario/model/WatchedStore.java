@@ -13,11 +13,16 @@ import clusterless.config.Config;
 import java.net.URI;
 
 public class WatchedStore extends Config {
+    WatchType watchType = WatchType.s3;
     String region;
     URI path;
     int objectCount = 3;
     int pollingSleepSec = 60;
     int timeoutSec = 3 * 15 * 60;
+
+    public WatchType watchType() {
+        return watchType;
+    }
 
     public String region() {
         return region;

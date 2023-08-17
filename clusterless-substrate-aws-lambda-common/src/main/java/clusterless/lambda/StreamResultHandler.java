@@ -28,8 +28,7 @@ import java.util.function.Function;
  *
  */
 public abstract class StreamResultHandler<E, R> implements RequestStreamHandler {
-    protected static final Logger LOG = LogManager.getLogger(StreamResultHandler.class);
-
+    private static final Logger LOG = LogManager.getLogger(StreamResultHandler.class);
     /**
      * Use the same message format as log4j.
      */

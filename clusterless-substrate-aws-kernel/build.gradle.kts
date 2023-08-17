@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":clusterless-substrate-aws-construct-common"))
     implementation(project(":clusterless-substrate-aws-construct-core"))
 
+    implementation("software.amazon.awssdk:s3")
+
     implementation("com.google.guava:guava")
 }
 

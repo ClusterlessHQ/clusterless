@@ -38,6 +38,7 @@ public abstract class EventResultHandler<E, R, O extends EventObserver> extends 
         try {
             r = handleEvent(event, context, observer());
         } catch (Exception e) {
+            // todo: update to only catch unexpected exceptions
             logErrorAndThrow(RuntimeException::new, e, "failed executing handler: {}, with: {}", getClass().getName(), e.getMessage());
         }
 

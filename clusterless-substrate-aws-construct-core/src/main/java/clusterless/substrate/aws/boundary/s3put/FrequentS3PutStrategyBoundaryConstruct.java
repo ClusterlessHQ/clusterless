@@ -21,9 +21,9 @@ import clusterless.substrate.uri.ManifestURI;
 import clusterless.temporal.IntervalUnits;
 import clusterless.util.Env;
 import clusterless.util.URIs;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.events.*;
@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  *
  */
 public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3PutListenerBoundary> {
-    private static final Logger LOG = LoggerFactory.getLogger(FrequentS3PutStrategyBoundaryConstruct.class);
+    private static final Logger LOG = LogManager.getLogger(FrequentS3PutStrategyBoundaryConstruct.class);
 
     public FrequentS3PutStrategyBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
         super(context, model, Label.of("Frequent").with(model.name()).camelCase());

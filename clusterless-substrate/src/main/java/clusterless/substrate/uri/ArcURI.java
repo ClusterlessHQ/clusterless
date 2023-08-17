@@ -125,7 +125,7 @@ public class ArcURI extends StateURI<ArcState, ArcURI> {
     @Override
     public URI uriPrefix() {
         Partition partition = Partition.of(ARCS)
-                .withNamedTerminal("name", ofNullable(project).map(Project::name))
+                .withNamedTerminal("name", ofNullable(project).map(Project::name)) // todo: rename to project
                 .withNamedTerminal("version", ofNullable(project).map(Project::version))
                 .withNamedTerminal("arc", arcName)
                 .withNamedTerminal("lot", lotId) // retain case

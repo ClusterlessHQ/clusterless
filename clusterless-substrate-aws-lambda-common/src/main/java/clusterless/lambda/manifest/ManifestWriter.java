@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class ManifestWriter {
     private static final Logger LOG = LogManager.getLogger(ManifestWriter.class);
 
-    protected final S3 s3 = new S3();
+    private final S3 s3 = new S3();
     private final ManifestURI sinkManifestPath;
     private final Dataset sinkDataset;
     private final UriType uriType;
@@ -54,18 +55,18 @@ public class ManifestWriter {
     }
 
     public URI writeSuccessManifest(List<URI> uris, String lotId) {
-        return writeManifest(uris, lotId, sinkManifestPath, ManifestState.complete, null);
+        return writeManifest(uris, lotId, sinkManifestPath, ManifestState.complete, null, null);
     }
 
-    public URI writePartialManifest(List<URI> uris, String lotId, String comment) {
-        return writeManifest(uris, lotId, sinkManifestPath, ManifestState.partial, comment);
+    public URI writePartialManifest(List<URI> uris, String lotId, String attempt, String comment) {
+        return writeManifest(uris, lotId, sinkManifestPath, ManifestState.partial, attempt, comment);
     }
 
-    public URI writeEmptyManifest(List<URI> uris, String lotId) {
-        return writeManifest(uris, lotId, sinkManifestPath, ManifestState.empty, null);
+    public URI writeEmptyManifest(String lotId) {
+        return writeManifest(Collections.emptyList(), lotId, sinkManifestPath, ManifestState.empty, null, null);
     }
 
-    private URI writeManifest(List<URI> uris, String lotId, ManifestURI sinkManifestPath, ManifestState state, String comment) {
+    private URI writeManifest(List<URI> uris, String lotId, ManifestURI sinkManifestPath, ManifestState state, String attempt, String comment) {
         Manifest manifest = Manifest.builder()
                 .withState(state)
                 .withComment(comment)
@@ -76,7 +77,11 @@ public class ManifestWriter {
                 .build();
 
         // put manifest, nested under the 'lot' partition
-        URI sinkManifestIdentifier = sinkManifestPath.withState(state).withLot(lotId).uri();
+        URI sinkManifestIdentifier = sinkManifestPath
+                .withState(state)
+                .withLot(lotId)
+                .withAttemptId(attempt)
+                .uri();
 
         LOG.info("testing manifest: {}", sinkManifestIdentifier);
 

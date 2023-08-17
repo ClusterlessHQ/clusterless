@@ -17,6 +17,9 @@ import clusterless.substrate.aws.util.ErrorsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.services.glue.alpha.ITable;
+import software.amazon.awscdk.services.glue.alpha.Table;
+import software.amazon.awscdk.services.glue.alpha.TableAttributes;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 import software.constructs.IConstruct;
@@ -32,6 +35,7 @@ public class ModelConstruct<M extends Model> extends ManagedConstruct {
     private static final Logger LOG = LogManager.getLogger(ModelConstruct.class);
 
     private final Map<String, IBucket> buckets = new HashMap<>(); // cache the construct to prevent collisions
+    private final Map<String, ITable> tables = new HashMap<>(); // cache the construct to prevent collisions
     private final M model;
 
     public ModelConstruct(@NotNull ManagedComponentContext context, @NotNull M model, @NotNull String id) {
@@ -67,5 +71,13 @@ public class ModelConstruct<M extends Model> extends ManagedConstruct {
     @NotNull
     protected IBucket getBucketFor(String baseId, String bucketName) {
         return buckets.computeIfAbsent(bucketName, k -> Bucket.fromBucketName(this, baseId, k));
+    }
+
+    @NotNull
+    protected ITable getTableFor(String baseId, String tableName) {
+        return tables.computeIfAbsent(tableName, k -> Table.fromTableAttributes(this, baseId, TableAttributes.builder()
+                .tableName(k)
+                .build())
+        );
     }
 }

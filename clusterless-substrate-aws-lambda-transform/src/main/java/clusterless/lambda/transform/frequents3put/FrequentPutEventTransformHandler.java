@@ -195,7 +195,7 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
         eventObserver.applyDatasetItemsSize(uris.size());
 
         URI manifestURI = uris.isEmpty() ?
-                manifestWriter.writeEmptyManifest(uris, lotId) : manifestWriter.writeSuccessManifest(uris, lotId);
+                manifestWriter.writeEmptyManifest(lotId) : manifestWriter.writeSuccessManifest(uris, lotId);
 
         eventObserver.applyManifestURI(manifestURI);
 

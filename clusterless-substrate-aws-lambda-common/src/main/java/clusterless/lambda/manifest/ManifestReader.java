@@ -18,8 +18,7 @@ import java.io.UncheckedIOException;
 import java.net.URI;
 
 public class ManifestReader {
-    protected static final S3 s3 = new S3();
-
+    protected final S3 s3 = new S3();
     protected final ObjectReader manifestReader;
 
     public ManifestReader() {

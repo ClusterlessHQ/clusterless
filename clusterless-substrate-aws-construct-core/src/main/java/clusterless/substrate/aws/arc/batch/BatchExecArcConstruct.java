@@ -9,14 +9,13 @@
 package clusterless.substrate.aws.arc.batch;
 
 import clusterless.naming.Label;
+import clusterless.substrate.aws.arc.common.WorkloadManagedConstruct;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.substrate.aws.construct.ArcConstruct;
-import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.substrate.aws.event.ArcStateContext;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
+import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.props.Lookup;
-import clusterless.substrate.aws.resources.Assets;
-import clusterless.substrate.aws.resources.Functions;
 import clusterless.substrate.aws.resources.Policies;
 import clusterless.substrate.aws.resources.Resources;
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +39,6 @@ import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
@@ -56,9 +54,12 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
     public BatchExecArcConstruct(@NotNull ManagedComponentContext context, @NotNull BatchExecArc model) {
         super(context, model);
 
-        regionalName = Resources.regionallyUniqueProjectLabel(this, Label.of(model.name()));
+        Label modelName = Label.of(model.name());
 
-        Map<String, String> environment = new ArcEnvBuilder(placement(), model()).asEnvironment();
+        regionalName = Resources.regionallyUniqueProjectLabel(this, modelName);
+
+        Map<String, String> environment = new ArcEnvBuilder(placement(), model())
+                .asEnvironment();
 
         AssetImage image = ContainerImage.fromAsset(
                 model().workload().imagePath().toString(),
@@ -115,21 +116,15 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         jobQueue.addComputeEnvironment(computeEnvironment, 1);
 
-        String functionName = Functions.functionName(this, model().name(), "BatchResult");
-        Label functionLabel = Label.of(model().name()).with("BatchResult");
+        String handler = "clusterless.lambda.workload.batch.BatchResultHandler";
 
-        function = Function.Builder.create(this, functionLabel.camelCase())
-                .functionName(functionName)
-                .architecture(Lookup.architecture(model().workload().lambdaRuntimeProps().architecture()))
-                .code(Assets.find(Pattern.compile("^.*-aws-lambda-workload.*\\.zip$"))) // get packaged code
-                .handler("clusterless.lambda.workload.batch.BatchResultHandler") // get handler class name
-                .environment(environment)
-                .runtime(Functions.defaultJVM())
-                .memorySize(model().workload().lambdaRuntimeProps().memorySizeMB())
-                .timeout(Duration.minutes(model().workload().lambdaRuntimeProps().timeoutMin()))
-                .build();
+        Label baseId = Label.of("Result");
+        LambdaJavaRuntimeProps lambdaJavaRuntimeProps = model()
+                .workload()
+                .lambdaRuntimeProps();
 
-        new LambdaLogGroupConstruct(this, functionLabel, function, retentionDays, removalPolicy);
+        function = new WorkloadManagedConstruct(context, baseId, modelName, handler, lambdaJavaRuntimeProps, environment)
+                .function();
 
         grantManifestRead(function());
     }

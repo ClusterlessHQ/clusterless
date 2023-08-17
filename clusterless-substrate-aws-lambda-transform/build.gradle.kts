@@ -36,6 +36,8 @@ dependencies {
     implementation(project(":clusterless-substrate-aws-lambda-common"))
     implementation(project(":clusterless-substrate-aws-lambda-transform-model"))
 
+    implementation("software.amazon.awssdk:sqs")
+
     implementation("com.amazonaws:aws-lambda-java-events")
     implementation("com.amazonaws:aws-lambda-java-serialization")
 
@@ -87,7 +89,7 @@ val openApiGenerateScheduledEvent =
 //    logToStderr = true
 //    generateAliasAsModel = false
         enablePostProcessFile.set(false)
-}
+    }
 
 tasks.compileJava {
     dependsOn.add(openApiGenerateObjectCreated)

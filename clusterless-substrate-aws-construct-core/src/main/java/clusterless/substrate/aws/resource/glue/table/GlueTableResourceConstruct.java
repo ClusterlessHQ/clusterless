@@ -55,6 +55,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
         Table table = constructWithinHandler(() -> Table.Builder.create(this, id(model().tableName()))
                 .database(database)
                 .tableName(model().tableName())
+                .description(model().description())
                 .bucket(tableLocation)
                 .s3Prefix(URIs.asKeyPath(model.pathURI()))
                 .columns(columnsFrom(model.schema().columns()))
@@ -64,6 +65,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
                 // https://docs.aws.amazon.com/athena/latest/ug/glue-best-practices.html#glue-best-practices-partition-index
                 .enablePartitionFiltering(false)
                 .dataFormat(formatFrom(model.schema().dataFormat()))
+                // .encryption(TableEncryption.S3_MANAGED) // cannot be set if setting a bucket
                 .build());
 
         table.applyRemovalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN);

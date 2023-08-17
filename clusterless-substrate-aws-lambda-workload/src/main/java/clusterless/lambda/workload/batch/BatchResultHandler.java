@@ -17,6 +17,8 @@ import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.uri.ManifestURI;
 import clusterless.util.URIs;
 import com.amazonaws.services.lambda.runtime.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class BatchResultHandler extends ArcEventHandler<WorkloadProps> {
+    private static final Logger LOG = LoggerFactory.getLogger(BatchResultHandler.class);
     protected static final S3 s3 = new S3();
 
     @Override

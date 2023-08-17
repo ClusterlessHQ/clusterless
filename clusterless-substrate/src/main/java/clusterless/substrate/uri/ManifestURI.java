@@ -134,7 +134,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
                         .build())
                 .setLotId(value(split, index++))
                 .setState(ManifestState.parse(optional(index++, split).orElse(null)))
-                .setAttemptId(value(split, index++));
+                .setAttemptId(value(split, index));
     }
 
     @Override

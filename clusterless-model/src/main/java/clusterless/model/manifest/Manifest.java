@@ -26,6 +26,8 @@ public class Manifest implements Content, Struct {
     @JsonProperty(required = true)
     ManifestState state;
     String comment;
+
+    //todo: remove, redundant as a manifest is saved in a path describing the dataset
     @JsonProperty(required = true)
     Dataset dataset;
     @JsonProperty(required = true)

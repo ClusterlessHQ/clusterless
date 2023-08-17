@@ -40,7 +40,10 @@ public class CreateDataMachine {
     public CreateDataMachine applyBucketsFrom(Map<String, ? extends Dataset> datasetMap) {
 
         Set<String> buckets = datasetMap.values().stream()
-                .map(Dataset::pathURI).map(URI::getHost).collect(Collectors.toSet());
+                .map(Dataset::pathURI)
+                .filter(u -> u.getScheme().equals("s3"))
+                .map(URI::getHost)
+                .collect(Collectors.toSet());
 
         buckets.forEach(this::createBucket);
 

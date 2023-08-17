@@ -6,7 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.scenario.model.aws;
+package clusterless.scenario.model;
 
-public class S3WatchedStore {
+public enum WatchType {
+    s3,
+    glue
 }

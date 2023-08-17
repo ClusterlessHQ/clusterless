@@ -21,10 +21,10 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
         description = """
                 All data in the source manifest will be copied to the specified dataset.
                                 
-                workloadProps.failArcOnPartialPercent: The percentage of files that can fail before the Arc fails. Default is 0.0."""
+                workloadProps.failArcOnPartialPercent: The percentage of files that can fail before the Arc fails. Default is 0.0.
+                """
 )
 public class S3CopyArcProvider implements ArcComponentService<ManagedComponentContext, S3CopyArc, S3CopyArcConstruct> {
-
     @Override
     public S3CopyArcConstruct create(ManagedComponentContext context, S3CopyArc model) {
         return new S3CopyArcConstruct(context, model);

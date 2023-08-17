@@ -20,3 +20,4 @@ clusterless.substrate.aws.boundary.s3put.S3PutListenerBoundaryProvider
 # Arcs
 clusterless.substrate.aws.arc.s3copy.S3CopyArcProvider
 clusterless.substrate.aws.arc.batch.BatchExecArcProvider
+clusterless.substrate.aws.arc.glue.GlueAddPartitionsArcProvider

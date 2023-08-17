@@ -20,6 +20,7 @@ import java.util.Map;
 public class GlueTableResource extends Resource {
     private String databaseRef;
     private String tableName;
+    private String description;
     private GlueTableSchema schema = new GlueTableSchema();
     private URI pathURI;
     private boolean removeOnDestroy = false;
@@ -34,6 +35,10 @@ public class GlueTableResource extends Resource {
 
     public String tableName() {
         return tableName;
+    }
+
+    public String description() {
+        return description;
     }
 
     public GlueTableSchema schema() {

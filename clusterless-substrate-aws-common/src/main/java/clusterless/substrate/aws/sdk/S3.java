@@ -415,14 +415,16 @@ public class S3 extends ClientBase<S3Client> {
     }
 
     private static boolean hasNoAwsResponse(ClientBase<S3Client>.Response response) {
+        verifyResponse(response);
+
         if (response.exception instanceof NoSuchBucketException || response.exception instanceof NoSuchKeyException) {
             return true;
         }
 
-        if (response.exception != null) {
-            return true;
+        if (response.exception == null) {
+            return response.awsResponse == null;
         }
 
-        return response.awsResponse == null;
+        return true;
     }
 }

@@ -21,6 +21,7 @@ import software.amazon.awscdk.services.s3.IBucket;
 import software.amazon.awscdk.services.stepfunctions.IChainable;
 import software.amazon.awscdk.services.stepfunctions.TaskStateBase;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -41,18 +42,26 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
     }
 
     protected void grantDatasets(IGrantable grantable) {
-        grantEach(model().sources(), id("Source"), b -> b.grantRead(grantable));
-        grantEach(model().sinks(), id("Sink"), b -> b.grantReadWrite(grantable));
+        grantEachBucket(model().sources(), id("Source"), b -> b.grantRead(grantable));
+        grantEachBucket(model().sinks(), id("Sink"), b -> b.grantReadWrite(grantable));
     }
 
     public abstract IChainable createState(String inputPath, String outputPath, IChainable failed, Consumer<TaskStateBase> taskAmendments);
 
-    protected void grantEach(Map<String, ? extends Dataset> sources, String id, Consumer<IBucket> grant) {
-        sources.forEach((key, value) -> {
-            String baseId = Label.of(id).with(key).camelCase();
-            String bucketName = value.pathURI().getHost();
-            grant.accept(getBucketFor(baseId, bucketName));
-        });
+    protected void grantEachBucket(Map<String, ? extends Dataset> datasets, String id, Consumer<IBucket> grant) {
+        datasets.entrySet().stream()
+                .filter(e -> "s3".equals(e.getValue().pathURI().getScheme()))
+                .forEach(e -> {
+                    String baseId = Label.of(id).with(e.getKey()).camelCase();
+                    String bucketName = e.getValue().pathURI().getHost();
+                    grant.accept(getBucketFor(baseId, bucketName));
+                });
+    }
+
+    public void applyToEachTable(Map<String, ? extends Dataset> datasets, Consumer<URI> apply) {
+        datasets.values().stream()
+                .filter(d -> "glue".equals(d.pathURI().getScheme()))
+                .forEach(d -> apply.accept(d.pathURI()));
     }
 
     protected void grantManifestRead(@NotNull IGrantable grantee) {

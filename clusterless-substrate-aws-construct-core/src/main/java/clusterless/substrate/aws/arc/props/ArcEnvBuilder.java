@@ -40,32 +40,36 @@ import java.util.stream.Collectors;
  */
 public class ArcEnvBuilder {
     private final Placement placement;
-    private final Arc<? extends Workload<? extends WorkloadProps>> model;
     private final ArcProps<WorkloadProps> arcProps;
+    private final Map<String, SourceDataset> sources;
+    private final Map<String, SinkDataset> sinks;
+    private final WorkloadProps workloadProps;
 
     public ArcEnvBuilder(Placement placement, Arc<? extends Workload<? extends WorkloadProps>> model) {
         this.placement = placement;
-        this.model = model;
+        this.sources = model.sources();
+        this.sinks = model.sinks();
+        this.workloadProps = model.workload().workloadProps();
         this.arcProps = createArcProps();
     }
 
     protected ArcProps<WorkloadProps> createArcProps() {
-        Map<String, ManifestURI> sourceManifestPaths = model.sources()
+        Map<String, ManifestURI> sourceManifestPaths = sources
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(placement, ManifestState.complete, e.getValue())));
 
-        Map<String, ManifestURI> sinkManifestPaths = model.sinks()
+        Map<String, ManifestURI> sinkManifestPaths = sinks
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> StateURIs.manifestPath(placement, e.getValue())));
 
         return ArcProps.builder()
-                .withSources(model.sources())
-                .withSinks(model.sinks())
+                .withSources(sources)
+                .withSinks(sinks)
                 .withSourceManifestPaths(sourceManifestPaths)
                 .withSinkManifestTemplates(sinkManifestPaths)
-                .withWorkloadProps(model.workload().workloadProps())
+                .withWorkloadProps(workloadProps)
                 .build();
     }
 
@@ -85,7 +89,7 @@ public class ArcEnvBuilder {
                 .withLot(lotId)
                 .uri();
 
-        SourceDataset dataset = model.sources().get(role);
+        SourceDataset dataset = sources.get(role);
 
         return ArcWorkloadContext.builder()
                 .withArcNotifyEvent(

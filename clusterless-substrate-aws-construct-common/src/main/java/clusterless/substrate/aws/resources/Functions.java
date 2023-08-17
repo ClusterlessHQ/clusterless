@@ -34,6 +34,12 @@ public class Functions {
     public static String functionName(Construct scope, String modelName, Label functionName) {
         Objects.requireNonNull(modelName, "modelName may not be null");
         Objects.requireNonNull(functionName, "functionName may not be null");
+        return functionName(scope, Label.of(modelName), functionName);
+    }
+
+    public static String functionName(Construct scope, Label modelName, Label functionName) {
+        Objects.requireNonNull(modelName, "modelName may not be null");
+        Objects.requireNonNull(functionName, "functionName may not be null");
 
         Label region = Region.of(Stack.of(scope).getRegion());
         Label stage = StagedApp.stagedOf(scope).stage();

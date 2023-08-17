@@ -44,8 +44,8 @@ For example scenarios, see
 
 ## About
 
-Clusterless is a tool for deploying scalable and secure data-processing workloads for continuously arriving data, across
-clouds.
+Clusterless is a tool for deploying decentralized, scalable, and secure data-processing workloads for continuously
+arriving data, across clouds.
 
 By standardizing the metadata as new data arrives, workloads can be implemented behind a consistent interface, and can
 be easily deployed to listen for upstream availability events and fire new events to downstream listeners.

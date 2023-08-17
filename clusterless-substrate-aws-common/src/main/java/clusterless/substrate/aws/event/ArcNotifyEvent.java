@@ -24,6 +24,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
     public static final String DETAIL = "Clusterless Arc Notification";
     public static final String DATASET_ID = "datasetId";
 
+    //todo: this may be redundant as the dataset can be looked up by role in the arc props
     Dataset dataset;
     String lot;
     URI manifest;

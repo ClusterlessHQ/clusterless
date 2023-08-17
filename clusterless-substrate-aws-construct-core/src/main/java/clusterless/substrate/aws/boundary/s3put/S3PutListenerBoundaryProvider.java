@@ -46,7 +46,7 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
                     before returning. If a message is available, the call returns sooner than WaitTimeSeconds.
                     If no messages are available and the wait time expires, the call returns successfully with an
                     empty list of messages.
-                    It is recommended to leave this value at zero (0).  
+                    It is recommended to leave this value at zero (0).
                 """
 )
 public class S3PutListenerBoundaryProvider implements BoundaryComponentService<ManagedComponentContext, S3PutListenerBoundary, S3PutListenerBoundaryConstruct> {

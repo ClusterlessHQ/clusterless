@@ -6,7 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.scenario.model.aws;
+package clusterless.scenario.conductor.task;
 
-public class S3IngressStore {
+public class WatcherTask extends BaseSimpleTask {
+    public WatcherTask(String taskDefName, String taskReferenceName) {
+        super(taskDefName, taskReferenceName);
+    }
 }

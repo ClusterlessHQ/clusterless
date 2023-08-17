@@ -10,9 +10,9 @@ package clusterless.substrate.aws.resources;
 
 import clusterless.naming.Ref;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.services.ec2.IVpc;
 import software.amazon.awscdk.services.ec2.Vpc;
@@ -22,7 +22,7 @@ import software.constructs.Construct;
 import java.util.Objects;
 
 public class Vpcs {
-    private static final Logger LOG = LoggerFactory.getLogger(Vpcs.class);
+    private static final Logger LOG = LogManager.getLogger(Vpcs.class);
 
     public static final String COMMON_VPC = "CommonVpc";
     public static final String VPC = "vpc";

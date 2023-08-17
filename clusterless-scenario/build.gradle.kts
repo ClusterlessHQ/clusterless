@@ -21,6 +21,12 @@ dependencies {
         exclude("org.apache.logging.log4j:log4j-slf4j-impl")
     }
 
+    implementation("software.amazon.awssdk:s3")
+    implementation("software.amazon.awssdk:eventbridge")
+    implementation("software.amazon.awssdk:sqs")
+    implementation("software.amazon.awssdk:glue")
+    implementation("software.amazon.awssdk:athena")
+
     // the log4j exclusion works around the strict version requirement
     val conductor = "3.13.8"
     implementation("com.netflix.conductor:conductor-core:$conductor") {

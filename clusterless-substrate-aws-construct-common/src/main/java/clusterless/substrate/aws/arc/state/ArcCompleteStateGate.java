@@ -18,7 +18,7 @@ import software.amazon.awscdk.services.iam.IGrantable;
 
 public class ArcCompleteStateGate extends ArcStateGate {
     public ArcCompleteStateGate(@NotNull ManagedComponentContext context, Arc<?> arc, ArcStateProps arcStateProps, LambdaJavaRuntimeProps runtimeProps) {
-        super(context, Label.of("ArcComplete"), arc, arcStateProps, "clusterless.lambda.arc.ArcStateCompleteHandler", runtimeProps);
+        super(context, Label.of("Complete"), arc, arcStateProps, "clusterless.lambda.arc.ArcStateCompleteHandler", runtimeProps);
     }
 
     @Override

@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.sdk;
 
+import com.google.common.base.Throwables;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +19,11 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.awscore.internal.AwsErrorCode;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.http.SdkHttpResponse;
-import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Optional;
@@ -91,14 +93,11 @@ public abstract class ClientBase<C> {
     }
 
     public class Response {
+
         final AwsResponse awsResponse;
         final SdkHttpResponse sdkHttpResponse;
         Exception exception;
         ResponseBytes<GetObjectResponse> objectAsBytes;
-
-        public Response(PutEventsResponse putEventsResponse) {
-            this((AwsResponse) putEventsResponse);
-        }
 
         public Response(AwsResponse awsResponse) {
             this.awsResponse = awsResponse;
@@ -179,8 +178,7 @@ public abstract class ClientBase<C> {
         }
 
         public boolean isAccessDenied() {
-            if (exception instanceof AwsServiceException) {
-                AwsServiceException serviceException = (AwsServiceException) exception;
+            if (exception instanceof AwsServiceException serviceException) {
                 AwsErrorDetails awsErrorDetails = serviceException.awsErrorDetails();
                 return awsErrorDetails.errorCode().equals("AccessDenied");
             }
@@ -189,8 +187,7 @@ public abstract class ClientBase<C> {
         }
 
         public boolean isThrottled() {
-            if (exception instanceof AwsServiceException) {
-                AwsServiceException serviceException = (AwsServiceException) exception;
+            if (exception instanceof AwsServiceException serviceException) {
                 return serviceException.isThrottlingException();
             }
 
@@ -198,8 +195,7 @@ public abstract class ClientBase<C> {
         }
 
         public boolean isRetryable() {
-            if (exception instanceof AwsServiceException) {
-                AwsServiceException serviceException = (AwsServiceException) exception;
+            if (exception instanceof AwsServiceException serviceException) {
                 return AwsErrorCode.isRetryableErrorCode(serviceException.awsErrorDetails().errorCode());
             }
 
@@ -216,6 +212,17 @@ public abstract class ClientBase<C> {
 
         public InputStream asInputStream() {
             return objectAsBytes.asInputStream();
+        }
+
+    }
+
+    protected static void verifyResponse(ClientBase<S3Client>.Response response) {
+        if (response.exception == null) {
+            return;
+        }
+
+        if (Throwables.getRootCause(response.exception) instanceof ConnectException) {
+            throw new IllegalStateException("unable to connect to S3", response.exception);
         }
     }
 }
