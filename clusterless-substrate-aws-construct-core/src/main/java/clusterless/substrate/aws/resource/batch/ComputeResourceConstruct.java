@@ -14,8 +14,8 @@ import clusterless.substrate.aws.resources.Resources;
 import clusterless.substrate.aws.resources.Vpcs;
 import clusterless.substrate.aws.util.TagsUtil;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.services.batch.alpha.FargateComputeEnvironment;
-import software.amazon.awscdk.services.batch.alpha.IManagedComputeEnvironment;
+import software.amazon.awscdk.services.batch.FargateComputeEnvironment;
+import software.amazon.awscdk.services.batch.IManagedComputeEnvironment;
 import software.constructs.Construct;
 
 /**

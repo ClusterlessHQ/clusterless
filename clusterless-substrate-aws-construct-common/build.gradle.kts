@@ -18,11 +18,10 @@ dependencies {
 
     // update .github actions when updating this version
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
-    val cdkVersion = "2.90.0"
+    val cdkVersion = "2.96.2"
     api("software.amazon.awscdk:aws-cdk-lib:$cdkVersion")
-    api("software.amazon.awscdk:batch-alpha:$cdkVersion-alpha.0")
     api("software.amazon.awscdk:glue-alpha:$cdkVersion-alpha.0")
     // https://mvnrepository.com/artifact/software.constructs/constructs
-    val constructsVersion = "10.2.69"
+    val constructsVersion = "10.2.70"
     api("software.constructs:constructs:$constructsVersion")
 }

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Size;
-import software.amazon.awscdk.services.batch.alpha.*;
+import software.amazon.awscdk.services.batch.*;
 import software.amazon.awscdk.services.ecr.assets.NetworkMode;
 import software.amazon.awscdk.services.ecs.*;
 import software.amazon.awscdk.services.iam.IRole;
