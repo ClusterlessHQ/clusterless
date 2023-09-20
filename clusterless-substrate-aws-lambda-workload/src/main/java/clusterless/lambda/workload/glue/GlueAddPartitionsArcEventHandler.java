@@ -64,7 +64,7 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
 
         Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
 
-        eventObserver.applyFromManifest(incomingManifest);
+        eventObserver.applyFromManifest(incomingManifestIdentifier, incomingManifest);
 
         Map<String, URI> result = new LinkedHashMap<>();
 

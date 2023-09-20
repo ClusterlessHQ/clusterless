@@ -14,7 +14,6 @@ import clusterless.lambda.TestDatasets;
 import clusterless.lambda.arc.ArcEventObserver;
 import clusterless.lambda.arc.ArcProps;
 import clusterless.model.deploy.SinkDataset;
-import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcWorkloadContext;
@@ -29,6 +28,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -104,10 +104,10 @@ public class GlueAddPartitionsArcEventHandlerTest extends LocalStackBase {
 
         Assertions.assertFalse(result.isEmpty());
 
-        verify(eventObserver).applyFromManifest(argThat(m -> m.uris().size() == 1));
-        SourceDataset mainSource = getProps().sources().get("main");
-        verify(eventObserver).applyFromManifest(argThat(m -> m.dataset().name().equals(mainSource.name())));
-        verify(eventObserver).applyFromManifest(argThat(m -> m.dataset().version().equals(mainSource.version())));
+        ArcNotifyEvent arcNotifyEvent = arcWorkloadContext.arcNotifyEvent();
+        verify(eventObserver).applyFromManifest(argThat(u -> u.equals(arcNotifyEvent.manifest())), argThat(m -> m.uris().size() == 1));
+        verify(eventObserver).applyFromManifest(argThat(u -> u.equals(arcNotifyEvent.manifest())), isNotNull());
+        verify(eventObserver).applyFromManifest(argThat(u -> u.equals(arcNotifyEvent.manifest())), isNotNull());
 
         SinkDataset mainSink = getProps().sinks().get("main");
         verify(eventObserver).applyToDataset(argThat(s -> s.equals("main")), argThat(d -> d.name().equals(mainSink.name())));

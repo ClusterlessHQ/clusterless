@@ -51,12 +51,10 @@ public abstract class ArcEventHandler<P extends WorkloadProps> extends EventResu
     protected ArcEventObserver observer() {
         return new ArcEventObserver() {
             @Override
-            public void applyFromManifest(Manifest manifest) {
-                String name = manifest.dataset() != null ? manifest.dataset().name() : null;
-                String version = manifest.dataset() != null ? manifest.dataset().version() : null;
+            public void applyFromManifest(URI uri, Manifest manifest) {
                 String lotId = manifest.lotId();
                 int size = manifest.uris() != null ? manifest.uris().size() : 0;
-                LOG.info("manifest from dataset name: {}, version: {}, lot: {}, size: {}", name, version, lotId, size);
+                LOG.info("manifest from dataset uri: {}, lot: {}, size: {}", uri, lotId, size);
             }
 
             @Override

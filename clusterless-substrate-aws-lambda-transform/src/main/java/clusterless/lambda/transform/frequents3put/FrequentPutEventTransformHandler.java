@@ -54,7 +54,6 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
 
     protected ManifestWriter manifestWriter = new ManifestWriter(
             transformProps.manifestCompletePath(),
-            transformProps.dataset(),
             UriType.identifier
     );
 

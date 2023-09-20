@@ -24,18 +24,14 @@ public class Manifest implements Content, Struct {
     public static final String JSON_EXTENSION = "json";
 
     @JsonProperty(required = true)
-    ManifestState state;
-    String comment;
-
-    //todo: remove, redundant as a manifest is saved in a path describing the dataset
+    protected ManifestState state;
+    protected String comment;
     @JsonProperty(required = true)
-    Dataset dataset;
+    protected String lotId;
     @JsonProperty(required = true)
-    String lotId;
+    protected UriType uriType = UriType.identifier;
     @JsonProperty(required = true)
-    UriType uriType = UriType.identifier;
-    @JsonProperty(required = true)
-    List<URI> uris;
+    protected List<URI> uris;
 
     public Manifest() {
     }
@@ -56,10 +52,6 @@ public class Manifest implements Content, Struct {
         return uriType;
     }
 
-    public Dataset dataset() {
-        return dataset;
-    }
-
     public String lotId() {
         return lotId;
     }
@@ -77,7 +69,6 @@ public class Manifest implements Content, Struct {
     public String contentType() {
         return "application/json";
     }
-
 
     public static final class Builder {
         ManifestState state;
@@ -104,11 +95,6 @@ public class Manifest implements Content, Struct {
             return this;
         }
 
-        public Builder withDataset(Dataset dataset) {
-            this.dataset = dataset;
-            return this;
-        }
-
         public Builder withLotId(String lotId) {
             this.lotId = lotId;
             return this;
@@ -130,7 +116,6 @@ public class Manifest implements Content, Struct {
             manifest.comment = this.comment;
             manifest.state = this.state;
             manifest.uriType = this.uriType;
-            manifest.dataset = this.dataset;
             manifest.lotId = this.lotId;
             return manifest;
         }

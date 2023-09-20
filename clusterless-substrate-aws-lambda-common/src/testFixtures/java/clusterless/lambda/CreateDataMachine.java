@@ -100,7 +100,6 @@ public class CreateDataMachine {
 
         Manifest manifest = Manifest.builder()
                 .withUris(List.of(dataIdentifier))
-                .withDataset(new Dataset(dataset)) // don't serialize a subclass
                 .withLotId(lot)
                 .withUriType(UriType.identifier)
                 .build();

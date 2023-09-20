@@ -57,7 +57,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
 
         Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
 
-        eventObserver.applyFromManifest(incomingManifest);
+        eventObserver.applyFromManifest(incomingManifestIdentifier, incomingManifest);
 
         Map<String, URI> result = new LinkedHashMap<>();
 

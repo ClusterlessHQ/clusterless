@@ -9,7 +9,6 @@
 package clusterless.lambda.manifest;
 
 import clusterless.model.UriType;
-import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
 import clusterless.model.manifest.ManifestState;
@@ -29,28 +28,21 @@ public class ManifestWriter {
 
     private final S3 s3 = new S3();
     private final ManifestURI sinkManifestPath;
-    private final Dataset sinkDataset;
     private final UriType uriType;
 
     public static Map<String, ManifestWriter> writers(Map<String, SinkDataset> sinks, Map<String, ManifestURI> sinkManifestPaths, UriType uriType) {
         Map<String, ManifestWriter> results = new HashMap<>();
 
-        for (Map.Entry<String, SinkDataset> entry : sinks.entrySet()) {
-            String role = entry.getKey();
-            SinkDataset sinkDataset = entry.getValue();
-            results.put(role, new ManifestWriter(
-                    sinkManifestPaths.get(role),
-                    sinkDataset,
-                    uriType
-            ));
+        for (String role : sinks.keySet()) {
+            ManifestURI sinkManifestPath = sinkManifestPaths.get(role);
+            results.put(role, new ManifestWriter(sinkManifestPath, uriType));
         }
 
         return results;
     }
 
-    public ManifestWriter(ManifestURI sinkManifestPath, Dataset sinkDataset, UriType uriType) {
+    public ManifestWriter(ManifestURI sinkManifestPath, UriType uriType) {
         this.sinkManifestPath = sinkManifestPath;
-        this.sinkDataset = new Dataset(sinkDataset);
         this.uriType = uriType;
     }
 
@@ -72,7 +64,6 @@ public class ManifestWriter {
                 .withComment(comment)
                 .withLotId(lotId)
                 .withUriType(uriType)
-                .withDataset(sinkDataset)
                 .withUris(uris)
                 .build();
 
