@@ -65,7 +65,7 @@ public abstract class ProcessExec {
 
             RetryConfig config = RetryConfig.<Integer>custom()
                     .maxAttempts(maxAttempts)
-                    .intervalFunction(IntervalFunction.of(Duration.ofSeconds(30)))
+                    .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(30), 2.0))
                     .consumeResultBeforeRetryAttempt((attempt, exitCode) -> LOG.warn("got exit code: {}, for command: {}, retry attempt: {} of {}", exitCode, args, attempt, retries))
                     .retryOnResult(exitCode -> exitCode != 0)
                     .failAfterMaxAttempts(true)
