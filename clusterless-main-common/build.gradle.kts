@@ -16,4 +16,5 @@ dependencies {
 
     implementation("info.picocli:picocli")
     implementation("com.github.jknack:handlebars")
+    implementation("io.github.resilience4j:resilience4j-retry")
 }

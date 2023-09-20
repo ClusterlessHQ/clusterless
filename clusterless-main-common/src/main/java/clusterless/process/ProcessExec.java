@@ -11,10 +11,14 @@ package clusterless.process;
 import clusterless.config.Configuration;
 import clusterless.json.JSONUtil;
 import clusterless.startup.Startup;
+import io.github.resilience4j.core.IntervalFunction;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -23,6 +27,7 @@ public abstract class ProcessExec {
     protected Supplier<Boolean> dryRun = () -> false;
     protected Supplier<Boolean> retry = () -> false;
     protected Supplier<Integer> verbosity = () -> 0;
+    private int retries = 5;
 
     public ProcessExec() {
     }
@@ -52,22 +57,24 @@ public abstract class ProcessExec {
 
     protected int executeProcess(Map<String, String> environment, List<String> args) {
         try {
-            int exitCode = process(environment, args);
+            int maxAttempts = retry() ? retries : 1;
 
-            if (retry() && exitCode != 0) {
-                LOG.warn("got exit code: {}, for command: {}, retrying in 15 seconds", exitCode, args);
-                Thread.sleep(15 * 1000);
-                exitCode = process(environment, args);
-
-                if (retry() && exitCode != 0) {
-                    LOG.warn("got exit code: {}, for command: {}, retrying in 30 seconds", exitCode, args);
-                    Thread.sleep(30 * 1000);
-                    exitCode = process(environment, args);
-                }
+            if (retry()) {
+                LOG.info("enabled retrying command: {} {} times", args, maxAttempts);
             }
 
-            return exitCode;
-        } catch (IOException | InterruptedException e) {
+            RetryConfig config = RetryConfig.<Integer>custom()
+                    .maxAttempts(maxAttempts)
+                    .intervalFunction(IntervalFunction.of(Duration.ofSeconds(30)))
+                    .consumeResultBeforeRetryAttempt((attempt, exitCode) -> LOG.warn("got exit code: {}, for command: {}, retry attempt: {} of {}", exitCode, args, attempt, retries))
+                    .retryOnResult(exitCode -> exitCode != 0)
+                    .failAfterMaxAttempts(true)
+                    .build();
+
+            Retry process = Retry.of("process", config);
+
+            return process.executeCheckedSupplier(() -> process(environment, args));
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
