@@ -25,8 +25,7 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     @CommandLine.Option(
             names = {"-l", "--lot"},
             description = "the lot id of the manifest to source",
-            required = false,
-            defaultValue = "lotId"
+            required = false
     )
     String lotId;
 

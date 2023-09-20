@@ -10,6 +10,7 @@ package clusterless.substrate.aws;
 
 import clusterless.config.CommonConfig;
 import clusterless.substrate.aws.cdk.Provider;
+import clusterless.util.Strings;
 import picocli.CommandLine;
 
 public class CommonCommand {
@@ -26,5 +27,13 @@ public class CommonCommand {
 
     protected int verbosityLevel() {
         return kernel.verbosity().level();
+    }
+
+    protected String prompt(String value, String prompt) {
+        if (value == null && System.console() != null) {
+            return Strings.emptyToNull(System.console().readLine(prompt));
+        }
+
+        return value;
     }
 }

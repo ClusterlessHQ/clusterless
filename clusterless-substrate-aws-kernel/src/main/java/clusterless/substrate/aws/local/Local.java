@@ -16,6 +16,7 @@ import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Workload;
+import clusterless.substrate.aws.CommonCommand;
 import clusterless.substrate.aws.cdk.Provider;
 import clusterless.util.Runtimes;
 import picocli.CommandLine;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 @CommandLine.Command(
         name = "local"
 )
-public class Local implements Callable<Integer> {
+public class Local extends CommonCommand implements Callable<Integer> {
     @CommandLine.Mixin
     LocalCommandOptions commandOptions = new LocalCommandOptions();
 
@@ -67,7 +68,7 @@ public class Local implements Callable<Integer> {
                 .values()
                 .stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList());
+                .toList();
 
         if (arcs.isEmpty()) {
             System.err.println("no arcs found for: " + commandOptions.arc());
@@ -82,7 +83,8 @@ public class Local implements Callable<Integer> {
 
         ArcLocalExecutor executor = executorFor(deployable.placement(), arc);
 
-        List<ArcLocalExecutor.Command> commands = executor.commands(commandOptions.role(), commandOptions.lotId(), commandOptions.manifestState());
+        String lotId = prompt(commandOptions.lotId(), "Enter lot id: ");
+        List<ArcLocalExecutor.Command> commands = executor.commands(commandOptions.role(), lotId, commandOptions.manifestState());
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());
 

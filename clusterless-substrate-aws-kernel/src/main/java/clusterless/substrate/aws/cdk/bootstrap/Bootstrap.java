@@ -187,12 +187,4 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
     private static Path createBootstrapMetaPath(String outputPath) {
         return Paths.get(outputPath).resolve("bootstrap").resolve("meta.json");
     }
-
-    protected String prompt(String value, String prompt) {
-        if (value == null && System.console() != null) {
-            return Strings.emptyToNull(System.console().readLine(prompt));
-        }
-
-        return value;
-    }
 }
