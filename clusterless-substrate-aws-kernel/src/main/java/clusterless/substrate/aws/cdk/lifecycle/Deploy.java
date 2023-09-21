@@ -12,6 +12,7 @@ import clusterless.command.DeployCommandOptions;
 import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
+import clusterless.substrate.aws.meta.Metadata;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -30,13 +31,19 @@ public class Deploy extends BaseCDKCommand implements Callable<Integer> {
 
         confirmBootstrapForPlacements(commandOptions.projectFiles(), processExec.profile());
 
-        return processExec.executeLifecycleProcess(
+        Integer exitCode = processExec.executeLifecycleProcess(
                 getCommonConfig(),
                 getProviderConfig(),
                 commandOptions,
-                CDKCommand.Deploy,
+                CDKCommand.DEPLOY,
                 getRequireDeployApproval(commandOptions.approve().orElse(null))
         );
+
+        if (exitCode != 0) {
+            return exitCode;
+        }
+
+        return Metadata.pushDeployablesMetadata(processExec.getOutputPath(), commandOptions.dryRun());
     }
 
 }

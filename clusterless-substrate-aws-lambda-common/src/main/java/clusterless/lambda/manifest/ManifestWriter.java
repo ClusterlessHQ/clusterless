@@ -76,7 +76,7 @@ public class ManifestWriter {
 
         LOG.info("testing manifest: {}", sinkManifestIdentifier);
 
-        // todo: perform a listing to test for states (completed, empty, etc)
+        // TODO: perform a listing to test for states (completed, empty, etc)
         S3.Response exists = s3.exists(sinkManifestIdentifier);
 
         exists.isNotSuccessOrThrow(

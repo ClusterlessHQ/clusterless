@@ -13,6 +13,7 @@ import clusterless.command.DestroyCommandOptions;
 import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;
+import clusterless.substrate.aws.meta.Metadata;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -28,12 +29,18 @@ public class Destroy extends BaseCDKCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return processExec.executeLifecycleProcess(
+        Integer exitCode = processExec.executeLifecycleProcess(
                 getCommonConfig(),
                 getProviderConfig(),
                 commandOptions,
-                CDKCommand.Destroy,
+                CDKCommand.DESTROY,
                 getRequireDestroyApproval(commandOptions.approve().orElse(null))
         );
+
+        if (exitCode != 0) {
+            return exitCode;
+        }
+
+        return Metadata.removeDeployablesMetadata(processExec.getOutputPath(), commandOptions.dryRun());
     }
 }

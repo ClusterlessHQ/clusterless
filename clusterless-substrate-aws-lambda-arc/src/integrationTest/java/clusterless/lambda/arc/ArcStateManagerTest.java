@@ -11,7 +11,7 @@ package clusterless.lambda.arc;
 import clusterless.lambda.LocalStackBase;
 import clusterless.lambda.TestLots;
 import clusterless.model.state.ArcState;
-import clusterless.substrate.uri.ArcURI;
+import clusterless.substrate.uri.ArcStateURI;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class ArcStateManagerTest extends LocalStackBase {
     protected ArcStateProps getProps() {
         return ArcStateProps.builder()
                 .withArcStatePath(
-                        ArcURI.builder()
+                        ArcStateURI.builder()
                                 .withPlacement(defaultPlacement())
                                 .withProject(defaultProject())
                                 .withArcName("test-arc")

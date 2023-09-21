@@ -77,7 +77,7 @@ public class BaseCDKCommand extends CommonCommand {
                 continue;
             }
 
-            // todo: add copy/paste bootstrap command here
+            // TODO: add copy/paste bootstrap command here
             String account = placement.account();
             String region = placement.region();
             String stage = placement.stage();

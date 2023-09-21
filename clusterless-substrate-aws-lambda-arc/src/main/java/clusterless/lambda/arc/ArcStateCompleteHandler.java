@@ -145,7 +145,7 @@ public class ArcStateCompleteHandler extends StreamResultHandler<ArcStateContext
         Optional<ArcState> priorArcState = arcStateManager.setStateFor(lotId, newArcState, hasWorkloadError ? workloadError : null);
 
         // confirm there isn't some race condition
-        // todo: create new exception to capture in state machine
+        // TODO: create new exception to capture in state machine
         // this should always be running state
         ArcState currentState = stateContext.currentState();
         if (currentState == ArcState.running && currentState != priorArcState.orElse(null)) {

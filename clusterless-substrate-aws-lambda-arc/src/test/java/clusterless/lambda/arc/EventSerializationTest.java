@@ -15,7 +15,7 @@ import clusterless.model.manifest.ManifestState;
 import clusterless.model.state.ArcState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.event.ArcStateContext;
-import clusterless.substrate.uri.ArcURI;
+import clusterless.substrate.uri.ArcStateURI;
 import clusterless.util.Env;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ public class EventSerializationTest extends LambdaHandlerTestBase {
                 .withSinks(datasets().sinkDatasetMap())
                 .withSources(datasets().sourceDatasetMap())
                 .withArcStatePath(
-                        ArcURI.builder()
+                        ArcStateURI.builder()
                                 .withPlacement(defaultPlacement())
                                 .withProject(defaultProject())
                                 .withArcName("test-arc")

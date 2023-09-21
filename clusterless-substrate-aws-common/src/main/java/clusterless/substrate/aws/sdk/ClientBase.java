@@ -146,15 +146,15 @@ public abstract class ClientBase<C> {
             isSuccessOrThrow(message, RuntimeException::new);
         }
 
-        public void isNotSuccessOrThrow(Function<Response, String> message, BiFunction<String, Exception, RuntimeException> exception) {
+        public void isNotSuccessOrThrow(Function<Response, String> message, BiFunction<String, Throwable, RuntimeException> exception) {
             isOrThrow(Predicate.not(Response::isSuccess), message, exception);
         }
 
-        public void isSuccessOrThrow(Function<Response, String> message, BiFunction<String, Exception, RuntimeException> exception) {
+        public void isSuccessOrThrow(Function<Response, String> message, BiFunction<String, Throwable, RuntimeException> exception) {
             isOrThrow(Response::isSuccess, message, exception);
         }
 
-        private void isOrThrow(Predicate<Response> predicate, Function<Response, String> message, BiFunction<String, Exception, RuntimeException> exception) {
+        private void isOrThrow(Predicate<Response> predicate, Function<Response, String> message, BiFunction<String, Throwable, RuntimeException> exception) {
             if (predicate.test(this)) {
                 return;
             }
@@ -163,6 +163,21 @@ public abstract class ClientBase<C> {
             LOG.error(m, this.errorMessage());
 
             throw exception.apply(m, this.exception);
+        }
+
+        public Optional<Throwable> isSuccessOrLog(Function<Response, String> message) {
+            return isOrLog(Response::isSuccess, message);
+        }
+
+        private Optional<Throwable> isOrLog(Predicate<Response> predicate, Function<Response, String> message) {
+            if (predicate.test(this)) {
+                return Optional.empty();
+            }
+
+            String m = message.apply(this);
+            LOG.error(m, this.errorMessage());
+
+            return Optional.of(this.exception);
         }
 
         public String errorMessage() {

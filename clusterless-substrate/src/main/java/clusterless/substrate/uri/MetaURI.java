@@ -8,7 +8,6 @@
 
 package clusterless.substrate.uri;
 
-import clusterless.model.State;
 import clusterless.model.Struct;
 import clusterless.model.deploy.Placement;
 import clusterless.substrate.store.StateStore;
@@ -22,23 +21,21 @@ import java.util.regex.Pattern;
 
 import static clusterless.util.Optionals.optional;
 
-public abstract class StateURI<S extends State, T extends StateURI<S, T>> implements Struct {
+public abstract class MetaURI<S extends Struct, T extends MetaURI<S, T>> implements Struct {
     private static final Pattern COMPILE = Pattern.compile("^.+=");
     protected StateStore stateStore;
     protected Placement placement;
-    protected String lotId;
-    protected S state;
+    protected S struct;
     protected Supplier<String> storeName = Lazy.of(this::storeName);
 
-    public StateURI(StateURI<S, T> other) {
+    public MetaURI(MetaURI<S, T> other) {
         this.stateStore = other.stateStore;
         this.placement = other.placement;
-        this.lotId = other.lotId;
-        this.state = other.state;
         this.storeName = other.storeName;
+        this.struct = other.struct;
     }
 
-    protected StateURI(StateStore stateStore) {
+    protected MetaURI(StateStore stateStore) {
         this.stateStore = stateStore;
     }
 
@@ -56,12 +53,8 @@ public abstract class StateURI<S extends State, T extends StateURI<S, T>> implem
         return placement;
     }
 
-    public String lotId() {
-        return lotId;
-    }
-
-    public S state() {
-        return state;
+    public S struct() {
+        return struct;
     }
 
     protected abstract T copy();
@@ -76,25 +69,12 @@ public abstract class StateURI<S extends State, T extends StateURI<S, T>> implem
         return self();
     }
 
-    protected T setLotId(String lotId) {
-        this.lotId = lotId;
-        return self();
-    }
-
-    protected T setState(S state) {
-        this.state = state;
+    protected T setStruct(S struct) {
+        this.struct = struct;
         return self();
     }
 
     protected abstract T self();
-
-    public T withLot(String lotId) {
-        return copy().setLotId(lotId);
-    }
-
-    public T withState(S state) {
-        return copy().setState(state);
-    }
 
     protected String storeName() {
         require(stateStore, "stateBucket");

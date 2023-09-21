@@ -150,7 +150,6 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
     private Partition terminalPartition() {
         Partition attempt = state != null && state.hasAttempts() ? Partition.namedOf("attempt", attemptId()) : Partition.NULL;
 
-
         return Partition.of(DATASETS)
                 .withNamedTerminal("name", Optional.ofNullable(dataset).map(Dataset::name))
                 .withNamedTerminal("version", Optional.ofNullable(dataset).map(Dataset::version))

@@ -27,6 +27,6 @@ public class Diff extends BaseCDKCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, CDKCommand.Diff);
+        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, CDKCommand.DIFF);
     }
 }

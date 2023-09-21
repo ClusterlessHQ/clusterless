@@ -8,15 +8,21 @@
 
 package clusterless.substrate.aws.cdk;
 
+import java.util.Optional;
+
 public enum CDKCommand {
-    Deploy,
-    Destroy,
-    Diff,
-    Verify,
-    Synth,
-    Import;
+    DEPLOY,
+    DESTROY,
+    DIFF,
+    VERIFY,
+    SYNTH,
+    IMPORT;
 
     public String command() {
         return name().toLowerCase();
+    }
+
+    public static CDKCommand from(String command) {
+        return Optional.ofNullable(command).map(String::toUpperCase).map(CDKCommand::valueOf).orElse(null);
     }
 }

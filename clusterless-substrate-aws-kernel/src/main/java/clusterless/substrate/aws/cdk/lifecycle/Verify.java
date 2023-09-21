@@ -30,6 +30,6 @@ public class Verify extends BaseCDKCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, CDKCommand.Synth);
+        return processExec.executeLifecycleProcess(getCommonConfig(), getProviderConfig(), commandOptions, CDKCommand.SYNTH);
     }
 }

@@ -47,7 +47,7 @@ public class Import extends BaseCDKCommand implements Callable<Integer> {
                 getCommonConfig(),
                 getProviderConfig(),
                 commandOptions,
-                CDKCommand.Import,
+                CDKCommand.IMPORT,
                 args
         );
     }

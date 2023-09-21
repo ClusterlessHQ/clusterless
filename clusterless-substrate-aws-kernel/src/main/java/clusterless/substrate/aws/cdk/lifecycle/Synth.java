@@ -11,6 +11,9 @@ package clusterless.substrate.aws.cdk.lifecycle;
 import clusterless.command.ProjectCommandOptions;
 import clusterless.model.deploy.Deployable;
 import clusterless.substrate.aws.cdk.BaseCDKCommand;
+import clusterless.substrate.aws.cdk.CDKCommand;
+import clusterless.substrate.aws.cdk.CDKProcessExec;
+import clusterless.substrate.aws.meta.Metadata;
 import clusterless.substrate.aws.util.TagsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,6 +70,11 @@ public class Synth extends BaseCDKCommand implements Callable<Integer> {
         }
 
         lifecycle.synthProjectModels(deployables);
+
+        CDKCommand cdkCommand = CDKProcessExec.currentCommand();
+        if (cdkCommand == CDKCommand.DEPLOY || cdkCommand == CDKCommand.DESTROY) {
+            Metadata.writeProjectMetaLocal(deployables);
+        }
 
         return 0;
     }

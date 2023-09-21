@@ -12,7 +12,7 @@ import clusterless.model.Struct;
 import clusterless.model.deploy.Project;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.SourceDataset;
-import clusterless.substrate.uri.ArcURI;
+import clusterless.substrate.uri.ArcStateURI;
 
 import java.util.Map;
 
@@ -21,7 +21,7 @@ public class ArcStateProps implements Struct {
     String name;
     Map<String, SourceDataset> sources;
     Map<String, SinkDataset> sinks;
-    ArcURI arcStatePath;
+    ArcStateURI arcStatePath;
     String eventBusName;
 
     public static Builder builder() {
@@ -44,7 +44,7 @@ public class ArcStateProps implements Struct {
         return sinks;
     }
 
-    public ArcURI arcStatePath() {
+    public ArcStateURI arcStatePath() {
         return arcStatePath;
     }
 
@@ -57,7 +57,7 @@ public class ArcStateProps implements Struct {
         String name;
         Map<String, SourceDataset> sources;
         Map<String, SinkDataset> sinks;
-        ArcURI arcStatePath;
+        ArcStateURI arcStatePath;
         String eventBusName;
 
         private Builder() {
@@ -87,7 +87,7 @@ public class ArcStateProps implements Struct {
             return this;
         }
 
-        public Builder withArcStatePath(ArcURI arcStatePath) {
+        public Builder withArcStatePath(ArcStateURI arcStatePath) {
             this.arcStatePath = arcStatePath;
             return this;
         }

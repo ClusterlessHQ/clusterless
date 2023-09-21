@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
@@ -38,61 +39,60 @@ import static java.util.Optional.ofNullable;
  * <p>
  * {@code {providerService}://{stateStore}/{projectName}/{projectVersion}/{arcName}/{lot}/{state}.arc}
  */
-@JsonSerialize(using = ArcURI.Serializer.class)
-@JsonDeserialize(using = ArcURI.DeSerializer.class)
-public class ArcURI extends MetaURI<Project, ArcURI> {
+@JsonSerialize(using = ProjectURI.Serializer.class)
+@JsonDeserialize(using = ProjectURI.DeSerializer.class)
+public class ProjectURI extends MetaURI<Project, ProjectURI> {
 
-    public static final String ARCS = "arcs";
+    public static final String PROJECTS = "projects";
 
     public static Builder builder() {
         return Builder.builder();
     }
 
-    static class Serializer extends StdScalarSerializer<ArcURI> {
+    static class Serializer extends StdScalarSerializer<ProjectURI> {
         protected Serializer() {
-            super(ArcURI.class);
+            super(ProjectURI.class);
         }
 
         @Override
-        public void serialize(ArcURI value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        public void serialize(ProjectURI value, JsonGenerator gen, SerializerProvider provider) throws IOException {
             gen.writeString(value.template());
         }
     }
 
-    static class DeSerializer extends StdScalarDeserializer<ArcURI> {
+    static class DeSerializer extends StdScalarDeserializer<ProjectURI> {
         protected DeSerializer() {
-            super(ArcURI.class);
+            super(ProjectURI.class);
         }
 
         @Override
-        public ArcURI deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+        public ProjectURI deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
             // The critical path: ensure we handle the common case first.
             if (p.hasToken(JsonToken.VALUE_STRING)) {
-                return ArcURI.parse(p.getText());
+                return ProjectURI.parse(p.getText());
             }
             // [databind#381]
 //            if (p.hasToken(JsonToken.START_ARRAY)) {
 //                return _deserializeFromArray(p, ctxt);
 //            }
 
-            return ArcURI.parse(_parseString(p, ctxt, this));
+            return ProjectURI.parse(_parseString(p, ctxt, this));
         }
     }
 
     protected Project project;
-    protected String arcName;
 
-    protected ArcURI() {
+    protected ProjectURI() {
         super(StateStore.Meta);
     }
 
-    protected ArcURI(ArcURI other) {
+    protected ProjectURI(ProjectURI other) {
         super(other);
         this.project = other.project;
     }
 
-    protected ArcURI copy() {
-        return new ArcURI(this);
+    protected ProjectURI copy() {
+        return new ProjectURI(this);
     }
 
     @Override
@@ -100,39 +100,36 @@ public class ArcURI extends MetaURI<Project, ArcURI> {
         return project == null || project.name() == null || project.version() == null;
     }
 
-    public static ArcURI parse(String template) {
+    public static ProjectURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
 
-        // {providerService}://{stateStore}/arcs/{projectName}/{projectVersion}/{arcName}/arc.json
+        // {providerService}://{stateStore}/projects/{projectName}/{projectVersion}/project.json
         String[] split = template.split("/");
 
         int index = 4; // start after arcs
-        return new ArcURI()
+        return new ProjectURI()
                 .setStoreName(value(split, 2))
                 .setProject(Project.Builder.builder()
                         .withName(value(split, index++))
-                        .withVersion(value(split, index++))
-                        .build())
-                .withArcName(value(split, index));
+                        .withVersion(value(split, index))
+                        .build());
     }
 
     @Override
     public URI uriPrefix() {
-        Partition partition = Partition.of(ARCS)
-                .withNamedTerminal("project", ofNullable(project).map(Project::name))
-                .withNamedTerminal("version", ofNullable(project).map(Project::version))
-                .withNamedTerminal("arc", arcName);
+        Partition partition = Partition.of(PROJECTS)
+                .withNamedTerminal("name", ofNullable(project).map(Project::name))
+                .withNamedTerminal("version", ofNullable(project).map(Project::version));
 
         return createUri(partition.prefix());
     }
 
     @Override
     public URI uriPath() {
-        String path = Partition.of(ARCS)
-                .withNamedTerminal("project", ofNullable(project).map(Project::name))
-                .withNamedTerminal("version", ofNullable(project).map(Project::version))
-                .withNamedTerminal("arc", arcName)
-                .with("arc.json")
+        String path = Partition.of(PROJECTS)
+                .withNamedTerminal("name", Optional.ofNullable(project).map(Project::name))
+                .withNamedTerminal("version", Optional.ofNullable(project).map(Project::version))
+                .with("project.json")
                 .prefix();
 
         return createUri(path);
@@ -142,11 +139,10 @@ public class ArcURI extends MetaURI<Project, ArcURI> {
     public URI uri() {
         require(project, "project");
 
-        String path = Partition.of(ARCS)
-                .withNamed("project", project.name())
+        String path = Partition.of(PROJECTS)
+                .withNamed("name", project.name())
                 .withNamed("version", project.version())
-                .withNamed("arc", arcName)
-                .with("arc.json")
+                .with("project.json")
                 .prefix();
 
         return createUri(path);
@@ -154,43 +150,31 @@ public class ArcURI extends MetaURI<Project, ArcURI> {
 
     @Override
     public String template() {
-        String path = Partition
-                .namedOf("project", ofNullable(project.name()).orElse("{projectName}"))
+        String path = Partition.namedOf("name", ofNullable(project.name()).orElse("{projectName}"))
                 .withNamed("version", ofNullable(project.version()).orElse("{projectVersion}"))
-                .withNamed("arc", ofNullable(arcName).orElse("{arcName}"))
-                .with("arc.json")
+                .with("project.json")
                 .partition();
 
-        return String.format("s3://%s/%s/%s", storeName.get(), ARCS, path);
+        return String.format("s3://%s/%s/%s", storeName.get(), PROJECTS, path);
     }
 
-    protected ArcURI setProject(Project project) {
+    protected ProjectURI setProject(Project project) {
         this.project = project;
         return this;
     }
 
-    public ArcURI setArcName(String arcName) {
-        this.arcName = arcName;
-        return this;
-    }
-
-    public ArcURI withProject(Project project) {
+    public ProjectURI withProject(Project project) {
         return copy().setProject(project);
     }
 
-    public ArcURI withArcName(String arcName) {
-        return copy().setArcName(arcName);
-    }
-
     @Override
-    public ArcURI self() {
+    public ProjectURI self() {
         return this;
     }
 
     public static final class Builder {
-        protected Project project;
-        protected String arcName;
         protected Placement placement;
+        protected Project project;
 
         private Builder() {
         }
@@ -199,27 +183,21 @@ public class ArcURI extends MetaURI<Project, ArcURI> {
             return new Builder();
         }
 
-        public Builder withProject(Project project) {
-            this.project = project;
-            return this;
-        }
-
-        public Builder withArcName(String arcName) {
-            this.arcName = arcName;
-            return this;
-        }
-
         public Builder withPlacement(Placement placement) {
             this.placement = placement;
             return this;
         }
 
-        public ArcURI build() {
-            ArcURI arcURI = new ArcURI();
-            arcURI.setProject(project);
-            arcURI.setArcName(arcName);
-            arcURI.setPlacement(placement);
-            return arcURI;
+        public Builder withProject(Project project) {
+            this.project = project;
+            return this;
+        }
+
+        public ProjectURI build() {
+            ProjectURI projectURI = new ProjectURI();
+            projectURI.setPlacement(placement);
+            projectURI.setProject(project);
+            return projectURI;
         }
     }
 }

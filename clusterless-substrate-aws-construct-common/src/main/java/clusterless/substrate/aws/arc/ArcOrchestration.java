@@ -22,7 +22,7 @@ import clusterless.substrate.aws.managed.ManagedConstruct;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.resources.Arcs;
 import clusterless.substrate.aws.resources.Events;
-import clusterless.substrate.uri.ArcURI;
+import clusterless.substrate.uri.ArcStateURI;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.events.targets.SfnStateMachine;
@@ -57,7 +57,7 @@ public class ArcOrchestration extends ManagedConstruct implements Orchestration 
                 .withSinks(arc.sinks())
                 .withSources(arc.sources())
                 .withArcStatePath(
-                        ArcURI.builder()
+                        ArcStateURI.builder()
                                 .withPlacement(context().deployable().placement())
                                 .withProject(context().deployable().project())
                                 .withArcName(arc.name())

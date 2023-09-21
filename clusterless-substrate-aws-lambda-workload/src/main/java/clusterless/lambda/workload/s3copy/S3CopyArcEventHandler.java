@@ -90,7 +90,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
                 toUris.add(new Tuple2<>(fromUri, toURI));
             }
 
-            // todo: check integrity of uris to be copied
+            // TODO: check integrity of uris to be copied
 
             List<URI> completed = new LinkedList<>();
             List<Tuple3<URI, URI, S3.Response>> failed = new LinkedList<>();

@@ -11,7 +11,7 @@ package clusterless.lambda.arc;
 import clusterless.json.JSONUtil;
 import clusterless.model.state.ArcState;
 import clusterless.substrate.aws.sdk.S3;
-import clusterless.substrate.uri.ArcURI;
+import clusterless.substrate.uri.ArcStateURI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,9 +26,9 @@ public class ArcStateManager {
     private static final Logger LOG = LogManager.getLogger(ArcStateManager.class);
     private final S3 s3 = new S3();
 
-    final ArcURI arcStatePath;
+    final ArcStateURI arcStatePath;
 
-    public ArcStateManager(ArcURI arcStatePath) {
+    public ArcStateManager(ArcStateURI arcStatePath) {
         Objects.requireNonNull(arcStatePath, "arcStatePath");
         this.arcStatePath = arcStatePath;
 

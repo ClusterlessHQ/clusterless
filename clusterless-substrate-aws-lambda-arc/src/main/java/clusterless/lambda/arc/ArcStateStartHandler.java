@@ -112,14 +112,14 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
 
         if (currentState.isPresent() && currentState.get() == ArcState.partial) {
             LOG.info("lot was partially completed: {}", lotId);
-            // todo: get partial manifests and apply to the arc context
+            // TODO: get partial manifests and apply to the arc context
         }
 
         // set to running
         Optional<ArcState> previousState = arcStateManager.setStateFor(lotId, ArcState.running);
 
         // confirm there isn't some race condition
-        // todo: create new exception to capture in state machine
+        // TODO: create new exception to capture in state machine
         if (!currentState.equals(previousState)) {
             logErrorAndThrow(IllegalStateException::new, "unexpected state change from: {}, to: {}", currentState.orElse(null), previousState.orElse(null));
         }

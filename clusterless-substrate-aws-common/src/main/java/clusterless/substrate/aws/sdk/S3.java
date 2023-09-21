@@ -372,7 +372,7 @@ public class S3 extends ClientBase<S3Client> {
                 URI from = tuple.get_1();
                 URI to = tuple.get_2();
 
-                // todo: apply retry logic here. note response knows about throttling and retryable exceptions
+                // TODO: apply retry logic here. note response knows about throttling and retryable exceptions
                 S3.Response response = copy(client, from, to);
 
                 if (response.isSuccess()) {

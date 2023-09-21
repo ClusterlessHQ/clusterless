@@ -11,6 +11,7 @@ package clusterless.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -211,6 +212,18 @@ public class JSONUtil {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public static <T> T readAsObjectSafe(Path path, TypeReference<T> type) {
+        try {
+            return OBJECT_READER.forType(type).readValue(path.toFile());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T readAsObject(Path path, TypeReference<T> type) throws IOException {
+        return OBJECT_READER.forType(type).readValue(path.toFile());
     }
 
     public static String writeTypedAsStringSafe(Object object) {

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class CDKProcessExec extends ProcessExec {
     private static final Logger LOG = LogManager.getLogger(CDKProcessExec.class);
     public static final String CLS_CDK_COMMAND = "CLS_CDK_COMMAND";
     public static final String CLS_CDK_OUTPUT_PATH = "CLS_CDK_OUTPUT_PATH";
+    public static final String CLS_CDK_PROFILE = "CLS_CDK_PROFILE";
 
     @CommandLine.Option(names = "--cdk", description = {"path to the cdk binary", "uses $PATH by default to search for 'cdk'"})
     private String cdk = "cdk";
@@ -174,7 +176,7 @@ public class CDKProcessExec extends ProcessExec {
         cdkCommands.addAll(
                 SafeList.of(
                         cdkCommand.command(),
-                        cdkCommand != CDKCommand.Import ? "--all" : null // deploy all stacks
+                        cdkCommand != CDKCommand.IMPORT ? "--all" : null // deploy all stacks
                 )
         );
 
@@ -182,7 +184,8 @@ public class CDKProcessExec extends ProcessExec {
 
         Map<String, String> environment = OrderedSafeMaps.of(
                 CLS_CDK_COMMAND, cdkCommand.command(),
-                CLS_CDK_OUTPUT_PATH, getOutputPath()
+                CLS_CDK_OUTPUT_PATH, getOutputPath(),
+                CLS_CDK_PROFILE, profile()
         );
 
         return executeProcess(environment, cdkCommands);
@@ -231,4 +234,13 @@ public class CDKProcessExec extends ProcessExec {
     protected String filesAsArg(List<File> files) {
         return files.stream().map(Object::toString).collect(Collectors.joining(","));
     }
+
+    public static CDKCommand currentCommand() {
+        return CDKCommand.from(System.getenv().get(CLS_CDK_COMMAND));
+    }
+
+    public static Path cdkLocalOutputPath() {
+        return Optional.ofNullable(System.getenv().get(CLS_CDK_OUTPUT_PATH)).map(Paths::get).orElse(null);
+    }
+
 }
