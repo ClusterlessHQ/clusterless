@@ -17,6 +17,10 @@ public class CommonCommand {
     @CommandLine.ParentCommand
     protected Kernel kernel;
 
+    public Kernel kernel() {
+        return kernel;
+    }
+
     protected CommonConfig getCommonConfig() {
         return kernel.configurations().get("common");
     }

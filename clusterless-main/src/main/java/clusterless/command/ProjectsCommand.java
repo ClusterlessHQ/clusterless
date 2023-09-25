@@ -9,15 +9,15 @@
 package clusterless.command;
 
 import clusterless.CommandWrapper;
-import clusterless.command.project.LocalCommandOptions;
+import clusterless.command.report.ProjectsCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-        name = "local",
-        description = "support for executing workloads locally"
+        name = "projects",
+        description = "list all deployed projects"
 )
-public class LocalCommand extends CommandWrapper {
-    public LocalCommand() {
-        super(new LocalCommandOptions());
+public class ProjectsCommand extends CommandWrapper {
+    public ProjectsCommand() {
+        super(new ProjectsCommandOptions());
     }
 }

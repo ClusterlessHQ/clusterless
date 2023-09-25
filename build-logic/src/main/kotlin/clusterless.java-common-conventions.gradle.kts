@@ -104,13 +104,16 @@ dependencies {
         implementationAndTestFixture("com.jayway.jsonpath:json-path:2.8.0")
         implementationAndTestFixture("com.google.guava:guava:31.1-jre")
 
-        val jackson = "2.14.2"
+        val jackson = "2.15.2"
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-core:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-databind:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-joda:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jackson")
+        implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:$jackson")
+
+        implementationAndTestFixture("one.util:streamex:0.8.2")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
         val awsSdk = "2.20.98"

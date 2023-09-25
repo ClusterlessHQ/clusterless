@@ -66,11 +66,11 @@ public class CDKProcessExec extends ProcessExec {
     @CommandLine.Option(names = "--profile", description = "aws profile")
     private String profile = System.getenv("AWS_PROFILE");
 
-    @CommandLine.Option(names = "--output", description = "cloud assembly output directory")
+    @CommandLine.Option(names = "--output-path", description = "cloud assembly output directory")
     private String output = "cdk.out";
 
     @CommandLine.Option(
-            names = "--use-temp-output",
+            names = "--use-temp-output-path",
             description = "place cloud assembly output into a temp directory",
             defaultValue = CommandLine.Option.NULL_VALUE,
             fallbackValue = "true",

@@ -6,9 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.command;
+package clusterless.command.project;
 
 
+import clusterless.command.ProjectCommandOptions;
 import picocli.CommandLine;
 
 import java.util.Optional;
@@ -16,8 +17,11 @@ import java.util.Optional;
 /**
  *
  */
-@CommandLine.Command(description = "deploy the given project files")
-public class DeployCommandOptions extends ProjectCommandOptions {
+@CommandLine.Command(description = "destroy project declared by the project files")
+public class DestroyCommandOptions extends ProjectCommandOptions {
+    @CommandLine.Option(names = "--retry", description = "retry the operation")
+    private boolean retry = false;
+
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--approve",
@@ -27,6 +31,10 @@ public class DeployCommandOptions extends ProjectCommandOptions {
             arity = "0..1"
     )
     Optional<Boolean> approve;
+
+    public boolean retry() {
+        return retry;
+    }
 
     public Optional<Boolean> approve() {
         return approve;

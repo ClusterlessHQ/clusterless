@@ -22,6 +22,8 @@ import clusterless.substrate.SubstrateProvider;
 import clusterless.substrate.aws.cdk.bootstrap.Bootstrap;
 import clusterless.substrate.aws.cdk.lifecycle.*;
 import clusterless.substrate.aws.local.Local;
+import clusterless.substrate.aws.report.Placements;
+import clusterless.substrate.aws.report.Projects;
 import clusterless.util.ExecutionExceptionHandler;
 import clusterless.util.ExitCodeExceptionMapper;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +50,8 @@ import java.util.stream.Collectors;
                 Destroy.class,
                 Synth.class,
                 Local.class,
-                Report.class
+                Placements.class,
+                Projects.class
         }
 )
 public class Kernel extends Startup implements SubstrateProvider {

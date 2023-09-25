@@ -10,6 +10,8 @@ package clusterless.model.deploy;
 
 import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Struct;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -31,6 +33,7 @@ import java.util.Objects;
                 region: Any valid AWS region, such as "us-east-1", "us-west-2", etc. Required.
                 """
 )
+@JsonPropertyOrder({"provider", "stage", "account", "region"})
 public class Placement implements Struct {
     String provider;
     String stage;
@@ -38,6 +41,13 @@ public class Placement implements Struct {
     String region;
 
     public Placement() {
+    }
+
+    protected Placement(Placement other) {
+        this.provider = other.provider;
+        this.stage = other.stage;
+        this.account = other.account;
+        this.region = other.region;
     }
 
     private Placement(Builder builder) {
@@ -51,20 +61,57 @@ public class Placement implements Struct {
         return Builder.builder();
     }
 
+    @NotNull
+    private Placement copy() {
+        return new Placement(this);
+    }
+
     public String provider() {
         return provider;
+    }
+
+    protected Placement setProvider(String provider) {
+        this.provider = provider;
+        return this;
+    }
+
+    public Placement withProvider(String provider) {
+        return copy().setProvider(provider);
     }
 
     public String stage() {
         return stage;
     }
 
+    protected Placement setStage(String stage) {
+        this.stage = stage;
+        return this;
+    }
+
+    public Placement withStage(String stage) {
+        return copy().setStage(stage);
+    }
+
     public String account() {
         return account;
     }
 
+    protected Placement setAccount(String account) {
+        this.account = account;
+        return this;
+    }
+
+    public Placement withAccount(String account) {
+        return copy().setAccount(account);
+    }
+
     public String region() {
         return region;
+    }
+
+    protected Placement setRegion(String region) {
+        this.region = region;
+        return this;
     }
 
     @Override

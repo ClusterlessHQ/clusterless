@@ -37,7 +37,7 @@ import java.util.function.Predicate;
 public abstract class ClientBase<C> {
     private static final Logger LOG = LogManager.getLogger(ClientBase.class);
     protected static final boolean localStackEnabled = Boolean.getBoolean("clusterless.localstack.enabled");
-    protected static final String defaultRegion = System.getenv("AWS_DEFAULT_REGION");
+    protected static final String defaultRegion = Optional.ofNullable(System.getenv("AWS_REGION")).orElse(System.getenv("AWS_DEFAULT_REGION"));
     protected static final String defaultProfile = System.getenv("AWS_PROFILE");
 
     protected URI endpointOverride = Optional.ofNullable(System.getenv().get(getEndpointEnvVar()))

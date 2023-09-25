@@ -6,9 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.command;
+package clusterless.command.project;
 
 
+import clusterless.command.ProjectCommandOptions;
 import picocli.CommandLine;
 
 import java.util.Optional;

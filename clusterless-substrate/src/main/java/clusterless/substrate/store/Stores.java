@@ -12,6 +12,7 @@ import clusterless.model.deploy.Placement;
 import clusterless.naming.Region;
 import clusterless.naming.Stage;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Stores {
@@ -32,4 +33,26 @@ public class Stores {
                 .with(region)
                 .lowerHyphen();
     }
+
+    public static List<Placement> parseBootstrapStoreNames(StateStore stateStore, List<String> bootstrapStoreNames) {
+        String filter = "-clusterless-%s".formatted(stateStore.name().toLowerCase());
+
+        return bootstrapStoreNames.stream()
+                .filter(n -> n.contains(filter))
+                .map(Stores::parseBootstrapStoreName)
+                .toList();
+    }
+
+    public static Placement parseBootstrapStoreName(String bootstrapStoreName) {
+        Objects.requireNonNull(bootstrapStoreName, "bootstrapStoreName is null");
+
+        String[] parts = bootstrapStoreName.split("-", 5);
+
+        return Placement.builder()
+                .withStage(parts[0])
+                .withAccount(parts[3])
+                .withRegion(parts[4])
+                .build();
+    }
+
 }

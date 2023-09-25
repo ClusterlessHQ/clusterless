@@ -47,7 +47,9 @@ import java.util.concurrent.Callable;
                 DiffCommand.class,
                 ImportCommand.class,
                 LocalCommand.class,
-                VerifyCommand.class
+                VerifyCommand.class,
+                PlacementsCommand.class,
+                ProjectsCommand.class
         }
 )
 public class Main extends Startup implements Callable<Integer> {

@@ -20,18 +20,20 @@ import java.io.*;
 import java.util.Collection;
 import java.util.Map;
 
+import static clusterless.printer.Printer.Format.table;
 import static com.github.jknack.handlebars.internal.lang3.Validate.notNull;
 
 /**
  *
  */
 public class Printer {
-    @CommandLine.Option(
-            names = {"-j", "--json"},
-            description = "print results as json",
-            hidden = true
-    )
-    boolean json = false;
+    public enum Format {
+        table,
+        json,
+        csv,
+        tsv
+    }
+
     private static final Handlebars handlebars = new Handlebars()
             .prettyPrint(false);
 
@@ -40,9 +42,19 @@ public class Printer {
         handlebars.registerHelper("indent", Printer::indent);
     }
 
+    @CommandLine.Option(
+            names = {"--output"},
+            scope = CommandLine.ScopeType.INHERIT,
+            description = "print results using given format"
+    )
+    Format format = table;
     private PrintStream out = System.out;
 
     public Printer() {
+    }
+
+    public Format format() {
+        return format;
     }
 
     public void println(Collection<String> strings) {
@@ -53,10 +65,10 @@ public class Printer {
         out.println(string);
     }
 
-    public Writer writer() {
-        return new OutputStreamWriter(out) {
+    public BufferedWriter writer() {
+        return new BufferedWriter(new OutputStreamWriter(out)) {
             @Override
-            public void close() throws IOException {
+            public void close() {
                 // do nothing
             }
         };
@@ -66,9 +78,7 @@ public class Printer {
         try {
             Context context = Context
                     .newBuilder(params)
-                    .resolver(
-                            MapValueResolver.INSTANCE
-                    )
+                    .resolver(MapValueResolver.INSTANCE)
                     .build();
 
             Template compile = handlebars.compile(template);
@@ -83,6 +93,9 @@ public class Printer {
     protected static CharSequence indent(final Object value, final Options options) {
         Integer width = options.param(0, 4);
         notNull(width, "found 'null', expected 'indent'");
-        return value.toString().trim().indent(width);
+
+        return value.toString()
+                .trim()
+                .indent(width);
     }
 }

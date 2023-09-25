@@ -12,10 +12,12 @@ plugins {
 
 dependencies {
     api("com.google.guava:guava")
+    api("one.util:streamex")
     api("com.fasterxml.jackson.core:jackson-core")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.datatype:jackson-datatype-joda")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-toml")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-properties")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
 }

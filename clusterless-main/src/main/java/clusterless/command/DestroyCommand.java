@@ -9,6 +9,7 @@
 package clusterless.command;
 
 import clusterless.CommandWrapper;
+import clusterless.command.project.DestroyCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -16,7 +17,7 @@ import picocli.CommandLine;
         description = "destroy a project deployed a declared placement"
 )
 public class DestroyCommand extends CommandWrapper {
-  public DestroyCommand() {
-    super(new DestroyCommandOptions());
-  }
+    public DestroyCommand() {
+        super(new DestroyCommandOptions());
+    }
 }

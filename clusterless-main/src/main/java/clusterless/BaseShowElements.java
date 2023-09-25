@@ -23,7 +23,7 @@ import java.util.*;
 public abstract class BaseShowElements extends ShowCommand.BaseShow {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
-            names = "--output",
+            names = "--output-path",
             arity = "1",
             description = "write out the documentation",
             hidden = true

@@ -61,7 +61,7 @@ public class Startup {
     protected Verbosity verbosity = new Verbosity();
 
     @CommandLine.Mixin
-    Printer printer = new Printer();
+    protected Printer printer = new Printer();
 
     @CommandLine.Option(
             names = {"-D", "--property"},

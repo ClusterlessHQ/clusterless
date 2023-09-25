@@ -47,6 +47,10 @@ For example scenarios, see
 Clusterless is a tool for deploying decentralized, scalable, and secure data-processing workloads for continuously
 arriving data, across clouds.
 
+By leveraging native pay-as-you-go primitives, no runtimes or dedicated services need to be managed.
+
+Zero data arriving means zero costs (other than storage for historical data).
+
 By standardizing the metadata as new data arrives, workloads can be implemented behind a consistent interface, and can
 be easily deployed to listen for upstream availability events and fire new events to downstream listeners.
 
@@ -76,10 +80,6 @@ And can be implemented as:
 
 Where the intent isn't to have functional parity across substrates, but to ease secure and reliable interoperability
 between them.
-
-By leveraging native pay-as-you-go primitives, no runtimes or dedicated services need to be managed.
-
-Zero data arriving means zero costs (other than storage for historical data).
 
 Currently supported cloud substrates:
 

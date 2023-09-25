@@ -21,6 +21,7 @@ project scope commands:
 
 * `substrates` - list all deployed substrates
 * `regions` - list all deployed regions
+* `projects` - list all deployed projects
 * `arcs` - list all deployed arcs
 * `boundarys` - list all deployed boundaries
 * `verify` - confirm the project files will render

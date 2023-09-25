@@ -9,6 +9,7 @@
 package clusterless.command;
 
 import clusterless.CommandWrapper;
+import clusterless.command.project.DiffCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -16,7 +17,7 @@ import picocli.CommandLine;
         description = "compare local project changes with a deployed a declared placement"
 )
 public class DiffCommand extends CommandWrapper {
-  public DiffCommand() {
-    super(new DiffCommandOptions());
-  }
+    public DiffCommand() {
+        super(new DiffCommandOptions());
+    }
 }

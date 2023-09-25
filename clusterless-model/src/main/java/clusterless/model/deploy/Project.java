@@ -10,6 +10,7 @@ package clusterless.model.deploy;
 
 import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Struct;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ import java.util.Objects;
                          It's recommended to use a date for the version, such as "20230101".
                 """
 )
+@JsonPropertyOrder({"name", "version"})
 public class Project implements Struct {
     String name;
     String version;

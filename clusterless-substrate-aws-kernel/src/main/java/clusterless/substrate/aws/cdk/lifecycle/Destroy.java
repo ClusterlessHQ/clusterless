@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 
-import clusterless.command.DestroyCommandOptions;
+import clusterless.command.project.DestroyCommandOptions;
 import clusterless.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.substrate.aws.cdk.CDKCommand;
 import clusterless.substrate.aws.cdk.CDKProcessExec;

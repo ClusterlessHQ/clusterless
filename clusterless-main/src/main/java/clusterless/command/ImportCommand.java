@@ -9,6 +9,7 @@
 package clusterless.command;
 
 import clusterless.CommandWrapper;
+import clusterless.command.project.ImportCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(

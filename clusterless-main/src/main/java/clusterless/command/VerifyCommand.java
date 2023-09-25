@@ -9,6 +9,7 @@
 package clusterless.command;
 
 import clusterless.CommandWrapper;
+import clusterless.command.project.VerifyCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -16,7 +17,7 @@ import picocli.CommandLine;
         description = "verify project changes with a provider"
 )
 public class VerifyCommand extends CommandWrapper {
-  public VerifyCommand() {
-    super(new VerifyCommandOptions());
-  }
+    public VerifyCommand() {
+        super(new VerifyCommandOptions());
+    }
 }

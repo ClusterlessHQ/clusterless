@@ -8,7 +8,7 @@
 
 package clusterless.substrate.aws.local;
 
-import clusterless.command.LocalCommandOptions;
+import clusterless.command.project.LocalCommandOptions;
 import clusterless.managed.component.*;
 import clusterless.model.DeployableLoader;
 import clusterless.model.Model;

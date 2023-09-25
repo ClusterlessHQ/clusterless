@@ -108,7 +108,7 @@ tasks.register<Exec>("generateComponentDocs") {
         "show",
         "component",
         "--describe-all",
-        "--output",
+        "--output-path",
         "${buildDir}/generated-docs/modules/components"
     )
 }
@@ -122,7 +122,7 @@ tasks.register<Exec>("generateComponentIndex") {
         "show",
         "component",
         "--list",
-        "--output",
+        "--output-path",
         "${buildDir}/generated-docs/modules/components/"
     )
 }
@@ -136,7 +136,7 @@ tasks.register<Exec>("generateComponentPartial") {
         "show",
         "component",
         "--list",
-        "--output",
+        "--output-path",
         "${buildDir}/generated-docs/modules/components/partials",
         "--name",
         "components.adoc",
@@ -154,7 +154,7 @@ tasks.register<Exec>("generateModelDocs") {
         "show",
         "model",
         "--describe-all",
-        "--output",
+        "--output-path",
         "${buildDir}/generated-docs/modules/models"
     )
 }
@@ -168,7 +168,7 @@ tasks.register<Exec>("generateModelIndex") {
         "show",
         "model",
         "--list",
-        "--output",
+        "--output-path",
         "${buildDir}/generated-docs/modules/models/"
     )
 }
@@ -182,7 +182,7 @@ tasks.register<Exec>("generateModelPartial") {
         "show",
         "model",
         "--list",
-        "--output",
+        "--output-path",
         "${buildDir}/generated-docs/modules/models/partials",
         "--name",
         "models.adoc",

@@ -91,6 +91,10 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
         this.project = other.project;
     }
 
+    public Project project() {
+        return project;
+    }
+
     protected ProjectURI copy() {
         return new ProjectURI(this);
     }

@@ -9,6 +9,7 @@
 package clusterless.command;
 
 import clusterless.CommandWrapper;
+import clusterless.command.project.DeployCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -16,7 +17,7 @@ import picocli.CommandLine;
         description = "deploy a project into a declared placement"
 )
 public class DeployCommand extends CommandWrapper {
-  public DeployCommand() {
-    super(new DeployCommandOptions());
-  }
+    public DeployCommand() {
+        super(new DeployCommandOptions());
+    }
 }

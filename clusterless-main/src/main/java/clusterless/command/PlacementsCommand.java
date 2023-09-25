@@ -8,12 +8,16 @@
 
 package clusterless.command;
 
-
+import clusterless.CommandWrapper;
+import clusterless.command.report.PlacementsCommandOptions;
 import picocli.CommandLine;
 
-/**
- *
- */
-@CommandLine.Command(description = "verify the given project files will render into the substrate declaration format")
-public class VerifyCommandOptions extends ProjectCommandOptions {
+@CommandLine.Command(
+        name = "placements",
+        description = "list all visible deployed placements"
+)
+public class PlacementsCommand extends CommandWrapper {
+    public PlacementsCommand() {
+        super(new PlacementsCommandOptions());
+    }
 }

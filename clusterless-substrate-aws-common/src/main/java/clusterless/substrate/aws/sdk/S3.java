@@ -61,10 +61,38 @@ public class S3 extends ClientBase<S3Client> {
         logEndpointOverride();
 
         return S3Client.builder()
-                .region(Region.of(region))
+                .region(region == null ? null : Region.of(region)) // allows sdk to lookup region in chain
                 .credentialsProvider(credentialsProvider)
                 .endpointOverride(endpointOverride)
                 .build();
+    }
+
+    public Response list() {
+        ListBucketsRequest request = ListBucketsRequest.builder()
+                .build();
+
+        try (S3Client client = createClient(region)) {
+            return new Response(client.listBuckets(request));
+        } catch (Exception exception) {
+            return new Response(exception);
+        }
+    }
+
+    public List<String> list(Response response) {
+        if (hasNoAwsResponse(response)) {
+            return Collections.emptyList();
+        }
+
+        ListBucketsResponse awsResponse = (ListBucketsResponse) response.awsResponse();
+
+        if (awsResponse.hasBuckets()) {
+            return awsResponse.buckets()
+                    .stream()
+                    .map(Bucket::name)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 
     public Response exists(String bucketName) {
@@ -298,7 +326,7 @@ public class S3 extends ClientBase<S3Client> {
         return list(null, bucketName, key);
     }
 
-    protected ClientBase<S3Client>.Response list(URI path, String delimiter) {
+    protected Response list(URI path, String delimiter) {
         Objects.requireNonNull(path, "path");
 
         String bucketName = path.getHost();
@@ -308,7 +336,7 @@ public class S3 extends ClientBase<S3Client> {
     }
 
     @NotNull
-    private ClientBase<S3Client>.Response list(String delimiter, String bucketName, String key) {
+    private Response list(String delimiter, String bucketName, String key) {
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
                 .prefix(key)
@@ -388,7 +416,7 @@ public class S3 extends ClientBase<S3Client> {
         return true; // success
     }
 
-    private ClientBase<S3Client>.Response copy(S3Client client, URI from, URI to) {
+    private Response copy(S3Client client, URI from, URI to) {
         try {
             return new Response(client.copyObject(createCopyRequest(from, to)));
         } catch (Exception exception) {
