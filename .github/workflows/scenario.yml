@@ -1,6 +1,7 @@
 name: Clusterless Scenario Tests
 run-name: "Push: from ${{ github.actor }}"
 on:
+  workflow_dispatch:
   push:
     branches:
       - '*-scenarios'

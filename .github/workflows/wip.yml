@@ -1,6 +1,7 @@
 name: Clusterless Wip Build
 run-name: "Push: from ${{ github.actor }}"
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'wip-*'
@@ -13,7 +14,7 @@ on:
       - '**.hbs'
 jobs:
   run-all-tests-and-release:
-    concurrency: scenarios-us-west-2
+    concurrency: scenarios-us-east-2
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +35,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Setup Env
-        run: echo "${{ vars.GRADLE_PROPERTIES }}" > gradle.properties
+        run: echo "${{ vars.GRADLE_PROPERTIES_EAST }}" > gradle.properties
 
       - name: Run Tests
         env:
@@ -46,7 +47,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-west-2
+          AWS_DEFAULT_REGION: us-east-2
         run: |
           ./gradlew --no-daemon --info --stacktrace scenarios
 
