@@ -27,7 +27,7 @@ public class ProviderSubstratesOptions {
 
     @CommandLine.Option(
             names = {"-P", "--providers"},
-            description = "provider substrates to target",
+            description = "Provider substrates to target.",
             scope = CommandLine.ScopeType.INHERIT
     )
     protected Set<String> providerNames = new LinkedHashSet<>();

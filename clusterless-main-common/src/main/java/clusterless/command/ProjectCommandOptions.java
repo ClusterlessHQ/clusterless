@@ -20,24 +20,24 @@ import java.util.Optional;
 /**
  *
  */
-public class ProjectCommandOptions extends CommonCommandOptions {
+public class ProjectCommandOptions extends ExecCommandOptions {
     @CommandLine.Option(
             names = {"-p", "--project"},
-            description = "the files that declare the project to be deployed, or `-` to read from stdin",
+            description = "The files that declare the project to be deployed, or `-` to read from stdin.",
             converter = StdInToFileConverter.class
     )
     List<File> projectFiles = new ArrayList<>();
 
     @CommandLine.Option(
             names = {"--exclude-arc"},
-            description = "exclude the named arc from the deployment"
+            description = "Exclude the named arc from the deployment."
     )
     List<String> excludeArcNames = new ArrayList<>();
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--exclude-all-arcs",
-            description = "exclude all arcs from the deployment, only deploy resources and boundaries",
+            description = "Exclude all arcs from the deployment, only deploy resources and boundaries.",
             defaultValue = CommandLine.Option.NULL_VALUE,
             fallbackValue = "true",
             arity = "0..1"
@@ -46,13 +46,13 @@ public class ProjectCommandOptions extends CommonCommandOptions {
 
     @CommandLine.Option(
             names = {"--only-resource"},
-            description = "only deploy the named resource"
+            description = "Only deploy the named resource."
     )
     List<String> onlyResourceNames = new ArrayList<>();
 
     @CommandLine.Option(
             names = "--exclude-all-tags",
-            description = "exclude all tags from the deployment",
+            description = "Exclude all tags from the deployment.",
             defaultValue = CommandLine.Option.NULL_VALUE,
             fallbackValue = "true",
             arity = "0..1"

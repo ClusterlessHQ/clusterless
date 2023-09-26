@@ -14,9 +14,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "destroy",
-        description = "destroy a project deployed a declared placement"
+        description = "Destroy a project deployed a declared placement."
 )
-public class DestroyCommand extends CommandWrapper {
+public class DestroyCommand extends CommandWrapper<DestroyCommandOptions> {
     public DestroyCommand() {
         super(new DestroyCommandOptions());
     }

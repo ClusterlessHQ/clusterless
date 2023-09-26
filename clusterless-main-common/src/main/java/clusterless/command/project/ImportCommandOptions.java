@@ -19,13 +19,13 @@ import java.util.Optional;
  */
 @CommandLine.Command(
         hidden = true,
-        description = "import resources from the declared placement"
+        description = "Import resources from the declared placement."
 )
 public class ImportCommandOptions extends ProjectCommandOptions {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--approve",
-            description = "approve import of resources",
+            description = "Approve import of resources.",
             defaultValue = CommandLine.Option.NULL_VALUE,
             fallbackValue = "true",
             arity = "0..1"

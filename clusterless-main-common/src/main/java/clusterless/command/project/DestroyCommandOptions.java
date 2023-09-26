@@ -17,15 +17,15 @@ import java.util.Optional;
 /**
  *
  */
-@CommandLine.Command(description = "destroy project declared by the project files")
+@CommandLine.Command(description = "Destroy project declared by the project files.")
 public class DestroyCommandOptions extends ProjectCommandOptions {
-    @CommandLine.Option(names = "--retry", description = "retry the operation")
+    @CommandLine.Option(names = "--retry", description = "Retry the operation.")
     private boolean retry = false;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--approve",
-            description = "approve changes to be deployed",
+            description = "Approve changes to be deployed.",
             defaultValue = CommandLine.Option.NULL_VALUE,
             fallbackValue = "true",
             arity = "0..1"

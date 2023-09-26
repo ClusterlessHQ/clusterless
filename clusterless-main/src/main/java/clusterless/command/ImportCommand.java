@@ -15,13 +15,13 @@ import picocli.CommandLine;
 @CommandLine.Command(
         hidden = true,
         name = "import",
-        description = "import resources into a project from a declared placement",
+        description = "Import resources into a project from a declared placement.",
         footer = """
                 This feature is not yet functional as it's based on `cdk import` which is still in preview.
                 https://github.com/aws/aws-cdk/blob/v1-main/packages/aws-cdk/README.md#cdk-import
                 """
 )
-public class ImportCommand extends CommandWrapper {
+public class ImportCommand extends CommandWrapper<ImportCommandOptions> {
     public ImportCommand() {
         super(new ImportCommandOptions());
     }

@@ -17,14 +17,14 @@ import java.util.concurrent.Callable;
  *
  */
 @CommandLine.Command()
-public class CommandWrapper implements Callable<Integer> {
+public class CommandWrapper<C extends CommonCommandOptions> implements Callable<Integer> {
     @CommandLine.ParentCommand
     Main main;
 
     @CommandLine.Mixin
-    CommonCommandOptions commandOptions;
+    C commandOptions;
 
-    public CommandWrapper(CommonCommandOptions commandOptions) {
+    public CommandWrapper(C commandOptions) {
         this.commandOptions = commandOptions;
     }
 

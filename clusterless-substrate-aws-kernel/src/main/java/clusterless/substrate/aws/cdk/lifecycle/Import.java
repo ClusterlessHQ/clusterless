@@ -26,7 +26,7 @@ public class Import extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     ImportCommandOptions commandOptions = new ImportCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions, this::verbosityLevel);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, this::verbosityLevel);
 
     @Override
     public Integer call() throws Exception {

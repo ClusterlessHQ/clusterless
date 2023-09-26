@@ -9,19 +9,8 @@
 package clusterless.command;
 
 
-import picocli.CommandLine;
-
 /**
  *
  */
-@CommandLine.Command(
-        subcommands = {CommandLine.HelpCommand.class}
-)
 public class CommonCommandOptions {
-    @CommandLine.Option(names = "--dry-run", description = "do not execute underlying cdk binary")
-    private boolean dryRun = false;
-
-    public boolean dryRun() {
-        return dryRun;
-    }
 }

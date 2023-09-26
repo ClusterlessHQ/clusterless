@@ -25,7 +25,7 @@ import java.util.*;
 
 @CommandLine.Command(
         name = "component",
-        description = "show available components"
+        description = "Show available components."
 )
 public class ShowComponents extends BaseShowElements {
 

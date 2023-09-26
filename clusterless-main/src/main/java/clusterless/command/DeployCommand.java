@@ -14,9 +14,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "deploy",
-        description = "deploy a project into a declared placement"
+        description = "Deploy a project into a declared placement."
 )
-public class DeployCommand extends CommandWrapper {
+public class DeployCommand extends CommandWrapper<DeployCommandOptions> {
     public DeployCommand() {
         super(new DeployCommandOptions());
     }

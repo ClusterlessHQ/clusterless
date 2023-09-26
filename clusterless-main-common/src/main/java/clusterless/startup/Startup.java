@@ -66,7 +66,7 @@ public class Startup {
     @CommandLine.Option(
             names = {"-D", "--property"},
             mapFallbackValue = "",
-            description = "key=value properties, will be passed down")
+            description = "Optional key=value properties, will be passed down.")
     Properties properties = new Properties();
 
     Configurations configurations = new Configurations(this::properties);

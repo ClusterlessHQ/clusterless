@@ -15,27 +15,30 @@ import java.util.Optional;
 /**
  *
  */
-@CommandLine.Command(description = "initialize the given environment")
-public class BootstrapCommandOptions extends CommonCommandOptions {
+@CommandLine.Command(description = "Initialize the given environment.")
+public class BootstrapCommandOptions extends ExecCommandOptions {
     @CommandLine.Option(
             names = {"--destroy"},
-            description = "remove the bootstrap for the given placement"
+            description = "Remove the bootstrap for the given placement."
     )
     boolean destroy = false;
     @CommandLine.Option(
             names = {"--account"},
-            description = "aws account"
+            description = "AWS account."
     )
     String account;
     @CommandLine.Option(
             names = {"--region"},
-            description = "aws region"
+            description = "AWS region."
     )
     String region;
     @CommandLine.Option(
             names = {"--stage"},
             arity = "0..1",
-            description = "optional stage prefix to use within the cloud placement"
+            description = {
+                    "Optional stage prefix to use within the cloud placement.",
+                    "For example: `dev`, `prod`, or `test`."
+            }
     )
     String stage;
     @CommandLine.Option(
@@ -46,13 +49,13 @@ public class BootstrapCommandOptions extends CommonCommandOptions {
 
     @CommandLine.Option(
             names = "--retry",
-            description = "retry the destroy operation")
+            description = "Retry the destroy operation.")
     private boolean retry = false;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--approve",
-            description = "approve changes to be deployed",
+            description = "Approve changes to be deployed.",
             defaultValue = CommandLine.Option.NULL_VALUE,
             fallbackValue = "true",
             arity = "0..1"

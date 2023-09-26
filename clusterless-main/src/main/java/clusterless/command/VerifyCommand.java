@@ -14,9 +14,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "verify",
-        description = "verify project changes with a provider"
+        description = "Verify project changes with a provider."
 )
-public class VerifyCommand extends CommandWrapper {
+public class VerifyCommand extends CommandWrapper<VerifyCommandOptions> {
     public VerifyCommand() {
         super(new VerifyCommandOptions());
     }

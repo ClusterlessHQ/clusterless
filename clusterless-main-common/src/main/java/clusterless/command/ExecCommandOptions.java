@@ -8,16 +8,19 @@
 
 package clusterless.command;
 
-import clusterless.CommandWrapper;
-import clusterless.command.report.PlacementsCommandOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-        name = "placements",
-        description = "List all visible placements with deployments."
+        subcommands = {CommandLine.HelpCommand.class}
 )
-public class PlacementsCommand extends CommandWrapper<PlacementsCommandOptions> {
-    public PlacementsCommand() {
-        super(new PlacementsCommandOptions());
+public class ExecCommandOptions extends CommonCommandOptions {
+    @CommandLine.Option(
+            names = "--dry-run",
+            description = "Do not execute underlying cdk binary."
+    )
+    private boolean dryRun = false;
+
+    public boolean dryRun() {
+        return dryRun;
     }
 }

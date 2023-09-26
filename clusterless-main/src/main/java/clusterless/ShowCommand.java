@@ -8,7 +8,6 @@
 
 package clusterless;
 
-import clusterless.command.CommonCommandOptions;
 import picocli.CommandLine;
 
 import java.util.Optional;
@@ -19,7 +18,7 @@ import java.util.concurrent.Callable;
  */
 @CommandLine.Command(
         name = "show",
-        description = "display details about providers, components, and project models",
+        description = "Display details about providers, components, and project models.",
         subcommands = {
                 ShowProviders.class,
                 ShowComponents.class,
@@ -30,9 +29,6 @@ public class ShowCommand {
     @CommandLine.ParentCommand
     Main main;
 
-    @CommandLine.Mixin
-    CommonCommandOptions commandOptions = new CommonCommandOptions();
-
     public ShowCommand() {
     }
 
@@ -42,7 +38,7 @@ public class ShowCommand {
             @CommandLine.Option(
                     names = "--list",
                     arity = "0",
-                    description = "list all names"
+                    description = "List all names."
             )
             Optional<Boolean> list;
 
@@ -50,7 +46,7 @@ public class ShowCommand {
             @CommandLine.Option(
                     names = "--describe-all",
                     arity = "0",
-                    description = "print description of all elements"
+                    description = "Print description of all elements."
             )
             Optional<Boolean> all;
 
@@ -58,7 +54,7 @@ public class ShowCommand {
             @CommandLine.Option(
                     names = "--model",
                     arity = "1",
-                    description = "print the json template of element"
+                    description = "Print the json template of element."
             )
             Optional<String> model;
 

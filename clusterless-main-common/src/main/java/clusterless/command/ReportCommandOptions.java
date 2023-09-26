@@ -13,26 +13,29 @@ import picocli.CommandLine;
 /**
  *
  */
-@CommandLine.Command(description = "")
+@CommandLine.Command(
+        description = "",
+        subcommands = {CommandLine.HelpCommand.class}
+)
 public class ReportCommandOptions extends CommonCommandOptions {
     @CommandLine.Option(
             names = "--profile",
-            description = "aws profile"
+            description = "AWS profile."
     )
     private String profile = System.getenv("AWS_PROFILE");
     @CommandLine.Option(
             names = {"--account"},
-            description = "filter by account"
+            description = "Filter results by account."
     )
     String account;
     @CommandLine.Option(
             names = {"--region"},
-            description = "filter by region"
+            description = "Filter results by region."
     )
     String region;
     @CommandLine.Option(
             names = {"--stage"},
-            description = "filter by stage",
+            description = "Filter results by stage.",
             fallbackValue = "",
             arity = "0..1"
     )

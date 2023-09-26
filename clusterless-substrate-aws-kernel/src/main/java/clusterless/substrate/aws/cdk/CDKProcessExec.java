@@ -8,7 +8,6 @@
 
 package clusterless.substrate.aws.cdk;
 
-import clusterless.command.CommonCommandOptions;
 import clusterless.command.ProjectCommandOptions;
 import clusterless.config.CommonConfig;
 import clusterless.process.ProcessExec;
@@ -84,8 +83,8 @@ public class CDKProcessExec extends ProcessExec {
     public CDKProcessExec() {
     }
 
-    public CDKProcessExec(CommonCommandOptions commandOptions, Supplier<Integer> verbosity) {
-        super(commandOptions::dryRun, verbosity);
+    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Integer> verbosity) {
+        super(dryRun, verbosity);
     }
 
     public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry, Supplier<Integer> verbosity) {

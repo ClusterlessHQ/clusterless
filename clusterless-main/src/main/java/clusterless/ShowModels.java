@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @CommandLine.Command(
         name = "model",
-        description = "show model elements"
+        description = "Show model elements."
 )
 public class ShowModels extends BaseShowElements {
 

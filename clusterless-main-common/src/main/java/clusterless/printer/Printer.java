@@ -46,10 +46,9 @@ public class Printer {
             names = {"--output"},
             scope = CommandLine.ScopeType.INHERIT,
             description = {
-                    "print results using given format",
-                    "  Values: ${COMPLETION-CANDIDATES}"
-            },
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+                    "Print results using given format.",
+                    "Values: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})"
+            }
     )
     Format format = table;
     private PrintStream out = System.out;

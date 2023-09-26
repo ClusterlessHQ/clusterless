@@ -25,21 +25,21 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
     @CommandLine.Option(
             names = "--output-path",
             arity = "1",
-            description = "write out the documentation",
+            description = "Write out the documentation.",
             hidden = true
     )
     Optional<String> output;
     @CommandLine.Option(
             names = "--template",
             arity = "1",
-            description = "the documentation template to use",
+            description = "The documentation template to use.",
             hidden = true
     )
     Optional<String> template;
     @CommandLine.Option(
             names = "--name",
             arity = "1",
-            description = "the documentation file name to use",
+            description = "The documentation file name to use.",
             hidden = true
     )
     Optional<String> name;

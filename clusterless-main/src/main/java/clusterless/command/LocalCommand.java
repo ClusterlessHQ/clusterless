@@ -14,9 +14,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "local",
-        description = "support for executing workloads locally"
+        description = "Support for executing workloads locally in a terminal."
 )
-public class LocalCommand extends CommandWrapper {
+public class LocalCommand extends CommandWrapper<LocalCommandOptions> {
     public LocalCommand() {
         super(new LocalCommandOptions());
     }

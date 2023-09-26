@@ -12,7 +12,10 @@ import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "provider", description = "show all available providers")
+@CommandLine.Command(
+        name = "provider",
+        description = "Show all available providers."
+)
 public class ShowProviders extends ShowCommand.BaseShow implements Callable<Integer> {
 
     @Override

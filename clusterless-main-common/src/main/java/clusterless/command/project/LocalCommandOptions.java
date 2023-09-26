@@ -15,24 +15,24 @@ import picocli.CommandLine;
 /**
  *
  */
-@CommandLine.Command(description = "exec the specified arc locally for testing")
+@CommandLine.Command(description = "Enable execution of the specified arc locally for testing.")
 public class LocalCommandOptions extends ProjectCommandOptions {
     @CommandLine.Option(
             names = {"-a", "--arc"},
-            description = "the arc name to execute",
+            description = "The arc name to execute.",
             required = true
     )
     String arc;
     @CommandLine.Option(
             names = {"-l", "--lot"},
-            description = "the lot id of the manifest to source",
+            description = "The lot id of the manifest to source.",
             required = false
     )
     String lotId;
 
     @CommandLine.Option(
             names = {"-r", "--role"},
-            description = "the dataset role to execute against",
+            description = "The dataset role to execute against.",
             required = false,
             defaultValue = "main"
     )
@@ -40,7 +40,10 @@ public class LocalCommandOptions extends ProjectCommandOptions {
 
     @CommandLine.Option(
             names = {"-s", "--manifest-state"},
-            description = "manifest state"
+            description = {
+                    "Manifest state.",
+                    "Values: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})"
+            }
     )
     ManifestState manifestState = ManifestState.complete;
 

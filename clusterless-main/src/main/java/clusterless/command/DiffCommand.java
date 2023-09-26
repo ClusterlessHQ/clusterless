@@ -14,9 +14,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "diff",
-        description = "compare local project changes with a deployed a declared placement"
+        description = "Compare local project changes with a deployed a declared placement."
 )
-public class DiffCommand extends CommandWrapper {
+public class DiffCommand extends CommandWrapper<DiffCommandOptions> {
     public DiffCommand() {
         super(new DiffCommandOptions());
     }

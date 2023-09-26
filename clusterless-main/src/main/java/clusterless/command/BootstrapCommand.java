@@ -13,9 +13,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "bootstrap",
-        description = "initialize a cloud provider placement"
+        description = "Initialize a cloud provider placement."
 )
-public class BootstrapCommand extends CommandWrapper {
+public class BootstrapCommand extends CommandWrapper<BootstrapCommandOptions> {
   public BootstrapCommand() {
     super(new BootstrapCommandOptions());
   }
