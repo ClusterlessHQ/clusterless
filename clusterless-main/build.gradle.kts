@@ -9,6 +9,7 @@
 import org.jreleaser.model.Active
 import org.jreleaser.model.Distribution
 import org.jreleaser.model.Stereotype
+import java.nio.file.Files
 
 plugins {
     id("clusterless.java-application-conventions")
@@ -245,10 +246,14 @@ tasks.register("generateCLIIndex") {
     dependsOn("generateCLIDocs")
 
     doLast {
+        // remove cls-*-help.adoc files are they are redundant
+        fileTree("build/generated-docs/modules/commands/pages")
+            .filter { it.name.endsWith("-help.adoc") && it.name != "cls-help.adoc" }
+            .forEach { Files.delete(it.toPath()) }
+
         val names = fileTree("build/generated-docs/modules/commands/pages")
-            .map {
-                it.name
-            }.sortedBy { it.substringBefore(".") }
+            .map { it.name }
+            .sortedBy { it.substringBefore(".") }
             .toList()
         println(names)
         file("build/generated-docs/modules/commands").mkdirs()
