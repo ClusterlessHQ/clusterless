@@ -241,5 +241,4 @@ public class CDKProcessExec extends ProcessExec {
     public static Path cdkLocalOutputPath() {
         return Optional.ofNullable(System.getenv().get(CLS_CDK_OUTPUT_PATH)).map(Paths::get).orElse(null);
     }
-
 }
