@@ -14,7 +14,7 @@ import clusterless.scenario.conductor.task.cli.DeployerProject;
 public class DeployerProjectWorker extends ClusterlessProjectWorker {
 
     public DeployerProjectWorker(Options options) {
-        super("deploy", options);
+        super("deploy", options, "--retry");
     }
 
     @Override

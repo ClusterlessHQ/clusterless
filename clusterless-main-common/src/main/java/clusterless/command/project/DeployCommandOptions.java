@@ -19,6 +19,8 @@ import java.util.Optional;
  */
 @CommandLine.Command(description = "Deploy the given project files.")
 public class DeployCommandOptions extends ProjectCommandOptions {
+    @CommandLine.Option(names = "--retry", description = "Retry the operation.")
+    private boolean retry = false;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @CommandLine.Option(
             names = "--approve",
@@ -28,6 +30,10 @@ public class DeployCommandOptions extends ProjectCommandOptions {
             arity = "0..1"
     )
     Optional<Boolean> approve;
+
+    public boolean retry() {
+        return retry;
+    }
 
     public Optional<Boolean> approve() {
         return approve;

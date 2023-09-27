@@ -38,7 +38,7 @@ public abstract class ClusterlessBootstrapWorker implements Worker {
         String workingDirectory = Objects.toString(inputData.get("workingDirectory"), null);
         Map<String, String> placement = (Map<String, String>) inputData.get("placement");
 
-        ClusterlessBootstrapExecutor deploy = ClusterlessBootstrapExecutor.Builder.builder()
+        ClusterlessBootstrapExecutor executor = ClusterlessBootstrapExecutor.Builder.builder()
                 .withClsApp(options.clsApp())
                 .withDryRun(getDryRun())
                 .withPlacement(placement)
@@ -48,7 +48,7 @@ public abstract class ClusterlessBootstrapWorker implements Worker {
 
         LOG.info("worker executing bootstrap, placement: {}, destroy: {}", placement, destroy);
 
-        int exitCode = deploy.exec();
+        int exitCode = executor.exec();
 
         LOG.info("worker executed bootstrap, with exit: {}", exitCode);
 
