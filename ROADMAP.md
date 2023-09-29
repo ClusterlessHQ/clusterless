@@ -21,15 +21,19 @@ Most things in the cli have yet to be implemented.
 3. Custom Lambda based arc workloads
 4. High frequency S3 listener boundary
    1. For aggregating objects that arrive within a lot interval
+   2. https://docs.clusterless.io/reference/1.0-wip/components/aws-core-s3-put-listener-boundary.html
 5. Native resources and workloads
    1. AWS Glue database and catalog updates
+      1. https://docs.clusterless.io/reference/1.0-wip/components/aws-core-glue-database.html
+      2. https://docs.clusterless.io/reference/1.0-wip/components/aws-core-glue-table.html
+      3. https://docs.clusterless.io/reference/1.0-wip/components/aws-core-glue-add-partitions-arc.html
    2. AWS Athena CTAS/INSERT INTO queries (for chaining SQL)
    3. AWS Sagemaker training/validation
 6. Common data processing workloads
    1. Data reformatting (from text/json to binary/parquet)
-      2. https://github.com/ClusterlessHQ/tessellate
+      1https://github.com/ClusterlessHQ/tessellate
    2. Dynamic data repartitioning (partitions based on data like timestamps)
-      3. https://github.com/ClusterlessHQ/tessellate
+      1. https://github.com/ClusterlessHQ/tessellate
    3. Predicate/duplicate index creation and data filtering
 7. Join Barrier implementations
 8. Scheduled arc executions
@@ -39,3 +43,7 @@ Most things in the cli have yet to be implemented.
 10. Pluggable modules for providing third-party services
 11. Localstack support for faster testing AWS scenarios
 12. Alternate substrates/providers
+   1. Azure
+   2. GCP
+   3. Digital Ocean
+   4. OCI

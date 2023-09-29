@@ -14,7 +14,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "projects",
-        description = "list all deployed projects"
+        description = "List all deployed projects."
 )
 public class ProjectsCommand extends CommandWrapper<ProjectsCommandOptions> {
     public ProjectsCommand() {

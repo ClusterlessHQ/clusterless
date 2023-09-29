@@ -38,6 +38,7 @@ See the [ROADMAP](ROADMAP.md) for planned capabilities.
 
 For example scenarios, see
 
+- [How To](https://docs.clusterless.io/guide/1.0-wip/howtos/index.html) - step-by-step guides
 - [clusterless-aws-example](https://github.com/ClusterlessHQ/clusterless-aws-examples) - simple examples to start with
 - [aws-s3-log-pipeline](https://github.com/ClusterlessHQ/aws-s3-log-pipeline) - end-to-end sample pipeline for
   processing AWS S3 access logs
@@ -76,7 +77,7 @@ And can be implemented as:
 
 - Docker images (Python, Java, Node, etc)
 - Serverless functions (Python, Java, Node, etc)
-- Native services (AWS SageMaker, AWS Athena, AWS Glue, etc)
+- Native services (AWS SageMaker, AWS Athena, AWS Glue, etc.)
 
 Where the intent isn't to have functional parity across substrates, but to ease secure and reliable interoperability
 between them.
@@ -85,81 +86,41 @@ Currently supported cloud substrates:
 
 - AWS
 
-## Prerequisites
+## Installing
 
-_If you already have Node and npm, skip to the AWS CDK install._
-
-Install [nvm](https://github.com/nvm-sh/nvm):
-
-> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-
-Install node/npm:
-
-> nvm install --lts
-
-Install the AWS CDK:
-
-> npm install -g aws-cdk@2.89.0
-
-after install, make sure to bootstrap your account and region:
-
-https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html#bootstrapping-howto
-
-> cdk bootstrap aws://ACCOUNT-NUMBER-1/REGION-1 aws://ACCOUNT-NUMBER-2/REGION-2 ...
-
-Install Java 17 via [sdkman](https://sdkman.io):
-
-> sdk install java 17.0.8-graalce
-
-## Installing Clusterless
-
-The Clusterless CLI app `cls` is downloadable from GitHub releases:
-
-- https://github.com/ClusterlessHQ/clusterless/releases
-
-The `bin` folder will have:
-
-- `cls` - the root CLI interface
-- `cls-aws` - the AWS interface only used as an escape hatch and testing
+See: https://docs.clusterless.io/guide/1.0-wip/install-quickstart.html
 
 ## Running
 
 > cls --help
 
 ```text
-Usage: cls [-hVv] [-D=<String=String>]... [-P=<providerNames>]... [COMMAND]
+Usage: cls [-hVv] [--output=<format>] [-D=<String=String>]...
+           [-P=<providerNames>]... [COMMAND]
   -D, --property=<String=String>
-                  key=value properties, will be passed down
-  -h, --help      Show this help message and exit.
+                          Optional key=value properties, will be passed down.
+  -h, --help              Show this help message and exit.
+      --output=<format>   Print results using given format.
+                          Values: table, json, csv, tsv (default: table)
   -P, --providers=<providerNames>
-                  provider substrates to target
-  -v, --verbose   Specify multiple -v options to increase verbosity.
-                  For example, `-v -v -v` or `-vvv`
-  -V, --version   Print version information and exit.
+                          Provider substrates to target.
+  -v, --verbose           Specify multiple -v options to increase verbosity.
+                          For example, `-v -v -v` or `-vvv`
+  -V, --version           Print version information and exit.
 Commands:
-  help       Display help information about the specified command.
-  config     manage local and global configuration settings
-  show       display details about providers, components, and project models
-  bootstrap  initialize a cloud provider placement
-  deploy     deploy a project into a declared placement
-  destroy    destroy a project deployed a declared placement
-  diff       compare local project changes with a deployed a declared placement
-  local      support for executing workloads locally
-  verify     verify project changes with a provider
+  help        Display help information about the specified command.
+  config      Manage local and global configuration settings.
+  show        Display details about providers, components, and project models.
+  bootstrap   Initialize a cloud provider placement.
+  deploy      Deploy a project into a declared placement.
+  destroy     Destroy a project deployed a declared placement.
+  diff        Compare local project changes with a deployed a declared
+                placement.
+  local       Support for executing workloads locally in a terminal.
+  verify      Verify project changes with a provider.
+  placements  List all visible placements with deployments.
+  projects    List all deployed projects.
 ```
-
-Every region must be bootstrapped by the `cls` app before it can be used:
-
-> cls bootstrap help
-
-To bootstrap a region:
-
-> cls bootstrap --region us-east-1 --account 123456789012 --profile my-profile --stage DEV
-
-If any arguments are missing, `cls` will prompt for them.
-
-Note the `--stage` option creates a namespace for all resources, so you can have multiple environments in the same
-account.
 
 ## Building (optional)
 
