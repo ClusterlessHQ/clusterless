@@ -9,7 +9,6 @@
 import org.jreleaser.model.Active
 import org.jreleaser.model.Distribution
 import org.jreleaser.model.Stereotype
-import java.nio.file.Files
 
 plugins {
     id("clusterless.java-application-conventions")
@@ -100,6 +99,34 @@ tasks.register("release") {
     dependsOn("jreleaserRelease")
 }
 
+tasks.register<Exec>("generateComponentModels") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "component",
+        "--model-all",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/components"
+    )
+}
+
+tasks.register<Exec>("generateModelModels") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "model",
+        "--model-all",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/models"
+    )
+}
+
 tasks.register<Exec>("generateComponentDocs") {
     dependsOn("installDist")
 
@@ -114,18 +141,67 @@ tasks.register<Exec>("generateComponentDocs") {
     )
 }
 
-tasks.register<Exec>("generateComponentIndex") {
+tasks.register<Exec>("generateResourceIndex") {
     dependsOn("installDist")
 
     workingDir = file("build/install/clusterless/bin")
     commandLine = listOf(
         "./cls",
         "show",
-        "component",
+        "resource",
         "--list",
         "--output-path",
-        "${buildDir}/generated-docs/modules/components/"
+        "${buildDir}/generated-docs/modules/components/",
+        "--append=false"
     )
+}
+
+tasks.register<Exec>("generateArcIndex") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "arc",
+        "--list",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/components/",
+        "--append=true"
+    )
+    mustRunAfter("generateBoundariesIndex")
+}
+
+tasks.register<Exec>("generateBarriersIndex") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "barrier",
+        "--list",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/components/",
+        "--append=true"
+    )
+    mustRunAfter("generateArcIndex")
+}
+
+tasks.register<Exec>("generateBoundariesIndex") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "boundary",
+        "--list",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/components/",
+        "--append=true"
+    )
+    mustRunAfter("generateResourceIndex")
 }
 
 tasks.register<Exec>("generateComponentPartial") {
@@ -193,9 +269,14 @@ tasks.register<Exec>("generateModelPartial") {
 }
 
 tasks.register<Copy>("generateDocs") {
+    dependsOn("generateComponentModels")
     dependsOn("generateComponentDocs")
-    dependsOn("generateComponentIndex")
+    dependsOn("generateResourceIndex")
+    dependsOn("generateArcIndex")
+    dependsOn("generateBarriersIndex")
+    dependsOn("generateBoundariesIndex")
     dependsOn("generateComponentPartial")
+    dependsOn("generateModelModels")
     dependsOn("generateModelDocs")
     dependsOn("generateModelIndex")
     dependsOn("generateModelPartial")
@@ -246,13 +327,10 @@ tasks.register("generateCLIIndex") {
     dependsOn("generateCLIDocs")
 
     doLast {
-        // remove cls-*-help.adoc files are they are redundant
-        fileTree("build/generated-docs/modules/commands/pages")
-            .filter { it.name.endsWith("-help.adoc") && it.name != "cls-help.adoc" }
-            .forEach { Files.delete(it.toPath()) }
-
+        // remove cls-*-help.adoc files from the index as they are redundant
         val names = fileTree("build/generated-docs/modules/commands/pages")
             .map { it.name }
+            .filter { it == "cls-help.adoc" || !it.endsWith("-help.adoc") }
             .sortedBy { it.substringBefore(".") }
             .toList()
         println(names)

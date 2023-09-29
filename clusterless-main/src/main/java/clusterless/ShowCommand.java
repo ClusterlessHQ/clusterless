@@ -22,7 +22,12 @@ import java.util.concurrent.Callable;
         subcommands = {
                 ShowProviders.class,
                 ShowComponents.class,
-                ShowModels.class
+                ShowResources.class,
+                ShowBoundaries.class,
+                ShowBarriers.class,
+                ShowArcs.class,
+                ShowModels.class,
+                CommandLine.HelpCommand.class
         }
 )
 public class ShowCommand {
@@ -44,14 +49,6 @@ public class ShowCommand {
 
             @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
             @CommandLine.Option(
-                    names = "--describe-all",
-                    arity = "0",
-                    description = "Print description of all elements."
-            )
-            Optional<Boolean> all;
-
-            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-            @CommandLine.Option(
                     names = "--model",
                     arity = "1",
                     description = "Print the json template of element."
@@ -61,6 +58,22 @@ public class ShowCommand {
             @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
             @CommandLine.Option(names = "--describe", arity = "1")
             Optional<String> name;
+
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+            @CommandLine.Option(
+                    names = "--describe-all",
+                    arity = "0",
+                    description = "Print description of all elements."
+            )
+            Optional<Boolean> describeAll;
+
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+            @CommandLine.Option(
+                    names = "--model-all",
+                    arity = "0",
+                    description = "Print model of all elements."
+            )
+            Optional<Boolean> modelAll;
 
             public Exclusive() {
             }
@@ -74,8 +87,10 @@ public class ShowCommand {
 
         @Override
         public Integer call() throws Exception {
-            if (exclusive.all.isPresent() && exclusive.all.get()) {
+            if (exclusive.describeAll.isPresent() && exclusive.describeAll.get()) {
                 return handleDescribeAll();
+            } else if (exclusive.modelAll.isPresent() && exclusive.modelAll.get()) {
+                return handleModelAll();
             } else if (exclusive.list.isPresent() && exclusive.list.get()) {
                 return handleList();
             } else if (exclusive.model.isPresent()) {
@@ -99,8 +114,14 @@ public class ShowCommand {
             return 0;
         }
 
+        protected Integer handleModelAll() throws Exception {
+            return 0;
+        }
+
         protected Integer handleDescribe() throws Exception {
             return 0;
         }
     }
 }
+
+

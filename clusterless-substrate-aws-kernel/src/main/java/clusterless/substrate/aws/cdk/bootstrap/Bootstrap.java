@@ -47,7 +47,7 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     BootstrapCommandOptions commandOptions = new BootstrapCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry, this::verbosityLevel);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry, this::verbosityLevel, commandOptions::profile);
 
     @Override
     public Integer call() throws Exception {
@@ -103,7 +103,7 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
             return 0;
         }
 
-        return Metadata.pushBootstrapMetadata(processExec.profile(), region, processExec.getOutputPath(), commandOptions.dryRun());
+        return Metadata.pushBootstrapMetadata(commandOptions.profile(), region, processExec.getOutputPath(), commandOptions.dryRun());
     }
 
     private Integer synth() {

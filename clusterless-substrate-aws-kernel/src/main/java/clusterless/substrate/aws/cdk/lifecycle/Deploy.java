@@ -24,7 +24,7 @@ public class Deploy extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     DeployCommandOptions commandOptions = new DeployCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry, this::verbosityLevel);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, commandOptions::retry, this::verbosityLevel, commandOptions::profile);
 
     @Override
     public Integer call() throws Exception {

@@ -20,7 +20,14 @@ public class ExecCommandOptions extends CommonCommandOptions {
     )
     private boolean dryRun = false;
 
+    @CommandLine.Option(names = "--profile", description = "aws profile")
+    private String profile = System.getenv("AWS_PROFILE");
+
     public boolean dryRun() {
         return dryRun;
+    }
+
+    public String profile() {
+        return profile;
     }
 }

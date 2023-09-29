@@ -22,10 +22,11 @@ import picocli.CommandLine;
 
 import java.io.Writer;
 import java.util.*;
+import java.util.function.Predicate;
 
 @CommandLine.Command(
         name = "component",
-        description = "Show available components."
+        description = "Show all available provider components (resources, barriers, boundaries, and arcs)."
 )
 public class ShowComponents extends BaseShowElements {
 
@@ -40,12 +41,23 @@ public class ShowComponents extends BaseShowElements {
 
     @Override
     protected Collection<String> getNames() {
-        Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
+        return getNamesHaving(e -> true);
+    }
 
+    @NotNull
+    protected Set<String> getNamesHaving(Predicate<Map.Entry<String, Class<? extends Struct>>> entryPredicate) {
+        Map<String, SubstrateProvider> providers = showCommand.main.substratesOptions().requestedProvider();
         Set<String> ordered = new TreeSet<>();
 
         for (Map.Entry<String, SubstrateProvider> entry : providers.entrySet()) {
-            ordered.addAll(entry.getValue().models().keySet());
+            Map<String, Class<? extends Struct>> models = entry.getValue()
+                    .models();
+
+            models.entrySet()
+                    .stream()
+                    .filter(entryPredicate)
+                    .map(Map.Entry::getKey)
+                    .forEach(ordered::add);
         }
 
         return ordered;
@@ -73,6 +85,7 @@ public class ShowComponents extends BaseShowElements {
 
         Map<String, Object> params = Map.of(
                 "name", providesComponent.get().type(),
+                "component", elementSubType(),
                 "synopsis", providesComponent.get().synopsis(),
                 "description", providesComponent.get().description(),
                 "model", BaseShowElements.getModel(modelClass)

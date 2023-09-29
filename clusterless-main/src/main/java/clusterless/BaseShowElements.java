@@ -11,6 +11,7 @@ package clusterless;
 import clusterless.json.JSONUtil;
 import clusterless.model.Struct;
 import clusterless.naming.Label;
+import clusterless.util.OrderedSafeMaps;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 
@@ -44,6 +45,14 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
     )
     Optional<String> name;
 
+    @CommandLine.Option(
+            names = "--append",
+            arity = "1",
+            description = "Append to the file",
+            hidden = true
+    )
+    boolean append = false;
+
     interface Handler {
         int handle(String name, Class<?> documentedClass, Class<? extends Struct> structClass);
     }
@@ -57,19 +66,21 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
     }
 
     protected static String getModel(Class<? extends Struct> modelClass) {
-        String model;
         try {
             // todo: have provider return a model instance with default values for use as a template
-            model = JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance());
+            return JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        return model;
     }
 
     @NotNull
     protected abstract String elementType();
+
+    protected String elementSubType() {
+        return elementType();
+    }
 
     protected abstract Collection<String> getNames();
 
@@ -77,35 +88,7 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
         Collection<String> ordered = getNames();
 
         if (output.isPresent()) {
-            try {
-                Path path = Paths.get(output.get());
-                path.toFile().mkdirs();
-
-                File file = path
-                        .resolve(name.orElse("nav.adoc"))
-                        .toFile();
-
-                Writer writer = new FileWriter(file);
-
-                List<Map<String, String>> elements = new ArrayList<>();
-
-                ordered.forEach(c -> elements.add(Map.of(
-                        "name", c,
-                        "filename", BaseShowElements.createFileName(c)
-                )));
-
-                Map<String, Object> params = Map.of(
-                        "title", elementType(),
-                        "type", elementType().toLowerCase(),
-                        "elements", elements
-                );
-
-                String partial = template.orElse("elements-list-adoc"); // a generic template
-                showCommand.main.printer().writeWithTemplate("/templates/" + partial, params, writer);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            writeFromTemplate(ordered);
         } else {
             showCommand.main.printer().println(ordered);
         }
@@ -113,10 +96,52 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
         return 0;
     }
 
+    protected void writeFromTemplate(Collection<String> ordered) {
+        try {
+            Path path = Paths.get(output.get());
+            path.toFile().mkdirs();
+
+            File file = path
+                    .resolve(name.orElse("nav.adoc"))
+                    .toFile();
+
+            Writer writer = new FileWriter(file, append);
+
+            List<Map<String, String>> elements = new ArrayList<>();
+
+            ordered.forEach(c -> elements.add(Map.of(
+                    "name", c,
+                    "filename", BaseShowElements.createFileName(c)
+            )));
+
+            Map<String, Object> params = OrderedSafeMaps.of(
+                    "title", !append ? elementType() : null,
+                    "component", elementSubType(),
+                    "type", elementType().toLowerCase(),
+                    "elements", elements
+            );
+
+            String template = elementType().equals(elementSubType()) ? "elements-list-adoc" : "elements-sublist-adoc";
+            String partial = this.template.orElse(template); // a generic template
+            showCommand.main.printer().writeWithTemplate("/templates/" + partial, params, writer);
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     protected Integer handleDescribeAll() {
         for (String component : getNames()) {
             handle(component, this::printDescription);
+        }
+        return 0;
+    }
+
+    @Override
+    protected Integer handleModelAll() throws Exception {
+        for (String component : getNames()) {
+            handle(component, this::printModel);
         }
         return 0;
     }
@@ -133,7 +158,30 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
     protected abstract int handle(String name, Handler func);
 
     protected int printModel(String name, Class<?> documentedClass, Class<? extends Struct> modelClass) {
-        showCommand.main.printer().println(getModel(modelClass));
+        try {
+            Writer writer = showCommand.main.printer().writer();
+
+            if (output.isPresent()) {
+                Path path = Paths.get(output.get()).resolve("examples");
+                path.toFile().mkdirs();
+
+                File file = path
+                        .resolve(BaseShowElements.createFileName(name))
+                        .toFile();
+
+                writer = new FileWriter(file);
+            }
+
+            writer.append(getModel(modelClass));
+            writer.append("\n");
+
+            writer.flush();
+            writer.close();
+
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
         return 0;
     }
 

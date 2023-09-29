@@ -21,7 +21,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 @CommandLine.Command(
         name = "config",
-        description = "Manage local and global configuration settings."
+        description = "Manage local and global configuration settings.",
+        subcommands = {CommandLine.HelpCommand.class}
 )
 public class ConfigCommand {
     @CommandLine.ParentCommand

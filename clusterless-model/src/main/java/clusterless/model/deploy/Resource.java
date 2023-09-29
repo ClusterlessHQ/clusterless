@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName
 public abstract class Resource extends Support {
-    String name;
+    private String name;
 
     public String name() {
         return name;

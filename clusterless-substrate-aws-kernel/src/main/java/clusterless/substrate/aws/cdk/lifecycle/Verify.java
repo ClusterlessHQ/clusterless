@@ -23,7 +23,7 @@ public class Verify extends BaseCDKCommand implements Callable<Integer> {
     @CommandLine.Mixin
     VerifyCommandOptions commandOptions = new VerifyCommandOptions();
     @CommandLine.Mixin
-    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, this::verbosityLevel);
+    CDKProcessExec processExec = new CDKProcessExec(commandOptions::dryRun, this::verbosityLevel, commandOptions::profile);
 
     public Verify() {
     }

@@ -62,8 +62,6 @@ public class CDKProcessExec extends ProcessExec {
     )
     private Optional<String> useLocalStackHost;
 
-    @CommandLine.Option(names = "--profile", description = "aws profile")
-    private String profile = System.getenv("AWS_PROFILE");
 
     @CommandLine.Option(names = "--output-path", description = "cloud assembly output directory")
     private String output = "cdk.out";
@@ -79,16 +77,19 @@ public class CDKProcessExec extends ProcessExec {
     private Optional<Boolean> useTempOutput;
 
     private final Lazy<String> outputPath = Lazy.of(this::createOutputPath);
+    private Supplier<String> profile;
 
     public CDKProcessExec() {
     }
 
-    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Integer> verbosity) {
+    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Integer> verbosity, Supplier<String> profile) {
         super(dryRun, verbosity);
+        this.profile = profile;
     }
 
-    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry, Supplier<Integer> verbosity) {
+    public CDKProcessExec(Supplier<Boolean> dryRun, Supplier<Boolean> retry, Supplier<Integer> verbosity, Supplier<String> profile) {
         super(dryRun, retry, verbosity);
+        this.profile = profile;
     }
 
     public String cdk() {
@@ -100,7 +101,7 @@ public class CDKProcessExec extends ProcessExec {
     }
 
     public String profile() {
-        return profile;
+        return profile.get();
     }
 
     public String output() {
