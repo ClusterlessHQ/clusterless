@@ -12,7 +12,7 @@ import org.jreleaser.model.Stereotype
 
 plugins {
     id("clusterless.java-application-conventions")
-    id("org.jreleaser") version "1.7.0"
+    id("org.jreleaser") version "1.8.0"
 }
 
 dependencies {
