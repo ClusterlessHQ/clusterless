@@ -17,9 +17,16 @@ A scenario follows this simple pattern:
 
 ### Gradle
 
-> ./gradlew clean scenarios
+```shell
+$ ../gradlew clean scenarios
+```
 
 ### Console
 
-> ./gradlew clean :clusterless-scenario:installDist
-> ./clusterless-scenario/build/install/cls-scenario/bin/cls-scenario --help
+```shell
+$ ../gradlew clean installDist copyScenarios
+```
+
+```shell
+$ build/install/cls-scenario/bin/cls-scenario --dry-run -f build/scenarios
+```

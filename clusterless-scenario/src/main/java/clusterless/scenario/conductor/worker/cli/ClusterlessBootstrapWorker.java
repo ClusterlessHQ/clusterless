@@ -50,12 +50,13 @@ public abstract class ClusterlessBootstrapWorker implements Worker {
 
         int exitCode = executor.exec();
 
-        LOG.info("worker executed bootstrap, with exit: {}", exitCode);
-
         if (exitCode == 0) {
+            LOG.info("worker executed bootstrap, with exit: {}", exitCode);
+
             return TaskResult.complete();
         }
 
+        LOG.error("worker executed bootstrap, with exit: {}", exitCode);
         return TaskResult.failed("exit code: " + exitCode);
     }
 

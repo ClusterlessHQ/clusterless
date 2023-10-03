@@ -43,7 +43,7 @@ public class S3IngressWorker implements Worker {
     public TaskResult execute(Task task) {
         Map<String, Object> inputData = task.getInputData();
 
-        LOG.info("ingress worker starting");
+        LOG.info("ingress worker starting, having...");
 
         task.setStatus(Task.Status.IN_PROGRESS);
 
@@ -51,9 +51,9 @@ public class S3IngressWorker implements Worker {
         Integer delay = (Integer) inputData.get("delay");
         Integer iteration = (Integer) inputData.get("iteration");
 
-        LOG.info("input: {}", delay);
-        LOG.info("delay: {}", JSONUtil.writeAsStringSafe(store));
-        LOG.info("iteration: {}", iteration);
+        LOG.info("  delay: {}", delay);
+        LOG.info("  iteration: {}", iteration);
+        LOG.info("  store: {}", JSONUtil.writeAsStringSafe(store));
 
         // 1 based
         if (iteration != 1) {

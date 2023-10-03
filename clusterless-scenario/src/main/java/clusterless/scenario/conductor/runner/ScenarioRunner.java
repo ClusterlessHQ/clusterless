@@ -82,7 +82,7 @@ public class ScenarioRunner {
         }
 
         LOG.info("scenario: {}, adding verifier: {}", scenario.name(), scenario.projectFiles());
-        tasks.addAll(new VerifierProject("clsVerifier", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
+        tasks.addAll(new VerifierProject("clsVerifier_%s".formatted(makeSafe(scenario.name())), scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 
     private void applyDeployer(List<WorkflowTask> tasks) {
@@ -92,7 +92,7 @@ public class ScenarioRunner {
         }
 
         LOG.info("scenario: {}, adding deployer: {}", scenario.name(), scenario.projectFiles());
-        tasks.addAll(new DeployerProject("clsDeployer", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
+        tasks.addAll(new DeployerProject("clsDeployer_%s".formatted(makeSafe(scenario.name())), scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 
     private void applyIngress(List<WorkflowTask> tasks) {
@@ -102,18 +102,32 @@ public class ScenarioRunner {
 
         LOG.info("scenario: {}, adding ingress stores: {}", scenario.name(), scenario.ingressStores().size());
 
+        DoWhile[][] children = new DoWhile[scenario.ingressStores().size()][1];
+
+        int count = 0;
         for (IngressStore ingressStore : scenario.ingressStores()) {
-            DoWhile doWhile = new DoWhile("ingressWhile", ingressStore.objectCount());
+            String scenarioNameSafe = makeSafe(scenario.name());
+            String name = "ingressWhile_%s_%02d".formatted(scenarioNameSafe, count);
+            DoWhile doWhile = new DoWhile(name, ingressStore.objectCount());
 
             // the wait task within a choice has massive delays
             // the choice itself requires the javascript interpreter which is not available in jdk 17
-            SimpleTask ingress = new S3Ingress("s3IngressDelayed", ingressStore)
-                    .input("iteration", "${ingressWhile.output.iteration}");
+            SimpleTask ingress = new S3Ingress("s3IngressDelayed_%s_%02d".formatted(scenarioNameSafe, count), ingressStore)
+                    .input("iteration", "${%s.output.iteration}".formatted(name));
 
             doWhile.loopOver(ingress);
 
-            tasks.addAll(doWhile.getWorkflowDefTasks());
+            children[count++][0] = doWhile;
         }
+
+        ForkJoin forkJoin = new ForkJoin("ingressFork", children);
+
+        tasks.addAll(forkJoin.getWorkflowDefTasks());
+    }
+
+    @NotNull
+    private String makeSafe(String name) {
+        return name.replace("-", "_");
     }
 
     /**
@@ -225,6 +239,6 @@ public class ScenarioRunner {
         }
 
         LOG.info("scenario: {}, adding destroyer: {}", scenario.name(), scenario.projectFiles());
-        tasks.addAll(new DestroyerProject("clsDestroyer", scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
+        tasks.addAll(new DestroyerProject("clsDestroyer_%s".formatted(makeSafe(scenario.name())), scenario.projectDirectory(), scenario.projectFiles()).getWorkflowDefTasks());
     }
 }

@@ -28,7 +28,7 @@ dependencies {
     implementation("software.amazon.awssdk:athena")
 
     // the log4j exclusion works around the strict version requirement
-    val conductor = "3.13.8"
+    val conductor = "3.14.0"
     implementation("com.netflix.conductor:conductor-core:$conductor") {
         exclude("org.apache.logging.log4j")
         exclude("log4j:log4j")

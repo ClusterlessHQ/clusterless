@@ -92,7 +92,7 @@ public class Main implements Callable<Integer> {
 
         List<Scenario> scenarios = paths.stream()
                 .map(Main::scenario)
-                .collect(Collectors.toList());
+                .toList();
 
         if (serverHostPort == null) {
             server();
@@ -103,7 +103,7 @@ public class Main implements Callable<Integer> {
                 .filter(Scenario::enabled)
                 .flatMap(s -> s.placements().stream())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         int totalFailedFlows = 0;
 
@@ -162,7 +162,7 @@ public class Main implements Callable<Integer> {
     private Set<String> startBootstrapExecution(List<Map<String, String>> placements, WorkflowManager workflowManager, boolean destroy) {
         List<BootstrapRunner> runners = placements.stream()
                 .map(s -> new BootstrapRunner(options, workflowManager, s, destroy, scenarios))
-                .collect(Collectors.toList());
+                .toList();
 
         return runners.stream()
                 .map(BootstrapRunner::exec)
@@ -174,7 +174,7 @@ public class Main implements Callable<Integer> {
         List<ScenarioRunner> runners = scenarios.stream()
                 .filter(Scenario::enabled)
                 .map(s -> new ScenarioRunner(options, workflowManager, s))
-                .collect(Collectors.toList());
+                .toList();
 
         return runners.stream()
                 .map(ScenarioRunner::exec)
@@ -191,7 +191,7 @@ public class Main implements Callable<Integer> {
         while (true) {
             List<Workflow> workflows = started.stream()
                     .map(i -> workflowManager.workflowClient().getWorkflow(i, true))
-                    .collect(Collectors.toList());
+                    .toList();
 
             Set<String> completed = workflows.stream()
                     .filter(w -> w.getStatus() == Workflow.WorkflowStatus.COMPLETED)

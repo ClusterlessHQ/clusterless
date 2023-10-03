@@ -50,16 +50,16 @@ public abstract class ClusterlessProjectWorker implements Worker {
                 .withExtraArgs(List.of(extraArgs))
                 .build();
 
-        LOG.info("worker executing command: {}", command);
+        LOG.info("worker executing command: {}, in {}", command, workingDirectory);
 
         int exitCode = deploy.exec();
 
-        LOG.info("worker executed command: {}, with exit: {}", command, exitCode);
-
         if (exitCode == 0) {
+            LOG.info("worker executed command: {}, in {}, with exit: {}", command, workingDirectory, exitCode);
             return TaskResult.complete();
         }
 
+        LOG.error("worker executed command: {}, in {}, with exit: {}", command, workingDirectory, exitCode);
         return TaskResult.failed("exit code: " + exitCode);
     }
 
