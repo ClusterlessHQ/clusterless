@@ -13,6 +13,7 @@ import clusterless.lambda.arc.ArcEventObserver;
 import clusterless.lambda.manifest.AttemptCounter;
 import clusterless.lambda.manifest.ManifestReader;
 import clusterless.lambda.manifest.ManifestWriter;
+import clusterless.lambda.util.PathMatcher;
 import clusterless.model.UriType;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.Manifest;
@@ -48,6 +49,12 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
             UriType.identifier
     );
 
+    protected PathMatcher.Builder pathMatcher = PathMatcher.builder()
+            .withPathSeparator(arcProps().workloadProps().filter().pathSeparator())
+            .withIgnoreCase(arcProps().workloadProps().filter().ignoreCase())
+            .withIncludes(arcProps().workloadProps().filter().includes())
+            .withExcludes(arcProps().workloadProps().filter().excludes());
+
     @Override
     protected Map<String, URI> handleEvent(ArcWorkloadContext arcWorkloadContext, Context context, ArcEventObserver eventObserver) {
         String fromRole = arcWorkloadContext.role();
@@ -64,6 +71,9 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
         //  copy files
         URI fromDatasetPath = notifyEvent.dataset().pathURI();
         List<URI> fromUris = incomingManifest.uris();
+
+        PathMatcher match = pathMatcher.withPath(fromDatasetPath.getPath())
+                .build();
 
         for (Map.Entry<String, SinkDataset> sinkRoleEntry : arcProps().sinks().entrySet()) {
             String toRole = sinkRoleEntry.getKey();
@@ -86,6 +96,11 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
             // not using a map so that collisions can be managed independently on the to/from sides
             List<Tuple2<URI, URI>> toUris = new LinkedList<>();
             for (URI fromUri : fromUris) {
+
+                if (!match.keep(fromUri.getPath())) {
+                    continue;
+                }
+
                 URI toURI = URIs.fromTo(fromDatasetPath, fromUri, toDatasetPath);
                 toUris.add(new Tuple2<>(fromUri, toURI));
             }

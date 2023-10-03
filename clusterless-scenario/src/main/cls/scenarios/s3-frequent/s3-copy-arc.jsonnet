@@ -54,6 +54,13 @@ local unit = 'Twelfths';
           pathURI: bucketPrefix + '/copy-a/',
         },
       },
+      workload: {
+        workloadProps: {
+          filter: {
+            excludes: ['**/_*'],
+          },
+        },
+      },
     },
   ],
 }

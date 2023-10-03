@@ -2,7 +2,7 @@ local stage = std.extVar('scenario.stage');
 local account = std.extVar('scenario.aws.account');
 local region = std.extVar('scenario.aws.region');
 local bucketName = 'clusterless-chain-test-' + account + '-' + region;
-local bucketPrefix = 's3://'+bucketName;
+local bucketPrefix = 's3://' + bucketName;
 local unit = 'Twelfths';
 
 {
@@ -30,7 +30,7 @@ local unit = 'Twelfths';
       dataset: {
         name: 'ingress-chain',
         version: '20220101',
-        pathURI: bucketPrefix+'/ingress/',
+        pathURI: bucketPrefix + '/ingress/',
       },
       lotUnit: unit,
     },
@@ -43,14 +43,14 @@ local unit = 'Twelfths';
         main: {
           name: 'ingress-chain',
           version: '20220101',
-          pathURI: bucketPrefix+'/ingress/',
+          pathURI: bucketPrefix + '/ingress/',
         },
       },
       sinks: {
         main: {
           name: 'copy-a-chain',
           version: '20230101',
-          pathURI: bucketPrefix+'/copy-a/',
+          pathURI: bucketPrefix + '/copy-a/',
         },
       },
     },
@@ -61,14 +61,14 @@ local unit = 'Twelfths';
         main: {
           name: 'copy-a-chain',
           version: '20230101',
-          pathURI: bucketPrefix+'/copy-a/',
+          pathURI: bucketPrefix + '/copy-a/',
         },
       },
       sinks: {
         main: {
           name: 'copy-b-chain',
           version: '20230101',
-          pathURI: bucketPrefix+'/copy-b/',
+          pathURI: bucketPrefix + '/copy-b/',
         },
       },
       workload: {
@@ -84,14 +84,14 @@ local unit = 'Twelfths';
         main: {
           name: 'copy-b-chain',
           version: '20230101',
-          pathURI: bucketPrefix+'/copy-b/',
+          pathURI: bucketPrefix + '/copy-b/',
         },
       },
       sinks: {
         main: {
           name: 'copy-c-chain',
           version: '20230101',
-          pathURI: bucketPrefix+'/copy-c/',
+          pathURI: bucketPrefix + '/copy-c/',
         },
       },
     },
