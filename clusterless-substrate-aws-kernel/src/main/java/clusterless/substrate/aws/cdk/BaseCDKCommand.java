@@ -57,12 +57,17 @@ public class BaseCDKCommand extends CommonCommand {
         return Collections.emptyList();
     }
 
-    protected void confirmBootstrapForPlacements(List<File> projectFiles, String awsProfile) throws IOException {
+    protected void confirmBootstrapForPlacements(List<File> projectFiles, String awsProfile, boolean dryRun) throws IOException {
         Set<Placement> placements = new Loader(projectFiles)
                 .readObjects(Provider.NAME, Deployable.PROVIDER_POINTER, Deployable.class, Deployable::setSourceFile)
                 .stream()
                 .map(Deployable::placement)
                 .collect(Collectors.toSet());
+
+        if (dryRun) {
+            LOG.info("skipping confirming bootstrap, dry run");
+            return;
+        }
 
         S3 s3 = new S3(awsProfile);
 

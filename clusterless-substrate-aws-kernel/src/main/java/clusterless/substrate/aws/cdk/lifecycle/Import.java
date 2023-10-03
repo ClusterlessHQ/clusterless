@@ -31,7 +31,7 @@ public class Import extends BaseCDKCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-        confirmBootstrapForPlacements(commandOptions.projectFiles(), processExec.profile());
+        confirmBootstrapForPlacements(commandOptions.projectFiles(), processExec.profile(), commandOptions.dryRun());
 
         List<String> args = SafeList.of(
                 "ResourceBoundary",

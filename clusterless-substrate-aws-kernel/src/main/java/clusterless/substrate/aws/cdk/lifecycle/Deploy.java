@@ -29,7 +29,7 @@ public class Deploy extends BaseCDKCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-        confirmBootstrapForPlacements(commandOptions.projectFiles(), processExec.profile());
+        confirmBootstrapForPlacements(commandOptions.projectFiles(), processExec.profile(), commandOptions.dryRun());
 
         Integer exitCode = processExec.executeLifecycleProcess(
                 getCommonConfig(),
