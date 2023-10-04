@@ -1,7 +1,7 @@
 local project = import 's3-copy-arc.jsonnet';
 
 {
-  name: 's3-frequent',
+  name: 's3-frequent-filter-copy',
   description: 'copy workload with frequent arrivals',
   projectFiles: [
     's3-copy-arc.json',

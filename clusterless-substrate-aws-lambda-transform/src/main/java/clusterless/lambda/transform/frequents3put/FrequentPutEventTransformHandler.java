@@ -12,6 +12,7 @@ import clusterless.lambda.EventHandler;
 import clusterless.lambda.arc.ArcNotifyEventPublisher;
 import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.lambda.transform.json.event.AWSEvent;
+import clusterless.lambda.util.PathMatcher;
 import clusterless.model.UriType;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.aws.sdk.SQS;
@@ -61,6 +62,14 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
             transformProps.eventBusName(),
             transformProps.dataset()
     );
+
+    protected PathMatcher pathMatcher = PathMatcher.builder()
+            .withPath(transformProps.dataset().pathURI().getPath())
+            .withPathSeparator(transformProps.filter().pathSeparator())
+            .withIgnoreCase(transformProps.filter().ignoreCase())
+            .withIncludes(transformProps.filter().includes())
+            .withExcludes(transformProps.filter().excludes())
+            .build();
 
     public FrequentPutEventTransformHandler() {
         super(AWSEvent.class);
@@ -173,6 +182,7 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
                         .map(this::uriFromDetail)
                         .filter(uri -> !isEmpty(uri.getPath()) && uri.getPath().charAt(uri.getPath().length() - 1) != '/') // only retain files
                         .peek(eventObserver::applyIdentifierURI)
+                        .filter(pathMatcher::keep)
                         .forEach(uris::add);
             }
 

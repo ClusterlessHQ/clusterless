@@ -20,12 +20,17 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
         synopsis = "The AWS S3 Copy Arc component copies data from one S3 bucket to another S3 bucket.",
         description = """
                 All data in the source manifest will be copied to the specified dataset, except those paths that do
-                not pass the filter. The filter is a list of include and exclude patterns.
+                not pass the filter, if given. The filter is a list of include and exclude patterns.
+                                
+                Where:
+                - ? matches one character
+                - * matches zero or more characters
+                - ** matches zero or more directories in a path
                                 
                 A common exclude pattern would be '**/_*'. This would exclude all files that start with an underscore,
                 like '_SUCCESS' or '_metadata'.
-                                
-                workloadProps.filter.includes: A list of include patterns.
+
+                workloadProps.filter.includes: A list of include patterns. Default is '**'.
                 workloadProps.filter.excludes: A list of exclude patterns.
                 workloadProps.filter.pathSeparator: The path separator to use when matching patterns. Default is '/'.
                 workloadProps.filter.ignoreCase: Whether to ignore case when matching patterns. Default is false.

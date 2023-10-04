@@ -10,6 +10,7 @@ package clusterless.lambda.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -67,10 +68,13 @@ public class PathMatcher {
         return path -> matcher.match(pattern, path.subSequence(this.path.length(), path.length()));
     }
 
+    public boolean keep(URI uri) {
+        return keep(uri.getPath());
+    }
+
     public boolean keep(String path) {
         return predicate.test(path);
     }
-
 
     public static final class Builder {
         protected String path;

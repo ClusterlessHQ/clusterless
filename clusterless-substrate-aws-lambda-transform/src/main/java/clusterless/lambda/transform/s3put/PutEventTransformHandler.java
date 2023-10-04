@@ -12,6 +12,7 @@ import clusterless.lambda.EventHandler;
 import clusterless.lambda.arc.ArcNotifyEventPublisher;
 import clusterless.lambda.manifest.ManifestWriter;
 import clusterless.lambda.transform.json.object.AWSEvent;
+import clusterless.lambda.util.PathMatcher;
 import clusterless.model.UriType;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.temporal.IntervalBuilder;
@@ -22,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,6 +49,14 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
             transformProps.eventBusName(),
             transformProps.dataset()
     );
+
+    protected PathMatcher pathMatcher = PathMatcher.builder()
+            .withPath(transformProps.dataset().pathURI().getPath())
+            .withPathSeparator(transformProps.filter().pathSeparator())
+            .withIgnoreCase(transformProps.filter().ignoreCase())
+            .withIncludes(transformProps.filter().includes())
+            .withExcludes(transformProps.filter().excludes())
+            .build();
 
     public PutEventTransformHandler() {
         super(AWSEvent.class);
@@ -97,27 +107,25 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
 
         eventObserver.applyIdentifierURI(identifier);
 
-        String lotId = null;
-
-        switch (transformProps.lotSource()) {
-            case eventTime:
-                lotId = intervalBuilder.truncateAndFormat(time);
-                break;
-            case objectModifiedTime:
-                lotId = fromModifiedTime(identifier);
-                break;
-            case keyTimestampRegex:
-                lotId = null;
-                break;
-        }
+        String lotId =
+                switch (transformProps.lotSource()) {
+                    case eventTime -> intervalBuilder.truncateAndFormat(time);
+                    case objectModifiedTime -> fromModifiedTime(identifier);
+                    case keyTimestampRegex -> null;
+                };
 
         eventObserver.applyLotId(lotId);
 
-        List<URI> uris = List.of(identifier);
+        List<URI> uris = Collections.emptyList();
+
+        if (pathMatcher.keep(key)) {
+            uris = List.of(identifier);
+        }
 
         eventObserver.applyDatasetItemsSize(uris.size());
 
-        URI manifestURI = manifestWriter.writeSuccessManifest(uris, lotId);
+        URI manifestURI = uris.isEmpty() ?
+                manifestWriter.writeEmptyManifest(lotId) : manifestWriter.writeSuccessManifest(uris, lotId);
 
         eventObserver.applyManifestURI(manifestURI);
 

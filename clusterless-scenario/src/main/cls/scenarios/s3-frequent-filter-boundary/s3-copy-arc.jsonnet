@@ -1,13 +1,13 @@
 local stage = std.extVar('scenario.stage');
 local account = std.extVar('scenario.aws.account');
 local region = std.extVar('scenario.aws.region');
-local bucketName = 'clusterless-frequent-test-' + account + '-' + region;
+local bucketName = 'clusterless-frequent-filter-boundary-test-' + account + '-' + region;
 local bucketPrefix = 's3://' + bucketName;
 local unit = 'Twelfths';
 
 {
   project: {
-    name: 'S3Freq',
+    name: 'S3FreqFiltBndy',
     version: '20230101-00',
   },
   placement: {
@@ -29,11 +29,14 @@ local unit = 'Twelfths';
       name: 'FreqPutListener',
       eventArrival: 'frequent',
       dataset: {
-        name: 'ingress-frequent',
+        name: 'ingress-frequent-boundary',
         version: '20220101',
         pathURI: bucketPrefix + '/ingress/',
       },
       lotUnit: unit,
+      filter: {
+        excludes: ['**/_*'],
+      },
     },
   ],
   arcs: [
@@ -42,23 +45,16 @@ local unit = 'Twelfths';
       name: 'copyA',
       sources: {
         main: {
-          name: 'ingress-frequent',
+          name: 'ingress-frequent-boundary',
           version: '20220101',
           pathURI: bucketPrefix + '/ingress/',
         },
       },
       sinks: {
         main: {
-          name: 'copy-a-frequent',
+          name: 'copy-a-frequent-boundary',
           version: '20230101',
           pathURI: bucketPrefix + '/copy-a/',
-        },
-      },
-      workload: {
-        workloadProps: {
-          filter: {
-            excludes: ['**/_*'],
-          },
         },
       },
     },

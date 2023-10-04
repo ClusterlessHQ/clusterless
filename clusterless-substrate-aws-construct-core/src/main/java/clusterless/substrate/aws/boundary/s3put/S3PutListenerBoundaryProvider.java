@@ -40,13 +40,32 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
                 infrequent.enableEventBridge: true|false
                     true will enable event bridge on the bucket
                     if the bucket was not declared with eventBridgeNotification enabled, it must be set here
-                    
+
                 frequent.queueFetchWaitSec: seconds
                     The duration (in seconds) for which the call waits for a message to arrive in the queue
                     before returning. If a message is available, the call returns sooner than WaitTimeSeconds.
                     If no messages are available and the wait time expires, the call returns successfully with an
                     empty list of messages.
                     It is recommended to leave this value at zero (0).
+
+                For frequently arriving events, all paths are collected until the end of the interval, except those
+                paths that do not pass the filter, if given. The filter is a list of include and exclude patterns.
+                                
+                Where:
+                - ? matches one character
+                - * matches zero or more characters
+                - ** matches zero or more directories in a path
+                                
+                A common exclude pattern would be '**/_*'. This would exclude all files that start with an underscore,
+                like '_SUCCESS' or '_metadata'.
+
+                frequent.filter.includes: A list of include patterns.
+                    Default is '**'.
+                frequent.filter.excludes: A list of exclude patterns.
+                frequent.filter.pathSeparator: The path separator to use when matching patterns.
+                    Default is '/'.
+                frequent.filter.ignoreCase: Whether to ignore case when matching patterns.
+                    Default is false.
                 """
 )
 public class S3PutListenerBoundaryProvider implements BoundaryComponentService<ManagedComponentContext, S3PutListenerBoundary, S3PutListenerBoundaryConstruct> {

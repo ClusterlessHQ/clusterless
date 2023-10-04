@@ -83,6 +83,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
                 .withLotUnit(model.lotUnit())
                 .withLotSource(model().infrequent().lotSource())
                 .withKeyRegex(model().infrequent().keyRegex())
+                .withFilter(model().filter())
                 .build();
 
         Map<String, String> environment = Env.toEnv(transformProps);

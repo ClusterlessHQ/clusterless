@@ -48,7 +48,6 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
             arcProps().sinkManifestTemplates(),
             UriType.identifier
     );
-
     protected PathMatcher.Builder pathMatcher = PathMatcher.builder()
             .withPathSeparator(arcProps().workloadProps().filter().pathSeparator())
             .withIgnoreCase(arcProps().workloadProps().filter().ignoreCase())

@@ -95,6 +95,7 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
                 .withManifestCompletePath(manifestComplete)
                 .withManifestPartialPath(manifestPartial)
                 .withLotUnit(model.lotUnit())
+                .withFilter(model().filter())
                 .build();
 
         Map<String, String> environment = Env.toEnv(transformProps);

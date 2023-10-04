@@ -10,6 +10,7 @@ package clusterless.lambda.transform.s3put;
 
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,10 +18,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class S3PutTransformProps extends TransformProps {
-
     @JsonProperty(required = true)
     LotSource lotSource;
-
     String keyRegex;
 
     public S3PutTransformProps() {
@@ -40,14 +39,15 @@ public class S3PutTransformProps extends TransformProps {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TransformProps{");
-        sb.append("lotUnit='").append(lotUnit).append('\'');
-        sb.append(", lotSource=").append(lotSource);
+        final StringBuilder sb = new StringBuilder("S3PutTransformProps{");
+        sb.append("lotSource=").append(lotSource);
         sb.append(", keyRegex='").append(keyRegex).append('\'');
+        sb.append(", lotUnit='").append(lotUnit).append('\'');
         sb.append(", manifestCompletePath=").append(manifestCompletePath);
         sb.append(", manifestPartialPath=").append(manifestPartialPath);
         sb.append(", dataset=").append(dataset);
         sb.append(", eventBusName='").append(eventBusName).append('\'');
+        sb.append(", filter=").append(filter);
         sb.append('}');
         return sb.toString();
     }
@@ -58,6 +58,7 @@ public class S3PutTransformProps extends TransformProps {
         protected ManifestURI manifestPartialPath;
         protected Dataset dataset;
         protected String eventBusName;
+        protected PathFilter filter;
         LotSource lotSource;
         String keyRegex;
 
@@ -93,6 +94,11 @@ public class S3PutTransformProps extends TransformProps {
             return this;
         }
 
+        public Builder withFilter(PathFilter filter) {
+            this.filter = filter;
+            return this;
+        }
+
         public Builder withLotSource(LotSource lotSource) {
             this.lotSource = lotSource;
             return this;
@@ -105,13 +111,14 @@ public class S3PutTransformProps extends TransformProps {
 
         public S3PutTransformProps build() {
             S3PutTransformProps s3PutTransformProps = new S3PutTransformProps();
-            s3PutTransformProps.lotUnit = this.lotUnit;
-            s3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
-            s3PutTransformProps.eventBusName = this.eventBusName;
+            s3PutTransformProps.filter = this.filter;
             s3PutTransformProps.lotSource = this.lotSource;
             s3PutTransformProps.dataset = this.dataset;
             s3PutTransformProps.keyRegex = this.keyRegex;
+            s3PutTransformProps.lotUnit = this.lotUnit;
+            s3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
             s3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
+            s3PutTransformProps.eventBusName = this.eventBusName;
             return s3PutTransformProps;
         }
     }

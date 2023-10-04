@@ -10,6 +10,7 @@ package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.s3put.EventArrival;
 import clusterless.model.deploy.IngressBoundary;
+import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.substrate.aws.props.Memory;
 
@@ -25,6 +26,8 @@ public class S3PutListenerBoundary extends IngressBoundary {
     );
     Infrequent infrequent = new Infrequent();
     Frequent frequent = new Frequent();
+
+    PathFilter filter = new PathFilter();
 
     public S3PutListenerBoundary() {
     }
@@ -43,5 +46,9 @@ public class S3PutListenerBoundary extends IngressBoundary {
 
     public Frequent frequent() {
         return frequent;
+    }
+
+    public PathFilter filter() {
+        return filter;
     }
 }

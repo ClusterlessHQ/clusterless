@@ -10,9 +10,11 @@ package clusterless.lambda.transform.frequents3put;
 
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
 
 public class FrequentS3PutTransformProps extends TransformProps {
+
     protected String sqsQueueName;
     protected int sqsWaitTimeSeconds = 0;
 
@@ -30,15 +32,17 @@ public class FrequentS3PutTransformProps extends TransformProps {
 
     @Override
     public String toString() {
-        String sb = "FrequentS3PutTransformProps{" + "sqsQueueName='" + sqsQueueName + '\'' +
-                    ", sqsWaitTimeSeconds=" + sqsWaitTimeSeconds +
-                    ", lotUnit='" + lotUnit + '\'' +
-                    ", manifestCompletePath=" + manifestCompletePath +
-                    ", manifestPartialPath=" + manifestPartialPath +
-                    ", dataset=" + dataset +
-                    ", eventBusName='" + eventBusName + '\'' +
-                    '}';
-        return sb;
+        final StringBuilder sb = new StringBuilder("FrequentS3PutTransformProps{");
+        sb.append("sqsQueueName='").append(sqsQueueName).append('\'');
+        sb.append(", sqsWaitTimeSeconds=").append(sqsWaitTimeSeconds);
+        sb.append(", lotUnit='").append(lotUnit).append('\'');
+        sb.append(", manifestCompletePath=").append(manifestCompletePath);
+        sb.append(", manifestPartialPath=").append(manifestPartialPath);
+        sb.append(", dataset=").append(dataset);
+        sb.append(", eventBusName='").append(eventBusName).append('\'');
+        sb.append(", filter=").append(filter);
+        sb.append('}');
+        return sb.toString();
     }
 
     public static final class Builder {
@@ -47,6 +51,7 @@ public class FrequentS3PutTransformProps extends TransformProps {
         protected ManifestURI manifestPartialPath;
         protected Dataset dataset;
         protected String eventBusName;
+        protected PathFilter filter;
         protected String sqsQueueName;
         protected int sqsWaitTimeSeconds = 0;
 
@@ -82,6 +87,11 @@ public class FrequentS3PutTransformProps extends TransformProps {
             return this;
         }
 
+        public Builder withFilter(PathFilter filter) {
+            this.filter = filter;
+            return this;
+        }
+
         public Builder withSqsQueueName(String sqsQueueName) {
             this.sqsQueueName = sqsQueueName;
             return this;
@@ -94,12 +104,13 @@ public class FrequentS3PutTransformProps extends TransformProps {
 
         public FrequentS3PutTransformProps build() {
             FrequentS3PutTransformProps frequentS3PutTransformProps = new FrequentS3PutTransformProps();
+            frequentS3PutTransformProps.filter = this.filter;
             frequentS3PutTransformProps.dataset = this.dataset;
-            frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;
-            frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
             frequentS3PutTransformProps.lotUnit = this.lotUnit;
-            frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
+            frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
             frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
+            frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;
+            frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
             frequentS3PutTransformProps.eventBusName = this.eventBusName;
             return frequentS3PutTransformProps;
         }

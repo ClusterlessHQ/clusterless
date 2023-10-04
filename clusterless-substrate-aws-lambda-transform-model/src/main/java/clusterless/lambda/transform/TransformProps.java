@@ -10,6 +10,7 @@ package clusterless.lambda.transform;
 
 import clusterless.model.Struct;
 import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,6 +24,7 @@ public class TransformProps implements Struct {
     @JsonProperty(required = true)
     protected Dataset dataset;
     protected String eventBusName;
+    protected PathFilter filter;
 
     public String lotUnit() {
         return lotUnit;
@@ -42,5 +44,9 @@ public class TransformProps implements Struct {
 
     public String eventBusName() {
         return eventBusName;
+    }
+
+    public PathFilter filter() {
+        return filter;
     }
 }
