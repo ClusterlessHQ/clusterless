@@ -1,6 +1,6 @@
 name: clusterless
 title: Clusterless Reference
-version: wip-1.0
+version: 1.0-wip
 ext:
   collector:
     run:
