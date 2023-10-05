@@ -51,7 +51,7 @@ public class FrequentS3PutTransformProps extends TransformProps {
         protected ManifestURI manifestPartialPath;
         protected Dataset dataset;
         protected String eventBusName;
-        protected PathFilter filter;
+        protected PathFilter filter = new PathFilter();
         protected String sqsQueueName;
         protected int sqsWaitTimeSeconds = 0;
 
@@ -104,14 +104,14 @@ public class FrequentS3PutTransformProps extends TransformProps {
 
         public FrequentS3PutTransformProps build() {
             FrequentS3PutTransformProps frequentS3PutTransformProps = new FrequentS3PutTransformProps();
-            frequentS3PutTransformProps.filter = this.filter;
-            frequentS3PutTransformProps.dataset = this.dataset;
-            frequentS3PutTransformProps.lotUnit = this.lotUnit;
             frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
-            frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
+            frequentS3PutTransformProps.lotUnit = this.lotUnit;
             frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;
             frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
+            frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
             frequentS3PutTransformProps.eventBusName = this.eventBusName;
+            frequentS3PutTransformProps.dataset = this.dataset;
+            frequentS3PutTransformProps.filter = this.filter;
             return frequentS3PutTransformProps;
         }
     }

@@ -58,7 +58,7 @@ public class S3PutTransformProps extends TransformProps {
         protected ManifestURI manifestPartialPath;
         protected Dataset dataset;
         protected String eventBusName;
-        protected PathFilter filter;
+        protected PathFilter filter = new PathFilter();
         LotSource lotSource;
         String keyRegex;
 
@@ -111,14 +111,14 @@ public class S3PutTransformProps extends TransformProps {
 
         public S3PutTransformProps build() {
             S3PutTransformProps s3PutTransformProps = new S3PutTransformProps();
-            s3PutTransformProps.filter = this.filter;
             s3PutTransformProps.lotSource = this.lotSource;
-            s3PutTransformProps.dataset = this.dataset;
+            s3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
             s3PutTransformProps.keyRegex = this.keyRegex;
             s3PutTransformProps.lotUnit = this.lotUnit;
-            s3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
             s3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
             s3PutTransformProps.eventBusName = this.eventBusName;
+            s3PutTransformProps.dataset = this.dataset;
+            s3PutTransformProps.filter = this.filter;
             return s3PutTransformProps;
         }
     }

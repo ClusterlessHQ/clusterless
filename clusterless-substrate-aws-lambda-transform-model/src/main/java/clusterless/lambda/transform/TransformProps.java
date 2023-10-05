@@ -24,7 +24,7 @@ public class TransformProps implements Struct {
     @JsonProperty(required = true)
     protected Dataset dataset;
     protected String eventBusName;
-    protected PathFilter filter;
+    protected PathFilter filter = new PathFilter();
 
     public String lotUnit() {
         return lotUnit;
