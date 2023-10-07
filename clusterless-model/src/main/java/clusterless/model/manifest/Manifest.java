@@ -8,11 +8,11 @@
 
 package clusterless.model.manifest;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.Content;
 import clusterless.model.Struct;
 import clusterless.model.UriType;
 import clusterless.model.deploy.Dataset;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
 import java.util.List;
@@ -23,14 +23,14 @@ import java.util.List;
 public class Manifest implements Content, Struct {
     public static final String JSON_EXTENSION = "json";
 
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected ManifestState state;
     protected String comment;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected String lotId;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected UriType uriType = UriType.identifier;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected List<URI> uris;
 
     public Manifest() {

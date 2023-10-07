@@ -62,7 +62,8 @@ public class ShowModels extends BaseShowElements {
                 "name", modelClass.getSimpleName(),
                 "synopsis", documentsModel.get().synopsis(),
                 "description", documentsModel.get().description(),
-                "model", BaseShowElements.getModel(modelClass)
+                "model", BaseShowElements.getModel(modelClass, false),
+                "required", BaseShowElements.getModel(modelClass, true)
         );
 
         showCommand.main.printer().writeWithTemplate(template, params, writer);

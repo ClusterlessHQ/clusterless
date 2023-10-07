@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.resource.glue.database;
 
 import clusterless.config.ResourceConfig;
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.deploy.Resource;
 
 import java.util.LinkedHashMap;
@@ -18,6 +19,7 @@ import java.util.Map;
  * Creates and maintains glue database and any associated metadata.
  */
 public class GlueDatabaseResource extends Resource {
+    @JsonRequiredProperty
     private String databaseName;
 
     /**

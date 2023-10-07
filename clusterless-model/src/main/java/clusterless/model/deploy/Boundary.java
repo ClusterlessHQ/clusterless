@@ -8,16 +8,16 @@
 
 package clusterless.model.deploy;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import clusterless.json.JsonRequiredProperty;
 
 /**
  *
  */
 public abstract class Boundary extends Support {
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     String name;
 
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     Dataset dataset = new Dataset();
 
     public String name() {

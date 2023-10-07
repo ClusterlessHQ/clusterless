@@ -8,8 +8,8 @@
 
 package clusterless.model.deploy;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.Model;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
 
@@ -17,11 +17,11 @@ import java.net.URI;
  *
  */
 public class Dataset extends Model {
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     String name;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     String version;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     URI pathURI;
 
     protected Dataset() {

@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.resource.s3;
 
 import clusterless.config.ResourceConfig;
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.deploy.Resource;
 
 import java.util.LinkedHashMap;
@@ -18,6 +19,7 @@ import java.util.Map;
  * Creates and maintains an S3 bucket and any associated metadata.
  */
 public class S3BucketResource extends Resource {
+    @JsonRequiredProperty
     private String bucketName;
     private boolean versioned = false;
 

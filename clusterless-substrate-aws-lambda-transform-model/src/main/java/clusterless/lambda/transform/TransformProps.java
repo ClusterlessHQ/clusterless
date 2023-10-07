@@ -8,20 +8,20 @@
 
 package clusterless.lambda.transform;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.Struct;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransformProps implements Struct {
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected String lotUnit;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected ManifestURI manifestCompletePath;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected ManifestURI manifestPartialPath;
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     protected Dataset dataset;
     protected String eventBusName;
     protected PathFilter filter = new PathFilter();

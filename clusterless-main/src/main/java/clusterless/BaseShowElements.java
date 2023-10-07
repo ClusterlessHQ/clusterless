@@ -58,16 +58,20 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
     }
 
     @NotNull
-    private static String createFileName(String name) {
+    private static String createFileName(String name, boolean required) {
         return Label.of(name)
+                .with(required ? "required" : null)
                 .lowerHyphen()
                 .replace(":", "-")
                 .concat(".adoc");
     }
 
-    protected static String getModel(Class<? extends Struct> modelClass) {
+    protected static String getModel(Class<? extends Struct> modelClass, boolean required) {
         try {
             // todo: have provider return a model instance with default values for use as a template
+            if (required) {
+                return JSONUtil.writeRequiredAsPrettyStringSafe(modelClass.getConstructor().newInstance());
+            }
             return JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
@@ -111,7 +115,7 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
 
             ordered.forEach(c -> elements.add(Map.of(
                     "name", c,
-                    "filename", BaseShowElements.createFileName(c)
+                    "filename", BaseShowElements.createFileName(c, false)
             )));
 
             Map<String, Object> params = OrderedSafeMaps.of(
@@ -166,13 +170,13 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
                 path.toFile().mkdirs();
 
                 File file = path
-                        .resolve(BaseShowElements.createFileName(name))
+                        .resolve(BaseShowElements.createFileName(name, required.orElse(false)))
                         .toFile();
 
                 writer = new FileWriter(file);
             }
 
-            writer.append(getModel(modelClass));
+            writer.append(getModel(modelClass, required.orElse(false)));
             writer.append("\n");
 
             writer.flush();
@@ -196,7 +200,7 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
                 path.toFile().mkdirs();
 
                 File file = path
-                        .resolve(BaseShowElements.createFileName(name))
+                        .resolve(BaseShowElements.createFileName(name, false))
                         .toFile();
 
                 writer = new FileWriter(file);

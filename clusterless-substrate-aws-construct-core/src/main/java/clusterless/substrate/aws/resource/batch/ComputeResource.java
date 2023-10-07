@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.resource.batch;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.deploy.Resource;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,6 +29,7 @@ public class ComputeResource extends Resource {
 
     @JsonIgnore
     private boolean useSpot = false;
+    @JsonRequiredProperty
     private String computeEnvironmentName;
 
     @JsonIgnore

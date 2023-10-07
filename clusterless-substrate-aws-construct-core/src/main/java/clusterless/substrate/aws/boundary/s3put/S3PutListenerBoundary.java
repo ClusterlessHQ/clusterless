@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.boundary.s3put;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.lambda.transform.s3put.EventArrival;
 import clusterless.model.deploy.IngressBoundary;
 import clusterless.model.deploy.partial.PathFilter;
@@ -18,6 +19,7 @@ import clusterless.substrate.aws.props.Memory;
  *
  */
 public class S3PutListenerBoundary extends IngressBoundary {
+    @JsonRequiredProperty
     EventArrival eventArrival = EventArrival.infrequent;
     LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
             Memory.MEM_1_024MB,

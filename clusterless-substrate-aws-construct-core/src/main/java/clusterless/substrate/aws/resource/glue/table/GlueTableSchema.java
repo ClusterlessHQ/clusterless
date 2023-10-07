@@ -8,8 +8,8 @@
 
 package clusterless.substrate.aws.resource.glue.table;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.Struct;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,11 +33,11 @@ public class GlueTableSchema implements Struct {
         }
     }
 
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     List<GlueColumn> columns = new LinkedList<>();
     List<GlueColumn> partitions = new LinkedList<>();
 
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     String dataFormat;
 
     public List<GlueColumn> columns() {

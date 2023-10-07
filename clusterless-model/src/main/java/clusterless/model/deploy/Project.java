@@ -8,6 +8,7 @@
 
 package clusterless.model.deploy;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Struct;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -30,7 +31,9 @@ import java.util.Objects;
 )
 @JsonPropertyOrder({"name", "version"})
 public class Project implements Struct {
+    @JsonRequiredProperty
     String name;
+    @JsonRequiredProperty
     String version;
 
     public Project() {

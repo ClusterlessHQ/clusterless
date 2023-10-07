@@ -8,6 +8,7 @@
 
 package clusterless.model.deploy;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,7 +36,9 @@ public class Deployable extends Model {
     @JsonIgnore
     File sourceFile;
 
+    @JsonRequiredProperty
     Project project = new Project();
+    @JsonRequiredProperty
     Placement placement = new Placement();
     @JsonProperty("resources")
     List<Resource> resources = new ArrayList<>();

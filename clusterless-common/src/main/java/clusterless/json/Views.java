@@ -6,19 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model.deploy;
+package clusterless.json;
 
-import clusterless.json.JsonRequiredProperty;
-
-/**
- *
- */
-public class IngressBoundary extends Boundary {
-
-    @JsonRequiredProperty
-    private String lotUnit;
-
-    public String lotUnit() {
-        return lotUnit;
+public class Views {
+    public static class Required {
     }
 }

@@ -8,8 +8,8 @@
 
 package clusterless.model.deploy;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.managed.component.DocumentsModel;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,9 +38,11 @@ import java.util.Map;
                 """
 )
 public class Arc<W extends Workload<?>> extends Extensible {
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     String name;
+    @JsonRequiredProperty
     Map<String, SourceDataset> sources = new LinkedHashMap<>();
+    @JsonRequiredProperty
     Map<String, SinkDataset> sinks = new LinkedHashMap<>();
 
     W workload;

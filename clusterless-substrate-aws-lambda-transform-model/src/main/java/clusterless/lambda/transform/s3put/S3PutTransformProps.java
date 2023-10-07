@@ -8,17 +8,17 @@
 
 package clusterless.lambda.transform.s3put;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.lambda.transform.TransformProps;
 import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
  */
 public class S3PutTransformProps extends TransformProps {
-    @JsonProperty(required = true)
+    @JsonRequiredProperty
     LotSource lotSource;
     String keyRegex;
 

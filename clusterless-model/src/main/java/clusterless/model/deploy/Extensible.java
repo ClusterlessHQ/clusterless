@@ -9,8 +9,10 @@
 package clusterless.model.deploy;
 
 import clusterless.json.ExtensibleResolver;
+import clusterless.json.Views;
 import clusterless.model.Model;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -25,6 +27,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 )
 @JsonTypeIdResolver(ExtensibleResolver.class)
 public abstract class Extensible extends Model {
+    // can't use @JsonRequiredProperty here
+    @JsonView(Views.Required.class)
     String type;
     boolean exclude = false;
 

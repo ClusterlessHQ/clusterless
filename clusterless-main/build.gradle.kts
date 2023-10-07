@@ -113,6 +113,21 @@ tasks.register<Exec>("generateComponentModels") {
     )
 }
 
+tasks.register<Exec>("generateComponentModelsRequired") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "component",
+        "--model-all",
+        "--required",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/components"
+    )
+}
+
 tasks.register<Exec>("generateModelModels") {
     dependsOn("installDist")
 
@@ -122,6 +137,21 @@ tasks.register<Exec>("generateModelModels") {
         "show",
         "model",
         "--model-all",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/models"
+    )
+}
+
+tasks.register<Exec>("generateModelModelsRequired") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "model",
+        "--model-all",
+        "--required",
         "--output-path",
         "${buildDir}/generated-docs/modules/models"
     )
@@ -270,6 +300,7 @@ tasks.register<Exec>("generateModelPartial") {
 
 tasks.register<Copy>("generateDocs") {
     dependsOn("generateComponentModels")
+    dependsOn("generateComponentModelsRequired")
     dependsOn("generateComponentDocs")
     dependsOn("generateResourceIndex")
     dependsOn("generateArcIndex")
@@ -277,6 +308,7 @@ tasks.register<Copy>("generateDocs") {
     dependsOn("generateBoundariesIndex")
     dependsOn("generateComponentPartial")
     dependsOn("generateModelModels")
+    dependsOn("generateModelModelsRequired")
     dependsOn("generateModelDocs")
     dependsOn("generateModelIndex")
     dependsOn("generateModelPartial")

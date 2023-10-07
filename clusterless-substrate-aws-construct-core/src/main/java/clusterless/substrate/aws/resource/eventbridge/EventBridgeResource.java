@@ -8,12 +8,14 @@
 
 package clusterless.substrate.aws.resource.eventbridge;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.deploy.Resource;
 
 /**
  *
  */
 public class EventBridgeResource extends Resource {
+    @JsonRequiredProperty
     private String eventBusName;
 
     public String eventBusName() {

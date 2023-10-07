@@ -8,6 +8,7 @@
 
 package clusterless.model.deploy;
 
+import clusterless.json.JsonRequiredProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName
 public abstract class Resource extends Support {
+    @JsonRequiredProperty
     private String name;
 
     public String name() {

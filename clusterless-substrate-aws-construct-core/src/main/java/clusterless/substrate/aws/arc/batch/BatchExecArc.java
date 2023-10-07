@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.arc.batch;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.Workload;
 import clusterless.model.deploy.WorkloadProps;
@@ -35,8 +36,10 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
                 15
         );
 
+        @JsonRequiredProperty
         String computeEnvironmentRef;
 
+        @JsonRequiredProperty
         Path imagePath;
 
         Map<String, String> environment = new LinkedHashMap<>();

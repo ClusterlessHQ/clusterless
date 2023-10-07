@@ -85,6 +85,18 @@ public class ShowCommand {
         @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
         Exclusive exclusive;
 
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        @CommandLine.Option(
+                names = "--required",
+                arity = "0",
+                description = "Only show required fields in model."
+        )
+        Optional<Boolean> required;
+
+        public Optional<Boolean> required() {
+            return required;
+        }
+
         @Override
         public Integer call() throws Exception {
             if (exclusive.describeAll.isPresent() && exclusive.describeAll.get()) {

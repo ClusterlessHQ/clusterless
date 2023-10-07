@@ -8,6 +8,7 @@
 
 package clusterless.substrate.aws.resource.glue.table;
 
+import clusterless.json.JsonRequiredProperty;
 import clusterless.model.deploy.Resource;
 
 import java.net.URI;
@@ -18,10 +19,13 @@ import java.util.Map;
  * Creates and maintains glue database and any associated metadata.
  */
 public class GlueTableResource extends Resource {
+    @JsonRequiredProperty
     private String databaseRef;
+    @JsonRequiredProperty
     private String tableName;
     private String description;
     private GlueTableSchema schema = new GlueTableSchema();
+    @JsonRequiredProperty
     private URI pathURI;
     private boolean removeOnDestroy = false;
     private Map<String, String> tags = new LinkedHashMap<>();

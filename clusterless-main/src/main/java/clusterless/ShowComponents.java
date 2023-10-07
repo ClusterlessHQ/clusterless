@@ -88,7 +88,8 @@ public class ShowComponents extends BaseShowElements {
                 "component", elementSubType(),
                 "synopsis", providesComponent.get().synopsis(),
                 "description", providesComponent.get().description(),
-                "model", BaseShowElements.getModel(modelClass)
+                "model", BaseShowElements.getModel(modelClass, false),
+                "required", BaseShowElements.getModel(modelClass, true)
         );
 
         showCommand.main.printer().writeWithTemplate(template, params, writer);

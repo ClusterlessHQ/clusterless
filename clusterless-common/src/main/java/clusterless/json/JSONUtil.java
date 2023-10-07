@@ -12,10 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -75,6 +72,12 @@ public class JSONUtil {
     public static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer();
 
     public static final ObjectWriter OBJECT_WRITER_PRETTY = OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
+
+
+    public static final ObjectWriter OBJECT_REQUIRED_WRITER_PRETTY = createObjectMapper()
+            .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+            .writerWithDefaultPrettyPrinter()
+            .withView(Views.Required.class);
 
     public static final ObjectReader OBJECT_READER = OBJECT_MAPPER
             .enable(JsonParser.Feature.ALLOW_COMMENTS)
@@ -237,6 +240,14 @@ public class JSONUtil {
     public static String writeAsPrettyStringSafe(Object object) {
         try {
             return OBJECT_WRITER_PRETTY.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static String writeRequiredAsPrettyStringSafe(Object object) {
+        try {
+            return OBJECT_REQUIRED_WRITER_PRETTY.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
