@@ -57,14 +57,17 @@ public abstract class ProcessExec {
 
     protected int executeProcess(Map<String, String> environment, List<String> args) {
         try {
-            int maxAttempts = retry() ? retries : 1;
+            if (!retry()) {
+                // do not wrap the exec if retry is not enabled
+                return process(environment, args);
+            }
 
             if (retry()) {
-                LOG.info("enabled retrying command: {} {} times", args, maxAttempts);
+                LOG.info("enabled retrying command: {} {} times", args, retries);
             }
 
             RetryConfig config = RetryConfig.<Integer>custom()
-                    .maxAttempts(maxAttempts)
+                    .maxAttempts(retries)
                     .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(30), 2.0))
                     .consumeResultBeforeRetryAttempt((attempt, exitCode) -> LOG.warn("got exit code: {}, for command: {}, retry attempt: {} of {}", exitCode, args, attempt, retries))
                     .retryOnResult(exitCode -> exitCode != 0)
