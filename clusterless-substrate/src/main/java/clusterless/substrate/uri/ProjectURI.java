@@ -104,15 +104,23 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
         return project == null || project.name() == null || project.version() == null;
     }
 
+    /**
+     * Template may be a URI or an absolute path.
+     *
+     * @param template
+     * @return
+     */
     public static ProjectURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
 
         // {providerService}://{stateStore}/projects/{projectName}/{projectVersion}/project.json
         String[] split = template.split("/");
 
-        int index = 4; // start after arcs
+        boolean isOnlyPath = isOnlyPath(template);
+        int index = isOnlyPath ? 2 : 4;
+        String storeName = isOnlyPath ? null : value(split, 2);
         return new ProjectURI()
-                .setStoreName(value(split, 2))
+                .setStoreName(storeName) // the bucket in s3
                 .setProject(Project.Builder.builder()
                         .withName(value(split, index++))
                         .withVersion(value(split, index))

@@ -37,4 +37,14 @@ public class MetaURITest {
         assertEquals(URI.create("s3://prod-clusterless-metadata-00000000-us-west-2/projects/name=test-project/version=20230101/project.json"), projectURI.uri());
         assertEquals(projectURI.uri(), ProjectURI.parse(projectURI.template()).uri());
     }
+
+    @Test
+    void projectKey() {
+        Project project = Project.Builder.builder()
+                .withName("test-project")
+                .withVersion("20230101")
+                .build();
+
+        assertEquals(project, ProjectURI.parse("/projects/name=test-project/version=20230101/project.json").project());
+    }
 }

@@ -70,6 +70,15 @@ public class Project implements Struct {
         return Objects.hash(name, version);
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Project{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
     /**
      * {@code Project} builder static inner class.
      */

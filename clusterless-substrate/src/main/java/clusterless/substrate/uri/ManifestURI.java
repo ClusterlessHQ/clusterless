@@ -125,9 +125,11 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}[/{attempt}]/manifest.{ext}
         String[] split = template.split("/");
 
-        int index = 4; // start after arcs
+        boolean isOnlyPath = isOnlyPath(template);
+        int index = isOnlyPath ? 2 : 4;
+        String storeName = isOnlyPath ? null : value(split, 2);
         return new ManifestURI()
-                .setStoreName(value(split, 2))
+                .setStoreName(storeName)
                 .setDataset(Dataset.builder()
                         .withName(value(split, index++))
                         .withVersion(value(split, index++))

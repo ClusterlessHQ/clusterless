@@ -17,12 +17,8 @@ import clusterless.util.Lazy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
-import static clusterless.util.Optionals.optional;
-
-public abstract class MetaURI<S extends Struct, T extends MetaURI<S, T>> implements Struct {
-    private static final Pattern COMPILE = Pattern.compile("^.+=");
+public abstract class MetaURI<S extends Struct, T extends MetaURI<S, T>> extends BaseURI implements Struct {
     protected StateStore stateStore;
     protected Placement placement;
     protected S struct;
@@ -96,17 +92,6 @@ public abstract class MetaURI<S extends Struct, T extends MetaURI<S, T>> impleme
     public abstract URI uri();
 
     public abstract String template();
-
-    protected static String value(String[] split, int index) {
-        return optional(index, split)
-                .map(s -> COMPILE.matcher(s).replaceAll(""))
-                .filter(ArcStateURI::isNotTemplate)
-                .orElse(null);
-    }
-
-    protected static boolean isNotTemplate(String s) {
-        return !s.startsWith("{") || !s.endsWith("}");
-    }
 
     protected URI createUri(String path) {
         try {

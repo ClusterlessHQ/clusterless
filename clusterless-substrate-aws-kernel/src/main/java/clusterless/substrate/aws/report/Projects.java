@@ -82,6 +82,7 @@ public class Projects extends Reports implements Callable<Integer> {
         Stream<Map.Entry<Placement, List<String>>> stream = results.entrySet().stream();
         Stream<Record> records = EntryStream.of(stream)
                 .flatMapKeyValue((k, v) -> v.stream()
+                        .map("/"::concat)
                         .map(ProjectURI::parse)
                         .map(ProjectURI::project)
                         .map(p -> new Record(k, p))
