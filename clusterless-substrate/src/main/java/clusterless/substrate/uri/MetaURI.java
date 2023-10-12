@@ -65,11 +65,6 @@ public abstract class MetaURI<S extends Struct, T extends MetaURI<S, T>> extends
         return self();
     }
 
-    protected T setStruct(S struct) {
-        this.struct = struct;
-        return self();
-    }
-
     protected abstract T self();
 
     protected String storeName() {

@@ -8,24 +8,16 @@
 
 package clusterless.model;
 
+import clusterless.json.JSONUtil;
 import clusterless.naming.Label;
 
-/**
- * Note {@link #equals(Object)} and {@link #hashCode()} are declared final. No two Model instances
- * should ever be equal
- */
 public abstract class Model implements Struct {
     public final Label label() {
         return Label.of(getClass().getSimpleName());
     }
 
     @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        return super.equals(obj);
+    public final String toString() {
+        return JSONUtil.writeAsStringSafe(this);
     }
 }

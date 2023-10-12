@@ -9,7 +9,7 @@
 package clusterless.substrate.uri;
 
 import clusterless.json.JSONUtil;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.LocatedDataset;
 import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Project;
 import clusterless.model.manifest.ManifestState;
@@ -83,7 +83,7 @@ public class StateURITest {
                         .withProvider("aws")
                         .withStage("prod")
                         .build())
-                .withDataset(Dataset.builder()
+                .withDataset(LocatedDataset.Builder.builder()
                         .withName("test-dataset")
                         .withVersion("20230101")
                         .build())

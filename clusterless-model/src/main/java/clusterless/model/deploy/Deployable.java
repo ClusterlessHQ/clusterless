@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @DocumentsModel(
         synopsis = "A deployable project, the base of a project file",
@@ -82,5 +83,18 @@ public class Deployable extends Model {
 
     public List<Arc<? extends Workload>> arcs() {
         return arcs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Deployable that = (Deployable) o;
+        return Objects.equals(sourceFile, that.sourceFile) && Objects.equals(project, that.project) && Objects.equals(placement, that.placement) && Objects.equals(resources, that.resources) && Objects.equals(boundaries, that.boundaries) && Objects.equals(barriers, that.barriers) && Objects.equals(arcs, that.arcs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sourceFile, project, placement, resources, boundaries, barriers, arcs);
     }
 }

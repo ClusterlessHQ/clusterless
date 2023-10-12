@@ -35,68 +35,86 @@ public class KernelTest {
     };
 
     @Test
-    @StdIo("{\n" +
-           "\"project\": {\n" +
-           "    \"name\" : \"TestProject\",\n" +
-           "    \"version\": \"20230101-00\"\n" +
-           "},\n" +
-           "\"placement\": {\n" +
-           "    \"stage\": \"prod\",\n" +
-           "    \"provider\": \"aws\",\n" +
-           "    \"account\": \"abc123\",\n" +
-           "    \"region\": \"us-east-2\"\n" +
-           "},\n" +
-           "\"resources\" : [\n" +
-           "    {\n" +
-           "        \"type\" : \"aws:core:s3Bucket\",\n" +
-           "        \"name\" : \"sample-bucket1\",\n" +
-           "        \"bucketName\" : \"sample-bucket1\"\n" +
-           "    },\n" +
-           "    {\n" +
-           "        \"type\" : \"aws:core:s3Bucket\",\n" +
-           "        \"name\" : \"sample-bucket2\",\n" +
-           "        \"bucketName\" : \"sample-bucket2\"\n" +
-           "    }\n" +
-           "    ]\n" +
-           "}\n")
+    @StdIo("""
+            {
+            "project": {
+                "name" : "TestProject",
+                "version": "20230101-00"
+            },
+            "placement": {
+                "stage": "prod",
+                "provider": "aws",
+                "account": "abc123",
+                "region": "us-east-2"
+            },
+            "resources" : [
+                {
+                    "type" : "aws:core:s3Bucket",
+                    "name" : "sample-bucket1",
+                    "bucketName" : "sample-bucket1"
+                },
+                {
+                    "type" : "aws:core:s3Bucket",
+                    "name" : "sample-bucket2",
+                    "bucketName" : "sample-bucket2"
+                }
+                ]
+            }
+            """)
     void createResourcesProject() {
         Assertions.assertEquals(0, new Kernel().execute(args));
     }
 
+    /**
+     * This test confirms the boundary dataset is resolved into the arc source dataset declaration
+     */
     @Test
-    @StdIo("{\n" +
-           "  \"project\": {\n" +
-           "    \"name\": \"TestProject\",\n" +
-           "    \"version\": \"20230101-00\"\n" +
-           "  },\n" +
-           "  \"placement\": {\n" +
-           "    \"stage\": \"prod\",\n" +
-           "    \"provider\": \"aws\",\n" +
-           "    \"account\": \"abc123\",\n" +
-           "    \"region\": \"us-east-2\"\n" +
-           "  },\n" +
-           "  \"arcs\": [\n" +
-           "    {\n" +
-           "      \"type\": \"aws:core:s3CopyArc\",\n" +
-           "      \"name\": \"copy\",\n" +
-           "      \"sources\": {\n" +
-           "        \"main\": {\n" +
-           "          \"name\": \"ingress\",\n" +
-           "          \"version\": \"20220101\",\n" +
-           "          \"pathURI\": \"s3://clusterless-test/ingress/\"\n" +
-           "        }\n" +
-           "      },\n" +
-           "      \"sinks\": {\n" +
-           "        \"main\": {\n" +
-           "          \"name\": \"copy\",\n" +
-           "          \"version\": \"20230101\",\n" +
-           "          \"pathURI\": \"s3://clusterless-test/copy/\"\n" +
-           "        }\n" +
-           "      }\n" +
-           "    }\n" +
-           "  ]\n" +
-           "}\n" +
-           "          ")
+    @StdIo("""
+            {
+              "project": {
+                "name": "TestProject",
+                "version": "20230101-00"
+              },
+              "placement": {
+                "stage": "prod",
+                "provider": "aws",
+                "account": "abc123",
+                "region": "us-east-2"
+              },
+              "boundaries": [
+                {
+                  "dataset": {
+                    "name": "ingress",
+                    "version": "20220101",
+                    "pathURI": "s3://test-native-copy-0192-us-west-2/ingress/"
+                  },
+                  "eventArrival": "infrequent",
+                  "lotUnit": "Twelfths",
+                  "name": "IngressPutListener",
+                  "type": "aws:core:s3PutListenerBoundary"
+                }
+              ],
+              "arcs": [
+                {
+                  "type": "aws:core:s3CopyArc",
+                  "name": "copy",
+                  "sources": {
+                    "main": {
+                      "name": "ingress",
+                      "version": "20220101"
+                    }
+                  },
+                  "sinks": {
+                    "main": {
+                      "name": "copy",
+                      "version": "20230101",
+                      "pathURI": "s3://clusterless-test/copy/"
+                    }
+                  }
+                }
+              ]
+            }
+            """)
     void copyArcProject() {
         Assertions.assertEquals(0, new Kernel().execute(args));
     }

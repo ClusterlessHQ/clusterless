@@ -56,8 +56,8 @@ public class EventSerializationTest extends LambdaHandlerTestBase {
         return ArcStateProps.builder()
                 .withName("test-arc")
                 .withProject(defaultProject())
-                .withSinks(datasets().sinkDatasetMap())
-                .withSources(datasets().sourceDatasetMap())
+                .withSinks(datasets().sinkDatasetMapAsSink())
+                .withSources(datasets().sourceDatasetMapAsSource())
                 .withArcStatePath(
                         ArcStateURI.builder()
                                 .withPlacement(defaultPlacement())

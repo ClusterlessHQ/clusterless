@@ -9,7 +9,7 @@
 package clusterless.lambda.transform.frequents3put;
 
 import clusterless.lambda.transform.TransformProps;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
 
@@ -49,7 +49,7 @@ public class FrequentS3PutTransformProps extends TransformProps {
         protected String lotUnit;
         protected ManifestURI manifestCompletePath;
         protected ManifestURI manifestPartialPath;
-        protected Dataset dataset;
+        protected SinkDataset dataset;
         protected String eventBusName;
         protected PathFilter filter = new PathFilter();
         protected String sqsQueueName;
@@ -77,7 +77,7 @@ public class FrequentS3PutTransformProps extends TransformProps {
             return this;
         }
 
-        public Builder withDataset(Dataset dataset) {
+        public Builder withDataset(SinkDataset dataset) {
             this.dataset = dataset;
             return this;
         }
@@ -104,13 +104,13 @@ public class FrequentS3PutTransformProps extends TransformProps {
 
         public FrequentS3PutTransformProps build() {
             FrequentS3PutTransformProps frequentS3PutTransformProps = new FrequentS3PutTransformProps();
-            frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
-            frequentS3PutTransformProps.lotUnit = this.lotUnit;
-            frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;
-            frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
-            frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
             frequentS3PutTransformProps.eventBusName = this.eventBusName;
+            frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
+            frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;
+            frequentS3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
+            frequentS3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
             frequentS3PutTransformProps.dataset = this.dataset;
+            frequentS3PutTransformProps.lotUnit = this.lotUnit;
             frequentS3PutTransformProps.filter = this.filter;
             return frequentS3PutTransformProps;
         }

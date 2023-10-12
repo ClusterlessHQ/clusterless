@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -126,7 +125,7 @@ public class ArcStateStartHandler extends StreamResultHandler<ArcNotifyEvent, Ar
 
         List<String> roles = arcStateProps.sources().entrySet()
                 .stream()
-                .filter(e -> Objects.equals(e.getValue().name(), event.dataset().name()) && Objects.equals(e.getValue().version(), event.dataset().version()))
+                .filter(e -> e.getValue().sameDataset(event.dataset()))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
 
         eventObserver.applyRoles(roles);

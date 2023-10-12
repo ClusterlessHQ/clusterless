@@ -13,7 +13,7 @@ import clusterless.json.JsonRequiredProperty;
 /**
  *
  */
-public class IngressBoundary extends Boundary {
+public abstract class IngressBoundary extends Boundary {
 
     @JsonRequiredProperty
     private String lotUnit;

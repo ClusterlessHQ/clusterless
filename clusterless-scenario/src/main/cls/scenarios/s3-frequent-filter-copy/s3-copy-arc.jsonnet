@@ -44,7 +44,6 @@ local unit = 'Twelfths';
         main: {
           name: 'ingress-frequent-copy',
           version: '20220101',
-          pathURI: bucketPrefix + '/ingress/',
         },
       },
       sinks: {

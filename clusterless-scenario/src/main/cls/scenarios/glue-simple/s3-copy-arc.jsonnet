@@ -76,7 +76,6 @@ local tableName = 'clusterless-glue-test-table';
         main: {
           name: 'ingress-glue',
           version: '20220101',
-          pathURI: bucketPrefix + '/ingress/',
         },
       },
       sinks: {

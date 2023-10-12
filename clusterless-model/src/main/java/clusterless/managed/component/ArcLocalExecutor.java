@@ -8,6 +8,7 @@
 
 package clusterless.managed.component;
 
+import clusterless.managed.dataset.LookupDatasetOwnerLookup;
 import clusterless.model.manifest.ManifestState;
 
 import java.util.LinkedHashMap;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface ArcLocalExecutor {
-
     class Command {
         String headerComment;
         Map<String, String> environmentComments = new LinkedHashMap<>();
@@ -99,5 +99,5 @@ public interface ArcLocalExecutor {
         }
     }
 
-    List<Command> commands(String role, String lotId, ManifestState manifestState);
+    List<Command> commands(String role, String lotId, ManifestState manifestState, LookupDatasetOwnerLookup ownerLookup);
 }

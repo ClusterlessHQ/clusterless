@@ -12,6 +12,7 @@ import clusterless.managed.component.DocumentsModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.net.URI;
+import java.util.Objects;
 
 /**
  *
@@ -32,16 +33,33 @@ import java.net.URI;
                          The URI must be a valid URI and must be accessible. This is typically a S3 URI.
                 """
 )
-public class SinkDataset extends Dataset {
-
+public class SinkDataset extends LocatedDataset {
     @JsonIgnore
     boolean publish = true;
 
     public SinkDataset() {
     }
 
+    public SinkDataset(LocatedDataset other) {
+        super(other);
+    }
+
     public boolean publish() {
         return publish;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SinkDataset that = (SinkDataset) o;
+        return publish == that.publish;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), publish);
     }
 
     public static final class Builder {
@@ -79,10 +97,10 @@ public class SinkDataset extends Dataset {
 
         public SinkDataset build() {
             SinkDataset sinkDataset = new SinkDataset();
-            sinkDataset.publish = this.publish;
-            sinkDataset.version = this.version;
             sinkDataset.name = this.name;
+            sinkDataset.version = this.version;
             sinkDataset.pathURI = this.pathURI;
+            sinkDataset.publish = this.publish;
             return sinkDataset;
         }
     }

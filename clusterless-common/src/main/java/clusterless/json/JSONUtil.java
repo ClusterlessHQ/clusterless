@@ -229,6 +229,14 @@ public class JSONUtil {
         return OBJECT_READER.forType(type).readValue(path.toFile());
     }
 
+    public static <T> T readAsObjectSafe(InputStream inputStream, TypeReference<T> type) {
+        try {
+            return OBJECT_READER.forType(type).readValue(inputStream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static String writeTypedAsStringSafe(Object object) {
         try {
             return TYPED_OBJECT_MAPPER.writeValueAsString(object);

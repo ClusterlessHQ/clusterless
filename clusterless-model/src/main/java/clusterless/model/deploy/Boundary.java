@@ -18,13 +18,13 @@ public abstract class Boundary extends Support {
     String name;
 
     @JsonRequiredProperty
-    Dataset dataset = new Dataset();
+    SinkDataset dataset = new SinkDataset();
 
     public String name() {
         return name;
     }
 
-    public Dataset dataset() {
+    public SinkDataset dataset() {
         return dataset;
     }
 }

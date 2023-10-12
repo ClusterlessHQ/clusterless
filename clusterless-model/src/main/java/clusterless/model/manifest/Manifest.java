@@ -12,7 +12,6 @@ import clusterless.json.JsonRequiredProperty;
 import clusterless.model.Content;
 import clusterless.model.Struct;
 import clusterless.model.UriType;
-import clusterless.model.deploy.Dataset;
 
 import java.net.URI;
 import java.util.List;
@@ -37,7 +36,7 @@ public class Manifest implements Content, Struct {
     }
 
     public static Builder builder() {
-        return Builder.aManifest();
+        return Builder.builder();
     }
 
     public ManifestState state() {
@@ -71,17 +70,16 @@ public class Manifest implements Content, Struct {
     }
 
     public static final class Builder {
-        ManifestState state;
-        String comment;
-        Dataset dataset;
-        String lotId;
-        UriType uriType = UriType.identifier;
-        List<URI> uris;
+        protected ManifestState state;
+        protected String comment;
+        protected String lotId;
+        protected UriType uriType = UriType.identifier;
+        protected List<URI> uris;
 
         private Builder() {
         }
 
-        public static Builder aManifest() {
+        public static Builder builder() {
             return new Builder();
         }
 
@@ -113,9 +111,9 @@ public class Manifest implements Content, Struct {
         public Manifest build() {
             Manifest manifest = new Manifest();
             manifest.uris = this.uris;
-            manifest.comment = this.comment;
             manifest.state = this.state;
             manifest.uriType = this.uriType;
+            manifest.comment = this.comment;
             manifest.lotId = this.lotId;
             return manifest;
         }

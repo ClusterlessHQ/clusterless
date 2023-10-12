@@ -6,10 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.model.deploy;
+package clusterless.managed.dataset;
 
-/**
- *
- */
-public abstract class EgressBoundary extends Boundary {
+import clusterless.model.deploy.OwnedDataset;
+import clusterless.model.deploy.SourceDataset;
+
+public interface LookupDatasetOwnerLookup {
+    OwnedDataset lookup(SourceDataset source);
 }

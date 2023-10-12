@@ -9,6 +9,7 @@
 package clusterless.substrate.uri;
 
 import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.LocatedDataset;
 import clusterless.model.deploy.Placement;
 import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Partition;
@@ -130,7 +131,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         String storeName = isOnlyPath ? null : value(split, 2);
         return new ManifestURI()
                 .setStoreName(storeName)
-                .setDataset(Dataset.builder()
+                .setDataset(LocatedDataset.Builder.builder()
                         .withName(value(split, index++))
                         .withVersion(value(split, index++))
                         .build())
@@ -238,7 +239,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         return this;
     }
 
-    public ManifestURI withDataset(Dataset dataset) {
+    public ManifestURI withDataset(LocatedDataset dataset) {
         return copy().setDataset(dataset);
     }
 

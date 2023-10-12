@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.arc.props;
 
 import clusterless.lambda.arc.ArcProps;
+import clusterless.managed.dataset.LookupDatasetOwnerLookup;
 import clusterless.model.deploy.*;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
@@ -82,19 +83,21 @@ public class ArcEnvBuilder {
     }
 
     @NotNull
-    public ArcWorkloadContext execContext(String role, String lotId, ManifestState manifestState) {
+    public ArcWorkloadContext execContext(String role, String lotId, ManifestState manifestState, LookupDatasetOwnerLookup lookupOwner) {
         URI manifest = arcProps.sourceManifestPaths()
                 .get(role)
                 .withState(manifestState)
                 .withLot(lotId)
                 .uri();
 
-        SourceDataset dataset = sources.get(role);
+        SourceDataset source = sources.get(role);
+
+        OwnedDataset sink = lookupOwner.lookup(source);
 
         return ArcWorkloadContext.builder()
                 .withArcNotifyEvent(
                         ArcNotifyEvent.Builder.builder()
-                                .withDataset(dataset)
+                                .withDataset(sink.dataset())
                                 .withManifest(manifest)
                                 .withLot(lotId)
                                 .build()

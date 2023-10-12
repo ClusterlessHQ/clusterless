@@ -39,54 +39,54 @@ import static java.util.Optional.ofNullable;
  * <p>
  * {@code {providerService}://{stateStore}/{projectName}/{projectVersion}/project.json}
  */
-@JsonSerialize(using = ProjectURI.Serializer.class)
-@JsonDeserialize(using = ProjectURI.DeSerializer.class)
-public class ProjectURI extends MetaURI<Project, ProjectURI> {
+@JsonSerialize(using = ProjectMaterialsURI.Serializer.class)
+@JsonDeserialize(using = ProjectMaterialsURI.DeSerializer.class)
+public class ProjectMaterialsURI extends MetaURI<Project, ProjectMaterialsURI> {
 
-    public static final String PROJECTS = "projects";
+    public static final String MATERIALS = "materials";
 
     public static Builder builder() {
         return Builder.builder();
     }
 
-    static class Serializer extends StdScalarSerializer<ProjectURI> {
+    static class Serializer extends StdScalarSerializer<ProjectMaterialsURI> {
         protected Serializer() {
-            super(ProjectURI.class);
+            super(ProjectMaterialsURI.class);
         }
 
         @Override
-        public void serialize(ProjectURI value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        public void serialize(ProjectMaterialsURI value, JsonGenerator gen, SerializerProvider provider) throws IOException {
             gen.writeString(value.template());
         }
     }
 
-    static class DeSerializer extends StdScalarDeserializer<ProjectURI> {
+    static class DeSerializer extends StdScalarDeserializer<ProjectMaterialsURI> {
         protected DeSerializer() {
-            super(ProjectURI.class);
+            super(ProjectMaterialsURI.class);
         }
 
         @Override
-        public ProjectURI deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+        public ProjectMaterialsURI deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
             // The critical path: ensure we handle the common case first.
             if (p.hasToken(JsonToken.VALUE_STRING)) {
-                return ProjectURI.parse(p.getText());
+                return ProjectMaterialsURI.parse(p.getText());
             }
             // [databind#381]
 //            if (p.hasToken(JsonToken.START_ARRAY)) {
 //                return _deserializeFromArray(p, ctxt);
 //            }
 
-            return ProjectURI.parse(_parseString(p, ctxt, this));
+            return ProjectMaterialsURI.parse(_parseString(p, ctxt, this));
         }
     }
 
     protected Project project;
 
-    protected ProjectURI() {
+    protected ProjectMaterialsURI() {
         super(StateStore.Meta);
     }
 
-    protected ProjectURI(ProjectURI other) {
+    protected ProjectMaterialsURI(ProjectMaterialsURI other) {
         super(other);
         this.project = other.project;
     }
@@ -95,8 +95,8 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
         return project;
     }
 
-    protected ProjectURI copy() {
-        return new ProjectURI(this);
+    protected ProjectMaterialsURI copy() {
+        return new ProjectMaterialsURI(this);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
      * @param template
      * @return
      */
-    public static ProjectURI parse(String template) {
+    public static ProjectMaterialsURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
 
         // {providerService}://{stateStore}/projects/{projectName}/{projectVersion}/project.json
@@ -119,7 +119,7 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
         boolean isOnlyPath = isOnlyPath(template);
         int index = isOnlyPath ? 2 : 4;
         String storeName = isOnlyPath ? null : value(split, 2);
-        return new ProjectURI()
+        return new ProjectMaterialsURI()
                 .setStoreName(storeName) // the bucket in s3
                 .setProject(Project.Builder.builder()
                         .withName(value(split, index++))
@@ -129,7 +129,7 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
 
     @Override
     public URI uriPrefix() {
-        Partition partition = Partition.of(PROJECTS)
+        Partition partition = Partition.of(MATERIALS)
                 .withNamedTerminal("name", ofNullable(project).map(Project::name))
                 .withNamedTerminal("version", ofNullable(project).map(Project::version));
 
@@ -138,10 +138,10 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
 
     @Override
     public URI uriPath() {
-        String path = Partition.of(PROJECTS)
+        String path = Partition.of(MATERIALS)
                 .withNamedTerminal("name", Optional.ofNullable(project).map(Project::name))
                 .withNamedTerminal("version", Optional.ofNullable(project).map(Project::version))
-                .with("project.json")
+                .with("materials.json")
                 .prefix();
 
         return createUri(path);
@@ -151,10 +151,10 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
     public URI uri() {
         require(project, "project");
 
-        String path = Partition.of(PROJECTS)
+        String path = Partition.of(MATERIALS)
                 .withNamed("name", project.name())
                 .withNamed("version", project.version())
-                .with("project.json")
+                .with("materials.json")
                 .prefix();
 
         return createUri(path);
@@ -164,23 +164,23 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
     public String template() {
         String path = Partition.namedOf("name", ofNullable(project.name()).orElse("{projectName}"))
                 .withNamed("version", ofNullable(project.version()).orElse("{projectVersion}"))
-                .with("project.json")
+                .with("materials.json")
                 .partition();
 
-        return String.format("s3://%s/%s/%s", storeName.get(), PROJECTS, path);
+        return String.format("s3://%s/%s/%s", storeName.get(), MATERIALS, path);
     }
 
-    protected ProjectURI setProject(Project project) {
+    protected ProjectMaterialsURI setProject(Project project) {
         this.project = project;
         return this;
     }
 
-    public ProjectURI withProject(Project project) {
+    public ProjectMaterialsURI withProject(Project project) {
         return copy().setProject(project);
     }
 
     @Override
-    public ProjectURI self() {
+    public ProjectMaterialsURI self() {
         return this;
     }
 
@@ -205,8 +205,8 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
             return this;
         }
 
-        public ProjectURI build() {
-            ProjectURI projectURI = new ProjectURI();
+        public ProjectMaterialsURI build() {
+            ProjectMaterialsURI projectURI = new ProjectMaterialsURI();
             projectURI.setPlacement(placement);
             projectURI.setProject(project);
             return projectURI;

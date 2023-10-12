@@ -27,7 +27,6 @@ public class ManagedProject extends StagedApp implements Managed {
     private final Label name;
     private final String version;
     private final List<Deployable> deployableModel;
-
     private final List<ManagedStack> stacks = new LinkedList<>();
 
     public static ManagedProject projectOf(Construct scope) {

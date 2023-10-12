@@ -12,7 +12,7 @@ local project = import 's3-copy-arc.jsonnet';
   ingressStores: [
     {
       region: project.placement.region,
-      path: project.arcs[0].sources.main.pathURI,
+      path: project.boundaries[0].dataset.pathURI,
       uploadDelaySec: 60 * 5,
       objectCount: 3,
       objectName: 'partition=%1$04d/data-%1$04d-%2$d.txt',

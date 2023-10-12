@@ -37,7 +37,7 @@ import java.util.Map;
                           See the documentation for the arc component for details.
                 """
 )
-public class Arc<W extends Workload<?>> extends Extensible {
+public abstract class Arc<W extends Workload<?>> extends Extensible {
     @JsonRequiredProperty
     String name;
     @JsonRequiredProperty

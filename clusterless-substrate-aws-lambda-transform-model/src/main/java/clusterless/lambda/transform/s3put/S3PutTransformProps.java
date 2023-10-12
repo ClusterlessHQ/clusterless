@@ -10,7 +10,7 @@ package clusterless.lambda.transform.s3put;
 
 import clusterless.json.JsonRequiredProperty;
 import clusterless.lambda.transform.TransformProps;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
 
@@ -56,7 +56,7 @@ public class S3PutTransformProps extends TransformProps {
         protected String lotUnit;
         protected ManifestURI manifestCompletePath;
         protected ManifestURI manifestPartialPath;
-        protected Dataset dataset;
+        protected SinkDataset dataset;
         protected String eventBusName;
         protected PathFilter filter = new PathFilter();
         LotSource lotSource;
@@ -84,7 +84,7 @@ public class S3PutTransformProps extends TransformProps {
             return this;
         }
 
-        public Builder withDataset(Dataset dataset) {
+        public Builder withDataset(SinkDataset dataset) {
             this.dataset = dataset;
             return this;
         }
@@ -111,13 +111,13 @@ public class S3PutTransformProps extends TransformProps {
 
         public S3PutTransformProps build() {
             S3PutTransformProps s3PutTransformProps = new S3PutTransformProps();
+            s3PutTransformProps.eventBusName = this.eventBusName;
             s3PutTransformProps.lotSource = this.lotSource;
             s3PutTransformProps.manifestCompletePath = this.manifestCompletePath;
             s3PutTransformProps.keyRegex = this.keyRegex;
-            s3PutTransformProps.lotUnit = this.lotUnit;
             s3PutTransformProps.manifestPartialPath = this.manifestPartialPath;
-            s3PutTransformProps.eventBusName = this.eventBusName;
             s3PutTransformProps.dataset = this.dataset;
+            s3PutTransformProps.lotUnit = this.lotUnit;
             s3PutTransformProps.filter = this.filter;
             return s3PutTransformProps;
         }

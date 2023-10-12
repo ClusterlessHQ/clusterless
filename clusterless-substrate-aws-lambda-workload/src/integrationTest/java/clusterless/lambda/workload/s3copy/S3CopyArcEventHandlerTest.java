@@ -50,9 +50,9 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
     @Override
     protected ArcProps<?> getProps() {
         return ArcProps.builder()
-                .withSources(datasets().sourceDatasetMap())
+                .withSources(datasets().sourceDatasetMapAsSource())
                 .withSourceManifestPaths(datasets().sourceManifestPathMap())
-                .withSinks(datasets().sinkDatasetMap())
+                .withSinks(datasets().sinkDatasetMapAsSink())
                 .withSinkManifestTemplates(datasets().sinkManifestPathMap())
                 .withWorkloadProps(new S3CopyProps())
                 .build();
@@ -78,9 +78,9 @@ public class S3CopyArcEventHandlerTest extends LocalStackBase {
         ArcProps<?> props = getProps();
 
         new CreateDataMachine("20230227PT5M287")
-                .applyBucketsFrom(props.sources())
-                .applyBucketsFrom(props.sinks())
-                .buildSources(props.sourceManifestPaths(), props.sources());
+                .applyBucketsFrom(datasets().sourceDatasetMap())
+                .applyBucketsFrom(datasets().sinkDatasetMap())
+                .buildSources(props.sourceManifestPaths(), datasets().sourceDatasetMap());
     }
 
     public void invoke(

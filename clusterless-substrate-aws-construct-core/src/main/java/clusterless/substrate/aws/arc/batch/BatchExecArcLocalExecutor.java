@@ -10,6 +10,7 @@ package clusterless.substrate.aws.arc.batch;
 
 import clusterless.json.JSONUtil;
 import clusterless.managed.component.ArcLocalExecutor;
+import clusterless.managed.dataset.LookupDatasetOwnerLookup;
 import clusterless.model.deploy.Placement;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.arc.props.ArcEnvBuilder;
@@ -57,10 +58,11 @@ public class BatchExecArcLocalExecutor implements ArcLocalExecutor {
     }
 
     @Override
-    public List<Command> commands(String role, String lotId, ManifestState manifestState) {
+    public List<Command> commands(String role, String lotId, ManifestState manifestState, LookupDatasetOwnerLookup ownerLookup) {
         ArcEnvBuilder arcEnvBuilder = new ArcEnvBuilder(placement, arc);
         Map<String, String> arcEnvironment = arcEnvBuilder.asEnvironment();
-        ArcWorkloadContext arcWorkloadContext = arcEnvBuilder.execContext(role, lotId, manifestState);
+
+        ArcWorkloadContext arcWorkloadContext = arcEnvBuilder.execContext(role, lotId, manifestState, ownerLookup);
 
         Map<String, String> localComments = new LinkedHashMap<>();
         Map<String, String> localEnvironment = new LinkedHashMap<>(arcEnvironment);

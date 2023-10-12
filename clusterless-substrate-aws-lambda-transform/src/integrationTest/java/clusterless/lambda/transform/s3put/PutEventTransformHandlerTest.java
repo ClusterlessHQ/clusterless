@@ -52,7 +52,7 @@ public class PutEventTransformHandlerTest extends LocalStackBase {
                 .withManifestCompletePath(datasets().manifestPathList(ManifestState.complete).get(0))
                 .withManifestPartialPath(datasets().manifestPathList(ManifestState.partial).get(0))
                 .withLotUnit(IntervalUnit.TWELFTHS.name())
-                .withDataset(datasets().datasetList().get(0))
+                .withDataset(datasets().sinkDatasetListAsSink().get(0))
                 .withEventBusName(eventBusName())
                 .build();
     }

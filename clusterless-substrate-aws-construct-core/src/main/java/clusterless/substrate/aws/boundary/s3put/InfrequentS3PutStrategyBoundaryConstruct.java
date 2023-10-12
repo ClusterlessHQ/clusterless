@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.s3put.S3PutTransformProps;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
@@ -73,9 +73,10 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
 
         S3PutTransformProps transformProps = S3PutTransformProps.builder()
                 .withEventBusName(eventBusRef)
-                .withDataset(Dataset.builder()
+                .withDataset(SinkDataset.Builder.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())
+                        .withPublish(model.dataset().publish())
                         .withPathURI(listenURI)
                         .build())
                 .withManifestCompletePath(manifestComplete)

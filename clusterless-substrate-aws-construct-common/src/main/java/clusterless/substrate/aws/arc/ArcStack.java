@@ -10,8 +10,8 @@ package clusterless.substrate.aws.arc;
 
 import clusterless.config.Configurations;
 import clusterless.managed.component.ArcComponent;
+import clusterless.managed.dataset.DatasetResolver;
 import clusterless.model.deploy.Arc;
-import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.Deployable;
 import clusterless.model.deploy.Workload;
 import clusterless.naming.Label;
@@ -19,60 +19,43 @@ import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
 import clusterless.substrate.aws.resources.Stacks;
-import software.amazon.awscdk.services.s3.Bucket;
-import software.amazon.awscdk.services.s3.IBucket;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  *
  */
 public class ArcStack extends ManagedStack {
-    private Configurations configurations;
-    private ManagedProject managedProject;
+    private final Configurations configurations;
+    private final DatasetResolver resolver;
+    private final ManagedProject managedProject;
     private final Deployable deployable;
-    private final Arc<? extends Workload> arc;
+    private final Arc<? extends Workload<?>> arc;
 
     private ArcOrchestration orchestration;
     private ArcListener arcListener;
 
-    private static Label arcBaseId(Arc<? extends Workload> arc) {
+    private static Label arcBaseId(Arc<? extends Workload<?>> arc) {
         return Label.of("Arc").with(arc.name());
     }
 
-    public ArcStack(Configurations configurations, ManagedProject managedProject, Deployable deployable, Arc<? extends Workload> arc) {
+    public ArcStack(Configurations configurations, DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, Arc<? extends Workload> arc) {
         super(Stacks.stackName(deployable, arcBaseId(arc)), managedProject, deployable, arcBaseId(arc));
         this.configurations = configurations;
+        this.resolver = resolver;
         this.managedProject = managedProject;
         this.deployable = deployable;
         this.arc = arc;
     }
 
     public void applyArcWorkloadComponent(ArcComponent arcComponent) {
-        ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, this);
+        ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedProject, deployable, this);
 
         orchestration = new ArcOrchestration(context, arc);
 
         orchestration.buildOrchestrationWith(arcComponent);
 
-//        grantEach(arc.sources(), "Source", b->b.grantRead(orchestration.stateMachine()));
-//        grantEach(arc.sinks(), "Sink", b->b.grantReadWrite(orchestration.stateMachine()));
-//
-//        BootstrapStores.arcStateBucket(this).grantReadWrite(orchestration.stateMachine());
-//        BootstrapStores.manifestBucket(this).grantReadWrite(orchestration.stateMachine());
-
         arcListener = new ArcListener(context, arc, true);
 
         arcListener.rule().addTarget(orchestration.stateMachineTarget());
-    }
-
-    protected void grantEach(Map<String, ? extends Dataset> sources, String id, Consumer<IBucket> grant) {
-        sources.forEach((key, value) -> {
-            String baseId = Label.of(key).with(id).camelCase();
-            String bucketName = value.pathURI().getHost();
-            grant.accept(Bucket.fromBucketName(this, baseId, bucketName));
-        });
     }
 
     public ArcMeta arcMeta() {

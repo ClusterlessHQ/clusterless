@@ -10,7 +10,7 @@ package clusterless.substrate.aws.construct;
 
 import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.LocatedDataset;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.BootstrapStores;
@@ -42,13 +42,14 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
     }
 
     protected void grantDatasets(IGrantable grantable) {
-        grantEachBucket(model().sources(), id("Source"), b -> b.grantRead(grantable));
+        Map<String, ? extends LocatedDataset> located = context().resolver().locate(context().deployable().project(), model().sources());
+        grantEachBucket(located, id("Source"), b -> b.grantRead(grantable));
         grantEachBucket(model().sinks(), id("Sink"), b -> b.grantReadWrite(grantable));
     }
 
     public abstract IChainable createState(String inputPath, String outputPath, IChainable failed, Consumer<TaskStateBase> taskAmendments);
 
-    protected void grantEachBucket(Map<String, ? extends Dataset> datasets, String id, Consumer<IBucket> grant) {
+    protected void grantEachBucket(Map<String, ? extends LocatedDataset> datasets, String id, Consumer<IBucket> grant) {
         datasets.entrySet().stream()
                 .filter(e -> "s3".equals(e.getValue().pathURI().getScheme()))
                 .forEach(e -> {
@@ -58,7 +59,7 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
                 });
     }
 
-    public void applyToEachTable(Map<String, ? extends Dataset> datasets, Consumer<URI> apply) {
+    public void applyToEachTable(Map<String, ? extends LocatedDataset> datasets, Consumer<URI> apply) {
         datasets.values().stream()
                 .filter(d -> "glue".equals(d.pathURI().getScheme()))
                 .forEach(d -> apply.accept(d.pathURI()));

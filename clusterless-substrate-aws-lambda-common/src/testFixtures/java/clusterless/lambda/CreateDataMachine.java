@@ -9,9 +9,8 @@
 package clusterless.lambda;
 
 import clusterless.model.UriType;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.LocatedDataset;
 import clusterless.model.deploy.SinkDataset;
-import clusterless.model.deploy.SourceDataset;
 import clusterless.model.manifest.Manifest;
 import clusterless.model.manifest.ManifestState;
 import clusterless.substrate.aws.sdk.S3;
@@ -37,10 +36,10 @@ public class CreateDataMachine {
         this.lots.addAll(lots);
     }
 
-    public CreateDataMachine applyBucketsFrom(Map<String, ? extends Dataset> datasetMap) {
+    public CreateDataMachine applyBucketsFrom(Map<String, ? extends LocatedDataset> datasetMap) {
 
         Set<String> buckets = datasetMap.values().stream()
-                .map(Dataset::pathURI)
+                .map(LocatedDataset::pathURI)
                 .filter(u -> u.getScheme().equals("s3"))
                 .map(URI::getHost)
                 .collect(Collectors.toSet());
@@ -64,7 +63,7 @@ public class CreateDataMachine {
         for (String lot : lots) {
             for (Map.Entry<String, SinkDataset> entry : sinkMap.entrySet()) {
                 String role = entry.getKey();
-                Dataset dataset = entry.getValue();
+                LocatedDataset dataset = entry.getValue();
                 write(manifestMap, manifestState, lot, role, dataset);
             }
         }
@@ -72,12 +71,12 @@ public class CreateDataMachine {
         return this;
     }
 
-    public CreateDataMachine buildSources(Map<String, ManifestURI> manifestMap, Map<String, SourceDataset> sourceMap) {
+    public CreateDataMachine buildSources(Map<String, ManifestURI> manifestMap, Map<String, LocatedDataset> sourceMap) {
         ManifestState manifestState = ManifestState.complete;
         for (String lot : lots) {
-            for (Map.Entry<String, SourceDataset> entry : sourceMap.entrySet()) {
+            for (Map.Entry<String, LocatedDataset> entry : sourceMap.entrySet()) {
                 String role = entry.getKey();
-                Dataset dataset = entry.getValue();
+                LocatedDataset dataset = entry.getValue();
                 write(manifestMap, manifestState, lot, role, dataset);
             }
         }
@@ -85,7 +84,7 @@ public class CreateDataMachine {
         return this;
     }
 
-    private void write(Map<String, ManifestURI> manifestMap, ManifestState manifestState, String lot, String role, Dataset dataset) {
+    private void write(Map<String, ManifestURI> manifestMap, ManifestState manifestState, String lot, String role, LocatedDataset dataset) {
         URI datasetPath = dataset.pathURI();
 
         URI dataIdentifier = URIs.copyAppend(datasetPath, String.format("lot=%s", lot), "data.csv");

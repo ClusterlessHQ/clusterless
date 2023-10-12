@@ -14,6 +14,8 @@ import clusterless.substrate.aws.cdk.CDKProcessExec;
 import clusterless.substrate.aws.cdk.bootstrap.BootstrapMeta;
 import clusterless.substrate.aws.sdk.S3;
 import clusterless.substrate.uri.ArcURI;
+import clusterless.substrate.uri.DatasetURI;
+import clusterless.substrate.uri.ProjectMaterialsURI;
 import clusterless.substrate.uri.ProjectURI;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +28,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -127,6 +131,8 @@ public class Metadata {
         String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
 
         for (Deployable deployable : deployables) {
+            List<URI> materials = new ArrayList<>();
+
             Placement placement = deployable.placement();
             Project project = deployable.project();
 
@@ -138,6 +144,7 @@ public class Metadata {
                     .build()
                     .uri();
 
+            materials.add(metaURI);
             LOG.info("putting metadata in: {}", metaURI);
 
             Optional<Throwable> result = s3.put(metaURI, "application/json", deployable)
@@ -147,6 +154,8 @@ public class Metadata {
                 return 1;
             }
 
+            List<SinkDataset> sinks = new LinkedList<>();
+
             for (Arc<? extends Workload<?>> arc : deployable.arcs()) {
                 URI arcURI = ArcURI.builder()
                         .withPlacement(placement)
@@ -155,6 +164,7 @@ public class Metadata {
                         .build()
                         .uri();
 
+                materials.add(arcURI);
                 LOG.info("putting metadata in: {}", arcURI);
 
                 result = s3.put(arcURI, "application/json", arc)
@@ -163,6 +173,46 @@ public class Metadata {
                 if (result.isPresent()) {
                     return 1;
                 }
+
+                sinks.addAll(arc.sinks().values());
+            }
+
+            for (Boundary boundary : deployable.boundaries()) {
+                // todo: upload boundary metadata
+                sinks.add(boundary.dataset());
+            }
+
+            for (SinkDataset sinkDataset : sinks) {
+                URI datasetURI = DatasetURI.builder()
+                        .withPlacement(placement)
+                        .withDataset(sinkDataset)
+                        .build()
+                        .uri();
+
+                materials.add(datasetURI);
+                LOG.info("putting metadata in: {}", datasetURI);
+
+                result = s3.put(datasetURI, "application/json", new OwnedDataset(project, sinkDataset))
+                        .isSuccessOrLog(r -> String.format("unable to upload dataset metadata to: %s, %s", datasetURI, r.errorMessage()));
+
+                if (result.isPresent()) {
+                    return 1;
+                }
+            }
+
+            URI materialsURI = ProjectMaterialsURI.builder()
+                    .withPlacement(placement)
+                    .withProject(project)
+                    .build()
+                    .uri();
+
+            LOG.info("putting metadata in: {}", materialsURI);
+
+            Optional<Throwable> materialsResults = s3.put(materialsURI, "application/json", materials)
+                    .isSuccessOrLog(r -> String.format("unable to upload materials metadata to: %s, %s", metaURI, r.errorMessage()));
+
+            if (materialsResults.isPresent()) {
+                return 1;
             }
         }
 
@@ -178,41 +228,42 @@ public class Metadata {
 
             S3 s3 = new S3(profile, placement.region());
 
-            ProjectURI uri = ProjectURI.builder()
+            URI uri = ProjectMaterialsURI.builder()
                     .withPlacement(placement)
                     .withProject(project)
-                    .build();
+                    .build()
+                    .uri();
 
-            URI metaURI = uri.uri();
 
-            LOG.info("removing metadata in: {}", metaURI);
+            LOG.info("removing metadata in: {}", uri);
 
-            Optional<Throwable> result = s3.remove(metaURI)
-                    .isSuccessOrLog(r -> String.format("unable to remove project metadata to: %s, %s", metaURI, r.errorMessage()));
+            S3.Response response = s3.get(uri);
 
-            if (result.isPresent()) {
-                return 1;
+            if (!s3.exists(response)) {
+                throw new IllegalStateException("materials not found: " + uri, response.exception());
             }
 
-            for (Arc<? extends Workload<?>> arc : deployable.arcs()) {
-                URI arcURI = ArcURI.builder()
-                        .withPlacement(placement)
-                        .withProject(project)
-                        .withArcName(arc.name())
-                        .build()
-                        .uri();
+            List<URI> materials = JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {});
 
-                LOG.info("removing metadata in: {}", arcURI);
+            boolean failed = false;
+            for (URI material : materials) {
+                LOG.info("removing metadata in: {}", material);
 
-                result = s3.remove(arcURI)
-                        .isSuccessOrLog(r -> String.format("unable to remove arc metadata to: %s, %s", arcURI, r.errorMessage()));
+                Optional<Throwable> result = s3.remove(material)
+                        .isSuccessOrLog(r -> String.format("unable to remove material metadata to: %s, %s", material, r.errorMessage()));
 
-                if (result.isPresent()) {
-                    return 1;
-                }
+                failed |= result.isPresent();
+            }
+
+            Optional<Throwable> result = s3.remove(uri)
+                    .isSuccessOrLog(r -> String.format("unable to remove materials metadata to: %s, %s", uri, r.errorMessage()));
+
+            if (result.isPresent() || failed) {
+                return 1;
             }
         }
 
         return 0;
     }
+
 }

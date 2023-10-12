@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.event;
 
 import clusterless.model.Struct;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.LocatedDataset;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
@@ -24,8 +24,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
     public static final String DETAIL = "Clusterless Arc Notification";
     public static final String DATASET_ID = "datasetId";
 
-    //TODO: this may be redundant as the dataset can be looked up by role in the arc props
-    Dataset dataset;
+    LocatedDataset dataset;
     String lot;
     URI manifest;
 
@@ -34,9 +33,13 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
 
     private ArcNotifyEvent(Builder builder) {
         // dataset has subclasses with additional properties we don't need, so normalize
-        dataset = builder.dataset == null ? null : new Dataset(builder.dataset);
+        dataset = builder.dataset == null ? null : new LocatedDataset(builder.dataset);
         lot = builder.lot;
         manifest = builder.manifest;
+    }
+
+    public static Builder builder() {
+        return Builder.builder();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
         return DETAIL;
     }
 
-    public Dataset dataset() {
+    public LocatedDataset dataset() {
         return dataset;
     }
 
@@ -70,69 +73,7 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
      */
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String datasetId() {
-        return createDatasetId(dataset.name(), dataset.version());
-    }
-
-    public static String createDatasetId(String datasetName, String datasetVersion) {
-        return String.format("%s/%s", datasetName, datasetVersion);
-    }
-
-    /**
-     * {@code ArcNotifyEvent} builder static inner class.
-     */
-    public static final class Builder {
-        private Dataset dataset;
-        private String lot;
-        private URI manifest;
-
-        private Builder() {
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * Sets the {@code dataset} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code dataset} to set
-         * @return a reference to this Builder
-         */
-        public Builder withDataset(Dataset val) {
-            dataset = val;
-            return this;
-        }
-
-        /**
-         * Sets the {@code lotId} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code lotId} to set
-         * @return a reference to this Builder
-         */
-        public Builder withLot(String val) {
-            lot = val;
-            return this;
-        }
-
-        /**
-         * Sets the {@code manifest} and returns a reference to this Builder enabling method chaining.
-         *
-         * @param val the {@code manifest} to set
-         * @return a reference to this Builder
-         */
-        public Builder withManifest(URI val) {
-            manifest = val;
-            return this;
-        }
-
-        /**
-         * Returns a {@code ArcNotifyEvent} built from the parameters previously set.
-         *
-         * @return a {@code ArcNotifyEvent} built with parameters of this {@code ArcNotifyEvent.Builder}
-         */
-        public ArcNotifyEvent build() {
-            return new ArcNotifyEvent(this);
-        }
+        return dataset.id();
     }
 
     @Override
@@ -143,5 +84,42 @@ public class ArcNotifyEvent implements NotifyEvent, Struct {
         sb.append(", manifest=").append(manifest);
         sb.append('}');
         return sb.toString();
+    }
+
+    public static final class Builder {
+        //TODO: this may be redundant as the dataset can be looked up by role in the arc props
+        LocatedDataset dataset;
+        String lot;
+        URI manifest;
+
+        private Builder() {
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public Builder withDataset(LocatedDataset dataset) {
+            this.dataset = dataset;
+            return this;
+        }
+
+        public Builder withLot(String lot) {
+            this.lot = lot;
+            return this;
+        }
+
+        public Builder withManifest(URI manifest) {
+            this.manifest = manifest;
+            return this;
+        }
+
+        public ArcNotifyEvent build() {
+            ArcNotifyEvent arcNotifyEvent = new ArcNotifyEvent();
+            arcNotifyEvent.lot = this.lot;
+            arcNotifyEvent.manifest = this.manifest;
+            arcNotifyEvent.dataset = this.dataset;
+            return arcNotifyEvent;
+        }
     }
 }

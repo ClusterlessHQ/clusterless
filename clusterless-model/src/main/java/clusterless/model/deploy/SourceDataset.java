@@ -11,6 +11,7 @@ package clusterless.model.deploy;
 import clusterless.managed.component.DocumentsModel;
 
 import java.net.URI;
+import java.util.Objects;
 
 /**
  *
@@ -42,21 +43,38 @@ public class SourceDataset extends Dataset {
     public SourceDataset() {
     }
 
+    public SourceDataset(Dataset other) {
+        super(other);
+    }
+
     public boolean subscribe() {
         return subscribe;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SourceDataset that = (SourceDataset) o;
+        return subscribe == that.subscribe;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), subscribe);
     }
 
     public static final class Builder {
         String name;
         String version;
-        URI pathURI;
         boolean subscribe = true;
 
         private Builder() {
         }
 
         public static Builder builder() {
-            return new SourceDataset.Builder();
+            return new Builder();
         }
 
         public Builder withName(String name) {
@@ -69,11 +87,6 @@ public class SourceDataset extends Dataset {
             return this;
         }
 
-        public Builder withPathURI(URI pathURI) {
-            this.pathURI = pathURI;
-            return this;
-        }
-
         public Builder withSubscribe(boolean subscribe) {
             this.subscribe = subscribe;
             return this;
@@ -81,10 +94,9 @@ public class SourceDataset extends Dataset {
 
         public SourceDataset build() {
             SourceDataset sourceDataset = new SourceDataset();
-            sourceDataset.version = this.version;
             sourceDataset.name = this.name;
+            sourceDataset.version = this.version;
             sourceDataset.subscribe = this.subscribe;
-            sourceDataset.pathURI = this.pathURI;
             return sourceDataset;
         }
     }

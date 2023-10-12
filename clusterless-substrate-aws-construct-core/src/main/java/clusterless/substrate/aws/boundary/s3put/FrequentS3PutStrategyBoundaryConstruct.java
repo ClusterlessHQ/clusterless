@@ -9,7 +9,7 @@
 package clusterless.substrate.aws.boundary.s3put;
 
 import clusterless.lambda.transform.frequents3put.FrequentS3PutTransformProps;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.model.manifest.ManifestState;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.construct.LambdaLogGroupConstruct;
@@ -87,9 +87,10 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
                 .withEventBusName(eventBusRef)
                 .withSqsQueueName(queueName)
                 .withSqsWaitTimeSeconds(model().frequent().queueFetchWaitSec())
-                .withDataset(Dataset.builder()
+                .withDataset(SinkDataset.Builder.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())
+                        .withPublish(model.dataset().publish())
                         .withPathURI(listenURI)
                         .build())
                 .withManifestCompletePath(manifestComplete)

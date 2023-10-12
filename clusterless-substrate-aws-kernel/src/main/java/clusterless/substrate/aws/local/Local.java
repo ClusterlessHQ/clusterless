@@ -10,6 +10,7 @@ package clusterless.substrate.aws.local;
 
 import clusterless.command.project.LocalCommandOptions;
 import clusterless.managed.component.*;
+import clusterless.managed.dataset.DatasetResolver;
 import clusterless.model.DeployableLoader;
 import clusterless.model.Model;
 import clusterless.model.deploy.Arc;
@@ -51,6 +52,8 @@ public class Local extends CommonCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         List<Deployable> deployables = loadProjectModels(commandOptions.projectFiles());
 
+        DatasetResolver resolver = new DatasetResolver(deployables);
+
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
 
         for (Deployable deployable : deployables) {
@@ -84,7 +87,12 @@ public class Local extends CommonCommand implements Callable<Integer> {
         ArcLocalExecutor executor = executorFor(deployable.placement(), arc);
 
         String lotId = prompt(commandOptions.lotId(), "Enter lot id: ");
-        List<ArcLocalExecutor.Command> commands = executor.commands(commandOptions.role(), lotId, commandOptions.manifestState());
+        List<ArcLocalExecutor.Command> commands = executor.commands(
+                commandOptions.role(),
+                lotId,
+                commandOptions.manifestState(),
+                source -> resolver.locate(deployable.project(), source)
+        );
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());
 

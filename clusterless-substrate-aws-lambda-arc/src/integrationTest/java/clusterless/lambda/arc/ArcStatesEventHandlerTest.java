@@ -48,8 +48,8 @@ public class ArcStatesEventHandlerTest extends LocalStackBase {
         return ArcStateProps.builder()
                 .withName("test-arc")
                 .withProject(defaultProject())
-                .withSinks(datasets().sinkDatasetMap())
-                .withSources(datasets().sourceDatasetMap())
+                .withSinks(datasets().sinkDatasetMapAsSink())
+                .withSources(datasets().sourceDatasetMapAsSource())
                 .withArcStatePath(
                         ArcStateURI.builder()
                                 .withPlacement(defaultPlacement())
@@ -65,7 +65,7 @@ public class ArcStatesEventHandlerTest extends LocalStackBase {
         return Stream.of(
                 ArcNotifyEvent.Builder.builder()
                         .withDataset(datasets().sourceDatasetMap().get("main"))
-                        .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().sourceDatasetMap(), ManifestState.complete).get("main").uri())
+                        .withManifest(datasets().manifestIdentifierMap("20230227PT5M287", datasets().datasetMap(), ManifestState.complete).get("main").uri())
                         .withLot("20230227PT5M287")
                         .build()
         );
@@ -73,12 +73,10 @@ public class ArcStatesEventHandlerTest extends LocalStackBase {
 
     @BeforeEach
     void initData() {
-        ArcStateProps props = getProps();
-
         new CreateDataMachine("20230227PT5M287")
-                .applyBucketsFrom(props.sources())
-                .applyBucketsFrom(props.sinks())
-                .buildSources(datasets().manifestPathMapFor(props.sources()), props.sources());
+                .applyBucketsFrom(datasets().sourceDatasetMap())
+                .applyBucketsFrom(datasets().sinkDatasetMap())
+                .buildSources(datasets().manifestPathMapFor(datasets().sourceDatasetMap()), datasets().sourceDatasetMap());
     }
 
     public void invoke(

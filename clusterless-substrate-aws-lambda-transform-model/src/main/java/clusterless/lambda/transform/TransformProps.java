@@ -10,7 +10,7 @@ package clusterless.lambda.transform;
 
 import clusterless.json.JsonRequiredProperty;
 import clusterless.model.Struct;
-import clusterless.model.deploy.Dataset;
+import clusterless.model.deploy.SinkDataset;
 import clusterless.model.deploy.partial.PathFilter;
 import clusterless.substrate.uri.ManifestURI;
 
@@ -22,7 +22,7 @@ public class TransformProps implements Struct {
     @JsonRequiredProperty
     protected ManifestURI manifestPartialPath;
     @JsonRequiredProperty
-    protected Dataset dataset;
+    protected SinkDataset dataset;
     protected String eventBusName;
     protected PathFilter filter = new PathFilter();
 
@@ -38,7 +38,7 @@ public class TransformProps implements Struct {
         return manifestPartialPath;
     }
 
-    public Dataset dataset() {
+    public SinkDataset dataset() {
         return dataset;
     }
 

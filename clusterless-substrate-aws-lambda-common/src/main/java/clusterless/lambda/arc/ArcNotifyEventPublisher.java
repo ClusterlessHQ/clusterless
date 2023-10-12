@@ -8,7 +8,6 @@
 
 package clusterless.lambda.arc;
 
-import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.SinkDataset;
 import clusterless.substrate.aws.event.ArcNotifyEvent;
 import clusterless.substrate.aws.sdk.EventBus;
@@ -24,9 +23,9 @@ public class ArcNotifyEventPublisher {
     private static final Logger LOG = LogManager.getLogger(ArcNotifyEventPublisher.class);
     private final EventBus eventBus = new EventBus();
     private final String eventBusName;
-    private final Dataset dataset;
+    private final SinkDataset dataset;
 
-    public ArcNotifyEventPublisher(String eventBusName, Dataset dataset) {
+    public ArcNotifyEventPublisher(String eventBusName, SinkDataset dataset) {
         this.eventBusName = eventBusName;
         this.dataset = dataset;
     }
@@ -47,6 +46,11 @@ public class ArcNotifyEventPublisher {
                 .withLot(lotId)
                 .withManifest(manifestURI)
                 .build();
+
+        if (!dataset.publish()) {
+            LOG.info("skipping publish of {} on {}", () -> notifyEvent.getClass().getSimpleName(), () -> eventBusName);
+            return;
+        }
 
         LOG.info("publishing {} on {}", () -> notifyEvent.getClass().getSimpleName(), () -> eventBusName);
 

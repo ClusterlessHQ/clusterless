@@ -53,9 +53,9 @@ public class BatchArcEventHandlerTest extends LocalStackBase {
     @Override
     protected ArcProps<?> getProps() {
         return ArcProps.builder()
-                .withSources(datasets().sourceDatasetMap())
+                .withSources(datasets().sourceDatasetMapAsSource())
                 .withSourceManifestPaths(datasets().sourceManifestPathMap())
-                .withSinks(datasets().sinkDatasetMap())
+                .withSinks(datasets().sinkDatasetMapAsSink())
                 .withSinkManifestTemplates(datasets().sinkManifestPathMap())
                 .withWorkloadProps(new WorkloadProps())
                 .build();
@@ -81,9 +81,9 @@ public class BatchArcEventHandlerTest extends LocalStackBase {
         ArcProps<?> props = getProps();
 
         new CreateDataMachine(SUCCESS_LOT)
-                .applyBucketsFrom(props.sources())
-                .applyBucketsFrom(props.sinks())
-                .buildSources(props.sourceManifestPaths(), props.sources())
+                .applyBucketsFrom(datasets().sourceDatasetMap())
+                .applyBucketsFrom(datasets().sinkDatasetMap())
+                .buildSources(props.sourceManifestPaths(), datasets().sourceDatasetMap())
                 .buildSinks(props.sinkManifestTemplates(), props.sinks(), ManifestState.complete);
 
 //        new CreateDataMachine(PARTIAL_LOT)

@@ -11,5 +11,5 @@ package clusterless.model.deploy;
 /**
  * Supports are architectural elements that build up or support the workloads
  */
-public class Support extends Extensible {
+public abstract class Support extends Extensible {
 }

@@ -11,6 +11,7 @@ package clusterless.model.deploy;
 import clusterless.json.JsonRequiredProperty;
 import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Struct;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.Objects;
@@ -55,6 +56,11 @@ public class Project implements Struct {
 
     public String version() {
         return version;
+    }
+
+    @JsonIgnore
+    public String id() {
+        return String.format("%s/%s", name(), version());
     }
 
     @Override

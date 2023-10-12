@@ -8,6 +8,7 @@
 
 package clusterless.substrate.uri;
 
+import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.Placement;
 import clusterless.model.deploy.Project;
 import org.junit.jupiter.api.Test;
@@ -46,5 +47,35 @@ public class MetaURITest {
                 .build();
 
         assertEquals(project, ProjectURI.parse("/projects/name=test-project/version=20230101/project.json").project());
+    }
+
+    @Test
+    void dataset() {
+        DatasetURI datasetURI = DatasetURI.builder()
+                .withPlacement(Placement.builder()
+                        .withAccount("00000000")
+                        .withRegion("us-west-2")
+                        .withProvider("aws")
+                        .withStage("prod")
+                        .build())
+                .withDataset(Dataset.Builder.builder()
+                        .withName("test-project")
+                        .withVersion("20230101")
+                        .build())
+                .build();
+
+        assertFalse(datasetURI.isPath());
+        assertEquals(URI.create("s3://prod-clusterless-metadata-00000000-us-west-2/datasets/name=test-project/version=20230101/dataset.json"), datasetURI.uri());
+        assertEquals(datasetURI.uri(), DatasetURI.parse(datasetURI.template()).uri());
+    }
+
+    @Test
+    void datasetKey() {
+        Project project = Project.Builder.builder()
+                .withName("test-project")
+                .withVersion("20230101")
+                .build();
+
+        assertEquals(project, ProjectURI.parse("/datasets/name=test-project/version=20230101/dataset.json").project());
     }
 }

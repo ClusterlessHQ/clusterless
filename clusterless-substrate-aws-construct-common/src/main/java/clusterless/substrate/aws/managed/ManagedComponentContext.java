@@ -10,6 +10,7 @@ package clusterless.substrate.aws.managed;
 
 import clusterless.config.Configurations;
 import clusterless.managed.component.ComponentContext;
+import clusterless.managed.dataset.DatasetResolver;
 import clusterless.model.deploy.Deployable;
 import software.constructs.Construct;
 
@@ -19,16 +20,18 @@ import software.constructs.Construct;
 public class ManagedComponentContext implements ComponentContext {
 
     final Configurations configurations;
+    final DatasetResolver resolver;
     final ManagedProject managedProject;
     final Deployable deployable;
     final Managed parent;
 
-    public ManagedComponentContext(Configurations configurations, ManagedProject managedProject, Deployable deployable) {
-        this(configurations, managedProject, deployable, managedProject);
+    public ManagedComponentContext(Configurations configurations, DatasetResolver resolver, ManagedProject managedProject, Deployable deployable) {
+        this(configurations, resolver, managedProject, deployable, managedProject);
     }
 
-    public ManagedComponentContext(Configurations configurations, ManagedProject managedProject, Deployable deployable, Managed parent) {
+    public ManagedComponentContext(Configurations configurations, DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, Managed parent) {
         this.configurations = configurations;
+        this.resolver = resolver;
         this.managedProject = managedProject;
         this.deployable = deployable;
         this.parent = parent;
@@ -36,6 +39,10 @@ public class ManagedComponentContext implements ComponentContext {
 
     public Configurations configurations() {
         return configurations;
+    }
+
+    public DatasetResolver resolver() {
+        return resolver;
     }
 
     public ManagedProject managedProject() {

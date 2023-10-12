@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.arc;
 
 import clusterless.model.deploy.Arc;
+import clusterless.model.deploy.Dataset;
 import clusterless.model.deploy.SourceDataset;
 import clusterless.model.deploy.Workload;
 import clusterless.naming.Label;
@@ -33,13 +34,13 @@ public class ArcListener extends ManagedConstruct {
     private final Label ruleName;
     private final Rule rule;
 
-    public ArcListener(@NotNull ManagedComponentContext context, @NotNull Arc<? extends Workload> arc, boolean enabled) {
+    public ArcListener(@NotNull ManagedComponentContext context, @NotNull Arc<? extends Workload<?>> arc, boolean enabled) {
         super(context, Label.of(arc.name()).with("Listener"));
 
         List<String> ids = arc.sources().values()
                 .stream()
                 .filter(SourceDataset::subscribe) // only listen for those subscribed too
-                .map(d -> ArcNotifyEvent.createDatasetId(d.name(), d.version()))
+                .map(Dataset::id)
                 .collect(Collectors.toList());
 
         Map<String, Object> detail = OrderedSafeMaps.of(

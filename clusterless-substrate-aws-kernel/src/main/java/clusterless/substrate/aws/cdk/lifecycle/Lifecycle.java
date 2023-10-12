@@ -11,6 +11,7 @@ package clusterless.substrate.aws.cdk.lifecycle;
 import clusterless.config.Configurations;
 import clusterless.managed.ModelType;
 import clusterless.managed.component.*;
+import clusterless.managed.dataset.DatasetResolver;
 import clusterless.model.DeployableLoader;
 import clusterless.model.Model;
 import clusterless.model.deploy.Arc;
@@ -73,6 +74,8 @@ public class Lifecycle {
         String version = versions.stream().findFirst().orElseThrow();
         String stage = stages.isEmpty() ? null : stages.stream().findFirst().orElseThrow();
 
+        DatasetResolver resolver = new DatasetResolver(deployables);
+
         ManagedProject managedProject = new ManagedProject(name, version, stage, deployables);
 
         for (Deployable deployable : deployables) {
@@ -80,24 +83,24 @@ public class Lifecycle {
 
             // create a stack for each isolatable construct
             for (ModelType[] stackGroup : stackGroups.independentModels()) {
-                constructIndependentStacks(managedProject, deployable, stackGroup);
+                constructIndependentStacks(resolver, managedProject, deployable, stackGroup);
             }
 
             // create a stack for grouped constructs
             for (ModelType[] stackGroup : stackGroups.groupedModels()) {
-                constructGroupedStack(managedProject, deployable, stackGroup);
+                constructGroupedStack(resolver, managedProject, deployable, stackGroup);
             }
 
             // create a stack for independent constructs
             for (ModelType[] stackGroup : stackGroups.managedModels()) {
-                constructManagedStacks(managedProject, deployable, stackGroup);
+                constructManagedStacks(resolver, managedProject, deployable, stackGroup);
             }
         }
 
         return managedProject;
     }
 
-    private void constructManagedStacks(ManagedProject managedProject, Deployable deployable, ModelType[] independent) {
+    private void constructManagedStacks(DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, ModelType[] independent) {
         Map<Extensible, ComponentService<ComponentContext, Model, Component>> managed = componentServices.componentServicesFor(Isolation.managed, deployable, independent);
 
         if (managed.isEmpty()) {
@@ -122,12 +125,13 @@ public class Lifecycle {
             }
 
             // construct a stack for every arc
-            ArcStack stack = new ArcStack(configurations, managedProject, deployable, arc);
+            ArcStack stack = new ArcStack(configurations, resolver, managedProject, deployable, arc);
 
             // force dependency on prior stacks, but not prior arcs
             priorStacks.forEach(stack::addDependency);
 
-            ManagedComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, stack);
+            // todo: lookup all referenced datasets and retrieve their bucket names
+            ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedProject, deployable, stack);
             LOG.info(String.format("creating %s embedded construct: %s", arc.label(), arc.type()));
             ArcComponent construct = (ArcComponent) modelComponentService.create(context, arc);
 
@@ -136,7 +140,7 @@ public class Lifecycle {
 
     }
 
-    private void constructIndependentStacks(ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
+    private void constructIndependentStacks(DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, ModelType[] isolatable) {
         Map<Extensible, ComponentService<ComponentContext, Model, Component>> isolated = componentServices.componentServicesFor(Isolation.independent, deployable, isolatable);
 
         if (isolated.isEmpty()) {
@@ -145,10 +149,10 @@ public class Lifecycle {
         }
 
         // constructs a stack for every isolated declared model
-        construct(new ManagedComponentContext(configurations, managedProject, deployable), isolated);
+        construct(new ManagedComponentContext(configurations, resolver, managedProject, deployable), isolated);
     }
 
-    private void constructGroupedStack(ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
+    private void constructGroupedStack(DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, ModelType[] includable) {
         Map<Extensible, ComponentService<ComponentContext, Model, Component>> included = componentServices.componentServicesFor(Isolation.grouped, deployable, includable);
 
         if (included.isEmpty()) {
@@ -162,7 +166,7 @@ public class Lifecycle {
         // make the new stack dependent on the prior stacks so order is retained during deployment
         managedProject.stacks().forEach(stack::addDependency);
 
-        ComponentContext context = new ManagedComponentContext(configurations, managedProject, deployable, stack);
+        ComponentContext context = new ManagedComponentContext(configurations, resolver, managedProject, deployable, stack);
 
         construct(context, included);
     }

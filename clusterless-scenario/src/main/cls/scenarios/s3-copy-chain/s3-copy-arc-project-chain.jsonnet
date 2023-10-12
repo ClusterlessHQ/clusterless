@@ -43,7 +43,6 @@ local unit = 'Twelfths';
         main: {
           name: 'ingress-chain',
           version: '20220101',
-          pathURI: bucketPrefix + '/ingress/',
         },
       },
       sinks: {
