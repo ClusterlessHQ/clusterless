@@ -8,7 +8,7 @@
 
 package clusterless.scenario.conductor.worker.cli.exec;
 
-import clusterless.startup.Startup;
+import clusterless.cls.startup.Startup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

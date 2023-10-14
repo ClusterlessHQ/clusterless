@@ -24,7 +24,7 @@ dependencies {
 application {
     applicationName = "cls-aws"
 //    mainModule.set("clusterless.substrate.aws.kernel")
-    mainClass.set("clusterless.substrate.aws.Kernel")
+    mainClass.set("clusterless.cls.substrate.aws.Kernel")
 }
 
 distributions {

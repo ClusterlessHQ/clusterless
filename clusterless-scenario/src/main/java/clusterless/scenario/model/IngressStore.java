@@ -8,7 +8,7 @@
 
 package clusterless.scenario.model;
 
-import clusterless.config.Config;
+import clusterless.cls.config.Config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;

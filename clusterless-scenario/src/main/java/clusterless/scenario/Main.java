@@ -8,7 +8,7 @@
 
 package clusterless.scenario;
 
-import clusterless.json.JSONUtil;
+import clusterless.cls.json.JSONUtil;
 import clusterless.scenario.conductor.ConductorApp;
 import clusterless.scenario.conductor.TaskManager;
 import clusterless.scenario.conductor.WorkflowManager;

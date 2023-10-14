@@ -8,10 +8,10 @@
 
 package clusterless.scenario.conductor.worker.aws;
 
+import clusterless.cls.substrate.aws.sdk.Glue;
 import clusterless.scenario.Options;
 import clusterless.scenario.conductor.task.aws.GlueWatcher;
 import clusterless.scenario.model.WatchedStore;
-import clusterless.substrate.aws.sdk.Glue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.glue.model.Partition;

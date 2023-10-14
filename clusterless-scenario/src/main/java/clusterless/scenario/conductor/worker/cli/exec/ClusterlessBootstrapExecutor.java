@@ -8,7 +8,7 @@
 
 package clusterless.scenario.conductor.worker.cli.exec;
 
-import clusterless.util.SafeList;
+import clusterless.cls.util.SafeList;
 
 import java.util.List;
 import java.util.Map;

@@ -8,10 +8,10 @@
 
 package clusterless.scenario.conductor.worker.aws;
 
+import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.scenario.Options;
 import clusterless.scenario.conductor.task.aws.S3Watcher;
 import clusterless.scenario.model.WatchedStore;
-import clusterless.substrate.aws.sdk.S3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,0 +1,23 @@
+#
+# Copyright (c) 2023 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+# Resources
+clusterless.cls.substrate.aws.resource.s3.S3BucketResourceProvider
+clusterless.cls.substrate.aws.resource.batch.ComputeResourceProvider
+clusterless.cls.substrate.aws.resource.eventbridge.EventBridgeResourceProvider
+## Glue
+clusterless.cls.substrate.aws.resource.glue.database.GlueDatabaseResourceProvider
+clusterless.cls.substrate.aws.resource.glue.table.GlueTableResourceProvider
+
+# Boundaries
+clusterless.cls.substrate.aws.boundary.s3put.S3PutListenerBoundaryProvider
+
+# Arcs
+clusterless.cls.substrate.aws.arc.s3copy.S3CopyArcProvider
+clusterless.cls.substrate.aws.arc.batch.BatchExecArcProvider
+clusterless.cls.substrate.aws.arc.glue.GlueAddPartitionsArcProvider

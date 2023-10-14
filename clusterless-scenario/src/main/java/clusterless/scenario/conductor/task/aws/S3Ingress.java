@@ -8,7 +8,7 @@
 
 package clusterless.scenario.conductor.task.aws;
 
-import clusterless.json.JSONUtil;
+import clusterless.cls.json.JSONUtil;
 import clusterless.scenario.conductor.task.BaseSimpleTask;
 import clusterless.scenario.model.IngressStore;
 

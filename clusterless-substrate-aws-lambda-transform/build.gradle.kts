@@ -49,7 +49,7 @@ val openApiGenerateObjectCreated =
         generatorName.set("java")
         inputSpec.set("$projectDir/src/main/json/ObjectCreated.json")
         outputDir.set(generatedRoot)
-        modelPackage.set("clusterless.lambda.transform.json.object")
+        modelPackage.set("clusterless.aws.lambda.transform.json.object")
 
         configOptions.put("library", "native")
         configOptions.put("serializationLibrary", "jackson")
@@ -72,7 +72,7 @@ val openApiGenerateScheduledEvent =
         generatorName.set("java")
         inputSpec.set("$projectDir/src/main/json/ScheduledJson.json")
         outputDir.set(generatedRoot)
-        modelPackage.set("clusterless.lambda.transform.json.event")
+        modelPackage.set("clusterless.aws.lambda.transform.json.event")
 
         configOptions.put("library", "native")
         configOptions.put("serializationLibrary", "jackson")

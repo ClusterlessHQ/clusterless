@@ -8,7 +8,7 @@
 
 package clusterless.scenario.model;
 
-import clusterless.config.Config;
+import clusterless.cls.config.Config;
 
 import java.nio.file.Path;
 import java.util.LinkedList;

@@ -25,7 +25,7 @@ dependencies {
 application {
     // Define the main class for the application.
     applicationName = "cls"
-    mainClass.set("clusterless.Main")
+    mainClass.set("clusterless.cls.Main")
 }
 
 val awsKernelInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:installDist")

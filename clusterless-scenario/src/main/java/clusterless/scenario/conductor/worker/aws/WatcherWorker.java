@@ -8,7 +8,7 @@
 
 package clusterless.scenario.conductor.worker.aws;
 
-import clusterless.json.JSONUtil;
+import clusterless.cls.json.JSONUtil;
 import clusterless.scenario.Options;
 import clusterless.scenario.model.WatchedStore;
 import com.netflix.conductor.client.worker.Worker;
