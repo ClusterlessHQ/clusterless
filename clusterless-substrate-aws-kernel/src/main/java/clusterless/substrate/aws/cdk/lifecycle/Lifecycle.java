@@ -9,6 +9,7 @@
 package clusterless.substrate.aws.cdk.lifecycle;
 
 import clusterless.config.Configurations;
+import clusterless.json.JSONUtil;
 import clusterless.managed.ModelType;
 import clusterless.managed.component.*;
 import clusterless.managed.dataset.DatasetResolver;
@@ -20,15 +21,21 @@ import clusterless.model.deploy.Extensible;
 import clusterless.model.deploy.Workload;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.arc.ArcStack;
+import clusterless.substrate.aws.cdk.CDKProcessExec;
 import clusterless.substrate.aws.cdk.Provider;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.managed.ManagedProject;
 import clusterless.substrate.aws.managed.ManagedStack;
+import clusterless.substrate.aws.sdk.S3;
+import clusterless.substrate.uri.DatasetURI;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,7 +81,9 @@ public class Lifecycle {
         String version = versions.stream().findFirst().orElseThrow();
         String stage = stages.isEmpty() ? null : stages.stream().findFirst().orElseThrow();
 
-        DatasetResolver resolver = new DatasetResolver(deployables);
+        String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
+
+        DatasetResolver resolver = createResolver(profile, deployables);
 
         ManagedProject managedProject = new ManagedProject(name, version, stage, deployables);
 
@@ -98,6 +107,30 @@ public class Lifecycle {
         }
 
         return managedProject;
+    }
+
+    @NotNull
+    private static DatasetResolver createResolver(String profile, List<Deployable> deployables) {
+        return new DatasetResolver(
+                deployables,
+                (placement, source) -> {
+                    S3 s3 = new S3(profile, placement.region());
+
+                    URI datasetURI = DatasetURI.builder()
+                            .withPlacement(placement)
+                            .withDataset(source)
+                            .build()
+                            .uri();
+
+                    S3.Response response = s3.get(datasetURI);
+
+                    if (!s3.exists(response)) {
+                        return Optional.empty();
+                    }
+
+                    return Optional.of(JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {}));
+                }
+        );
     }
 
     private void constructManagedStacks(DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, ModelType[] independent) {

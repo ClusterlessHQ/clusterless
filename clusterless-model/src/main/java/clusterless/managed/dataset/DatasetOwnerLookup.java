@@ -11,6 +11,7 @@ package clusterless.managed.dataset;
 import clusterless.model.deploy.OwnedDataset;
 import clusterless.model.deploy.SourceDataset;
 
-public interface LookupDatasetOwnerLookup {
+@FunctionalInterface
+public interface DatasetOwnerLookup {
     OwnedDataset lookup(SourceDataset source);
 }

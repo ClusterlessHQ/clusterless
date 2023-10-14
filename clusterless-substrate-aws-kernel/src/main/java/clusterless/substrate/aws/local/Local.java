@@ -91,7 +91,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
                 commandOptions.role(),
                 lotId,
                 commandOptions.manifestState(),
-                source -> resolver.locate(deployable.project(), source)
+                source -> resolver.locate(deployable.placement(), deployable.project(), source)
         );
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());

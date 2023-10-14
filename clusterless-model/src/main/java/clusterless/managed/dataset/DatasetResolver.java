@@ -9,6 +9,8 @@
 package clusterless.managed.dataset;
 
 import clusterless.model.deploy.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -25,74 +27,91 @@ import java.util.stream.Collectors;
  */
 public class DatasetResolver {
     private static final Logger LOG = LogManager.getLogger(DatasetResolver.class);
-    List<Deployable> deployables;
-
-    Map<ReferencedDataset, OwnedDataset> resolved = new HashMap<>();
-    private List<ReferencedDataset> locallyReferenced;
-    private List<OwnedDataset> locallyOwned;
+    private final List<Deployable> deployables;
+    private final Map<Placement, Map<ReferencedDataset, OwnedDataset>> resolved = new HashMap<>();
+    private final RemoteDatasetOwnerLookup remoteLookup;
 
     public DatasetResolver(List<Deployable> deployables) {
-        this.deployables = deployables;
+        this(deployables, (placement, source) -> Optional.empty());
+    }
 
+    public DatasetResolver(List<Deployable> deployables, RemoteDatasetOwnerLookup remoteLookup) {
+        this.deployables = deployables;
+        this.remoteLookup = remoteLookup;
         build();
     }
 
     private void build() {
-        locallyReferenced = new LinkedList<>();
-        locallyOwned = new LinkedList<>();
+        Multimap<Placement, ReferencedDataset> locallyReferenced = ArrayListMultimap.create();
+        Multimap<Placement, OwnedDataset> locallyOwned = ArrayListMultimap.create();
 
         for (Deployable deployable : deployables) {
+            Placement placement = deployable.placement();
+            Project project = deployable.project();
             deployable.boundaries().stream()
-                    .map(boundary -> new OwnedDataset(deployable.project(), boundary.dataset()))
-                    .forEach(locallyOwned::add);
+                    .map(boundary -> new OwnedDataset(project, boundary.dataset()))
+                    .forEach(o -> locallyOwned.put(placement, o));
 
             for (Arc<? extends Workload<?>> arc : deployable.arcs()) {
                 arc.sources()
                         .values()
                         .stream()
-                        .map(source -> new ReferencedDataset(deployable.project(), source))
-                        .forEach(locallyReferenced::add);
+                        .map(source -> new ReferencedDataset(project, source))
+                        .forEach(r -> locallyReferenced.put(placement, r));
 
                 arc.sinks().values()
                         .stream()
-                        .map(sink -> new OwnedDataset(deployable.project(), sink))
-                        .forEach(locallyOwned::add);
+                        .map(sink -> new OwnedDataset(project, sink))
+                        .forEach(o -> locallyOwned.put(placement, o));
             }
         }
 
-        for (ReferencedDataset referencedDataset : locallyReferenced) {
-            Set<OwnedDataset> ownedDatasets = locallyOwned.stream()
-                    .filter(ownedDataset -> ownedDataset.dataset().sameDataset(referencedDataset.dataset()))
-                    .collect(Collectors.toSet());
+        for (Map.Entry<Placement, Collection<ReferencedDataset>> entry : locallyReferenced.asMap().entrySet()) {
+            for (ReferencedDataset referencedDataset : entry.getValue()) {
+                Placement placement = entry.getKey();
+                Set<OwnedDataset> ownedDatasets = locallyOwned.get(placement).stream()
+                        .filter(ownedDataset -> ownedDataset.dataset().sameDataset(referencedDataset.dataset()))
+                        .collect(Collectors.toSet());
 
-            // todo: confirm dataset isn't already owned outside this set of deployables
+                // we may want to be strict and always check
+                if (ownedDatasets.isEmpty()) {
+                    LOG.info("dataset owner not found locally, looking up remotely: {}", referencedDataset.dataset().id());
+                    remoteLookup.lookup(placement, referencedDataset.dataset())
+                            .ifPresent(ownedDatasets::add);
+                }
 
-            if (ownedDatasets.isEmpty()) {
-                String message = "dataset owner not found: %s".formatted(referencedDataset.dataset().id());
-                LOG.error(message);
-                throw new IllegalStateException(message);
-            } else if (ownedDatasets.size() != 1) {
-                Set<String> projects = ownedDatasets.stream().map(OwnedDataset::owner).map(Project::id).collect(Collectors.toSet());
-                String message = "dataset: %s, is owned by multiple projects: %s".formatted(referencedDataset.dataset().id(), projects);
-                LOG.error(message);
-                throw new IllegalStateException(message);
+                if (ownedDatasets.isEmpty()) {
+                    String message = "dataset owner not found: %s".formatted(referencedDataset.dataset().id());
+                    LOG.error(message);
+                    throw new IllegalStateException(message);
+                } else if (ownedDatasets.size() != 1) {
+                    Set<String> projects = ownedDatasets.stream().map(OwnedDataset::owner).map(Project::id).collect(Collectors.toSet());
+                    String message = "dataset: %s, is owned by multiple projects: %s".formatted(referencedDataset.dataset().id(), projects);
+                    LOG.error(message);
+                    throw new IllegalStateException(message);
+                }
+
+                OwnedDataset ownedDataset = ownedDatasets.stream().findFirst().orElseThrow();
+                resolved.computeIfAbsent(placement, p -> new HashMap<>())
+                        .put(referencedDataset, ownedDataset);
             }
-
-            resolved.put(referencedDataset, ownedDatasets.stream().findFirst().orElseThrow());
         }
     }
 
-    public List<OwnedDataset> locallyOwned() {
-        return locallyOwned;
+    public Map<String, ? extends LocatedDataset> locate(@NotNull Placement placement, @NotNull Project dependent, @NotNull Map<String, SourceDataset> sources) {
+        return sources.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> locate(placement, dependent, e.getValue()).dataset()));
     }
 
-    public Map<String, ? extends LocatedDataset> locate(@NotNull Project dependent, @NotNull Map<String, SourceDataset> sources) {
-        return sources.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> locate(dependent, e.getValue()).dataset()));
-    }
-
-    public OwnedDataset locate(Project dependent, SourceDataset value) {
+    public OwnedDataset locate(Placement placement, Project dependent, SourceDataset value) {
         ReferencedDataset referencedDataset = new ReferencedDataset(dependent, value);
-        OwnedDataset ownedDataset = resolved.get(referencedDataset);
+
+        if (!resolved.containsKey(placement)) {
+            String message = "dataset placement not found for: %s".formatted(placement.id());
+            LOG.error(message);
+            throw new IllegalStateException(message);
+        }
+
+        OwnedDataset ownedDataset = resolved.get(placement).get(referencedDataset);
 
         if (ownedDataset != null) {
             return ownedDataset;

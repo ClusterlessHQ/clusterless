@@ -8,7 +8,7 @@
 
 package clusterless.managed.component;
 
-import clusterless.managed.dataset.LookupDatasetOwnerLookup;
+import clusterless.managed.dataset.DatasetOwnerLookup;
 import clusterless.model.manifest.ManifestState;
 
 import java.util.LinkedHashMap;
@@ -99,5 +99,5 @@ public interface ArcLocalExecutor {
         }
     }
 
-    List<Command> commands(String role, String lotId, ManifestState manifestState, LookupDatasetOwnerLookup ownerLookup);
+    List<Command> commands(String role, String lotId, ManifestState manifestState, DatasetOwnerLookup ownerLookup);
 }

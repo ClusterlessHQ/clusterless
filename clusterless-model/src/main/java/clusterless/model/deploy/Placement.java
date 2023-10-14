@@ -11,6 +11,7 @@ package clusterless.model.deploy;
 import clusterless.json.JsonRequiredProperty;
 import clusterless.managed.component.DocumentsModel;
 import clusterless.model.Struct;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.jetbrains.annotations.NotNull;
 
@@ -116,6 +117,11 @@ public class Placement implements Struct {
     protected Placement setRegion(String region) {
         this.region = region;
         return this;
+    }
+
+    @JsonIgnore
+    public String id() {
+        return String.format("%s:%s:%s:%s", provider, stage, account, region);
     }
 
     @Override

@@ -11,6 +11,8 @@ package clusterless.substrate.aws.construct;
 import clusterless.managed.component.ArcComponent;
 import clusterless.model.deploy.Arc;
 import clusterless.model.deploy.LocatedDataset;
+import clusterless.model.deploy.Placement;
+import clusterless.model.deploy.Project;
 import clusterless.naming.Label;
 import clusterless.substrate.aws.managed.ManagedComponentContext;
 import clusterless.substrate.aws.resources.BootstrapStores;
@@ -42,7 +44,9 @@ public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> i
     }
 
     protected void grantDatasets(IGrantable grantable) {
-        Map<String, ? extends LocatedDataset> located = context().resolver().locate(context().deployable().project(), model().sources());
+        Placement placement = context().deployable().placement();
+        Project project = context().deployable().project();
+        Map<String, ? extends LocatedDataset> located = context().resolver().locate(placement, project, model().sources());
         grantEachBucket(located, id("Source"), b -> b.grantRead(grantable));
         grantEachBucket(model().sinks(), id("Sink"), b -> b.grantReadWrite(grantable));
     }
