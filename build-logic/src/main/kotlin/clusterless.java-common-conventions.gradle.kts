@@ -104,7 +104,7 @@ dependencies {
         implementationAndTestFixture("com.jayway.jsonpath:json-path:2.8.0")
         implementationAndTestFixture("com.google.guava:guava:31.1-jre")
 
-        val jackson = "2.15.2"
+        val jackson = "2.15.3"
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-core:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-databind:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-joda:$jackson")
@@ -116,7 +116,7 @@ dependencies {
         implementationAndTestFixture("one.util:streamex:0.8.2")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
-        val awsSdk = "2.20.98"
+        val awsSdk = "2.21.0"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:eventbridge:$awsSdk")
@@ -125,8 +125,8 @@ dependencies {
         implementationAndTestFixture("software.amazon.awssdk:athena:$awsSdk")
 
         // https://github.com/aws/aws-lambda-java-libs
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.2")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-events:3.11.0")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.3")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-events:3.11.3")
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-serialization:1.0.1")
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-log4j2:1.5.1")
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-tests:1.1.1")
@@ -138,22 +138,23 @@ dependencies {
         testImplementationAndTestFixture("org.mockito:mockito-core:5.1.1")
 
         // https://github.com/junit-pioneer/junit-pioneer/releases
-        val junitPioneer = "2.0.0"
+        val junitPioneer = "2.1.0"
         testImplementationAndTestFixture("org.junit-pioneer:junit-pioneer:$junitPioneer")
         testImplementationAndTestFixture("org.junit-pioneer:junit-pioneer-jackson:$junitPioneer")
 
         // https://github.com/hosuaby/inject-resources
-        val injectResources = "0.3.2"
+        val injectResources = "0.3.3"
         testImplementationAndTestFixture("io.hosuaby:inject-resources-core:$injectResources")
         testImplementationAndTestFixture("io.hosuaby:inject-resources-junit-jupiter:$injectResources")
 
         // https://github.com/webcompere/system-stubs
-        val systemStubs = "2.0.2"
+        val systemStubs = "2.1.3"
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-core:$systemStubs")
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-jupiter:$systemStubs")
         testImplementationAndTestFixture("org.mockito:mockito-inline:5.1.1")
 
-        val testContainers = "1.18.3"
+        // https://mvnrepository.com/artifact/org.testcontainers
+        val testContainers = "1.19.1"
         testImplementationAndTestFixture("org.testcontainers:testcontainers:$testContainers")
         testImplementationAndTestFixture("org.testcontainers:junit-jupiter:$testContainers")
         testImplementationAndTestFixture("org.testcontainers:localstack:$testContainers")
