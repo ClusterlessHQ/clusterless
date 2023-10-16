@@ -120,7 +120,9 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
         if (model().infrequent.enableEventBridge()) {
             // todo: inject warning about
             //  Custom::S3BucketNotifications
-            // Received response status [FAILED] from custom resource. Message returned: Error: An error occurred (OperationAborted) when calling the PutBucketNotificationConfiguration operation: A conflicting conditional operation is currently in progress against this resource. Please try again.. See the details in CloudWatch Log
+            //  Received response status [FAILED] from custom resource. Message returned: Error: An error occurred (OperationAborted) when calling the PutBucketNotificationConfiguration operation: A conflicting conditional operation is currently in progress against this resource. Please try again.. See the details in CloudWatch Log
+            // todo: make explicit dependency on bucket
+            //  for now Lifecycle makes all components dependent on any declared resources so the resources are removed first
             listenBucket.enableEventBridgeNotification(); // places put events into default event bus
         }
 

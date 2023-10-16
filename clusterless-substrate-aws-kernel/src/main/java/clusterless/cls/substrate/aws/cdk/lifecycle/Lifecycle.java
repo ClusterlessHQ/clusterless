@@ -23,15 +23,22 @@ import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.arc.ArcStack;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
 import clusterless.cls.substrate.aws.cdk.Provider;
+import clusterless.cls.substrate.aws.construct.ArcConstruct;
+import clusterless.cls.substrate.aws.construct.EgressBoundaryConstruct;
+import clusterless.cls.substrate.aws.construct.IngressBoundaryConstruct;
+import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedProject;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.DatasetURI;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import software.constructs.Construct;
 
 import java.io.File;
 import java.io.IOException;
@@ -205,6 +212,8 @@ public class Lifecycle {
     }
 
     private static void construct(ComponentContext context, Map<Extensible, ComponentService<ComponentContext, Model, Component>> containers) {
+        Multimap<Class<? extends Construct>, Construct> map = LinkedListMultimap.create();
+
         containers.entrySet().stream().filter(e -> e.getValue() != null).forEach(e -> {
             Extensible extensible = e.getKey();
 
@@ -215,8 +224,34 @@ public class Lifecycle {
 
             ComponentService<ComponentContext, Model, Component> modelComponentService = e.getValue();
             LOG.info("creating {} construct: {}", extensible.label(), extensible.type());
-            modelComponentService.create(context, extensible);
+
+            Component component = modelComponentService.create(context, extensible);
+
+            lookupModel(component)
+                    .ifPresent(type -> map.put(type, (Construct) component));
         });
+
+        for (Construct resource : map.get(ResourceConstruct.class)) {
+            map.get(ArcConstruct.class).forEach(c -> c.getNode().addDependency(resource));
+            map.get(EgressBoundaryConstruct.class).forEach(c -> c.getNode().addDependency(resource));
+            map.get(IngressBoundaryConstruct.class).forEach(c -> c.getNode().addDependency(resource));
+        }
+    }
+
+    private static Optional<Class<? extends Construct>> lookupModel(Component component) {
+        if (component instanceof ArcConstruct<?>) {
+            return Optional.of(ArcConstruct.class);
+        }
+        if (component instanceof ResourceConstruct<?>) {
+            return Optional.of(ResourceConstruct.class);
+        }
+        if (component instanceof EgressBoundaryConstruct<?>) {
+            return Optional.of(EgressBoundaryConstruct.class);
+        }
+        if (component instanceof IngressBoundaryConstruct<?>) {
+            return Optional.of(IngressBoundaryConstruct.class);
+        }
+        return Optional.empty();
     }
 
     private void verifyComponentsAreAvailable(Deployable deployableModel) {
