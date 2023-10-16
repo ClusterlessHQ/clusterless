@@ -12,6 +12,8 @@ import clusterless.cls.config.Configuration;
 import clusterless.cls.json.JSONUtil;
 import clusterless.cls.startup.Startup;
 import io.github.resilience4j.core.IntervalFunction;
+import io.github.resilience4j.core.StopWatch;
+import io.github.resilience4j.retry.MaxRetriesExceededException;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import org.apache.logging.log4j.LogManager;
@@ -56,6 +58,7 @@ public abstract class ProcessExec {
     }
 
     protected int executeProcess(Map<String, String> environment, List<String> args) {
+        StopWatch stopWatch = StopWatch.start();
         try {
             if (!retry()) {
                 // do not wrap the exec if retry is not enabled
@@ -77,6 +80,9 @@ public abstract class ProcessExec {
             Retry process = Retry.of("process", config);
 
             return process.executeCheckedSupplier(() -> process(environment, args));
+        } catch (MaxRetriesExceededException e) {
+            LOG.error("failed to execute command: {} after {} retries, duration: {}", args, retries, stopWatch.stop(), e);
+            return 1;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
