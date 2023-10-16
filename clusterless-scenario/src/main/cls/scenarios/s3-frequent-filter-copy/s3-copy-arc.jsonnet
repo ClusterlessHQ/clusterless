@@ -1,7 +1,7 @@
 local stage = std.extVar('scenario.stage');
 local account = std.extVar('scenario.aws.account');
 local region = std.extVar('scenario.aws.region');
-local bucketName = 'clusterless-frequent-filter-copy-test-' + account + '-' + region;
+local bucketName = 'clusterless-freq-filter-copy-test-' + account + '-' + region;
 local bucketPrefix = 's3://' + bucketName;
 local unit = 'Twelfths';
 
@@ -26,7 +26,7 @@ local unit = 'Twelfths';
   boundaries: [
     {
       type: 'aws:core:s3PutListenerBoundary',
-      name: 'FreqPutListener',
+      name: 'FreqPutLstnr',
       eventArrival: 'frequent',
       dataset: {
         name: 'ingress-frequent-copy',

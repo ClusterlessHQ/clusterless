@@ -28,5 +28,5 @@ $ ../gradlew clean installDist copyScenarios
 ```
 
 ```shell
-$ build/install/cls-scenario/bin/cls-scenario --dry-run -f build/scenarios
+$ build/install/cls-scenario/bin/cls-scenario --dry-run --verify-on-dry-run --stop-on-failure -f build/scenarios
 ```

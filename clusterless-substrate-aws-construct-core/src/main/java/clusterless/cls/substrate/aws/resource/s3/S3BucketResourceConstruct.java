@@ -11,6 +11,7 @@ package clusterless.cls.substrate.aws.resource.s3;
 import clusterless.cls.config.CommonConfig;
 import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
+import clusterless.cls.substrate.aws.resources.Buckets;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +46,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
                 .encryption(BucketEncryption.S3_MANAGED)
                 .enforceSsl(true) // adds a bucket policy on aws:SecureTransport
                 .versioned(model().versioned())
-                .bucketName(model().bucketName())
+                .bucketName(Buckets.verifyBucketName(model().bucketName()))
                 .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
                 .autoDeleteObjects(removeOnDestroy) // cdk adds a lambda if true
                 // as of 2.64.0 a lambda is installed -> https://github.com/aws/aws-cdk/issues/24086

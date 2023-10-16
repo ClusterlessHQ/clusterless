@@ -127,6 +127,7 @@ val run = tasks.named<JavaExec>("run") {
 //        "--server",
 //        "localhost:8080",
 //        "--disable-destroy",
+        "--stop-on-failure",
         "--cls-app",
         "${mainInstall.destinationDir.absolutePath}/bin/cls",
         "-f",

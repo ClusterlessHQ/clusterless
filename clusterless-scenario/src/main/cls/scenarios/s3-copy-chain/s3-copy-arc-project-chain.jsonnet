@@ -60,7 +60,6 @@ local unit = 'Twelfths';
         main: {
           name: 'copy-a-chain',
           version: '20230101',
-          pathURI: bucketPrefix + '/copy-a/',
         },
       },
       sinks: {
@@ -83,7 +82,6 @@ local unit = 'Twelfths';
         main: {
           name: 'copy-b-chain',
           version: '20230101',
-          pathURI: bucketPrefix + '/copy-b/',
         },
       },
       sinks: {
