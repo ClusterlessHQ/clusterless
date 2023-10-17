@@ -94,7 +94,7 @@ public final class Ref {
     }
 
     public Ref withScopeVersion(String scopeVersion) {
-        return withScopeVersion(Fixed.of(scopeVersion));
+        return withScopeVersion(Version.of(scopeVersion));
     }
 
     public Ref withScopeVersion(Fixed scopeVersion) {

@@ -8,8 +8,6 @@
 
 package clusterless.cls.substrate.aws.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import software.amazon.awscdk.TagProps;
 import software.amazon.awscdk.Tags;
 import software.constructs.IConstruct;
@@ -20,11 +18,9 @@ import java.util.Map;
  *
  */
 public class TagsUtil {
-    private static final Logger LOG = LogManager.getLogger(TagsUtil.class);
     private static boolean enabled = true;
 
     public static void disable() {
-        LOG.info("globally disabling tags");
         enabled = false;
     }
 

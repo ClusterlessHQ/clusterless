@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2023 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package clusterless.cls.substrate.aws.cdk.bootstrap;
+
+import clusterless.cls.naming.Label;
+import clusterless.cls.naming.Stage;
+import clusterless.cls.naming.Version;
+import clusterless.cls.substrate.aws.resources.ClsBootstrap;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.AppProps;
+
+public class BootstrapApp extends ScopedApp {
+    public BootstrapApp(@NotNull AppProps props, @NotNull Stage stage) {
+        super(props, stage, Label.of(ClsBootstrap.BOOTSTRAP), Version.of(ClsBootstrap.BOOTSTRAP_VERSION), new BootstrapMeta(ClsBootstrap.BOOTSTRAP_VERSION));
+    }
+}

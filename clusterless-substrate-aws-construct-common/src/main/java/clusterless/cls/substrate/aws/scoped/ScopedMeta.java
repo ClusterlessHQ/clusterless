@@ -6,16 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.substrate.aws.resources;
+package clusterless.cls.substrate.aws.scoped;
 
 import clusterless.cls.model.Struct;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class DeployMeta implements Struct {
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public class ScopedMeta {
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public static class Item implements Struct {
@@ -75,6 +77,9 @@ public class DeployMeta implements Struct {
 
     Map<String, Item> exports = new LinkedHashMap<>();
 
+    public ScopedMeta() {
+    }
+
     public Instant createDateTime() {
         return createDateTime;
     }
@@ -87,27 +92,27 @@ public class DeployMeta implements Struct {
         return exports.computeIfAbsent(name, n -> new Item());
     }
 
-    public DeployMeta setIdRef(String name, String value) {
+    public ScopedMeta setIdRef(String name, String value) {
         get(name).setIdRef(value);
         return this;
     }
 
-    public DeployMeta setNameRef(String name, String value) {
+    public ScopedMeta setNameRef(String name, String value) {
         get(name).setNameRef(value);
         return this;
     }
 
-    public DeployMeta setArnRef(String name, String value) {
+    public ScopedMeta setArnRef(String name, String value) {
         get(name).setArnRef(value);
         return this;
     }
 
-    public DeployMeta setId(String name, String value) {
+    public ScopedMeta setId(String name, String value) {
         get(name).setId(value);
         return this;
     }
 
-    public DeployMeta setName(String name, String value) {
+    public ScopedMeta setName(String name, String value) {
         get(name).setName(value);
         return this;
     }

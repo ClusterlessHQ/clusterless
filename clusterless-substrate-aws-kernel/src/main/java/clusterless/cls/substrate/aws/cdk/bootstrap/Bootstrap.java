@@ -13,7 +13,6 @@ import clusterless.cls.naming.Stage;
 import clusterless.cls.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
-import clusterless.cls.substrate.aws.managed.StagedApp;
 import clusterless.cls.substrate.aws.meta.Metadata;
 import clusterless.cls.substrate.aws.resources.Stacks;
 import clusterless.cls.util.ExitCodeException;
@@ -113,10 +112,7 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
         AppProps props = AppProps.builder()
                 .build();
 
-        StagedApp app = new StagedApp(props, stage);
-
-        BootstrapMeta deployMeta = new BootstrapMeta();
-        app.setDeployMeta(deployMeta);
+        BootstrapApp app = new BootstrapApp(props, stage);
 
         String stackName = Stacks.bootstrapStackName(stage);
 
@@ -133,7 +129,7 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
 
         app.synth();
 
-        Metadata.writeBootstrapMetaLocal(deployMeta);
+        Metadata.writeBootstrapMetaLocal((BootstrapMeta) app.stagedMeta());
 
         return 0;
     }

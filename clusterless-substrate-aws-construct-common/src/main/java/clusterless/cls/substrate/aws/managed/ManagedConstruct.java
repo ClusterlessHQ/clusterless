@@ -12,18 +12,16 @@ import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.model.deploy.Resource;
 import clusterless.cls.naming.Label;
 import clusterless.cls.naming.Ref;
-import clusterless.cls.substrate.aws.resources.Refs;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.cls.substrate.aws.scoped.ScopedConstruct;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 /**
  *
  */
-public class ManagedConstruct extends Construct implements Managed {
+public class ManagedConstruct extends ScopedConstruct implements Managed {
     private final ManagedComponentContext context;
 
     public ManagedConstruct(@NotNull ManagedComponentContext context, Label baseId) {
@@ -39,27 +37,13 @@ public class ManagedConstruct extends Construct implements Managed {
     protected Placement placement() {
         String account = Stack.of(this).getAccount();
         String region = Stack.of(this).getRegion();
-        Label stage = StagedApp.stagedOf(this).stage();
+        Label stage = ScopedApp.stagedOf(this).stage();
 
         return Placement.builder()
                 .withAccount(account)
                 .withRegion(region)
                 .withStage(stage.lowerHyphen())
                 .build();
-    }
-
-    protected void addArnRefFor(Resource resource, Construct construct, String value, String description) {
-        Ref ref = Ref.ref()
-                .withResourceNs(resource.resourceNs())
-                .withResourceType(resource.resourceType())
-                .withResourceName(resource.name());
-
-        addArnRefFor(ref, construct, value, description);
-    }
-
-    protected void addArnRefFor(Ref ref, Construct construct, String value, String description) {
-        StagedStack.stagedOf(this)
-                .addArnRef(ref, construct, value, description);
     }
 
     protected void addIdRefFor(Resource resource, Construct construct, String value, String description) {
@@ -71,8 +55,13 @@ public class ManagedConstruct extends Construct implements Managed {
         addIdRefFor(ref, construct, value, description);
     }
 
-    protected void addIdRefFor(Ref ref, Construct construct, String value, String description) {
-        StagedStack.stagedOf(this).addIdRefFor(ref, construct, value, description);
+    protected void addArnRefFor(Resource resource, Construct construct, String value, String description) {
+        Ref ref = Ref.ref()
+                .withResourceNs(resource.resourceNs())
+                .withResourceType(resource.resourceType())
+                .withResourceName(resource.name());
+
+        addArnRefFor(ref, construct, value, description);
     }
 
     protected void addNameRefFor(Resource resource, Construct construct, String value, String description) {
@@ -84,20 +73,5 @@ public class ManagedConstruct extends Construct implements Managed {
         addNameRefFor(ref, construct, value, description);
     }
 
-    protected void addNameRefFor(Ref ref, Construct construct, String value, String description) {
-        StagedStack.stagedOf(this)
-                .addNameRefFor(ref, construct, value, description);
-    }
 
-    protected <T> T resolveArnRef(String ref, Function<String, T> resolver) {
-        Construct construct = StagedApp.stagedOf(this).resolveRef(ref);
-
-        if (construct != null) {
-            return (T) construct;
-        }
-
-        Optional<String> arn = Refs.resolveArn(this, ref);
-
-        return resolver.apply(arn.orElseThrow(() -> new IllegalArgumentException("ref or arn are required" + ref)));
-    }
 }

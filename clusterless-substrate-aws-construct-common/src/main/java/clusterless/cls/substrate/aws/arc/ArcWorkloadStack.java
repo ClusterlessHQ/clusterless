@@ -10,16 +10,16 @@ package clusterless.cls.substrate.aws.arc;
 
 import clusterless.cls.managed.component.ArcComponent;
 import clusterless.cls.model.deploy.Arc;
+import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedNestedStack;
-import clusterless.cls.substrate.aws.managed.ManagedProject;
 import org.jetbrains.annotations.NotNull;
 
 /**
  *
  */
 public class ArcWorkloadStack extends ManagedNestedStack implements ArcComponent {
-    public ArcWorkloadStack(@NotNull ManagedProject managedProject, Arc arc) {
-        super(managedProject, arc.label().with(arc.name()));
+    public ArcWorkloadStack(@NotNull ManagedApp managedApp, Arc arc) {
+        super(managedApp, arc.label().with(arc.name()));
 
 
     }

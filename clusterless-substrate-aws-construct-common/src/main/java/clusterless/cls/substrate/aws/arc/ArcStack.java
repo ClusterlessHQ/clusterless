@@ -15,8 +15,8 @@ import clusterless.cls.model.deploy.Arc;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.model.deploy.Workload;
 import clusterless.cls.naming.Label;
+import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
-import clusterless.cls.substrate.aws.managed.ManagedProject;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
 import clusterless.cls.substrate.aws.resources.Stacks;
 
@@ -26,7 +26,7 @@ import clusterless.cls.substrate.aws.resources.Stacks;
 public class ArcStack extends ManagedStack {
     private final Configurations configurations;
     private final DatasetResolver resolver;
-    private final ManagedProject managedProject;
+    private final ManagedApp managedApp;
     private final Deployable deployable;
     private final Arc<? extends Workload<?>> arc;
 
@@ -37,17 +37,17 @@ public class ArcStack extends ManagedStack {
         return Label.of("Arc").with(arc.name());
     }
 
-    public ArcStack(Configurations configurations, DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, Arc<? extends Workload> arc) {
-        super(Stacks.stackName(deployable, arcBaseId(arc)), managedProject, deployable, arcBaseId(arc));
+    public ArcStack(Configurations configurations, DatasetResolver resolver, ManagedApp managedApp, Deployable deployable, Arc<? extends Workload> arc) {
+        super(Stacks.stackName(deployable, arcBaseId(arc)), managedApp, deployable, arcBaseId(arc));
         this.configurations = configurations;
         this.resolver = resolver;
-        this.managedProject = managedProject;
+        this.managedApp = managedApp;
         this.deployable = deployable;
         this.arc = arc;
     }
 
     public void applyArcWorkloadComponent(ArcComponent arcComponent) {
-        ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedProject, deployable, this);
+        ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable, this);
 
         orchestration = new ArcOrchestration(context, arc);
 

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.substrate.aws.managed;
+package clusterless.cls.substrate.aws.scoped;
 
 import clusterless.cls.naming.Ref;
 import clusterless.cls.naming.Stage;
@@ -21,28 +21,30 @@ import software.constructs.Construct;
 /**
  *
  */
-public class StagedStack extends Stack {
-    public static StagedStack stagedOf(Construct construct) {
-        return (StagedStack) Stack.of(construct);
+public class ScopedStack extends Stack {
+    public static ScopedStack scopedOf(Construct construct) {
+        Stack stack = Stack.of(construct);
+        if (stack instanceof ScopedStack) {
+            return (ScopedStack) stack;
+        }
+
+        throw new IllegalArgumentException("construct does not belong to a ScopedStack, found: " + stack.getClass().getName());
     }
 
     private final Stage stage;
 
-    public StagedStack(@NotNull StagedApp app, @Nullable String id, @Nullable StackProps props) {
+    public ScopedStack(@NotNull ScopedApp app, @Nullable String id, @Nullable StackProps props) {
         super(app, id, props);
-
         stage = app.stage();
     }
 
-    public StagedStack(@NotNull StagedApp app, @Nullable String id) {
+    public ScopedStack(@NotNull ScopedApp app, @Nullable String id) {
         super(app, id);
-
         stage = app.stage();
     }
 
-    public StagedStack(@NotNull StagedApp app) {
+    public ScopedStack(@NotNull ScopedApp app) {
         super(app);
-
         stage = app.stage();
     }
 
@@ -54,24 +56,24 @@ public class StagedStack extends Stack {
         addNameRefFor(ref, null, value, description);
     }
 
-    protected void addNameRefFor(Ref ref, Construct construct, String value, String description) {
+    public void addNameRefFor(Ref ref, Construct construct, String value, String description) {
         Ref.Qualifier qualifier = Ref.Qualifier.Name;
         Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
 
         OutputConstruct outputConstruct = new OutputConstruct(this, qualifiedRef, value, description);
 
         if (!Token.isUnresolved(value)) {
-            StagedApp.stagedOf(this)
-                    .deployMeta()
+            ScopedApp.stagedOf(this)
+                    .stagedMeta()
                     .setName(ref.resourceType().value(), value);
         }
 
-        StagedApp.stagedOf(this)
-                .deployMeta()
+        ScopedApp.stagedOf(this)
+                .stagedMeta()
                 .setNameRef(ref.resourceType().value(), outputConstruct.exportName());
 
         if (construct != null) {
-            StagedApp.stagedOf(this)
+            ScopedApp.stagedOf(this)
                     .addRef(qualifiedRef, construct);
         }
     }
@@ -80,24 +82,24 @@ public class StagedStack extends Stack {
         addIdRefFor(ref, null, value, description);
     }
 
-    protected void addIdRefFor(Ref ref, Construct construct, String value, String description) {
+    public void addIdRefFor(Ref ref, Construct construct, String value, String description) {
         Ref.Qualifier qualifier = Ref.Qualifier.Id;
         Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
 
         OutputConstruct outputConstruct = new OutputConstruct(this, qualifiedRef, value, description);
 
         if (!Token.isUnresolved(value)) {
-            StagedApp.stagedOf(this)
-                    .deployMeta()
+            ScopedApp.stagedOf(this)
+                    .stagedMeta()
                     .setId(ref.resourceType().value(), value);
         }
 
-        StagedApp.stagedOf(this)
-                .deployMeta()
+        ScopedApp.stagedOf(this)
+                .stagedMeta()
                 .setIdRef(ref.resourceType().value(), outputConstruct.exportName());
 
         if (construct != null) {
-            StagedApp.stagedOf(this)
+            ScopedApp.stagedOf(this)
                     .addRef(qualifiedRef, construct);
         }
     }
@@ -106,18 +108,18 @@ public class StagedStack extends Stack {
         addArnRef(ref, null, value, description);
     }
 
-    protected void addArnRef(Ref ref, Construct construct, String value, String description) {
+    public void addArnRef(Ref ref, Construct construct, String value, String description) {
         Ref.Qualifier qualifier = Ref.Qualifier.Arn;
         Ref qualifiedRef = withContext(ref).withQualifier(qualifier);
 
         OutputConstruct outputConstruct = new OutputConstruct(this, qualifiedRef, value, description);
 
-        StagedApp.stagedOf(this)
-                .deployMeta()
+        ScopedApp.stagedOf(this)
+                .stagedMeta()
                 .setArnRef(ref.resourceType().value(), outputConstruct.exportName());
 
         if (construct != null) {
-            StagedApp.stagedOf(this)
+            ScopedApp.stagedOf(this)
                     .addRef(qualifiedRef, construct);
         }
     }

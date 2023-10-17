@@ -11,6 +11,8 @@ package clusterless.cls.substrate.aws.managed;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.naming.Label;
 import clusterless.cls.naming.Stage;
+import clusterless.cls.naming.Version;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import clusterless.cls.util.OrderedMaps;
 import software.amazon.awscdk.AppProps;
@@ -23,17 +25,15 @@ import java.util.List;
 /**
  *
  */
-public class ManagedProject extends StagedApp implements Managed {
-    private final Label name;
-    private final String version;
+public class ManagedApp extends ScopedApp implements Managed {
     private final List<Deployable> deployableModel;
     private final List<ManagedStack> stacks = new LinkedList<>();
 
-    public static ManagedProject projectOf(Construct scope) {
-        return (ManagedProject) scope.getNode().getRoot();
+    public static ManagedApp appOf(Construct scope) {
+        return (ManagedApp) scope.getNode().getRoot();
     }
 
-    public ManagedProject(String name, String version, String stage, List<Deployable> deployableModels) {
+    public ManagedApp(String name, String version, String stage, List<Deployable> deployableModels) {
         super(AppProps.builder()
                         .context(OrderedMaps.of(
                                 "project", Label.of(name).lowerHyphen(),
@@ -41,11 +41,11 @@ public class ManagedProject extends StagedApp implements Managed {
                                 "stage", Label.of(stage).upperOnly()
                         ))
                         .build(),
-                Stage.of(stage)
+                Stage.of(stage),
+                Label.of(name),
+                Version.of(version)
         );
 
-        this.name = Label.of(name);
-        this.version = version;
         this.deployableModel = deployableModels;
 
         applyTags();
@@ -55,19 +55,12 @@ public class ManagedProject extends StagedApp implements Managed {
         return deployableModel;
     }
 
-    public Label name() {
-        return name;
-    }
-
-    public String version() {
-        return version;
-    }
 
     public List<ManagedStack> stacks() {
         return stacks;
     }
 
-    public ManagedProject addStack(ManagedStack managedStack) {
+    public ManagedApp addStack(ManagedStack managedStack) {
         stacks.add(managedStack);
         return this;
     }
@@ -76,7 +69,7 @@ public class ManagedProject extends StagedApp implements Managed {
         // apply tags to all constructs
         TagsUtil.applyTags(this, OrderedMaps.of(
                 "cls:project:name", name().lowerHyphen(),
-                "cls:project:version", version(),
+                "cls:project:version", version().value(),
                 "cls:project:stage", stage().camelCase()
         ), TagProps.builder()
                 .applyToLaunchedInstances(true)

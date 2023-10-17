@@ -66,6 +66,7 @@ public class Synth extends BaseCDKCommand implements Callable<Integer> {
         }
 
         if (commandOptions.excludeAllTags().orElse(false)) {
+            LOG.info("globally disabling tags");
             TagsUtil.disable();
         }
 

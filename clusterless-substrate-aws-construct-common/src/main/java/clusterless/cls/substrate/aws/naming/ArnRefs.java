@@ -6,19 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.substrate.aws.resources;
+package clusterless.cls.substrate.aws.naming;
 
 import clusterless.cls.naming.Ref;
 import clusterless.cls.naming.Stage;
-import clusterless.cls.substrate.aws.managed.ManagedProject;
-import clusterless.cls.substrate.aws.managed.StagedApp;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
 import software.amazon.awscdk.Fn;
 import software.constructs.Construct;
 
 import java.util.Objects;
 import java.util.Optional;
 
-public class Refs {
+public class ArnRefs {
 
     public static Optional<String> resolveArn(Construct scope, String refValue) {
         Objects.requireNonNull(refValue, "value must not be null");
@@ -29,8 +28,8 @@ public class Refs {
             return arn;
         }
 
-        Stage stage = StagedApp.stagedOf(scope).stage();
-        ManagedProject managedProject = ManagedProject.projectOf(scope);
+        ScopedApp scopedApp = ScopedApp.stagedOf(scope);
+        Stage stage = scopedApp.stage();
 
         String[] split = refValue.split(":");
 
@@ -45,8 +44,8 @@ public class Refs {
         String ref = Ref.arnRef()
                 .withProvider("aws")
                 .withStage(stage)
-                .withScope(managedProject.name())
-                .withScopeVersion(managedProject.version())
+                .withScope(scopedApp.name())
+                .withScopeVersion(scopedApp.version())
                 .withResourceNs(resourceNs)
                 .withResourceType(resourceType)
                 .withResourceName(resourceName)

@@ -12,6 +12,7 @@ import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.naming.Label;
 import clusterless.cls.naming.Ref;
 import clusterless.cls.substrate.aws.resources.Stacks;
+import clusterless.cls.substrate.aws.scoped.ScopedStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Stack;
@@ -21,28 +22,28 @@ import software.amazon.awscdk.StackProps;
 /**
  *
  */
-public class ManagedStack extends StagedStack implements Managed {
-    private final ManagedProject managedProject;
+public class ManagedStack extends ScopedStack implements Managed {
+    private final ManagedApp managedApp;
     private final Deployable deployable;
 
-    public ManagedStack(@NotNull ManagedProject managedProject, @NotNull Deployable deployable, @NotNull Label baseId) {
-        this(Stacks.stackName(deployable, baseId), managedProject, deployable, baseId);
+    public ManagedStack(@NotNull ManagedApp managedApp, @NotNull Deployable deployable, @NotNull Label baseId) {
+        this(Stacks.stackName(deployable, baseId), managedApp, deployable, baseId);
     }
 
-    public ManagedStack(@NotNull Label stackName, @NotNull ManagedProject managedProject, @NotNull Deployable deployable, @NotNull Label baseId) {
-        super(managedProject, baseId.camelCase(),
+    public ManagedStack(@NotNull Label stackName, @NotNull ManagedApp managedApp, @NotNull Deployable deployable, @NotNull Label baseId) {
+        super(managedApp, baseId.camelCase(),
                 StackProps.builder()
                         .env(Stacks.environmentFor(deployable))
                         .stackName(stackName.lowerHyphen())
                         .build()
         );
 
-        this.managedProject = managedProject.addStack(this);
+        this.managedApp = managedApp.addStack(this);
         this.deployable = deployable;
     }
 
-    public ManagedProject managedProject() {
-        return managedProject;
+    public ManagedApp managedProject() {
+        return managedApp;
     }
 
     public Deployable deployable() {

@@ -11,11 +11,11 @@ package clusterless.cls.substrate.aws.cdk.bootstrap;
 import clusterless.cls.naming.Label;
 import clusterless.cls.naming.Ref;
 import clusterless.cls.substrate.aws.cdk.bootstrap.vpc.VPCConstruct;
-import clusterless.cls.substrate.aws.managed.StagedApp;
-import clusterless.cls.substrate.aws.managed.StagedStack;
 import clusterless.cls.substrate.aws.resources.BootstrapStores;
 import clusterless.cls.substrate.aws.resources.ClsBootstrap;
 import clusterless.cls.substrate.aws.resources.Events;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.cls.substrate.aws.scoped.ScopedStack;
 import clusterless.cls.substrate.aws.util.ErrorsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,16 +43,16 @@ import static clusterless.cls.substrate.store.StateStore.*;
  * - BucketName
  * - ImageRepositoryName
  */
-public class BootstrapStack extends StagedStack {
+public class BootstrapStack extends ScopedStack {
     private static final Logger LOG = LogManager.getLogger(BootstrapStack.class);
 
-    public BootstrapStack(@NotNull StagedApp app, @NotNull StackProps props) {
+    public BootstrapStack(@NotNull ScopedApp app, @NotNull StackProps props) {
         super(app, "ClusterlessBootstrapStack", props);
 
         constructStack(app, props);
     }
 
-    protected void constructStack(@NotNull StagedApp app, @NotNull StackProps props) {
+    protected void constructStack(@NotNull ScopedApp app, @NotNull StackProps props) {
         Environment env = props.getEnv();
 
         Objects.requireNonNull(env);
@@ -73,7 +73,7 @@ public class BootstrapStack extends StagedStack {
         Bucket arcState = constructSharedBucket(arcStateBucketName, stage().with("ArcState"));
         Bucket manifest = constructSharedBucket(manifestBucketName, stage().with("Manifest"));
 
-        BootstrapMeta bootstrapMeta = (BootstrapMeta) app.deployMeta();
+        BootstrapMeta bootstrapMeta = (BootstrapMeta) app.stagedMeta();
 
         bootstrapMeta.setVersion(ClsBootstrap.BOOTSTRAP_VERSION);
 

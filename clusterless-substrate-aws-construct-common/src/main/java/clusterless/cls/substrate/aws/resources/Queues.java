@@ -9,9 +9,7 @@
 package clusterless.cls.substrate.aws.resources;
 
 import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Version;
-import clusterless.cls.substrate.aws.managed.ManagedProject;
-import clusterless.cls.substrate.aws.managed.StagedApp;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
 import software.constructs.Construct;
 
 import java.util.Objects;
@@ -23,9 +21,9 @@ public class Queues {
     public static Label queueName(Construct scope, String name) {
         Objects.requireNonNull(name, "name may not be null");
 
-        Label stage = StagedApp.stagedOf(scope).stage();
-        Label project = ManagedProject.projectOf(scope).name();
-        Label version = Version.of(ManagedProject.projectOf(scope).version());
+        Label stage = ScopedApp.stagedOf(scope).stage();
+        Label project = ScopedApp.stagedOf(scope).name();
+        Label version = ScopedApp.stagedOf(scope).version();
 
         return stage.upperOnly()
                 .with(project)

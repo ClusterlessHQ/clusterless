@@ -29,7 +29,7 @@ public abstract class ProcessExec {
     protected Supplier<Boolean> dryRun = () -> false;
     protected Supplier<Boolean> retry = () -> false;
     protected Supplier<Integer> verbosity = () -> 0;
-    private int retries = 7;
+    private int retries = 3;
 
     public ProcessExec() {
     }

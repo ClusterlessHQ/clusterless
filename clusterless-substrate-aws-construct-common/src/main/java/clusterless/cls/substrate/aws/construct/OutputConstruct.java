@@ -10,15 +10,13 @@ package clusterless.cls.substrate.aws.construct;
 
 import clusterless.cls.naming.Label;
 import clusterless.cls.naming.Ref;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import clusterless.cls.substrate.aws.scoped.ScopedConstruct;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.CfnOutputProps;
 import software.constructs.Construct;
 
-public class OutputConstruct extends Construct {
-    private static final Logger LOG = LogManager.getLogger(OutputConstruct.class);
+public class OutputConstruct extends ScopedConstruct {
     private final String exportName;
 
     public OutputConstruct(@NotNull Construct construct, Ref ref, String value, String description) {
@@ -33,8 +31,6 @@ public class OutputConstruct extends Construct {
 
     protected String createOutputFor(Ref ref, String value, String description) {
         String exportName = ref.exportName();
-
-        LOG.info("creating output for: {}", exportName);
 
         new CfnOutput(this, ref.resourceLabel().camelCase(), new CfnOutputProps.Builder()
                 .exportName(exportName)

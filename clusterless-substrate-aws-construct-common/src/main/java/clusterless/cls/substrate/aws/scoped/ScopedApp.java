@@ -6,13 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.substrate.aws.managed;
+package clusterless.cls.substrate.aws.scoped;
 
 import clusterless.cls.naming.Label;
 import clusterless.cls.naming.Ref;
 import clusterless.cls.naming.Stage;
-import clusterless.cls.substrate.aws.resources.DeployMeta;
+import clusterless.cls.naming.Version;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.AppProps;
 import software.constructs.Construct;
@@ -26,33 +27,45 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class StagedApp extends App {
-    public static StagedApp stagedOf(Construct scope) {
-        return (StagedApp) scope.getNode().getRoot();
+public class ScopedApp extends App {
+    public static ScopedApp stagedOf(Construct scope) {
+        return (ScopedApp) scope.getNode().getRoot();
     }
 
-    Stage stage;
+    private final Stage stage;
+    private final Label name;
+    private final Version version;
 
-    DeployMeta deployMeta = new DeployMeta();
+    private final ScopedMeta scopedMeta;
 
-    Map<Ref, Construct> refConstructs = new HashMap<>();
+    private final Map<Ref, Construct> refConstructs = new HashMap<>();
 
-    public StagedApp(@NotNull AppProps props, @NotNull Stage stage) {
+    public ScopedApp(@NotNull AppProps props, @NotNull Stage stage, @NotNull Label name, @NotNull Version version) {
+        this(props, stage, name, version, new ScopedMeta());
+    }
+
+    protected ScopedApp(@Nullable AppProps props, Stage stage, @NotNull Label name, @NotNull Version version, @NotNull ScopedMeta scopedMeta) {
         super(props);
         this.stage = stage;
+        this.name = name;
+        this.version = version;
+        this.scopedMeta = scopedMeta;
     }
 
     public Stage stage() {
         return stage;
     }
 
-    public StagedApp setDeployMeta(DeployMeta deployMeta) {
-        this.deployMeta = deployMeta;
-        return this;
+    public Label name() {
+        return name;
     }
 
-    public DeployMeta deployMeta() {
-        return deployMeta;
+    public Version version() {
+        return version;
+    }
+
+    public ScopedMeta stagedMeta() {
+        return scopedMeta;
     }
 
     public void addRef(Ref ref, Construct construct) {

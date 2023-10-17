@@ -8,10 +8,17 @@
 
 package clusterless.cls.substrate.aws.cdk.bootstrap;
 
-import clusterless.cls.substrate.aws.resources.DeployMeta;
+import clusterless.cls.substrate.aws.scoped.ScopedMeta;
 
-public class BootstrapMeta extends DeployMeta {
+public class BootstrapMeta extends ScopedMeta {
     String version;
+
+    public BootstrapMeta() {
+    }
+
+    public BootstrapMeta(String version) {
+        this.version = version;
+    }
 
     public String version() {
         return version;

@@ -19,8 +19,8 @@ import software.amazon.awscdk.RemovalPolicy;
  */
 public class ManagedNestedStack extends NestedStack implements Managed {
 
-    public ManagedNestedStack(@NotNull ManagedProject managedProject, @NotNull Label baseId) {
-        super(managedProject, baseId.camelCase(),
+    public ManagedNestedStack(@NotNull ManagedApp managedApp, @NotNull Label baseId) {
+        super(managedApp, baseId.camelCase(),
                 NestedStackProps.builder()
                         .description("nested arc process stack")
                         .removalPolicy(RemovalPolicy.DESTROY)

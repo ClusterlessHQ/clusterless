@@ -21,18 +21,18 @@ public class ManagedComponentContext implements ComponentContext {
 
     final Configurations configurations;
     final DatasetResolver resolver;
-    final ManagedProject managedProject;
+    final ManagedApp managedApp;
     final Deployable deployable;
     final Managed parent;
 
-    public ManagedComponentContext(Configurations configurations, DatasetResolver resolver, ManagedProject managedProject, Deployable deployable) {
-        this(configurations, resolver, managedProject, deployable, managedProject);
+    public ManagedComponentContext(Configurations configurations, DatasetResolver resolver, ManagedApp managedApp, Deployable deployable) {
+        this(configurations, resolver, managedApp, deployable, managedApp);
     }
 
-    public ManagedComponentContext(Configurations configurations, DatasetResolver resolver, ManagedProject managedProject, Deployable deployable, Managed parent) {
+    public ManagedComponentContext(Configurations configurations, DatasetResolver resolver, ManagedApp managedApp, Deployable deployable, Managed parent) {
         this.configurations = configurations;
         this.resolver = resolver;
-        this.managedProject = managedProject;
+        this.managedApp = managedApp;
         this.deployable = deployable;
         this.parent = parent;
     }
@@ -45,8 +45,8 @@ public class ManagedComponentContext implements ComponentContext {
         return resolver;
     }
 
-    public ManagedProject managedProject() {
-        return managedProject;
+    public ManagedApp managedProject() {
+        return managedApp;
     }
 
     public Deployable deployable() {

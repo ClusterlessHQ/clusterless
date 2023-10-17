@@ -14,8 +14,7 @@ import clusterless.cls.model.deploy.Project;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.managed.ManagedConstruct;
-import clusterless.cls.substrate.aws.managed.ManagedProject;
-import clusterless.cls.substrate.aws.managed.StagedApp;
+import clusterless.cls.substrate.aws.scoped.ScopedApp;
 import clusterless.cls.substrate.uri.ManifestURI;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
@@ -50,11 +49,11 @@ public class StateURIs {
 
     @NotNull
     public static Project projectFor(@NotNull ManagedConstruct managedConstruct) {
-        ManagedProject managedProject = ManagedProject.projectOf(managedConstruct);
+        ScopedApp managedApp = ScopedApp.stagedOf(managedConstruct);
 
         return Project.Builder.builder()
-                .withName(managedProject.name().lowerHyphen())
-                .withVersion(managedProject.version())
+                .withName(managedApp.name().lowerHyphen())
+                .withVersion(managedApp.version().value())
                 .build();
     }
 
@@ -62,7 +61,7 @@ public class StateURIs {
     public static Placement placementFor(@NotNull Construct scope) {
         String account = Stack.of(scope).getAccount();
         String region = Stack.of(scope).getRegion();
-        Label stage = StagedApp.stagedOf(scope).stage();
+        Label stage = ScopedApp.stagedOf(scope).stage();
 
         return Placement.builder()
                 .withAccount(account)
