@@ -71,12 +71,21 @@ public class BootstrapRunner {
                         .withName(name)
                         .withWorkflowDef(workflowDefinition);
 
+        if (tasks.isEmpty()) {
+            return null;
+        }
+
         workflowId = workflowManager.workflowClient().startWorkflow(workflowRequest);
 
         return workflowId;
     }
 
     private void applyBootstrapDeploy(List<WorkflowTask> tasks, String name) {
+        if (options.verifyOnly()) {
+            LOG.info("bootstrap deploy: {}, skipping deployer by request", name);
+            return;
+        }
+
         LOG.info("boostrap deployer: {}", name);
         tasks.addAll(new DeployerBootstrap("clsBootstrapDeployer", workingDirectory(), placement).getWorkflowDefTasks());
     }
@@ -84,6 +93,11 @@ public class BootstrapRunner {
     private void applyBootstrapDestroy(List<WorkflowTask> tasks, String name) {
         if (options.disableDestroy()) {
             LOG.info("bootstrap destroy: {}, skipping destroyer by request", name);
+            return;
+        }
+
+        if (options.verifyOnly()) {
+            LOG.info("bootstrap deploy: {}, skipping destroyer by request", name);
             return;
         }
 

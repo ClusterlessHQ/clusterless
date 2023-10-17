@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -166,6 +167,7 @@ public class Main implements Callable<Integer> {
 
         return runners.stream()
                 .map(BootstrapRunner::exec)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
@@ -178,6 +180,7 @@ public class Main implements Callable<Integer> {
 
         return runners.stream()
                 .map(ScenarioRunner::exec)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 

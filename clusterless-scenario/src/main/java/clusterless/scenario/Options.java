@@ -26,6 +26,12 @@ public class Options {
     @CommandLine.Option(names = "--disable-destroy", description = "do not invoke the destroy command, speeds up repeated testing")
     boolean disableDestroy = false;
 
+    @CommandLine.Option(names = "--verify-only", description = "execute verify")
+    private boolean verifyOnly = false;
+
+    @CommandLine.Option(names = "--deploy-destroy-only", description = "execute verify")
+    private boolean deployDestroyOnly = false;
+
     public String clsApp() {
         return clsApp;
     }
@@ -40,5 +46,13 @@ public class Options {
 
     public boolean disableDestroy() {
         return disableDestroy;
+    }
+
+    public boolean verifyOnly() {
+        return verifyOnly;
+    }
+
+    public boolean deployDestroyOnly() {
+        return deployDestroyOnly;
     }
 }

@@ -70,6 +70,10 @@ public class ScenarioRunner {
                         .withName(scenario.name())
                         .withWorkflowDef(workflowDefinition);
 
+        if (tasks.isEmpty()) {
+            return null;
+        }
+
         workflowId = workflowManager.workflowClient().startWorkflow(workflowRequest);
 
         return workflowId;
@@ -86,6 +90,11 @@ public class ScenarioRunner {
     }
 
     private void applyDeployer(List<WorkflowTask> tasks) {
+        if (options.verifyOnly()) {
+            LOG.info("scenario: {}, verify only, skipping deployer", scenario.name());
+            return;
+        }
+
         if (scenario.projectFiles().isEmpty()) {
             LOG.info("scenario: {}, no project files, skipping deployer", scenario.name());
             return;
@@ -96,6 +105,16 @@ public class ScenarioRunner {
     }
 
     private void applyIngress(List<WorkflowTask> tasks) {
+        if (options.verifyOnly()) {
+            LOG.info("scenario: {}, verify only, skipping ingress", scenario.name());
+            return;
+        }
+
+        if (options.deployDestroyOnly()) {
+            LOG.info("scenario: {}, deploy destroy only, skipping ingress", scenario.name());
+            return;
+        }
+
         if (scenario.ingressStores().isEmpty()) {
             return;
         }
@@ -201,6 +220,16 @@ public class ScenarioRunner {
     }
 
     private void applyWatchedSequential(List<WorkflowTask> tasks) {
+        if (options.verifyOnly()) {
+            LOG.info("scenario: {}, verify only, skipping watcher", scenario.name());
+            return;
+        }
+
+        if (options.deployDestroyOnly()) {
+            LOG.info("scenario: {}, deploy destroy only, skipping watcher", scenario.name());
+            return;
+        }
+
         if (scenario.watchedStores().isEmpty()) {
             return;
         }
@@ -230,6 +259,11 @@ public class ScenarioRunner {
     private void applyDestroyer(List<WorkflowTask> tasks) {
         if (options.disableDestroy()) {
             LOG.info("scenario: {}, skipping destroyer by request", scenario.name());
+            return;
+        }
+
+        if (options.verifyOnly()) {
+            LOG.info("scenario: {}, verify only, skipping destroyer", scenario.name());
             return;
         }
 

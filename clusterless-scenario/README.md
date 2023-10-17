@@ -30,3 +30,7 @@ $ ../gradlew clean installDist copyScenarios
 ```shell
 $ build/install/cls-scenario/bin/cls-scenario --dry-run --verify-on-dry-run --stop-on-failure -f build/scenarios
 ```
+
+```shell
+$ build/install/cls-scenario/bin/cls-scenario --stop-on-failure -f build/scenarios/s3-frequent-filter-boundary
+```
