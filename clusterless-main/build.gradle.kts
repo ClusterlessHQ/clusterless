@@ -351,7 +351,7 @@ tasks.register<JavaExec>("generateCLIDocs") {
     args = listOf(
         "--outdir",
         "build/generated-docs/modules/commands/pages",
-        "clusterless.Main"
+        "clusterless.cls.Main"
     )
 }
 

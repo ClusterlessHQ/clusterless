@@ -75,7 +75,7 @@ public abstract class BaseShowElements extends ShowCommand.BaseShow {
             return JSONUtil.writeAsPrettyStringSafe(modelClass.getConstructor().newInstance());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("unable to instantiate model: " + modelClass.getCanonicalName(), e);
         }
     }
 
