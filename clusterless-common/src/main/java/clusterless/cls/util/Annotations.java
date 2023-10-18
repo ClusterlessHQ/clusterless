@@ -15,6 +15,16 @@ import java.util.Optional;
  *
  */
 public class Annotations {
+    /**
+     * Finds the first occurrence of the given annotation class on the given type.
+     * <p>
+     * Current class is searched, then interfaces, then super classes, recursively.
+     *
+     * @param type
+     * @param annotationClass
+     * @param <A>
+     * @return an Optional of the annotation
+     */
     public static <A extends Annotation> Optional<A> find(Class<?> type, Class<A> annotationClass) {
         A annotation = type.getAnnotation(annotationClass);
 
