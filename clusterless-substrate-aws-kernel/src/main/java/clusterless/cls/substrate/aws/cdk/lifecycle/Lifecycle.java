@@ -172,7 +172,7 @@ public class Lifecycle {
 
             // todo: lookup all referenced datasets and retrieve their bucket names
             ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable, stack);
-            LOG.info(String.format("creating %s embedded construct: %s", arc.label(), arc.type()));
+            LOG.info(String.format("creating %s embedded construct: %s", arc.label().camelCase(), arc.type()));
             ArcComponent construct = (ArcComponent) modelComponentService.create(context, arc);
 
             stack.applyArcWorkloadComponent(construct);
@@ -218,12 +218,12 @@ public class Lifecycle {
             Extensible extensible = e.getKey();
 
             if (extensible.exclude()) {
-                LOG.info("excluding {} type: {}", extensible.label(), extensible.type());
+                LOG.info("excluding {} type: {}", extensible.label().camelCase(), extensible.type());
                 return;
             }
 
             ComponentService<ComponentContext, Model, Component> modelComponentService = e.getValue();
-            LOG.info("creating {} construct: {}", extensible.label(), extensible.type());
+            LOG.info("creating {} construct: {}", extensible.label().camelCase(), extensible.type());
 
             Component component = modelComponentService.create(context, extensible);
 
