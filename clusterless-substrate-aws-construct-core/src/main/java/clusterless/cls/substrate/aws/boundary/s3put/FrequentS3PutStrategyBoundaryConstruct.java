@@ -16,7 +16,9 @@ import clusterless.cls.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.cls.substrate.aws.construct.ModelConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.Lookup;
+import clusterless.cls.substrate.aws.resource.s3.S3BucketResourceConstruct;
 import clusterless.cls.substrate.aws.resources.*;
+import clusterless.cls.substrate.aws.scoped.ScopedStack;
 import clusterless.cls.substrate.uri.ManifestURI;
 import clusterless.cls.temporal.IntervalUnits;
 import clusterless.cls.util.Env;
@@ -79,6 +81,16 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
                 .queueName(queueName)
                 .build();
 
+        // attempts to prevent PutBucketNotificationConfiguration errors if the bucket is yet available
+        // if the bucket doesn't exist in this stack, it should already be created in another stack
+        ScopedStack.scopedOf(this)
+                .findHaving(S3BucketResourceConstruct.class)
+                .filter(b -> b.model().bucketName().equals(listenBucketName))
+                .forEach(b -> {
+                    LOG.info("adding dependency on bucket: {} for queue: {}", listenBucketName, queueName);
+                    s3EventQueue.getNode().addDependency(b);
+                });
+
         // declare lambda to convert put event into arc event
         ManifestURI manifestComplete = StateURIs.manifestPath(this, ManifestState.complete, model().dataset());
         ManifestURI manifestPartial = StateURIs.manifestPath(this, ManifestState.partial, model().dataset());
@@ -125,6 +137,8 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3Put
         manifestBucket.grantReadWrite(transformEventFunction);
         listenBucket.grantRead(transformEventFunction);
 
+        // performs a PutBucketNotificationConfiguration operation to the S3 API
+        // this may fail if the bucket creation is not yet completed
         listenBucket.addObjectCreatedNotification(
                 new SqsDestination(s3EventQueue),
                 NotificationKeyFilter.builder()

@@ -18,6 +18,8 @@ import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.Token;
 import software.constructs.Construct;
 
+import java.util.stream.Stream;
+
 /**
  *
  */
@@ -128,5 +130,11 @@ public class ScopedStack extends Stack {
         return ref
                 .withProvider("aws")
                 .withStage(stage());
+    }
+
+    public <T extends Construct> Stream<T> findHaving(Class<T> type) {
+        return getNode().findAll().stream()
+                .filter(node -> type.isAssignableFrom(node.getClass()))
+                .map(type::cast);
     }
 }

@@ -16,7 +16,9 @@ import clusterless.cls.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.cls.substrate.aws.construct.ModelConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.Lookup;
+import clusterless.cls.substrate.aws.resource.s3.S3BucketResourceConstruct;
 import clusterless.cls.substrate.aws.resources.*;
+import clusterless.cls.substrate.aws.scoped.ScopedStack;
 import clusterless.cls.substrate.uri.ManifestURI;
 import clusterless.cls.temporal.IntervalUnits;
 import clusterless.cls.util.Env;
@@ -121,9 +123,22 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
             // todo: inject warning about
             //  Custom::S3BucketNotifications
             //  Received response status [FAILED] from custom resource. Message returned: Error: An error occurred (OperationAborted) when calling the PutBucketNotificationConfiguration operation: A conflicting conditional operation is currently in progress against this resource. Please try again.. See the details in CloudWatch Log
-            // todo: make explicit dependency on bucket
-            //  for now Lifecycle makes all components dependent on any declared resources so the resources are removed first
-            listenBucket.enableEventBridgeNotification(); // places put events into default event bus
+            //  attempts to prevent PutBucketNotificationConfiguration errors if the bucket is yet available
+            //  if the bucket doesn't exist in this stack, it should already be created in another stack
+            List<S3BucketResourceConstruct> list = ScopedStack.scopedOf(this)
+                    .findHaving(S3BucketResourceConstruct.class)
+                    .filter(b -> b.model().bucketName().equals(listenBucketName))
+                    .toList();
+
+            if (list.isEmpty()) {
+                LOG.info("enabling event bridge notification on external bucket: {}", listenBucketName);
+                listenBucket.enableEventBridgeNotification(); // places put events into default event bus
+            } else {
+                list.forEach(b -> {
+                    LOG.info("enabling event bridge notification on local bucket: {}", listenBucketName);
+                    b.bucket().enableEventBridgeNotification(); // places put events into default event bus
+                });
+            }
         }
 
         EventPattern pattern = EventPattern.builder()
