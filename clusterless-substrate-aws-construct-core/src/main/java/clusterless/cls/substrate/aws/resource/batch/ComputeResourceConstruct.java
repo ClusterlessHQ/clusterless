@@ -10,9 +10,9 @@ package clusterless.cls.substrate.aws.resource.batch;
 
 import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
-import clusterless.cls.substrate.aws.resources.Resources;
 import clusterless.cls.substrate.aws.resources.Vpcs;
 import clusterless.cls.substrate.aws.util.TagsUtil;
+import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.batch.FargateComputeEnvironment;
 import software.amazon.awscdk.services.batch.IManagedComputeEnvironment;
@@ -27,7 +27,7 @@ public class ComputeResourceConstruct extends ResourceConstruct<ComputeResource>
     public ComputeResourceConstruct(@NotNull ManagedComponentContext context, @NotNull ComputeResource model) {
         super(context, model, model.computeEnvironmentName());
 
-        String name = Resources.regionallyUniqueProjectName(this, model().computeEnvironmentName());
+        String name = ResourceNames.regionUniqueScopedName(this, model().computeEnvironmentName());
 
         computeEnvironment = constructWithinHandler(() ->
                 {

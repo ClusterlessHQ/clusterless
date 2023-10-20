@@ -9,7 +9,7 @@
 package clusterless.cls.substrate.aws.local;
 
 import clusterless.cls.managed.component.ArcLocalExecutor;
-import clusterless.cls.util.Runtimes;
+import clusterless.commons.util.Runtimes;
 
 import java.util.List;
 import java.util.Map;

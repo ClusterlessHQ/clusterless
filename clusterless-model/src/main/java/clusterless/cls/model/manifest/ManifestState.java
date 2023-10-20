@@ -9,8 +9,8 @@
 package clusterless.cls.model.manifest;
 
 import clusterless.cls.model.State;
-import clusterless.cls.naming.Partition;
-import clusterless.cls.util.Strings;
+import clusterless.commons.naming.Partition;
+import clusterless.commons.util.Strings;
 
 import java.util.Locale;
 

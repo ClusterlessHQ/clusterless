@@ -16,7 +16,7 @@ import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.store.StateStore;
 import clusterless.cls.substrate.store.Stores;
-import clusterless.cls.util.Strings;
+import clusterless.commons.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

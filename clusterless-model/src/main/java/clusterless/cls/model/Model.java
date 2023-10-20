@@ -9,7 +9,7 @@
 package clusterless.cls.model;
 
 import clusterless.cls.json.JSONUtil;
-import clusterless.cls.naming.Label;
+import clusterless.commons.naming.Label;
 
 public abstract class Model implements Struct {
     public final Label label() {

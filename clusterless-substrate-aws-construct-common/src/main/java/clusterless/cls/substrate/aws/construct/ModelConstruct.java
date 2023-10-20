@@ -10,10 +10,10 @@ package clusterless.cls.substrate.aws.construct;
 
 import clusterless.cls.model.Model;
 import clusterless.cls.model.deploy.Extensible;
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedConstruct;
 import clusterless.cls.substrate.aws.util.ErrorsUtil;
+import clusterless.commons.naming.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

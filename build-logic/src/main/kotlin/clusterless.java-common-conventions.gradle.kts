@@ -44,6 +44,7 @@ else
 
 repositories {
     mavenCentral()
+//    mavenLocal() // for local io.clusterless libs
 }
 
 java {
@@ -88,6 +89,10 @@ dependencies {
 
     constraints {
         // manage dependency versions here
+
+        val commons = "0.4"
+        implementationAndTestFixture("io.clusterless:clusterless-commons-core:$commons")
+        implementationAndTestFixture("io.clusterless:clusterless-commons-aws:$commons")
 
         implementation("org.jetbrains:annotations:24.0.0")
         implementation("info.picocli:picocli:4.7.4")

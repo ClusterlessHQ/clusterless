@@ -12,13 +12,13 @@ import clusterless.cls.model.deploy.Arc;
 import clusterless.cls.model.deploy.Dataset;
 import clusterless.cls.model.deploy.SourceDataset;
 import clusterless.cls.model.deploy.Workload;
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedConstruct;
 import clusterless.cls.substrate.aws.resources.Arcs;
 import clusterless.cls.substrate.aws.resources.Events;
-import clusterless.cls.util.OrderedSafeMaps;
+import clusterless.commons.collection.OrderedSafeMaps;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.events.*;
 

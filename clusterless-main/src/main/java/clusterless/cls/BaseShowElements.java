@@ -10,8 +10,8 @@ package clusterless.cls;
 
 import clusterless.cls.json.JSONUtil;
 import clusterless.cls.model.Struct;
-import clusterless.cls.naming.Label;
-import clusterless.cls.util.OrderedSafeMaps;
+import clusterless.commons.collection.OrderedSafeMaps;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 

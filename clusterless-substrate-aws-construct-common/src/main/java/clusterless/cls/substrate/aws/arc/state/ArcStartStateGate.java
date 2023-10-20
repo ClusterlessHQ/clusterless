@@ -10,9 +10,9 @@ package clusterless.cls.substrate.aws.arc.state;
 
 import clusterless.aws.lambda.arc.ArcStateProps;
 import clusterless.cls.model.deploy.Arc;
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.LambdaJavaRuntimeProps;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.iam.IGrantable;
 

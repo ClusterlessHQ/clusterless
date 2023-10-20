@@ -9,11 +9,11 @@
 package clusterless.cls.substrate.aws.arc;
 
 import clusterless.aws.lambda.arc.ArcStateProps;
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedStateMachineFragment;
 import clusterless.cls.substrate.aws.resources.BootstrapStores;
 import clusterless.cls.substrate.aws.resources.Events;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.events.EventBus;
 import software.amazon.awscdk.services.events.IEventBus;

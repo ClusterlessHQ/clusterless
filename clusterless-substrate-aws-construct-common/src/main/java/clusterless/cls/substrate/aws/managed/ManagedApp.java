@@ -9,12 +9,12 @@
 package clusterless.cls.substrate.aws.managed;
 
 import clusterless.cls.model.deploy.Deployable;
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Stage;
-import clusterless.cls.naming.Version;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
 import clusterless.cls.substrate.aws.util.TagsUtil;
-import clusterless.cls.util.OrderedMaps;
+import clusterless.commons.collection.OrderedMaps;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Stage;
+import clusterless.commons.naming.Version;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.TagProps;
 import software.constructs.Construct;

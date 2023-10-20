@@ -8,12 +8,12 @@
 
 package clusterless.cls.substrate.aws.arc.s3copy;
 
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.arc.common.WorkloadManagedConstruct;
 import clusterless.cls.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.cls.substrate.aws.construct.ArcConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.LambdaJavaRuntimeProps;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.stepfunctions.IChainable;

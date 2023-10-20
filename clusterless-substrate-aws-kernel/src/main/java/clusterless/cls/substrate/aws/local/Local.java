@@ -19,7 +19,7 @@ import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.model.deploy.Workload;
 import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.cdk.Provider;
-import clusterless.cls.util.Runtimes;
+import clusterless.commons.util.Runtimes;
 import picocli.CommandLine;
 
 import java.io.File;

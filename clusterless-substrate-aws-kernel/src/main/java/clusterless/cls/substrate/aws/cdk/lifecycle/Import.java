@@ -12,7 +12,7 @@ import clusterless.cls.command.project.ImportCommandOptions;
 import clusterless.cls.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
-import clusterless.cls.util.SafeList;
+import clusterless.commons.collection.SafeList;
 import picocli.CommandLine;
 
 import java.util.Collections;

@@ -8,9 +8,9 @@
 
 package clusterless.cls.substrate.aws.resources;
 
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Region;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Region;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.constructs.Construct;
@@ -40,9 +40,9 @@ public class Functions {
         Objects.requireNonNull(functionName, "functionName may not be null");
 
         Label region = Region.of(Stack.of(scope).getRegion());
-        Label stage = ScopedApp.stagedOf(scope).stage();
-        Label project = ScopedApp.stagedOf(scope).name();
-        Label version = ScopedApp.stagedOf(scope).version();
+        Label stage = ScopedApp.scopedOf(scope).stage();
+        Label project = ScopedApp.scopedOf(scope).name();
+        Label version = ScopedApp.scopedOf(scope).version();
 
         String function = stage.upperOnly()
                 .with(project)

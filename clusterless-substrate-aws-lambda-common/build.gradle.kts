@@ -36,6 +36,7 @@ dependencies {
     testFixturesImplementation(project(":clusterless-model"))
     testFixturesImplementation(project(":clusterless-substrate-aws-common"))
 
+    testFixturesImplementation("io.clusterless:clusterless-commons-aws")
     testFixturesImplementation("com.google.guava:guava")
 
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-core")

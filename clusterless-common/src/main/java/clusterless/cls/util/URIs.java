@@ -8,7 +8,7 @@
 
 package clusterless.cls.util;
 
-import clusterless.cls.naming.Partition;
+import clusterless.commons.naming.Partition;
 import com.google.common.base.Strings;
 
 import javax.annotation.Nullable;

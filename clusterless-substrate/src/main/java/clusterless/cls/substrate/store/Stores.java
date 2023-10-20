@@ -9,8 +9,8 @@
 package clusterless.cls.substrate.store;
 
 import clusterless.cls.model.deploy.Placement;
-import clusterless.cls.naming.Region;
-import clusterless.cls.naming.Stage;
+import clusterless.commons.naming.Region;
+import clusterless.commons.naming.Stage;
 
 import java.util.List;
 import java.util.Objects;

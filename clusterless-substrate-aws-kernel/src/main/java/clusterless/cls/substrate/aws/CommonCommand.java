@@ -10,7 +10,7 @@ package clusterless.cls.substrate.aws;
 
 import clusterless.cls.config.CommonConfig;
 import clusterless.cls.substrate.aws.cdk.Provider;
-import clusterless.cls.util.Strings;
+import clusterless.commons.util.Strings;
 import picocli.CommandLine;
 
 public class CommonCommand {

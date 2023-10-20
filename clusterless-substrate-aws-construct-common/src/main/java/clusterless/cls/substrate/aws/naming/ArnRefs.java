@@ -8,9 +8,9 @@
 
 package clusterless.cls.substrate.aws.naming;
 
-import clusterless.cls.naming.Ref;
-import clusterless.cls.naming.Stage;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.naming.Stage;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import software.amazon.awscdk.Fn;
 import software.constructs.Construct;
 
@@ -28,7 +28,7 @@ public class ArnRefs {
             return arn;
         }
 
-        ScopedApp scopedApp = ScopedApp.stagedOf(scope);
+        ScopedApp scopedApp = ScopedApp.scopedOf(scope);
         Stage stage = scopedApp.stage();
 
         String[] split = refValue.split(":");

@@ -8,8 +8,8 @@
 
 package clusterless.cls.substrate.store;
 
-import clusterless.cls.naming.Fixed;
-import clusterless.cls.naming.Label;
+import clusterless.commons.naming.Fixed;
+import clusterless.commons.naming.Label;
 
 public enum StateStore implements Label {
     Meta("Metadata"),

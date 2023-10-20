@@ -8,8 +8,8 @@
 
 package clusterless.cls.substrate.aws.resources;
 
-import clusterless.cls.naming.Ref;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import org.jetbrains.annotations.NotNull;
 import software.constructs.Construct;
 
@@ -20,7 +20,7 @@ public class ClsBootstrap {
     @NotNull
     public static Ref bootstrapBase(@NotNull Construct scope, Ref qualified) {
         return qualified.withProvider("aws")
-                .withStage(ScopedApp.stagedOf(scope).stage())
+                .withStage(ScopedApp.scopedOf(scope).stage())
                 .withScope(BOOTSTRAP)
                 .withScopeVersion(BOOTSTRAP_VERSION)
                 .withResourceNs("meta");

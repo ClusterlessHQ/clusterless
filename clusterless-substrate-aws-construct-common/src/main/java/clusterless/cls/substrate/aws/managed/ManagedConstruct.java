@@ -10,10 +10,10 @@ package clusterless.cls.substrate.aws.managed;
 
 import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.model.deploy.Resource;
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Ref;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
-import clusterless.cls.substrate.aws.scoped.ScopedConstruct;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedConstruct;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.constructs.Construct;
@@ -37,7 +37,7 @@ public class ManagedConstruct extends ScopedConstruct implements Managed {
     protected Placement placement() {
         String account = Stack.of(this).getAccount();
         String region = Stack.of(this).getRegion();
-        Label stage = ScopedApp.stagedOf(this).stage();
+        Label stage = ScopedApp.scopedOf(this).stage();
 
         return Placement.builder()
                 .withAccount(account)

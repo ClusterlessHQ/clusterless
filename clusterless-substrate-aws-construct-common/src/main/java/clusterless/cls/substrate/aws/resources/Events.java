@@ -8,10 +8,10 @@
 
 package clusterless.cls.substrate.aws.resources;
 
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Ref;
-import clusterless.cls.naming.Region;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.naming.Region;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.Stack;
@@ -38,7 +38,7 @@ public class Events {
 
     private static String eventBusName(@NotNull Construct scope, String name) {
         Label region = Region.of(Stack.of(scope).getRegion());
-        Label stage = ScopedApp.stagedOf(scope).stage();
+        Label stage = ScopedApp.scopedOf(scope).stage();
         return stage.upperOnly()
                 .with(name)
                 .with(region)

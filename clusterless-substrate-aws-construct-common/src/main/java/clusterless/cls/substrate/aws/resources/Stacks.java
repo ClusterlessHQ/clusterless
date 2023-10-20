@@ -9,10 +9,10 @@
 package clusterless.cls.substrate.aws.resources;
 
 import clusterless.cls.model.deploy.Deployable;
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Region;
-import clusterless.cls.naming.Stage;
-import clusterless.cls.naming.Version;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Region;
+import clusterless.commons.naming.Stage;
+import clusterless.commons.naming.Version;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Environment;
 

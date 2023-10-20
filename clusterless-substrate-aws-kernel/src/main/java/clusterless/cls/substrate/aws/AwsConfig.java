@@ -10,8 +10,8 @@ package clusterless.cls.substrate.aws;
 
 import clusterless.cls.config.Config;
 import clusterless.cls.config.Configuration;
-import clusterless.cls.naming.Label;
-import clusterless.cls.util.Strings;
+import clusterless.commons.naming.Label;
+import clusterless.commons.util.Strings;
 
 /**
  * --require-approval     What security-sensitive changes need manual

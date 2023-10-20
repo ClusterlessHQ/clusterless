@@ -13,7 +13,7 @@ import clusterless.cls.managed.component.BoundaryComponent;
 import clusterless.cls.managed.component.Component;
 import clusterless.cls.managed.component.ResourceComponent;
 import clusterless.cls.model.Model;
-import clusterless.cls.naming.Label;
+import clusterless.commons.naming.Label;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

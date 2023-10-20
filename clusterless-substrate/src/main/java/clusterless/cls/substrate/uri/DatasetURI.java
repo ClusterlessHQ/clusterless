@@ -10,8 +10,8 @@ package clusterless.cls.substrate.uri;
 
 import clusterless.cls.model.deploy.Dataset;
 import clusterless.cls.model.deploy.Placement;
-import clusterless.cls.naming.Partition;
 import clusterless.cls.substrate.store.StateStore;
+import clusterless.commons.naming.Partition;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

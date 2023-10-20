@@ -11,6 +11,7 @@ plugins {
 }
 
 dependencies {
+    api("io.clusterless:clusterless-commons-core")
     api("com.google.guava:guava")
     api("one.util:streamex")
     api("com.fasterxml.jackson.core:jackson-core")

@@ -8,11 +8,11 @@
 
 package clusterless.cls.substrate.aws.cdk.bootstrap;
 
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Stage;
-import clusterless.cls.naming.Version;
 import clusterless.cls.substrate.aws.resources.ClsBootstrap;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Stage;
+import clusterless.commons.naming.Version;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.AppProps;
 

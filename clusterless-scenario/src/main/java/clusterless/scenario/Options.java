@@ -8,7 +8,7 @@
 
 package clusterless.scenario;
 
-import clusterless.cls.util.Runtimes;
+import clusterless.commons.util.Runtimes;
 import picocli.CommandLine;
 
 import java.nio.file.Paths;

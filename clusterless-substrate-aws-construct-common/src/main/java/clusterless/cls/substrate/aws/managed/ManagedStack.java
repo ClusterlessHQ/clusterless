@@ -9,10 +9,10 @@
 package clusterless.cls.substrate.aws.managed;
 
 import clusterless.cls.model.deploy.Deployable;
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Ref;
 import clusterless.cls.substrate.aws.resources.Stacks;
-import clusterless.cls.substrate.aws.scoped.ScopedStack;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Stack;

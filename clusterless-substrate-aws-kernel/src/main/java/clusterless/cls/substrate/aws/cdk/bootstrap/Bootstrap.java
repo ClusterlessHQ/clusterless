@@ -9,7 +9,6 @@
 package clusterless.cls.substrate.aws.cdk.bootstrap;
 
 import clusterless.cls.command.BootstrapCommandOptions;
-import clusterless.cls.naming.Stage;
 import clusterless.cls.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
@@ -17,8 +16,9 @@ import clusterless.cls.substrate.aws.meta.Metadata;
 import clusterless.cls.substrate.aws.resources.Stacks;
 import clusterless.cls.util.ExitCodeException;
 import clusterless.cls.util.Lists;
-import clusterless.cls.util.OrderedSafeMaps;
-import clusterless.cls.util.Strings;
+import clusterless.commons.collection.OrderedSafeMaps;
+import clusterless.commons.naming.Stage;
+import clusterless.commons.util.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;

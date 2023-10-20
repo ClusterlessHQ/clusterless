@@ -8,8 +8,8 @@
 
 package clusterless.aws.lambda;
 
-import clusterless.cls.temporal.IntervalBuilder;
-import clusterless.cls.temporal.IntervalUnit;
+import clusterless.commons.temporal.IntervalBuilder;
+import clusterless.commons.temporal.IntervalUnit;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

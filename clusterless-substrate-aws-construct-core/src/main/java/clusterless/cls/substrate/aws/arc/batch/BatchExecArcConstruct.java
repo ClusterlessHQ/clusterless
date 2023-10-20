@@ -8,7 +8,6 @@
 
 package clusterless.cls.substrate.aws.arc.batch;
 
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.arc.common.WorkloadManagedConstruct;
 import clusterless.cls.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.cls.substrate.aws.construct.ArcConstruct;
@@ -17,7 +16,8 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resources.Policies;
-import clusterless.cls.substrate.aws.resources.Resources;
+import clusterless.commons.naming.Label;
+import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +56,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         Label modelName = Label.of(model.name());
 
-        regionalName = Resources.regionallyUniqueProjectLabel(this, modelName);
+        regionalName = ResourceNames.regionUniqueScopedLabel(this, modelName);
 
         Map<String, String> environment = new ArcEnvBuilder(placement(), model())
                 .asEnvironment();

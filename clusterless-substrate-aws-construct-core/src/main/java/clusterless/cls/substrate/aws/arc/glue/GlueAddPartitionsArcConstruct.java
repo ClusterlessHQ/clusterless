@@ -8,13 +8,13 @@
 
 package clusterless.cls.substrate.aws.arc.glue;
 
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.arc.common.WorkloadManagedConstruct;
 import clusterless.cls.substrate.aws.arc.props.ArcEnvBuilder;
 import clusterless.cls.substrate.aws.construct.ArcConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.cls.substrate.aws.resources.Databases;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.iam.Effect;
 import software.amazon.awscdk.services.iam.PolicyStatement;

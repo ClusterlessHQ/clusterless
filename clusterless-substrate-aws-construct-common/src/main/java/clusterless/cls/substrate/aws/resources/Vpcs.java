@@ -8,8 +8,9 @@
 
 package clusterless.cls.substrate.aws.resources;
 
-import clusterless.cls.naming.Ref;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +54,7 @@ public class Vpcs {
     public static String bootstrapVPCName(Construct scope) {
         Objects.requireNonNull(scope, "scope is null");
 
-        return Resources.regionallyUniqueName(scope, COMMON_VPC);
+        return ResourceNames.regionUniqueName(scope, COMMON_VPC);
     }
 
     public static String bootstrapVpcIdRef(@NotNull Construct scope) {

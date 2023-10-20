@@ -15,7 +15,7 @@ import clusterless.aws.lambda.transform.json.event.AWSEvent;
 import clusterless.cls.json.JSONUtil;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.sdk.SQS;
-import clusterless.cls.temporal.IntervalUnit;
+import clusterless.commons.temporal.IntervalUnit;
 import com.adelean.inject.resources.junit.jupiter.GivenJsonResource;
 import com.adelean.inject.resources.junit.jupiter.GivenTextResource;
 import com.adelean.inject.resources.junit.jupiter.TestWithResources;

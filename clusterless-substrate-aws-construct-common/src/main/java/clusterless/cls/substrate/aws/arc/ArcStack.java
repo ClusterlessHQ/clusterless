@@ -14,11 +14,11 @@ import clusterless.cls.managed.dataset.DatasetResolver;
 import clusterless.cls.model.deploy.Arc;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.model.deploy.Workload;
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
 import clusterless.cls.substrate.aws.resources.Stacks;
+import clusterless.commons.naming.Label;
 
 /**
  *

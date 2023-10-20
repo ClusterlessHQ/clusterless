@@ -8,15 +8,15 @@
 
 package clusterless.cls.substrate.aws.cdk.bootstrap;
 
-import clusterless.cls.naming.Label;
-import clusterless.cls.naming.Ref;
 import clusterless.cls.substrate.aws.cdk.bootstrap.vpc.VPCConstruct;
 import clusterless.cls.substrate.aws.resources.BootstrapStores;
 import clusterless.cls.substrate.aws.resources.ClsBootstrap;
 import clusterless.cls.substrate.aws.resources.Events;
-import clusterless.cls.substrate.aws.scoped.ScopedApp;
-import clusterless.cls.substrate.aws.scoped.ScopedStack;
 import clusterless.cls.substrate.aws.util.ErrorsUtil;
+import clusterless.commons.naming.Label;
+import clusterless.commons.naming.Ref;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
+import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

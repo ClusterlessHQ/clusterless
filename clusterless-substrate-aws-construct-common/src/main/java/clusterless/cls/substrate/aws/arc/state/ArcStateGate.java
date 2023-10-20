@@ -10,15 +10,15 @@ package clusterless.cls.substrate.aws.arc.state;
 
 import clusterless.aws.lambda.arc.ArcStateProps;
 import clusterless.cls.model.deploy.Arc;
-import clusterless.cls.naming.Label;
 import clusterless.cls.substrate.aws.arc.ArcStateMachineFragment;
-import clusterless.cls.substrate.aws.construct.LambdaLogGroupConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resources.Assets;
 import clusterless.cls.substrate.aws.resources.Functions;
 import clusterless.cls.util.Env;
+import clusterless.commons.naming.Label;
+import clusterless.commons.substrate.aws.cdk.construct.LambdaLogGroupConstruct;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.lambda.Function;

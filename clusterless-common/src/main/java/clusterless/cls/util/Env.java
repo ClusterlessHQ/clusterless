@@ -9,8 +9,9 @@
 package clusterless.cls.util;
 
 import clusterless.cls.json.JSONUtil;
-import clusterless.cls.naming.Fixed;
-import clusterless.cls.naming.Label;
+import clusterless.commons.collection.OrderedSafeMaps;
+import clusterless.commons.naming.Fixed;
+import clusterless.commons.naming.Label;
 
 import java.util.Map;
 import java.util.function.Function;

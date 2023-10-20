@@ -9,8 +9,8 @@
 package clusterless.cls.substrate.aws.cdk.bootstrap.vpc;
 
 import clusterless.cls.substrate.aws.managed.Managed;
-import clusterless.cls.substrate.aws.resources.Resources;
 import clusterless.cls.substrate.aws.resources.Vpcs;
+import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +45,7 @@ public class VPCConstruct extends Construct implements Managed {
                 .enableDnsSupport(true)
                 .subnetConfiguration(Collections.singletonList(
                         SubnetConfiguration.builder()
-                                .name(Resources.regionallyUniqueName(this, "ClusterlessSubnet"))
+                                .name(ResourceNames.regionUniqueName(this, "ClusterlessSubnet"))
                                 // PUBLIC grants access to the internet, need to confirm Batch still requires this to work
                                 // PRIVATE_WITH_EGRESS will create a NAT gateway which has a charge
                                 .subnetType(SubnetType.PUBLIC)
