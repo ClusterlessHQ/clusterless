@@ -140,7 +140,7 @@ dependencies {
 
         implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.0.2")
 
-        testImplementationAndTestFixture("org.mockito:mockito-core:5.1.1")
+        testImplementationAndTestFixture("org.mockito:mockito-core:5.6.0")
 
         // https://github.com/junit-pioneer/junit-pioneer/releases
         val junitPioneer = "2.1.0"

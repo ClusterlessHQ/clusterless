@@ -234,7 +234,7 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
                 r -> String.format("unable to get table descriptor for: %s/%s, %s", databaseName, tableName, r.errorMessage())
         );
 
-        table = Glue.getTable(tableResponse);
+        table = glue.getTable(tableResponse);
 
         return table;
     }

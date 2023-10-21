@@ -17,10 +17,13 @@ import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.event.ArcWorkloadContext;
+import clusterless.cls.substrate.aws.sdk.Glue;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import software.amazon.awssdk.services.glue.model.Table;
 
 import java.net.URI;
 import java.util.Map;
@@ -29,8 +32,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.isNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @ParameterizeTest with @MethodSource does not work because events() is not static.
@@ -38,6 +40,11 @@ import static org.mockito.Mockito.verify;
  */
 public class GlueAddPartitionsArcEventHandlerTest extends LocalStackBase {
     TestDatasets datasets;
+
+    @Override
+    protected boolean usesGlue() {
+        return false;
+    }
 
     public TestDatasets datasets() {
         if (datasets == null) {
@@ -96,6 +103,8 @@ public class GlueAddPartitionsArcEventHandlerTest extends LocalStackBase {
     ) {
         Assertions.assertNotNull(arcWorkloadContext);
 
+        GlueAddPartitionsArcEventHandler.glue = mockGlue();
+
         GlueAddPartitionsArcEventHandler handler = new GlueAddPartitionsArcEventHandler();
 
         ArcEventObserver eventObserver = mock();
@@ -111,6 +120,24 @@ public class GlueAddPartitionsArcEventHandlerTest extends LocalStackBase {
 
         SinkDataset mainSink = getProps().sinks().get("main");
         verify(eventObserver).applyToDataset(argThat(s -> s.equals("main")), argThat(d -> d.name().equals(mainSink.name())));
+    }
+
+    @NotNull
+    private Glue mockGlue() {
+        Glue glue = mock();
+        Glue.Response tableResponse = mock();
+        Glue.Response partitionResponse = mock();
+
+        when(glue.getTable(anyString(), anyString())).thenReturn(tableResponse);
+        Table table = Table.builder()
+                .databaseName(glueDatabaseName())
+                .name(glueTableName())
+                .build();
+        when(glue.getTable(any())).thenReturn(table);
+        when(glue.addPartitions(nullable(String.class), any(Table.class), anyMap())).thenReturn(partitionResponse);
+        when(glue.hasBatchErrors(any())).thenReturn(false);
+
+        return glue;
     }
 
     @TestFactory

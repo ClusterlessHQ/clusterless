@@ -30,7 +30,8 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
         System.setProperty("clusterless.localstack.enabled", "true");
     }
 
-    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack-pro:2.2.0");
+    // pro disabled in favor of mocking glue apis in the tests
+    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:2.3.2");
 
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
@@ -46,6 +47,10 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
     @Override
     protected String defaultRegion() {
         return localstack.getRegion();
+    }
+
+    protected boolean usesGlue() {
+        return false;
     }
 
     @SystemStub
@@ -68,7 +73,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Meta, defaultPlacement()))
                 .applyEventbus(eventBusName())
                 .applySQSQueue(sqsQueueName())
-                .applyBucket(glueDatabaseName())
-                .applyGlueDatabase(glueDatabaseName(), glueTableName(), "s3://%s".formatted(glueDatabaseName()), glueTableColumns(), glueTablePartitions());
+                .applyBucket(usesGlue(), glueDatabaseName())
+                .applyGlueDatabase(usesGlue(), glueDatabaseName(), glueTableName(), "s3://%s".formatted(glueDatabaseName()), glueTableColumns(), glueTablePartitions());
     }
 }

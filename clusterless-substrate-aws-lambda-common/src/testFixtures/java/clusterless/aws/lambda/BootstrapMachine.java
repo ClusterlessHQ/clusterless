@@ -28,6 +28,13 @@ public class BootstrapMachine {
     public BootstrapMachine() {
     }
 
+    public BootstrapMachine applyBucket(boolean enabled, String bucketName) {
+        if (!enabled) {
+            return this;
+        }
+        return applyBucket(bucketName);
+    }
+
     public BootstrapMachine applyBucket(String bucketName) {
         if (bucketName == null) {
             return this;
@@ -73,8 +80,8 @@ public class BootstrapMachine {
         return this;
     }
 
-    public BootstrapMachine applyGlueDatabase(String glueDatabase, String glueTable, String location, List<Column> columns, List<Column> columnList) {
-        if (glueDatabase == null) {
+    public BootstrapMachine applyGlueDatabase(boolean usesGlue, String glueDatabase, String glueTable, String location, List<Column> columns, List<Column> columnList) {
+        if (glueDatabase == null || !usesGlue) {
             return this;
         }
 

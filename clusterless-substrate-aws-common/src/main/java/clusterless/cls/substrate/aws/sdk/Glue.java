@@ -98,7 +98,7 @@ public class Glue extends ClientBase<GlueClient> {
         }
     }
 
-    public static Table getTable(Glue.Response tableResponse) {
+    public Table getTable(Glue.Response tableResponse) {
         Objects.requireNonNull(tableResponse.awsResponse);
 
         return ((GetTableResponse) tableResponse.awsResponse).table();
