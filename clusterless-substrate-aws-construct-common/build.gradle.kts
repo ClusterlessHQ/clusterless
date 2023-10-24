@@ -16,6 +16,8 @@ dependencies {
     api(project(":clusterless-substrate-aws-common"))
     api(project(":clusterless-substrate-aws-lambda-arc-model"))
 
+    api("io.clusterless:clusterless-commons-aws")
+
     // update .github actions when updating this version
     // https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib
     val cdkVersion = "2.101.1"

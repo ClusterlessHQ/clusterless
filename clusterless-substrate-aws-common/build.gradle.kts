@@ -16,7 +16,6 @@ dependencies {
     implementation("com.google.guava:guava")
 
     api(project(":clusterless-substrate"))
-    api("io.clusterless:clusterless-commons-aws")
 
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")
