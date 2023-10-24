@@ -21,6 +21,7 @@ import clusterless.cls.substrate.SubstrateProvider;
 import clusterless.cls.util.ExecutionExceptionHandler;
 import clusterless.cls.util.ExitCodeExceptionMapper;
 import clusterless.cls.util.ParameterExceptionHandler;
+import clusterless.cls.util.VersionProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +37,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "cls",
         mixinStandardHelpOptions = true,
-        version = "1.0-wip",
+        versionProvider = VersionProvider.class,
         subcommands = {
                 CommandLine.HelpCommand.class,
                 ConfigCommand.class,

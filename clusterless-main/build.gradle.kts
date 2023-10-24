@@ -32,6 +32,13 @@ val awsKernelInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:instal
 
 tasks.getAt("installDist").dependsOn(awsKernelInstall)
 
+tasks.named<ProcessResources>("processResources") {
+    doFirst {
+        file("${buildDir}/resources/main/version.properties")
+            .writeText("clusterless.release.full=${version}")
+    }
+}
+
 val versionBranch = project.ext["versionBranch"].toString()
 
 distributions {
@@ -92,11 +99,20 @@ jreleaser {
             }
         }
     }
+
+    packagers {
+        brew {
+            active.set(Active.ALWAYS)
+            repository.active.set(Active.ALWAYS)
+        }
+    }
 }
 
 tasks.register("release") {
     dependsOn("distZip")
     dependsOn("jreleaserRelease")
+    dependsOn("jreleaserPackage")
+    dependsOn("jreleaserPublish")
 }
 
 tasks.register<Exec>("generateComponentModels") {
