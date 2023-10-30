@@ -8,6 +8,7 @@
 
 package clusterless.cls.command;
 
+import clusterless.cls.command.exec.ExecCommandOptions;
 import picocli.CommandLine;
 
 import java.util.Optional;

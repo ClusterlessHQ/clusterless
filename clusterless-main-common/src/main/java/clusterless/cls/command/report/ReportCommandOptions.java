@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command;
+package clusterless.cls.command.report;
 
+import clusterless.cls.command.CommonCommandOptions;
 import picocli.CommandLine;
 
 /**

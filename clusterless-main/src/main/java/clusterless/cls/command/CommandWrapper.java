@@ -6,9 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls;
+package clusterless.cls.command;
 
-import clusterless.cls.command.CommonCommandOptions;
+import clusterless.cls.Main;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;

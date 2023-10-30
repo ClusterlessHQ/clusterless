@@ -6,27 +6,27 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls;
+package clusterless.cls.command.show;
 
-import clusterless.cls.model.deploy.Resource;
+import clusterless.cls.model.deploy.Barrier;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 
 import java.util.Collection;
 
 @CommandLine.Command(
-        name = "resource",
-        description = "Show available provider resources."
+        name = "barrier",
+        description = "Show available provider barriers."
 )
-public class ShowResources extends ShowComponents {
+public class ShowBarriers extends ShowComponents {
 
     @Override
     protected @NotNull String elementSubType() {
-        return "Resources";
+        return "Barriers";
     }
 
     @Override
     protected Collection<String> getNames() {
-        return super.getNamesHaving(e -> Resource.class.isAssignableFrom(e.getValue()));
+        return super.getNamesHaving(e -> Barrier.class.isAssignableFrom(e.getValue()));
     }
 }

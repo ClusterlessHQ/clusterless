@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.cdk.lifecycle;
 
-import clusterless.cls.command.ProjectCommandOptions;
+import clusterless.cls.command.project.ProjectCommandOptions;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKCommand;

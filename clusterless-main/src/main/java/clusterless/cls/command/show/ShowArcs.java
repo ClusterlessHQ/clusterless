@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls;
+package clusterless.cls.command.show;
 
 import clusterless.cls.model.deploy.Arc;
 import org.jetbrains.annotations.NotNull;

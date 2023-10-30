@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.cdk;
 
-import clusterless.cls.command.ProjectCommandOptions;
+import clusterless.cls.command.project.ProjectCommandOptions;
 import clusterless.cls.config.CommonConfig;
 import clusterless.cls.process.ProcessExec;
 import clusterless.cls.startup.Startup;

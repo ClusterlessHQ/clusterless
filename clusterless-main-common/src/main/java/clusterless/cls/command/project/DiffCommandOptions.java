@@ -8,7 +8,6 @@
 
 package clusterless.cls.command.project;
 
-import clusterless.cls.command.ProjectCommandOptions;
 import picocli.CommandLine;
 
 /**

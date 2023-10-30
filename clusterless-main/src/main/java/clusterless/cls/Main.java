@@ -12,7 +12,13 @@
 
 package clusterless.cls;
 
-import clusterless.cls.command.*;
+import clusterless.cls.command.BootstrapCommand;
+import clusterless.cls.command.CommonCommandOptions;
+import clusterless.cls.command.ConfigCommand;
+import clusterless.cls.command.project.*;
+import clusterless.cls.command.report.PlacementsCommand;
+import clusterless.cls.command.report.ProjectsCommand;
+import clusterless.cls.command.show.ShowCommand;
 import clusterless.cls.model.Loader;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.startup.Startup;

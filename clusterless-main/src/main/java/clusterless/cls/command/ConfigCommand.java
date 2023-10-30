@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls;
+package clusterless.cls.command;
 
+import clusterless.cls.Main;
 import clusterless.cls.config.CommonConfig;
 import clusterless.cls.config.ConfigManager;
 import clusterless.cls.config.Configuration;

@@ -8,7 +8,5 @@
 
 package clusterless.cls.command.report;
 
-import clusterless.cls.command.ReportCommandOptions;
-
 public class ProjectsCommandOptions extends ReportCommandOptions {
 }

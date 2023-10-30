@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.report;
 
-import clusterless.cls.command.ReportCommandOptions;
+import clusterless.cls.command.report.ReportCommandOptions;
 import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.sdk.S3;

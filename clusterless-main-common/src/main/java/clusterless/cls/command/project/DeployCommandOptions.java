@@ -9,7 +9,6 @@
 package clusterless.cls.command.project;
 
 
-import clusterless.cls.command.ProjectCommandOptions;
 import picocli.CommandLine;
 
 import java.util.Optional;
