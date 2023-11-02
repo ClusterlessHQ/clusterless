@@ -44,7 +44,15 @@ else
 
 repositories {
     mavenCentral()
-//    mavenLocal() // for local io.clusterless libs
+
+    maven {
+        url = uri("https://maven.pkg.github.com/heretical/*")
+
+        credentials {
+            username = project.findProperty("githubUsername") as String?
+            password = project.findProperty("githubPassword") as String?
+        }
+    }
 }
 
 java {
@@ -93,6 +101,8 @@ dependencies {
         val commons = "0.7"
         implementationAndTestFixture("io.clusterless:clusterless-commons-core:$commons")
         implementationAndTestFixture("io.clusterless:clusterless-commons-aws:$commons")
+
+        implementation("io.heretical:mini-parsers-temporal:2.0.0-wip-6")
 
         implementation("org.jetbrains:annotations:24.0.0")
         implementation("info.picocli:picocli:4.7.4")

@@ -166,6 +166,14 @@ public class ArcURI extends MetaURI<Project, ArcURI> {
         return String.format("s3://%s/%s/%s", storeName.get(), ARCS, path);
     }
 
+    public Project project() {
+        return project;
+    }
+
+    public String arcName() {
+        return arcName;
+    }
+
     protected ArcURI setProject(Project project) {
         this.project = project;
         return this;

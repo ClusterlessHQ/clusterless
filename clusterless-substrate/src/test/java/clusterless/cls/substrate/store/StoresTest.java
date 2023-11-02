@@ -17,6 +17,16 @@ public class StoresTest {
     @Test
     void roundTrip() {
         Placement placement = Placement.builder()
+                .withAccount("00000000")
+                .withRegion("us-east-1")
+                .build();
+
+        assertEquals(placement, Stores.parseBootstrapStoreName(Stores.bootstrapStoreName(StateStore.Meta, placement)));
+    }
+
+    @Test
+    void roundTripWithStage() {
+        Placement placement = Placement.builder()
                 .withStage("dev")
                 .withAccount("00000000")
                 .withRegion("us-east-1")

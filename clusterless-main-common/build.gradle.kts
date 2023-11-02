@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":clusterless-common"))
     implementation(project(":clusterless-model"))
 
+    implementation("io.heretical:mini-parsers-temporal")
     implementation("info.picocli:picocli")
     implementation("com.github.jknack:handlebars")
     implementation("io.github.resilience4j:resilience4j-retry")

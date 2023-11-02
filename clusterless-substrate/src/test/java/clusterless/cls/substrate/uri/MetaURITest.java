@@ -78,4 +78,15 @@ public class MetaURITest {
 
         assertEquals(project, ProjectURI.parse("/datasets/name=test-project/version=20230101/dataset.json").project());
     }
+
+    @Test
+    void arcKey() {
+        Project project = Project.Builder.builder()
+                .withName("test-project")
+                .withVersion("20230101")
+                .build();
+
+        assertEquals(project, ArcURI.parse("/datasets/name=test-project/version=20230101/arc=testArc/arc.json").project());
+        assertEquals("testArc", ArcURI.parse("/datasets/name=test-project/version=20230101/arc=testArc/arc.json").arcName());
+    }
 }

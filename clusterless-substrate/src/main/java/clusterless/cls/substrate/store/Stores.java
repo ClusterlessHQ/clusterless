@@ -35,7 +35,7 @@ public class Stores {
     }
 
     public static List<Placement> parseBootstrapStoreNames(StateStore stateStore, List<String> bootstrapStoreNames) {
-        String filter = "-clusterless-%s".formatted(stateStore.name().toLowerCase());
+        String filter = "clusterless-%s".formatted(stateStore.name().toLowerCase());
 
         return bootstrapStoreNames.stream()
                 .filter(n -> n.contains(filter))
@@ -46,13 +46,25 @@ public class Stores {
     public static Placement parseBootstrapStoreName(String bootstrapStoreName) {
         Objects.requireNonNull(bootstrapStoreName, "bootstrapStoreName is null");
 
-        String[] parts = bootstrapStoreName.split("-", 5);
+        int i = bootstrapStoreName.indexOf("clusterless-");
+
+        if (i == -1) {
+            throw new IllegalArgumentException("bootstrapStoreName is not a valid bootstrap store name");
+        }
+
+        String stage = null;
+
+        if (i != 0) {
+            stage = bootstrapStoreName.substring(0, i - 1);
+            bootstrapStoreName = bootstrapStoreName.substring(i);
+        }
+
+        String[] parts = bootstrapStoreName.split("-", 4);
 
         return Placement.builder()
-                .withStage(parts[0])
-                .withAccount(parts[3])
-                .withRegion(parts[4])
+                .withStage(stage)
+                .withAccount(parts[2])
+                .withRegion(parts[3])
                 .build();
     }
-
 }

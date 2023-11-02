@@ -23,7 +23,7 @@ import java.util.List;
 public class TableReporter<T> extends Reporter<T> {
     private final Object[] headers;
     private final int[] lengths;
-    private ObjectMapper jsonMapper = new ObjectMapper();
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
     public TableReporter(Printer printer, Class<T> type) {
         super(printer, type);
@@ -73,7 +73,6 @@ public class TableReporter<T> extends Reporter<T> {
         }
 
         String format = formatBuilder.toString();
-
         printer.println(format.formatted(headers));
         printer.println("=".repeat(line));
 

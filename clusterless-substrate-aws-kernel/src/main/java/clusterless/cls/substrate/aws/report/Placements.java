@@ -11,6 +11,8 @@ package clusterless.cls.substrate.aws.report;
 import clusterless.cls.command.report.PlacementsCommandOptions;
 import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.substrate.aws.report.reporter.Reporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -23,11 +25,14 @@ import java.util.concurrent.Callable;
         name = "placements"
 )
 public class Placements extends Reports implements Callable<Integer> {
+    private static final Logger LOG = LoggerFactory.getLogger(Placements.class);
     @CommandLine.Mixin
     PlacementsCommandOptions commandOptions = new PlacementsCommandOptions();
 
     @Override
     public Integer call() throws Exception {
+        LOG.info("using profile: {}", commandOptions.profile());
+
         List<Placement> placements = filterPlacements(commandOptions);
 
         Reporter<Placement> reporter = Reporter.instance(kernel().printer(), Placement.class);

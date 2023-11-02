@@ -56,8 +56,15 @@ public abstract class MetaURI<S extends Struct, T extends MetaURI<S, T>> extends
     protected abstract T copy();
 
     protected T setStoreName(String storeName) {
-        this.storeName = () -> storeName;
+        if (storeName != null) {
+            this.storeName = () -> storeName;
+            parseStoreName(storeName);
+        }
         return self();
+    }
+
+    protected void parseStoreName(String storeName) {
+        setPlacement(Stores.parseBootstrapStoreName(storeName));
     }
 
     protected T setPlacement(Placement placement) {

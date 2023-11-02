@@ -16,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  *
  */
@@ -32,6 +34,18 @@ import java.util.Objects;
 )
 @JsonPropertyOrder({"name", "version"})
 public class Project implements Struct {
+    public static Project create(String value) {
+        requireNonNull(value, "value");
+
+        String[] split = value.split(":");
+
+        if (split.length == 1) {
+            return new Project(split[0], null);
+        }
+
+        return new Project(split[0], split[1]);
+    }
+
     @JsonRequiredProperty
     String name;
     @JsonRequiredProperty
@@ -49,6 +63,7 @@ public class Project implements Struct {
         name = builder.name;
         version = builder.version;
     }
+
 
     public String name() {
         return name;
