@@ -19,9 +19,10 @@ public class RangeOptions {
                     "Earliest time to include in report.",
                     "(default: ${DEFAULT-VALUE})"
             },
-            converter = MomentTypeConverter.class
+            converter = MomentTypeConverter.class,
+            defaultValue = "12h"
     )
-    private Moment earliest = Moment.parse("12h");
+    private Moment earliest;
     @CommandLine.Option(
             names = {"--latest"},
             description = {

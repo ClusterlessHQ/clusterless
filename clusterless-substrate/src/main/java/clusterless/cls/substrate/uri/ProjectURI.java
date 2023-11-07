@@ -116,9 +116,9 @@ public class ProjectURI extends MetaURI<Project, ProjectURI> {
         // {providerService}://{stateStore}/projects/{projectName}/{projectVersion}/project.json
         String[] split = template.split("/");
 
-        boolean isOnlyPath = isOnlyPath(template);
-        int index = isOnlyPath ? 2 : 4;
-        String storeName = isOnlyPath ? null : value(split, 2);
+        Format format = isOnlyPath(PROJECTS, template);
+        int index = format.offset();
+        String storeName = format == Format.full ? value(split, 2) : null;
         return new ProjectURI()
                 .setStoreName(storeName) // the bucket in s3
                 .setProject(Project.Builder.builder()

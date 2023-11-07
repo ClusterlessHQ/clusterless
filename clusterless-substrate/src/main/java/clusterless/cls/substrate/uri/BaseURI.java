@@ -13,6 +13,23 @@ import clusterless.cls.util.Optionals;
 import java.util.regex.Pattern;
 
 public class BaseURI {
+
+    protected enum Format {
+        full(4),
+        path(2),
+        key(1);
+
+        final int offset;
+
+        Format(int offset) {
+            this.offset = offset;
+        }
+
+        public int offset() {
+            return offset;
+        }
+    }
+
     private static final Pattern COMPILE = Pattern.compile("^.+=");
 
     protected static String value(String[] split, int index) {
@@ -27,7 +44,11 @@ public class BaseURI {
     }
 
 
-    protected static boolean isOnlyPath(String template) {
-        return template.charAt(0) == '/';
+    protected static Format isOnlyPath(String root, String template) {
+        if (template.charAt(0) == '/') return Format.path;
+
+        if (template.startsWith(root)) return Format.key;
+
+        return Format.full;
     }
 }

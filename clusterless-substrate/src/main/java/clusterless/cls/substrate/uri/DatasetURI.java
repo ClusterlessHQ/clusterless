@@ -116,9 +116,9 @@ public class DatasetURI extends MetaURI<Dataset, DatasetURI> {
         // {providerService}://{stateStore}/datasets/{datasetName}/{datasetVersion}/dataset.json
         String[] split = template.split("/");
 
-        boolean isOnlyPath = isOnlyPath(template);
-        int index = isOnlyPath ? 2 : 4;
-        String storeName = isOnlyPath ? null : value(split, 2);
+        Format format = isOnlyPath(DATASETS, template);
+        int index = format.offset();
+        String storeName = format == Format.full ? value(split, 2) : null;
         return new DatasetURI()
                 .setStoreName(storeName) // the bucket in s3
                 .setDataset(Dataset.Builder.builder()

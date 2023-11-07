@@ -29,7 +29,11 @@ public class Moment {
         this.instant = instant;
     }
 
-    public Instant moment() {
+    public String moment() {
+        return moment;
+    }
+
+    public Instant instant() {
         return instant;
     }
 
@@ -43,5 +47,10 @@ public class Moment {
 
     public String toInstantEpochMillisString() {
         return Long.toString(instant.toEpochMilli());
+    }
+
+    @Override
+    public String toString() {
+        return moment;
     }
 }

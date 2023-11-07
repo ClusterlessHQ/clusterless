@@ -44,7 +44,6 @@ import static java.util.Optional.ofNullable;
 @JsonSerialize(using = ArcStateURI.Serializer.class)
 @JsonDeserialize(using = ArcStateURI.DeSerializer.class)
 public class ArcStateURI extends StateURI<ArcState, ArcStateURI> {
-
     public static final String ARCS = "arcs";
 
     static class Serializer extends StdScalarSerializer<ArcStateURI> {
@@ -91,6 +90,14 @@ public class ArcStateURI extends StateURI<ArcState, ArcStateURI> {
         this.arcName = other.arcName;
     }
 
+    public Project project() {
+        return project;
+    }
+
+    public String arcName() {
+        return arcName;
+    }
+
     public static Builder builder() {
         return Builder.builder();
     }
@@ -104,15 +111,20 @@ public class ArcStateURI extends StateURI<ArcState, ArcStateURI> {
         return state == null;
     }
 
+    public static ArcState parseState(String template) {
+        int index = template.lastIndexOf('/');
+        return ArcState.parse(template.substring(index + 1));
+    }
+
     public static ArcStateURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
 
         // {providerService}://{stateStore}/arcs/{projectName}/{projectVersion}/{arcName}/{lot}/{state}.arc
         String[] split = template.split("/");
 
-        boolean isOnlyPath = isOnlyPath(template);
-        int index = isOnlyPath ? 2 : 4;
-        String storeName = isOnlyPath ? null : value(split, 2);
+        Format format = isOnlyPath(ARCS, template);
+        int index = format.offset();
+        String storeName = format == Format.full ? value(split, 2) : null;
         return new ArcStateURI()
                 .setStoreName(storeName)
                 .setProject(Project.Builder.builder()

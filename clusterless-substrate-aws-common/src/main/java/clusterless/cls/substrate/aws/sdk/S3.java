@@ -11,21 +11,26 @@ package clusterless.cls.substrate.aws.sdk;
 import clusterless.cls.json.JSONUtil;
 import clusterless.cls.util.Tuple2;
 import clusterless.cls.util.URIs;
+import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  *
@@ -38,13 +43,18 @@ public class S3 extends ClientBase<S3Client> {
         return URIs.create("s3", bucket, key);
     }
 
-    private final int maxKeys = 1000;
+    private int maxKeys = 1000;
 
     public S3() {
     }
 
     public S3(String profile) {
         super(profile);
+    }
+
+    public S3(String profile, int maxKeys) {
+        super(profile);
+        this.maxKeys = maxKeys;
     }
 
     public S3(String profile, String region) {
@@ -321,7 +331,7 @@ public class S3 extends ClientBase<S3Client> {
         Objects.requireNonNull(path, "path");
 
         String bucketName = path.getHost();
-        String key = URIs.asKey(path);
+        String key = URIs.asKey(path); // foo
 
         return list(null, bucketName, key);
     }
@@ -330,7 +340,7 @@ public class S3 extends ClientBase<S3Client> {
         Objects.requireNonNull(path, "path");
 
         String bucketName = path.getHost();
-        String key = URIs.asKeyPath(path);
+        String key = URIs.asKeyPath(path); // foo/
 
         return list(delimiter, bucketName, key);
     }
@@ -341,6 +351,7 @@ public class S3 extends ClientBase<S3Client> {
                 .bucket(bucketName)
                 .prefix(key)
                 .delimiter(delimiter)
+
                 .maxKeys(maxKeys)
                 .build();
 
@@ -351,9 +362,95 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
+    public Responses listObjectsIterable(URI path, URI startExclusive) {
+        return listIterable(path, null, startExclusive);
+    }
+
+    public Iterable<Response> listPathsIterable(URI path) {
+        return listIterable(path, "/", null);
+    }
+
+    public Iterable<Response> listObjectsIterable(URI path) {
+        return listIterable(path, null, null);
+    }
+
+    public Iterable<Response> listThisOrChildObjectsIterable(URI path) {
+        Objects.requireNonNull(path, "path");
+
+        String bucketName = path.getHost();
+        String key = URIs.asKey(path); // foo
+
+        return listIterable(null, bucketName, key, null);
+    }
+
+    protected Responses listIterable(URI path, String delimiter, URI startAfter) {
+        Objects.requireNonNull(path, "path");
+
+        String bucketName = path.getHost();
+        String key = URIs.asKeyPath(path); // foo/
+        String startKey = URIs.asKey(startAfter); // foo/bar
+
+        return listIterable(delimiter, bucketName, key, startKey);
+    }
+
+    @NotNull
+    private Responses listIterable(String delimiter, String bucketName, String key, String startAfter) {
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .startAfter(startAfter)
+                .prefix(key)
+                .delimiter(delimiter)
+
+                .maxKeys(maxKeys)
+                .build();
+
+        S3Client client = createClient();
+        try {
+            ListObjectsV2Iterable awsResponse = client.listObjectsV2Paginator(listObjectsV2Request);
+            return new Responses(client) {
+                @NotNull
+                @Override
+                public Iterator<Response> iterator() {
+                    return Iterables.transform(awsResponse, Response::new).iterator();
+                }
+            };
+        } catch (Exception exception) {
+            client.close();
+            return new Responses() {
+                @NotNull
+                @Override
+                public Iterator<Response> iterator() {
+                    return Collections.singletonList(new Response(exception)).iterator();
+                }
+            };
+        }
+    }
+
+    public Stream<String> listChildrenStream(Iterable<Response> responses, URI endExclusive, Consumer<ClientBase<S3Client>.Response> handler) {
+        String end = URIs.asKey(endExclusive);
+        return StreamSupport.stream(responses.spliterator(), false)
+                .takeWhile(r -> handle(r, handler))
+                .flatMap(this::listChildrenStream)
+                .takeWhile(key -> !key.startsWith(end));
+    }
+
+    private boolean handle(Response r, Consumer<ClientBase<S3Client>.Response> handler) {
+        if (r.isSuccess()) {
+            return true;
+        }
+
+        handler.accept(r);
+
+        return false;
+    }
+
     public List<String> listChildren(Response response) {
+        return listChildrenStream(response).toList();
+    }
+
+    public Stream<String> listChildrenStream(Response response) {
         if (hasNoAwsResponse(response)) {
-            return Collections.emptyList();
+            return Stream.empty();
         }
 
         ListObjectsV2Response awsResponse = (ListObjectsV2Response) response.awsResponse();
@@ -361,18 +458,16 @@ public class S3 extends ClientBase<S3Client> {
         if (awsResponse.hasCommonPrefixes() && !awsResponse.commonPrefixes().isEmpty()) {
             return awsResponse.commonPrefixes()
                     .stream()
-                    .map(CommonPrefix::prefix)
-                    .collect(Collectors.toList());
+                    .map(CommonPrefix::prefix);
         }
 
         if (awsResponse.hasContents()) {
             return awsResponse.contents()
                     .stream()
-                    .map(S3Object::key)
-                    .collect(Collectors.toList());
+                    .map(S3Object::key);
         }
 
-        return Collections.emptyList();
+        return Stream.empty();
     }
 
 
@@ -442,7 +537,7 @@ public class S3 extends ClientBase<S3Client> {
         return ((HeadObjectResponse) response.awsResponse).lastModified();
     }
 
-    private static boolean hasNoAwsResponse(ClientBase<S3Client>.Response response) {
+    private static boolean hasNoAwsResponse(S3.Response response) {
         verifyResponse(response);
 
         if (response.exception instanceof NoSuchBucketException || response.exception instanceof NoSuchKeyException) {

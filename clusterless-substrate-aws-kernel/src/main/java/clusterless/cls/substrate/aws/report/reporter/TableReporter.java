@@ -17,11 +17,12 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import one.util.streamex.StreamEx;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TableReporter<T> extends Reporter<T> {
-    private final Object[] headers;
+    private final Object[] fields;
+    private final Object[][] headers;
     private final int[] lengths;
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -32,24 +33,28 @@ public class TableReporter<T> extends Reporter<T> {
 
         CsvSchema columns = new CsvMapper().schemaFor(type);
 
-        headers = new String[columns.size()];
-        lengths = new int[headers.length];
+        fields = new String[columns.size()];
+        headers = new String[2][columns.size()];
+        lengths = new int[headers[1].length];
 
-        for (int i = 0; i < headers.length; i++) {
-            headers[i] = columns.columnName(i);
-            lengths[i] = columns.columnName(i).length();
+        for (int i = 0; i < fields.length; i++) {
+            fields[i] = columns.columnName(i);
+            String[] name = columns.columnName(i).split("\\.");
+            headers[0][i] = name.length > 1 ? name[0] : "";
+            headers[1][i] = name.length > 1 ? name[1] : name[0];
+            lengths[i] = Math.max(headers[0][i].toString().length(), headers[1][i].toString().length());
         }
     }
 
     @Override
-    public void report(Iterator<T> iterator) throws IOException {
-        List<T> list = StreamEx.of(iterator).toList();
+    public void report(Stream<T> stream) throws IOException {
+        List<T> list = stream.toList();
         ArrayNode array = jsonMapper.valueToTree(list);
 
         for (JsonNode jsonNode : array) {
             for (int i = 0; i < lengths.length; i++) {
-                JsonNode node = jsonNode.get(headers[i].toString());
-                String value = node != null ? node.textValue() : null;
+                JsonNode node = jsonNode.get(fields[i].toString());
+                String value = node != null ? asText(node) : null;
                 lengths[i] = Math.max(lengths[i], value == null ? 0 : value.length());
             }
         }
@@ -73,14 +78,20 @@ public class TableReporter<T> extends Reporter<T> {
         }
 
         String format = formatBuilder.toString();
-        printer.println(format.formatted(headers));
+        printer.println(format.formatted(headers[0]));
+        printer.println(format.formatted(headers[1]));
         printer.println("=".repeat(line));
 
         for (JsonNode jsonNode : array) {
-            Object[] values = StreamEx.of(jsonNode.iterator()).map(JsonNode::textValue).toArray(String.class);
+            Object[] values = StreamEx.of(jsonNode.iterator()).map(TableReporter::asText).toArray(String.class);
             printer.println(format.formatted(values));
         }
 
         printer.println("");
+    }
+
+    private static String asText(JsonNode node) {
+        // a hack as toString on textual quotes the values
+        return node.isTextual() ? node.textValue() : node.toString();
     }
 }

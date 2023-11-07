@@ -98,14 +98,14 @@ dependencies {
     constraints {
         // manage dependency versions here
 
-        val commons = "0.7"
+        val commons = "0.8"
         implementationAndTestFixture("io.clusterless:clusterless-commons-core:$commons")
         implementationAndTestFixture("io.clusterless:clusterless-commons-aws:$commons")
 
         implementation("io.heretical:mini-parsers-temporal:2.0.0-wip-6")
 
         implementation("org.jetbrains:annotations:24.0.0")
-        implementation("info.picocli:picocli:4.7.4")
+        implementation("info.picocli:picocli:4.7.5")
         implementation("com.github.jknack:handlebars:4.3.1")
 
         val log4j = "2.20.0"
@@ -119,6 +119,7 @@ dependencies {
         implementationAndTestFixture("com.jayway.jsonpath:json-path:2.8.0")
         implementationAndTestFixture("com.google.guava:guava:31.1-jre")
 
+        // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
         val jackson = "2.15.3"
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-core:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-databind:$jackson")
@@ -131,7 +132,7 @@ dependencies {
         implementationAndTestFixture("one.util:streamex:0.8.2")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
-        val awsSdk = "2.21.0"
+        val awsSdk = "2.21.13"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:eventbridge:$awsSdk")

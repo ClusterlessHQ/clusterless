@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -58,20 +57,16 @@ public abstract class Reporter<T> {
         return objectWriter;
     }
 
-    public void report(Stream<T> list) throws IOException {
-        report(list.iterator());
-    }
-
     public void report(List<T> list) throws IOException {
-        report(list.iterator());
+        report(list.stream());
     }
 
-    public void report(Iterator<T> iterator) throws IOException {
+    public void report(Stream<T> stream) throws IOException {
         BufferedWriter writer = writer();
 
         JsonGenerator generator = objectWriter().createGenerator(writer);
 
-        generator.writeObject(iterator);
+        generator.writeObject(stream.iterator());
 
         if (addNewline()) {
             writer.newLine();

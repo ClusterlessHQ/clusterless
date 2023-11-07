@@ -30,7 +30,11 @@ import java.util.stream.Stream;
  *
  */
 @CommandLine.Command(
-        name = "arcs"
+        name = "arcs",
+        description = "List all arcs",
+        subcommands = {
+                ArcStatus.class
+        }
 )
 public class Arcs extends Reports implements Callable<Integer> {
 
@@ -53,15 +57,7 @@ public class Arcs extends Reports implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        S3 s3 = new S3(commandOptions.profile());
-
-        Predicate<Project> sorted = projectFilter();
-
-        Stream<ArcRecord> records = listAllProjects(commandOptions)
-                .filter(r -> sorted.test(r.project))
-                .map(r -> Map.entry(r.placement, listAllArcKeys(s3, r)))
-                .flatMap(e -> e.getValue().stream().map(a -> Map.entry(e.getKey(), ArcURI.parse("/" + a))))
-                .map(e -> new ArcRecord(e.getKey(), e.getValue().project(), e.getValue().arcName()));
+        Stream<ArcRecord> records = listAllArcs();
 
         Reporter<ArcRecord> reporter = Reporter.instance(kernel().printer(), ArcRecord.class);
 
@@ -71,7 +67,26 @@ public class Arcs extends Reports implements Callable<Integer> {
     }
 
     @NotNull
-    private Predicate<Project> projectFilter() {
+    public Stream<ArcRecord> listAllArcs() {
+        return listAllArcs(v -> true);
+    }
+
+    @NotNull
+    public Stream<ArcRecord> listAllArcs(Predicate<ArcRecord> arcRecordPredicate) {
+        S3 s3 = new S3(commandOptions.profile());
+
+        Predicate<Project> sorted = projectFilter(commandOptions);
+
+        return listAllProjects(commandOptions)
+                .filter(r -> sorted.test(r.project))
+                .map(r -> Map.entry(r.placement, listAllArcKeys(s3, r)))
+                .flatMap(e -> e.getValue().stream().map(a -> Map.entry(e.getKey(), ArcURI.parse("/" + a))))
+                .map(e -> new ArcRecord(e.getKey(), e.getValue().project(), e.getValue().arcName()))
+                .filter(arcRecordPredicate);
+    }
+
+    @NotNull
+    private Predicate<Project> projectFilter(ArcsCommandOptions commandOptions) {
         if (commandOptions.projects().isEmpty()) {
             return p -> true;
         }

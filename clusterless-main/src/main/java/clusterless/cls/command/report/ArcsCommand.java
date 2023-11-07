@@ -11,12 +11,32 @@ package clusterless.cls.command.report;
 import clusterless.cls.command.CommandWrapper;
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(
         name = "arcs",
-        description = "List all deployed arcs."
+        description = "List all deployed arcs.",
+        subcommands = {ArcsCommand.ArcStatusCommand.class}
 )
 public class ArcsCommand extends CommandWrapper<ArcsCommandOptions> {
     public ArcsCommand() {
         super(new ArcsCommandOptions());
+    }
+
+    @CommandLine.Command(
+            name = "status",
+            description = "Show the status of the current target."
+    )
+    public static class ArcStatusCommand implements Callable<Integer> {
+        @CommandLine.ParentCommand
+        ArcsCommand arcsCommand;
+
+        @CommandLine.Mixin
+        ArcStatusCommandOption arcStatusCommandOption = new ArcStatusCommandOption();
+
+        @Override
+        public Integer call() throws Exception {
+            return arcsCommand.main().run(arcStatusCommandOption);
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.awscore.AwsClient;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -34,7 +35,7 @@ import java.util.function.Predicate;
 /**
  *
  */
-public abstract class ClientBase<C> {
+public abstract class ClientBase<C extends AwsClient> {
     private static final Logger LOG = LogManager.getLogger(ClientBase.class);
     protected static final boolean localStackEnabled = Boolean.getBoolean("clusterless.localstack.enabled");
     protected static final String defaultRegion = Optional.ofNullable(System.getenv("AWS_REGION")).orElse(System.getenv("AWS_DEFAULT_REGION"));
@@ -89,6 +90,25 @@ public abstract class ClientBase<C> {
             LOG.info("{}: client using endpoint override: {}", getClass().getSimpleName(), endpointOverride);
         } else if (localStackEnabled) {
             LOG.warn("{}: client not using endpoint override", getClass().getSimpleName());
+        }
+    }
+
+    public abstract class Responses implements Iterable<Response>, AutoCloseable {
+        C client;
+
+        public Responses() {
+        }
+
+        public Responses(C client) {
+            this.client = client;
+        }
+
+        @Override
+        public void close() {
+            if (client != null) {
+                client.close();
+                client = null;
+            }
         }
     }
 

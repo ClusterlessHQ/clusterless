@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static clusterless.cls.substrate.uri.ProjectURI.PROJECTS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -126,9 +127,9 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}[/{attempt}]/manifest.{ext}
         String[] split = template.split("/");
 
-        boolean isOnlyPath = isOnlyPath(template);
-        int index = isOnlyPath ? 2 : 4;
-        String storeName = isOnlyPath ? null : value(split, 2);
+        Format format = isOnlyPath(PROJECTS, template);
+        int index = format.offset();
+        String storeName = format == Format.full ? value(split, 2) : null;
         return new ManifestURI()
                 .setStoreName(storeName)
                 .setDataset(LocatedDataset.Builder.builder()

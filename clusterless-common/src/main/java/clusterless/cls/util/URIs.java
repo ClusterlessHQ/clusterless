@@ -139,6 +139,10 @@ public class URIs {
      * @return
      */
     public static String asKey(URI uri) {
+        if (uri == null) {
+            return null;
+        }
+
         String normalize = uri.normalize().getPath();
 
         if (normalize.isEmpty()) {

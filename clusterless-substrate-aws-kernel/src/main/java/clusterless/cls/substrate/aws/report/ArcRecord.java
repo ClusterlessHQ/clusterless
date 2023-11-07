@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @JsonPropertyOrder({"placement", "project", "name"})
-class ArcRecord implements Struct {
+public class ArcRecord implements Struct {
     @JsonUnwrapped(prefix = "placement.")
     Placement placement;
     @JsonUnwrapped(prefix = "project.")
@@ -38,5 +38,15 @@ class ArcRecord implements Struct {
 
     public String name() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ArcRecord{");
+        sb.append("placement=").append(placement);
+        sb.append(", project=").append(project);
+        sb.append(", name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

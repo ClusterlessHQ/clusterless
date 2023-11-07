@@ -8,5 +8,29 @@
 
 package clusterless.cls.command.report;
 
+import picocli.CommandLine;
+
 public class ProjectsCommandOptions extends ReportCommandOptions {
+    @CommandLine.Mixin
+    ReportOptions reportOptions = new ReportOptions();
+
+    @Override
+    public String profile() {
+        return reportOptions.profile();
+    }
+
+    @Override
+    public String account() {
+        return reportOptions.account();
+    }
+
+    @Override
+    public String region() {
+        return reportOptions.region();
+    }
+
+    @Override
+    public String stage() {
+        return reportOptions.stage();
+    }
 }

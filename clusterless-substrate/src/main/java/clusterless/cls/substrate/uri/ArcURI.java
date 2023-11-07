@@ -106,9 +106,9 @@ public class ArcURI extends MetaURI<Project, ArcURI> {
         // {providerService}://{stateStore}/arcs/{projectName}/{projectVersion}/{arcName}/arc.json
         String[] split = template.split("/");
 
-        boolean isOnlyPath = isOnlyPath(template);
-        int index = isOnlyPath ? 2 : 4;
-        String storeName = isOnlyPath ? null : value(split, 2);
+        Format format = isOnlyPath(ARCS, template);
+        int index = format.offset();
+        String storeName = format == Format.full ? value(split, 2) : null;
         return new ArcURI()
                 .setStoreName(storeName)
                 .setProject(Project.Builder.builder()

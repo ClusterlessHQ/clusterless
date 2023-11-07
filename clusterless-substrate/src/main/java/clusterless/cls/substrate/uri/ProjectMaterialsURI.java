@@ -113,12 +113,12 @@ public class ProjectMaterialsURI extends MetaURI<Project, ProjectMaterialsURI> {
     public static ProjectMaterialsURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
 
-        // {providerService}://{stateStore}/projects/{projectName}/{projectVersion}/project.json
+        // {providerService}://{stateStore}/materials/{projectName}/{projectVersion}/project.json
         String[] split = template.split("/");
 
-        boolean isOnlyPath = isOnlyPath(template);
-        int index = isOnlyPath ? 2 : 4;
-        String storeName = isOnlyPath ? null : value(split, 2);
+        Format format = isOnlyPath(MATERIALS, template);
+        int index = format.offset();
+        String storeName = format == Format.full ? value(split, 2) : null;
         return new ProjectMaterialsURI()
                 .setStoreName(storeName) // the bucket in s3
                 .setProject(Project.Builder.builder()

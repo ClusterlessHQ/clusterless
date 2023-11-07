@@ -75,6 +75,12 @@ public class StateURITest {
     }
 
     @Test
+    void arcStateKey() {
+        Assertions.assertEquals("20230921PT5M266", ArcStateURI.parse("/arcs/project=test-project/version=20230101/arc=arc1/lot=20230921PT5M266").lotId());
+        Assertions.assertEquals("20230921PT5M266", ArcStateURI.parse("arcs/project=test-project/version=20230101/arc=arc1/lot=20230921PT5M266").lotId());
+    }
+
+    @Test
     void arcManifest() {
         ManifestURI manifestState = ManifestURI.builder()
                 .withPlacement(Placement.builder()

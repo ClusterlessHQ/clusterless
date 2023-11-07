@@ -28,6 +28,10 @@ public class CommandWrapper<C extends CommonCommandOptions> implements Callable<
         this.commandOptions = commandOptions;
     }
 
+    public Main main() {
+        return main;
+    }
+
     @Override
     public Integer call() throws Exception {
         return main.run(this.commandOptions);
