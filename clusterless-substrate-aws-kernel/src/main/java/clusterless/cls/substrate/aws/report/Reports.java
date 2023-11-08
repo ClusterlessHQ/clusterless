@@ -14,6 +14,7 @@ import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.store.StateStore;
 import clusterless.cls.substrate.store.Stores;
+import clusterless.cls.substrate.uri.DatasetURI;
 import clusterless.cls.substrate.uri.ProjectURI;
 import clusterless.commons.util.Strings;
 import one.util.streamex.StreamEx;
@@ -51,12 +52,50 @@ public class Reports extends CommonCommand {
 
         URI uri = ProjectURI.builder()
                 .withPlacement(placement)
-                .build().uriPrefix();
+                .build()
+                .uriPrefix();
 
         S3.Response response = s3.listObjects(uri);
 
         response.isSuccessOrThrowRuntime(
                 r -> String.format("unable to list projects in: %s, %s", uri, r.errorMessage())
+        );
+
+        return s3.listChildren(response);
+    }
+
+    @NotNull
+    protected Stream<DatasetRecord> listAllDatasets(ReportCommandOptions commandOptions) {
+        List<Placement> placements = filterPlacements(commandOptions);
+
+        Stream<DatasetRecord> records = StreamEx.empty();
+
+        for (Placement placement : placements) {
+            List<String> children = listAllDatasetKeysFor(commandOptions.profile(), placement);
+
+            Stream<DatasetRecord> recordStream = children.stream().map("/"::concat)
+                    .map(DatasetURI::parse)
+                    .map(DatasetURI::dataset)
+                    .map(p -> new DatasetRecord(placement, p));
+
+            records = Stream.concat(records, recordStream);
+        }
+
+        return records;
+    }
+
+    protected static List<String> listAllDatasetKeysFor(String profile, Placement placement) {
+        S3 s3 = new S3(profile);
+
+        URI uri = DatasetURI.builder()
+                .withPlacement(placement)
+                .build()
+                .uriPrefix();
+
+        S3.Response response = s3.listObjects(uri);
+
+        response.isSuccessOrThrowRuntime(
+                r -> String.format("unable to list datasets in: %s, %s", uri, r.errorMessage())
         );
 
         return s3.listChildren(response);

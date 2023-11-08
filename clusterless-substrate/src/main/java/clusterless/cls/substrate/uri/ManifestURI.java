@@ -36,7 +36,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static clusterless.cls.substrate.uri.ProjectURI.PROJECTS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -127,7 +126,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         // {provider-service}://{manifest-store}/datasets/{dataset-name}/{dataset-version}/{lot}/{state}[/{attempt}]/manifest.{ext}
         String[] split = template.split("/");
 
-        Format format = isOnlyPath(PROJECTS, template);
+        Format format = isOnlyPath(DATASETS, template);
         int index = format.offset();
         String storeName = format == Format.full ? value(split, 2) : null;
         return new ManifestURI()
@@ -213,12 +212,11 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
                 .with(attempt)
                 .with("manifest.json");
 
-        String path = Partition.namedOf("name", Optional.ofNullable(dataset.name()).orElse("{datasetName}"))
+        return Partition.namedOf("name", Optional.ofNullable(dataset.name()).orElse("{datasetName}"))
                 .withNamed("version", Optional.ofNullable(dataset.version()).orElse("{datasetVersion}"))
                 .withNamed("lot", Optional.ofNullable(lotId).orElse("{lot}")) // retain case
                 .with(manifest)
                 .partition();
-        return path;
     }
 
     @JsonIgnore

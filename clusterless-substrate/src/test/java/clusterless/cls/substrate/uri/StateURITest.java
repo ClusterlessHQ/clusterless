@@ -81,7 +81,7 @@ public class StateURITest {
     }
 
     @Test
-    void arcManifest() {
+    void manifestState() {
         ManifestURI manifestState = ManifestURI.builder()
                 .withPlacement(Placement.builder()
                         .withAccount("00000000")
@@ -144,4 +144,11 @@ public class StateURITest {
         String jsonFromParsed = JSONUtil.writeAsStringSafe(parsedArcState);
         Assertions.assertEquals("\"s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=partial/attempt=" + attempt + "/manifest.json\"", jsonFromParsed);
     }
+
+    @Test
+    void manifestStateKey() {
+        Assertions.assertEquals("20230921PT5M242", ManifestURI.parse("/datasets/name=access-logs-parquet/version=20230817/lot=20230921PT5M242/").lotId());
+        Assertions.assertEquals("20230921PT5M242", ManifestURI.parse("datasets/name=access-logs-parquet/version=20230817/lot=20230921PT5M242/").lotId());
+    }
+
 }

@@ -9,8 +9,11 @@
 package clusterless.cls.substrate.aws.report.reporter;
 
 import clusterless.cls.printer.Printer;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -28,6 +31,14 @@ public class TableReporter<T> extends Reporter<T> {
 
     public TableReporter(Printer printer, Class<T> type) {
         super(printer, type);
+
+        jsonMapper.getSerializerProvider().setNullValueSerializer(new JsonSerializer<>() {
+            public void serialize(Object value, JsonGenerator jgen,
+                                  SerializerProvider provider)
+                    throws IOException {
+                jgen.writeString("-");
+            }
+        });
 
         objectWriter = jsonMapper.writer();
 

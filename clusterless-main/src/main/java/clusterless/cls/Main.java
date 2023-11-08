@@ -17,6 +17,7 @@ import clusterless.cls.command.CommonCommandOptions;
 import clusterless.cls.command.ConfigCommand;
 import clusterless.cls.command.project.*;
 import clusterless.cls.command.report.ArcsCommand;
+import clusterless.cls.command.report.DatasetsCommand;
 import clusterless.cls.command.report.PlacementsCommand;
 import clusterless.cls.command.report.ProjectsCommand;
 import clusterless.cls.command.show.ShowCommand;
@@ -58,7 +59,8 @@ import java.util.concurrent.Callable;
                 VerifyCommand.class,
                 PlacementsCommand.class,
                 ProjectsCommand.class,
-                ArcsCommand.class
+                ArcsCommand.class,
+                DatasetsCommand.class
         }
 )
 public class Main extends Startup implements Callable<Integer> {

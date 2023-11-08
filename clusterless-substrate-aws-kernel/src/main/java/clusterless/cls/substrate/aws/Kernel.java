@@ -23,6 +23,7 @@ import clusterless.cls.substrate.aws.cdk.bootstrap.Bootstrap;
 import clusterless.cls.substrate.aws.cdk.lifecycle.*;
 import clusterless.cls.substrate.aws.local.Local;
 import clusterless.cls.substrate.aws.report.Arcs;
+import clusterless.cls.substrate.aws.report.Datasets;
 import clusterless.cls.substrate.aws.report.Placements;
 import clusterless.cls.substrate.aws.report.Projects;
 import clusterless.cls.util.ExecutionExceptionHandler;
@@ -53,7 +54,8 @@ import java.util.stream.Collectors;
                 Local.class,
                 Placements.class,
                 Projects.class,
-                Arcs.class
+                Arcs.class,
+                Datasets.class
         }
 )
 public class Kernel extends Startup implements SubstrateProvider {

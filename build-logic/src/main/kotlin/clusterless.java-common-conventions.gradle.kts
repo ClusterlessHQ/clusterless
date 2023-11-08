@@ -45,14 +45,14 @@ else
 repositories {
     mavenCentral()
 
-    maven {
-        url = uri("https://maven.pkg.github.com/heretical/*")
-
-        credentials {
-            username = project.findProperty("githubUsername") as String?
-            password = project.findProperty("githubPassword") as String?
-        }
-    }
+//    maven {
+//        url = uri("https://maven.pkg.github.com/heretical/*")
+//
+//        credentials {
+//            username = project.findProperty("githubUsername") as String?
+//            password = project.findProperty("githubPassword") as String?
+//        }
+//    }
 }
 
 java {
@@ -102,7 +102,7 @@ dependencies {
         implementationAndTestFixture("io.clusterless:clusterless-commons-core:$commons")
         implementationAndTestFixture("io.clusterless:clusterless-commons-aws:$commons")
 
-        implementation("io.heretical:mini-parsers-temporal:2.0.0-wip-6")
+        implementation("io.heretical:mini-parsers-temporal:2.0.0")
 
         implementation("org.jetbrains:annotations:24.0.0")
         implementation("info.picocli:picocli:4.7.5")

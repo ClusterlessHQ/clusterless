@@ -27,9 +27,11 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -118,6 +120,8 @@ public class ArcStateURI extends StateURI<ArcState, ArcStateURI> {
 
     public static ArcStateURI parse(String template) {
         Objects.requireNonNull(template, "template is null");
+
+        template = URLDecoder.decode(template, UTF_8);
 
         // {providerService}://{stateStore}/arcs/{projectName}/{projectVersion}/{arcName}/{lot}/{state}.arc
         String[] split = template.split("/");

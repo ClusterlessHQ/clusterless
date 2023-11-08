@@ -9,40 +9,40 @@
 package clusterless.cls.substrate.aws.report;
 
 import clusterless.cls.model.Struct;
-import clusterless.cls.model.state.ArcState;
+import clusterless.cls.model.manifest.ManifestState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 
-@JsonPropertyOrder({"arc", "lotId", "arcState"})
-public class ArcStatusRecord implements StatusRecord<ArcState>, Struct {
+@JsonPropertyOrder({"dataset", "lotId", "manifestState"})
+public class DatasetStatusRecord implements StatusRecord<ManifestState>, Struct {
     @JsonUnwrapped
-    @JsonProperty("arc")
-    ArcRecord arcRecord;
+    @JsonProperty("dataset")
+    DatasetRecord datasetRecord;
     String lotId;
-    ArcState arcState;
+    ManifestState manifestState;
 
-    public ArcStatusRecord(ArcRecord arcRecord, String lotId, ArcState arcState) {
-        this.arcRecord = arcRecord;
+    public DatasetStatusRecord(DatasetRecord datasetRecord, String lotId, ManifestState manifestState) {
+        this.datasetRecord = datasetRecord;
         this.lotId = lotId;
-        this.arcState = arcState;
+        this.manifestState = manifestState;
     }
 
-    public ArcRecord arcRecord() {
-        return arcRecord;
+    public DatasetRecord datasetRecord() {
+        return datasetRecord;
     }
 
     public String lotId() {
         return lotId;
     }
 
-    public ArcState arcState() {
-        return arcState;
+    public ManifestState manifestState() {
+        return manifestState;
     }
 
     @Override
-    public ArcState state() {
-        return arcState;
+    public ManifestState state() {
+        return manifestState();
     }
 }

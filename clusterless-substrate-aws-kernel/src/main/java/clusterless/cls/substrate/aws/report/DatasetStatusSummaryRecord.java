@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.report;
 
-import clusterless.cls.model.state.ArcState;
+import clusterless.cls.model.manifest.ManifestState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -17,8 +17,9 @@ import com.google.common.collect.EnumMultiset;
 
 import java.time.temporal.TemporalUnit;
 
+
 @JsonPropertyOrder({
-        "arc",
+        "manifest",
         "temporalUnit",
         "startLot",
         "firstLot",
@@ -27,51 +28,27 @@ import java.time.temporal.TemporalUnit;
         "lastLot",
         "endGap",
         "intervals",
-        "running",
+        "removed",
         "partial",
-        "missing",
+        "empty",
         "complete",
         "gaps",
         "total"
 })
-public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
+public class DatasetStatusSummaryRecord extends StatusSummaryRecord<ManifestState> {
     @JsonUnwrapped
-    @JsonProperty("arc")
-    ArcRecord arcRecord;
+    @JsonProperty("manifest")
+    DatasetRecord datasetRecord;
 
     @JsonIgnore
-    EnumMultiset<ArcState> states = EnumMultiset.create(ArcState.class);
+    EnumMultiset<ManifestState> states = EnumMultiset.create(ManifestState.class);
 
     public static Builder builder() {
         return Builder.builder();
     }
 
-    public ArcRecord arcRecord() {
-        return arcRecord;
-    }
-
-    public EnumMultiset<ArcState> states() {
-        return states;
-    }
-
-    @JsonProperty("running")
-    public int running() {
-        return states.count(ArcState.running);
-    }
-
-    @JsonProperty("complete")
-    public int complete() {
-        return states.count(ArcState.complete);
-    }
-
-    @JsonProperty("partial")
-    public int partial() {
-        return states.count(ArcState.partial);
-    }
-
-    @JsonProperty("missing")
-    public int missing() {
-        return states.count(ArcState.missing);
+    public DatasetRecord datasetRecord() {
+        return datasetRecord;
     }
 
     @Override
@@ -79,17 +56,38 @@ public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
         return states.size();
     }
 
-    @Override
-    public void addState(ArcState state) {
+    public void addState(ManifestState state) {
         states.add(state);
     }
 
+    @JsonProperty("empty")
+    public int running() {
+        return states.count(ManifestState.empty);
+    }
+
+    @JsonProperty("complete")
+    public int complete() {
+        return states.count(ManifestState.complete);
+    }
+
+    @JsonProperty("partial")
+    public int partial() {
+        return states.count(ManifestState.partial);
+    }
+
+    @JsonProperty("removed")
+    public int removed() {
+        return states.count(ManifestState.removed);
+    }
+
     public static final class Builder {
-        ArcRecord arcRecord;
+        DatasetRecord datasetRecord;
         TemporalUnit temporalUnit;
         String startLot;
         String endLot;
         long intervals;
+        String firstLot;
+        String lastLot;
 
         private Builder() {
         }
@@ -98,8 +96,8 @@ public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
             return new Builder();
         }
 
-        public Builder withArcRecord(ArcRecord arcRecord) {
-            this.arcRecord = arcRecord;
+        public Builder withDatasetRecord(DatasetRecord datasetRecord) {
+            this.datasetRecord = datasetRecord;
             return this;
         }
 
@@ -123,17 +121,27 @@ public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
             return this;
         }
 
-        public ArcStatusSummaryRecord build() {
-            ArcStatusSummaryRecord arcStatusSummaryRecord = new ArcStatusSummaryRecord();
-            arcStatusSummaryRecord.startLot = this.startLot;
-            arcStatusSummaryRecord.intervals = this.intervals;
-            arcStatusSummaryRecord.temporalUnit = this.temporalUnit;
-            arcStatusSummaryRecord.arcRecord = this.arcRecord;
-            arcStatusSummaryRecord.endLot = this.endLot;
-            return arcStatusSummaryRecord;
+        public Builder withFirstLot(String firstLot) {
+            this.firstLot = firstLot;
+            return this;
+        }
+
+        public Builder withLastLot(String lastLot) {
+            this.lastLot = lastLot;
+            return this;
+        }
+
+        public DatasetStatusSummaryRecord build() {
+            DatasetStatusSummaryRecord datasetStatusSummaryRecord = new DatasetStatusSummaryRecord();
+            datasetStatusSummaryRecord.intervals = this.intervals;
+            datasetStatusSummaryRecord.datasetRecord = this.datasetRecord;
+            datasetStatusSummaryRecord.temporalUnit = this.temporalUnit;
+            datasetStatusSummaryRecord.endLot = this.endLot;
+            datasetStatusSummaryRecord.startLot = this.startLot;
+            datasetStatusSummaryRecord.lastLot = this.lastLot;
+            datasetStatusSummaryRecord.firstLot = this.firstLot;
+            return datasetStatusSummaryRecord;
         }
     }
 }
-
-
 

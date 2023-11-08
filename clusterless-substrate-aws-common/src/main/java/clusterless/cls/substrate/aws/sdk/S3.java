@@ -426,11 +426,12 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public Stream<String> listChildrenStream(Iterable<Response> responses, URI endExclusive, Consumer<ClientBase<S3Client>.Response> handler) {
+    public Stream<String> listChildrenStream(Iterable<Response> responses, URI endExclusive, String objectName, Consumer<ClientBase<S3Client>.Response> handler) {
         String end = URIs.asKey(endExclusive);
         return StreamSupport.stream(responses.spliterator(), false)
                 .takeWhile(r -> handle(r, handler))
                 .flatMap(this::listChildrenStream)
+                .filter(key -> key.endsWith(objectName)) // only return objects, that directories
                 .takeWhile(key -> !key.startsWith(end));
     }
 
