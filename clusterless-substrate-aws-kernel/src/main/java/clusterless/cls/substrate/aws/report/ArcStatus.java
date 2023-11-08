@@ -19,8 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @CommandLine.Command(
-        name = "status",
-        description = "List the status of all arcs in the range."
+        name = "status"
 )
 public class ArcStatus implements Callable<Integer> {
     @CommandLine.ParentCommand

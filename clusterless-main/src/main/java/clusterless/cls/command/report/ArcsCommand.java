@@ -25,7 +25,15 @@ public class ArcsCommand extends CommandWrapper<ArcsCommandOptions> {
 
     @CommandLine.Command(
             name = "status",
-            description = "Show the status of the current target."
+            description = {
+                    "Show a summary of deployed arcs status (within the time range).",
+                    "Where status is one of:",
+                    "  - running: workload is in process",
+                    "  - complete: workload finished successfully",
+                    "  - partial: workload finished but some data is missing",
+                    "  - missing: no data, possibly due to error, or missing upstream data",
+                    "The --list option will output all arc instances instead of summarizing."
+            }
     )
     public static class ArcStatusCommand implements Callable<Integer> {
         @CommandLine.ParentCommand

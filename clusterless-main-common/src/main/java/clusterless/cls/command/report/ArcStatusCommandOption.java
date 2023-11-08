@@ -15,24 +15,24 @@ import picocli.CommandLine;
 import java.util.LinkedList;
 import java.util.List;
 
-@CommandLine.Command(
-        name = "status",
-        description = "Show the status of the current target."
-)
 public class ArcStatusCommandOption extends CommonCommandOptions {
     @CommandLine.Mixin
     ArcReportOptions arcReportOptions = new ArcReportOptions();
 
-    @CommandLine.Mixin
+    @CommandLine.ArgGroup(
+            exclusive = false,
+            multiplicity = "1",
+            heading = "Time Range Options:%n"
+    )
     RangeOptions rangeOptions = new RangeOptions();
 
     @CommandLine.Option(
             names = {"--name"},
-            description = "Filter results by the name of the target to show."
+            description = "Filter results by the name of the arc."
     )
     List<String> names = new LinkedList<>();
 
-    @CommandLine.Option(names = {"--list"}, description = {"List all arc instances"})
+    @CommandLine.Option(names = {"--list"}, description = {"List all arc instances instead of summarizing."})
     boolean list = false;
 
     public ArcStatusCommandOption setNames(List<String> names) {

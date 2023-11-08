@@ -13,7 +13,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "placements",
-        description = "List all visible placements with deployments."
+        description = "List all placements with deployments."
 )
 public class PlacementsCommand extends CommandWrapper<PlacementsCommandOptions> {
     public PlacementsCommand() {

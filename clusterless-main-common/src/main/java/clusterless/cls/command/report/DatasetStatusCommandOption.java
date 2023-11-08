@@ -15,20 +15,20 @@ import picocli.CommandLine;
 import java.util.LinkedList;
 import java.util.List;
 
-@CommandLine.Command(
-        name = "status",
-        description = "Show the status of the current target."
-)
 public class DatasetStatusCommandOption extends CommonCommandOptions {
     @CommandLine.Mixin
     DatasetReportOptions datasetReportOptions = new DatasetReportOptions();
 
-    @CommandLine.Mixin
+    @CommandLine.ArgGroup(
+            exclusive = false,
+            multiplicity = "1",
+            heading = "Time Range Options:%n"
+    )
     RangeOptions rangeOptions = new RangeOptions();
 
     @CommandLine.Option(
             names = {"--name"},
-            description = "Filter results by the name of the target to show."
+            description = "Filter results by the name of the dataset."
     )
     List<String> names = new LinkedList<>();
 

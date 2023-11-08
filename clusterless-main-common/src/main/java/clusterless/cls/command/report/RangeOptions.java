@@ -16,7 +16,9 @@ public class RangeOptions {
     @CommandLine.Option(
             names = {"--earliest"},
             description = {
-                    "Earliest time to include in report.",
+                    "Earliest time to include in report, inclusive.",
+                    "Where the time can be most any date/time format, or",
+                    "an adjuster such as '1h' or '1d'.",
                     "(default: ${DEFAULT-VALUE})"
             },
             converter = MomentTypeConverter.class,
@@ -26,7 +28,9 @@ public class RangeOptions {
     @CommandLine.Option(
             names = {"--latest"},
             description = {
-                    "Latest time to include in report.",
+                    "Latest time to include in report, exclusive.",
+                    "Where the time can be most any date/time format, or",
+                    "an adjuster such as '1h' or '1d'.",
                     "(default: ${DEFAULT-VALUE})"
             },
             converter = MomentTypeConverter.class
