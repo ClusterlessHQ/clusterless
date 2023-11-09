@@ -21,7 +21,6 @@ public class ArcStatusCommandOption extends CommonCommandOptions {
 
     @CommandLine.ArgGroup(
             exclusive = false,
-            multiplicity = "1",
             heading = "Time Range Options:%n"
     )
     RangeOptions rangeOptions = new RangeOptions();
