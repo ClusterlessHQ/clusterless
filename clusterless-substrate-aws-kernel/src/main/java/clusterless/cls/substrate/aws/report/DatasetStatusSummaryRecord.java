@@ -21,19 +21,19 @@ import java.time.temporal.TemporalUnit;
 @JsonPropertyOrder({
         "manifest",
         "temporalUnit",
-        "startLot",
-        "firstLot",
-        "startGap",
-        "endLot",
-        "lastLot",
-        "endGap",
-        "intervals",
+        "earliest",
+        "earliestFound",
+        "earliestGap",
+        "latest",
+        "latestFound",
+        "latestGap",
         "removed",
         "partial",
         "empty",
         "complete",
-        "gaps",
-        "total"
+        "totalFound",
+        "range",
+        "rangeGap"
 })
 public class DatasetStatusSummaryRecord extends StatusSummaryRecord<ManifestState> {
     @JsonUnwrapped
@@ -83,11 +83,11 @@ public class DatasetStatusSummaryRecord extends StatusSummaryRecord<ManifestStat
     public static final class Builder {
         DatasetRecord datasetRecord;
         TemporalUnit temporalUnit;
-        String startLot;
-        String endLot;
-        long intervals;
-        String firstLot;
-        String lastLot;
+        String earliestLot;
+        String latestLot;
+        long rangeIntervals;
+        String firstFoundLot;
+        String lastFoundLot;
 
         private Builder() {
         }
@@ -106,42 +106,41 @@ public class DatasetStatusSummaryRecord extends StatusSummaryRecord<ManifestStat
             return this;
         }
 
-        public Builder withStartLot(String startLot) {
-            this.startLot = startLot;
+        public Builder withEarliestLot(String earliestLot) {
+            this.earliestLot = earliestLot;
             return this;
         }
 
-        public Builder withEndLot(String endLot) {
-            this.endLot = endLot;
+        public Builder withLatestLot(String latestLot) {
+            this.latestLot = latestLot;
             return this;
         }
 
-        public Builder withIntervals(long intervals) {
-            this.intervals = intervals;
+        public Builder withRangeIntervals(long rangeIntervals) {
+            this.rangeIntervals = rangeIntervals;
             return this;
         }
 
-        public Builder withFirstLot(String firstLot) {
-            this.firstLot = firstLot;
+        public Builder withFirstFoundLot(String firstFoundLot) {
+            this.firstFoundLot = firstFoundLot;
             return this;
         }
 
-        public Builder withLastLot(String lastLot) {
-            this.lastLot = lastLot;
+        public Builder withLastFoundLot(String lastFoundLot) {
+            this.lastFoundLot = lastFoundLot;
             return this;
         }
 
         public DatasetStatusSummaryRecord build() {
             DatasetStatusSummaryRecord datasetStatusSummaryRecord = new DatasetStatusSummaryRecord();
-            datasetStatusSummaryRecord.intervals = this.intervals;
+            datasetStatusSummaryRecord.earliestLot = this.earliestLot;
             datasetStatusSummaryRecord.datasetRecord = this.datasetRecord;
+            datasetStatusSummaryRecord.latestLot = this.latestLot;
+            datasetStatusSummaryRecord.lastFoundLot = this.lastFoundLot;
+            datasetStatusSummaryRecord.firstFoundLot = this.firstFoundLot;
+            datasetStatusSummaryRecord.rangeIntervals = this.rangeIntervals;
             datasetStatusSummaryRecord.temporalUnit = this.temporalUnit;
-            datasetStatusSummaryRecord.endLot = this.endLot;
-            datasetStatusSummaryRecord.startLot = this.startLot;
-            datasetStatusSummaryRecord.lastLot = this.lastLot;
-            datasetStatusSummaryRecord.firstLot = this.firstLot;
             return datasetStatusSummaryRecord;
         }
     }
 }
-

@@ -44,9 +44,9 @@ public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord,
         return DatasetStatusSummaryRecord.builder()
                 .withDatasetRecord(record)
                 .withTemporalUnit(temporalUnit)
-                .withStartLot(startLotInclusive)
-                .withEndLot(endLotInclusive)
-                .withIntervals(count)
+                .withEarliestLot(startLotInclusive)
+                .withLatestLot(endLotInclusive)
+                .withRangeIntervals(count)
                 .build();
     }
 

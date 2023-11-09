@@ -20,19 +20,19 @@ import java.time.temporal.TemporalUnit;
 @JsonPropertyOrder({
         "arc",
         "temporalUnit",
-        "startLot",
-        "firstLot",
-        "startGap",
-        "endLot",
-        "lastLot",
-        "endGap",
-        "intervals",
+        "earliest",
+        "earliestFound",
+        "earliestGap",
+        "latest",
+        "latestFound",
+        "latestGap",
         "running",
         "partial",
         "missing",
         "complete",
-        "gaps",
-        "total"
+        "totalFound",
+        "range",
+        "rangeGap"
 })
 public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
     @JsonUnwrapped
@@ -87,9 +87,11 @@ public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
     public static final class Builder {
         ArcRecord arcRecord;
         TemporalUnit temporalUnit;
-        String startLot;
-        String endLot;
-        long intervals;
+        String earliestLot;
+        String latestLot;
+        long rangeIntervals;
+        String firstFoundLot;
+        String lastFoundLot;
 
         private Builder() {
         }
@@ -108,28 +110,40 @@ public class ArcStatusSummaryRecord extends StatusSummaryRecord<ArcState> {
             return this;
         }
 
-        public Builder withStartLot(String startLot) {
-            this.startLot = startLot;
+        public Builder withEarliestLot(String earliestLot) {
+            this.earliestLot = earliestLot;
             return this;
         }
 
-        public Builder withEndLot(String endLot) {
-            this.endLot = endLot;
+        public Builder withLatestLot(String latestLot) {
+            this.latestLot = latestLot;
             return this;
         }
 
-        public Builder withIntervals(long intervals) {
-            this.intervals = intervals;
+        public Builder withRangeIntervals(long rangeIntervals) {
+            this.rangeIntervals = rangeIntervals;
+            return this;
+        }
+
+        public Builder withFirstFoundLot(String firstFoundLot) {
+            this.firstFoundLot = firstFoundLot;
+            return this;
+        }
+
+        public Builder withLastFoundLot(String lastFoundLot) {
+            this.lastFoundLot = lastFoundLot;
             return this;
         }
 
         public ArcStatusSummaryRecord build() {
             ArcStatusSummaryRecord arcStatusSummaryRecord = new ArcStatusSummaryRecord();
-            arcStatusSummaryRecord.startLot = this.startLot;
-            arcStatusSummaryRecord.intervals = this.intervals;
-            arcStatusSummaryRecord.temporalUnit = this.temporalUnit;
             arcStatusSummaryRecord.arcRecord = this.arcRecord;
-            arcStatusSummaryRecord.endLot = this.endLot;
+            arcStatusSummaryRecord.earliestLot = this.earliestLot;
+            arcStatusSummaryRecord.latestLot = this.latestLot;
+            arcStatusSummaryRecord.lastFoundLot = this.lastFoundLot;
+            arcStatusSummaryRecord.firstFoundLot = this.firstFoundLot;
+            arcStatusSummaryRecord.rangeIntervals = this.rangeIntervals;
+            arcStatusSummaryRecord.temporalUnit = this.temporalUnit;
             return arcStatusSummaryRecord;
         }
     }

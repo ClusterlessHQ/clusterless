@@ -46,9 +46,9 @@ public class ArcScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcStatusSum
         return ArcStatusSummaryRecord.builder()
                 .withArcRecord(record)
                 .withTemporalUnit(temporalUnit)
-                .withStartLot(startLotInclusive)
-                .withEndLot(endLotInclusive)
-                .withIntervals(count)
+                .withEarliestLot(startLotInclusive)
+                .withLatestLot(endLotInclusive)
+                .withRangeIntervals(count)
                 .build();
     }
 

@@ -21,40 +21,44 @@ import java.time.temporal.TemporalUnit;
 
 public abstract class StatusSummaryRecord<S extends State> implements Struct {
     TemporalUnit temporalUnit;
-    String startLot;
-    String endLot;
-    long intervals;
-    String firstLot;
-    String lastLot;
+    String earliestLot;
+    String latestLot;
+    long rangeIntervals;
+    String firstFoundLot;
+    String lastFoundLot;
 
     public TemporalUnit temporalUnit() {
         return temporalUnit;
     }
 
-    public String startLot() {
-        return startLot;
+    @JsonProperty("earliest")
+    public String earliestLot() {
+        return earliestLot;
     }
 
-    public String endLot() {
-        return endLot;
+    @JsonProperty("latest")
+    public String latestLot() {
+        return latestLot;
     }
 
-    public String firstLot() {
-        return firstLot;
+    @JsonProperty("earliestFound")
+    public String firstFoundLot() {
+        return firstFoundLot;
     }
 
-    public String lastLot() {
-        return lastLot;
+    @JsonProperty("latestFound")
+    public String lastFoundLot() {
+        return lastFoundLot;
     }
 
-    @JsonProperty("startGap")
-    public Integer startGap() {
-        return gap(startLot, firstLot);
+    @JsonProperty("earliestGap")
+    public Integer earliestGap() {
+        return gap(earliestLot, firstFoundLot);
     }
 
-    @JsonProperty("endGap")
-    public Integer endGap() {
-        return gap(lastLot, endLot);
+    @JsonProperty("latestGap")
+    public Integer latestGap() {
+        return gap(lastFoundLot, latestLot);
     }
 
     private Integer gap(String lhs, String rhs) {
@@ -74,17 +78,17 @@ public abstract class StatusSummaryRecord<S extends State> implements Struct {
         return (int) Duration.between(begin.query(Instant::from), end.query(Instant::from)).dividedBy(temporalUnit.getDuration());
     }
 
-    @JsonProperty("intervals")
-    public long intervals() {
-        return intervals;
+    @JsonProperty("range")
+    public long rangeIntervals() {
+        return rangeIntervals;
     }
 
-    @JsonProperty("gaps")
-    public long gaps() {
-        return intervals - statesSize();
+    @JsonProperty("rangeGap")
+    public long rangeGap() {
+        return rangeIntervals - statesSize();
     }
 
-    @JsonProperty("total")
+    @JsonProperty("totalFound")
     public int total() {
         return statesSize();
     }
@@ -95,9 +99,9 @@ public abstract class StatusSummaryRecord<S extends State> implements Struct {
 
     public void addStateRecord(StatusRecord<S> statusRecord) {
         addState(statusRecord.state());
-        if (firstLot == null) {
-            firstLot = statusRecord.lotId();
+        if (firstFoundLot == null) {
+            firstFoundLot = statusRecord.lotId();
         }
-        lastLot = statusRecord.lotId();
+        lastFoundLot = statusRecord.lotId();
     }
 }
