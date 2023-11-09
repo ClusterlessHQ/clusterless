@@ -28,10 +28,12 @@ public class DatasetsCommand extends CommandWrapper<DatasetsCommandOptions> {
             description = {
                     "Show a summary of deployed dataset manifest status (within the time range).",
                     "Where status is one of:",
-                    "  - complete: manifest is complete",
-                    "  - partial: manifest exists, but some data is missing",
-                    "  - empty: manifest has no data, possibly due to error, or missing upstream data",
-                    "  - removed: the manifest and its data has been removed",
+                    "",
+                    "- complete: manifest is complete",
+                    "- partial: manifest exists, but some data is missing",
+                    "- empty: manifest has no data, possibly due to error, or missing upstream data",
+                    "- removed: the manifest and its data has been removed",
+                    "",
                     "The --list option will output all manifest instances instead of summarizing."
             }
     )
