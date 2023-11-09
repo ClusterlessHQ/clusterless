@@ -9,6 +9,7 @@
 package clusterless.cls.substrate.aws.report.reporter;
 
 import clusterless.cls.printer.Printer;
+import clusterless.commons.naming.Label;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -50,7 +51,7 @@ public class TableReporter<T> extends Reporter<T> {
 
         for (int i = 0; i < fields.length; i++) {
             fields[i] = columns.columnName(i);
-            String[] name = columns.columnName(i).split("\\.");
+            String[] name = Label.of(columns.columnName(i)).lowerHyphen().split("[.-]");
             headers[0][i] = name.length > 1 ? name[0] : "";
             headers[1][i] = name.length > 1 ? name[1] : name[0];
             lengths[i] = Math.max(headers[0][i].toString().length(), headers[1][i].toString().length());
