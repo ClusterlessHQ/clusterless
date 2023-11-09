@@ -53,4 +53,8 @@ public class Moment {
     public String toString() {
         return moment;
     }
+
+    public String print() {
+        return "%s/%s".formatted(moment, instant);
+    }
 }

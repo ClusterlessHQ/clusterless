@@ -21,20 +21,20 @@ import picocli.CommandLine;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class MomentTypeConverter implements CommandLine.ITypeConverter<Moment> {
+    /**
+     * Locks the clock to now for the lifetime of the jvm so that earliest now and latest now are the same.
+     */
+    private static final Lazy<Clock> clockLazy = Lazy.of(() -> Clock.fixed(Clock.system(ZoneOffset.UTC).instant(), ZoneOffset.UTC));
     private static final Map<String, DateTimeFormatter> units = Arrays.stream(IntervalUnit.values())
             .collect(Collectors.toMap(u -> u.getDuration().toString(), IntervalUnits::formatter));
-
-    private Supplier<ZoneId> zoneId = () -> ZoneOffset.UTC;
 
     RelativeDateTimeAdjusterParser adjusterParser;
     AbsoluteDateTimeParser absoluteParser;
@@ -46,7 +46,7 @@ public class MomentTypeConverter implements CommandLine.ITypeConverter<Moment> {
     }
 
     protected Context getContext() {
-        return new Context(Clock.system(zoneId.get()));
+        return new Context(clockLazy.get());
     }
 
     @Override

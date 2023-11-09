@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,19 +31,17 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
     protected static final Logger LOG = LoggerFactory.getLogger(ArcScanner.class);
     protected final String profile;
     protected final Rec record;
-    protected final Moment earliest;
-    protected final Moment latest;
     protected final StateURI<?, ?> stateURI;
     protected final TemporalUnit temporalUnit;
     protected final String startLotInclusive;
     protected final String endLotInclusive;
     protected final String endLotExclusive;
+    private final Instant earliestInstant;
+    private final Instant latestInstant;
 
     public Scanner(String profile, Rec record, Moment earliest, Moment latest) {
         this.profile = profile;
         this.record = record;
-        this.earliest = earliest;
-        this.latest = latest;
         LOG.info("creating scanner for: {}", record);
 
         this.stateURI = createStateURIFrom(record);
@@ -50,10 +49,19 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
 
         LOG.info("using temporal unit: {}", this.temporalUnit);
 
-        this.startLotInclusive = IntervalUnits.formatter(this.temporalUnit).format(earliest.instant());
-        this.endLotExclusive = IntervalUnits.formatter(this.temporalUnit).format(latest.instant());
+        LOG.info("using moment earliest: {}, latest: {}", earliest.print(), latest.print());
 
-        this.endLotInclusive = IntervalUnits.formatter(this.temporalUnit).format(latest.instant().minus(1, temporalUnit));
+        this.earliestInstant = earliest.instant();
+        boolean sameInterval = latest.instant().truncatedTo(temporalUnit).equals(earliestInstant.truncatedTo(temporalUnit));
+        this.latestInstant = sameInterval ? latest.instant().plus(1, temporalUnit) : latest.instant();
+
+        LOG.info("using instant earliest: {}, latest: {}, latest adjusted: {}", earliestInstant, latestInstant, sameInterval);
+
+        this.startLotInclusive = IntervalUnits.formatter(this.temporalUnit).format(this.earliestInstant);
+        this.endLotExclusive = IntervalUnits.formatter(this.temporalUnit).format(this.latestInstant);
+        this.endLotInclusive = IntervalUnits.formatter(this.temporalUnit).format(this.latestInstant.minus(1, temporalUnit));
+
+        LOG.info("using lot earliest: {}, latest: {}", startLotInclusive, endLotExclusive);
     }
 
     protected abstract StateURI<?, ?> createStateURIFrom(Rec record);
@@ -110,7 +118,7 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
     }
 
     public StatusSummaryRec summarizeScan() {
-        long count = Duration.between(earliest.instant(), latest.instant()).dividedBy(temporalUnit.getDuration());
+        long count = Duration.between(earliestInstant, latestInstant).dividedBy(temporalUnit.getDuration());
 
         StatusSummaryRec summaryRecord = createSummaryRecord(count);
 
