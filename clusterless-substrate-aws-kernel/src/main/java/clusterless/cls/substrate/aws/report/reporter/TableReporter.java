@@ -103,6 +103,13 @@ public class TableReporter<T> extends Reporter<T> {
 
     private static String asText(JsonNode node) {
         // a hack as toString on textual quotes the values
-        return node.isTextual() ? node.textValue() : node.toString();
+        if (node.isTextual()) {
+            return node.textValue();
+        }
+
+        if (node.isNumber()) {
+            return "%,d".formatted(node.longValue());
+        }
+        return node.toString();
     }
 }
