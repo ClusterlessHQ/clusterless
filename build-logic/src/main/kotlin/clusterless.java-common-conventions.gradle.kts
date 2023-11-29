@@ -98,7 +98,7 @@ dependencies {
     constraints {
         // manage dependency versions here
 
-        val commons = "0.8"
+        val commons = "0.9"
         implementationAndTestFixture("io.clusterless:clusterless-commons-core:$commons")
         implementationAndTestFixture("io.clusterless:clusterless-commons-aws:$commons")
 
