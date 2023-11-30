@@ -26,7 +26,7 @@ import java.util.Objects;
                                 
                 > cls show model --model deployable > project.json
                                 
-                A project is a collection of resources, boundaries, barriers, and arcs deployed into
+                A project is a collection of resources, activities, boundaries, barriers, and arcs deployed into
                 a providers placement environment.
                 """
 )
@@ -43,6 +43,8 @@ public class Deployable extends Model {
     Placement placement = new Placement();
     @JsonProperty("resources")
     List<Resource> resources = new ArrayList<>();
+    @JsonProperty("activities")
+    List<Activity> activities = new ArrayList<>();
     @JsonProperty("boundaries")
     List<Boundary> boundaries = new ArrayList<>();
     @JsonProperty("barriers")
@@ -73,6 +75,10 @@ public class Deployable extends Model {
         return resources;
     }
 
+    public List<Activity> activities() {
+        return activities;
+    }
+
     public List<Boundary> boundaries() {
         return boundaries;
     }
@@ -90,11 +96,11 @@ public class Deployable extends Model {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Deployable that = (Deployable) o;
-        return Objects.equals(sourceFile, that.sourceFile) && Objects.equals(project, that.project) && Objects.equals(placement, that.placement) && Objects.equals(resources, that.resources) && Objects.equals(boundaries, that.boundaries) && Objects.equals(barriers, that.barriers) && Objects.equals(arcs, that.arcs);
+        return Objects.equals(sourceFile, that.sourceFile) && Objects.equals(project, that.project) && Objects.equals(placement, that.placement) && Objects.equals(resources, that.resources) && Objects.equals(activities, that.activities) && Objects.equals(boundaries, that.boundaries) && Objects.equals(barriers, that.barriers) && Objects.equals(arcs, that.arcs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceFile, project, placement, resources, boundaries, barriers, arcs);
+        return Objects.hash(sourceFile, project, placement, resources, activities, boundaries, barriers, arcs);
     }
 }

@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.boundary.s3put;
 
-import clusterless.aws.lambda.transform.s3put.S3PutTransformProps;
+import clusterless.aws.lambda.boundary.s3put.S3PutBoundaryProps;
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.construct.ModelConstruct;
@@ -73,7 +73,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
         ManifestURI manifestComplete = StateURIs.manifestPath(this, ManifestState.complete, model().dataset());
         ManifestURI manifestPartial = StateURIs.manifestPath(this, ManifestState.partial, model().dataset());
 
-        S3PutTransformProps transformProps = S3PutTransformProps.builder()
+        S3PutBoundaryProps transformProps = S3PutBoundaryProps.builder()
                 .withEventBusName(eventBusRef)
                 .withDataset(SinkDataset.Builder.builder()
                         .withName(model().dataset().name())
@@ -96,7 +96,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3P
         Function transformEventFunction = Function.Builder.create(this, functionLabel.camelCase())
                 .functionName(functionName)
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-transform-.*\\.zip$"))) // get packaged code
-                .handler("clusterless.aws.lambda.transform.s3put.PutEventTransformHandler") // get handler class name
+                .handler("clusterless.aws.lambda.boundary.s3put.PutEventTransformHandler") // get handler class name
                 .environment(environment)
                 .runtime(Functions.defaultJVM())
                 .memorySize(model().runtimeProps().memorySizeMB())

@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.boundary.s3put;
 
-import clusterless.aws.lambda.transform.s3put.EventArrival;
+import clusterless.aws.lambda.boundary.s3put.EventArrival;
 import clusterless.cls.json.JsonRequiredProperty;
 import clusterless.cls.model.deploy.IngressBoundary;
 import clusterless.cls.model.deploy.partial.PathFilter;

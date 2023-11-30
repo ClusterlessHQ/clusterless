@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.boundary.s3put;
 
-import clusterless.aws.lambda.transform.s3put.LotSource;
+import clusterless.aws.lambda.boundary.s3put.LotSource;
 import clusterless.cls.model.Struct;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

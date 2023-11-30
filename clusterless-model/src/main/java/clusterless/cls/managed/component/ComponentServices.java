@@ -35,7 +35,7 @@ public class ComponentServices {
     }
 
     protected ComponentServices() {
-        ServiceLoader<ComponentService> serviceLoader = ServiceLoader.load(ComponentService.class);
+        var serviceLoader = ServiceLoader.load(ComponentService.class);
 
         serviceLoader.stream().forEach(s -> {
             Optional<DeclaresComponent> provides = Annotations.find(s.type(), DeclaresComponent.class);
@@ -108,15 +108,11 @@ public class ComponentServices {
     }
 
     private static List<Extensible> getExtensibleModelsFor(ModelType modelType, Deployable deployableModel) {
-        switch (modelType) {
-            case Resource:
-                return new ArrayList<>(deployableModel.resources());
-            case Boundary:
-                return new ArrayList<>(deployableModel.boundaries());
-            case Arc:
-                return new ArrayList<>(deployableModel.arcs());
-        }
-
-        return Collections.emptyList();
+        return switch (modelType) {
+            case Resource -> new ArrayList<>(deployableModel.resources());
+            case Activity -> new ArrayList<>(deployableModel.activities());
+            case Boundary -> new ArrayList<>(deployableModel.boundaries());
+            case Arc -> new ArrayList<>(deployableModel.arcs());
+        };
     }
 }

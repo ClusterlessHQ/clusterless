@@ -6,9 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform.s3put;
+package clusterless.aws.lambda.boundary.s3put;
 
-import clusterless.aws.lambda.transform.TransformProps;
+import clusterless.aws.lambda.boundary.BoundaryProps;
 import clusterless.cls.json.JsonRequiredProperty;
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.deploy.partial.PathFilter;
@@ -17,12 +17,12 @@ import clusterless.cls.substrate.uri.ManifestURI;
 /**
  *
  */
-public class S3PutTransformProps extends TransformProps {
+public class S3PutBoundaryProps extends BoundaryProps {
     @JsonRequiredProperty
     LotSource lotSource;
     String keyRegex;
 
-    public S3PutTransformProps() {
+    public S3PutBoundaryProps() {
     }
 
     public static Builder builder() {
@@ -109,8 +109,8 @@ public class S3PutTransformProps extends TransformProps {
             return this;
         }
 
-        public S3PutTransformProps build() {
-            S3PutTransformProps s3PutTransformProps = new S3PutTransformProps();
+        public S3PutBoundaryProps build() {
+            S3PutBoundaryProps s3PutTransformProps = new S3PutBoundaryProps();
             s3PutTransformProps.eventBusName = this.eventBusName;
             s3PutTransformProps.lotSource = this.lotSource;
             s3PutTransformProps.manifestCompletePath = this.manifestCompletePath;

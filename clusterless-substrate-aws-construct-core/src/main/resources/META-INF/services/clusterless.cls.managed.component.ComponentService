@@ -14,6 +14,9 @@ clusterless.cls.substrate.aws.resource.eventbridge.EventBridgeResourceProvider
 clusterless.cls.substrate.aws.resource.glue.database.GlueDatabaseResourceProvider
 clusterless.cls.substrate.aws.resource.glue.table.GlueTableResourceProvider
 
+# Activities
+clusterless.cls.substrate.aws.activity.cloudwatch.CloudWatchExportActivityProvider
+
 # Boundaries
 clusterless.cls.substrate.aws.boundary.s3put.S3PutListenerBoundaryProvider
 

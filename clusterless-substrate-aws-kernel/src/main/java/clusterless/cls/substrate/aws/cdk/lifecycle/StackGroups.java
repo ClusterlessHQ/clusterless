@@ -24,6 +24,7 @@ public class StackGroups {
 
         // each instance result in one stack, but this controls the order of the stacks
         stackGroups.add(ModelType.values(ModelType.Resource));
+        stackGroups.add(ModelType.values(ModelType.Activity));
         stackGroups.add(ModelType.values(ModelType.Boundary));
 
         return stackGroups;
@@ -33,7 +34,7 @@ public class StackGroups {
         List<ModelType[]> stackGroups = new LinkedList<>();
 
         // places these types in the same stack
-        stackGroups.add(ModelType.values(ModelType.Resource, ModelType.Boundary));
+        stackGroups.add(ModelType.values(ModelType.Resource, ModelType.Activity, ModelType.Boundary));
 
         return stackGroups;
     }

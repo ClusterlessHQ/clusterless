@@ -6,14 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform.frequents3put;
+package clusterless.aws.lambda.boundary.frequents3put;
 
-import clusterless.aws.lambda.transform.TransformProps;
+import clusterless.aws.lambda.boundary.BoundaryProps;
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.deploy.partial.PathFilter;
 import clusterless.cls.substrate.uri.ManifestURI;
 
-public class FrequentS3PutTransformProps extends TransformProps {
+public class FrequentS3PutBoundaryProps extends BoundaryProps {
 
     protected String sqsQueueName;
     protected int sqsWaitTimeSeconds = 0;
@@ -102,8 +102,8 @@ public class FrequentS3PutTransformProps extends TransformProps {
             return this;
         }
 
-        public FrequentS3PutTransformProps build() {
-            FrequentS3PutTransformProps frequentS3PutTransformProps = new FrequentS3PutTransformProps();
+        public FrequentS3PutBoundaryProps build() {
+            FrequentS3PutBoundaryProps frequentS3PutTransformProps = new FrequentS3PutBoundaryProps();
             frequentS3PutTransformProps.eventBusName = this.eventBusName;
             frequentS3PutTransformProps.sqsWaitTimeSeconds = this.sqsWaitTimeSeconds;
             frequentS3PutTransformProps.sqsQueueName = this.sqsQueueName;

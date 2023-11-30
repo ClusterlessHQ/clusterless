@@ -8,10 +8,7 @@
 
 package clusterless.cls.managed;
 
-import clusterless.cls.managed.component.ArcComponent;
-import clusterless.cls.managed.component.BoundaryComponent;
-import clusterless.cls.managed.component.Component;
-import clusterless.cls.managed.component.ResourceComponent;
+import clusterless.cls.managed.component.*;
 import clusterless.cls.model.Model;
 import clusterless.commons.naming.Label;
 
@@ -25,6 +22,10 @@ public enum ModelType implements Label.EnumLabel {
     Resource(
             clusterless.cls.model.deploy.Resource.class,
             ResourceComponent.class
+    ),
+    Activity(
+            clusterless.cls.model.deploy.Activity.class,
+            ActivityComponent.class
     ),
     Boundary(
             clusterless.cls.model.deploy.Boundary.class,

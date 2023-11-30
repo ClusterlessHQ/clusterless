@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform;
+package clusterless.aws.lambda.boundary;
 
 import clusterless.cls.json.JsonRequiredProperty;
 import clusterless.cls.model.Struct;
@@ -14,7 +14,7 @@ import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.deploy.partial.PathFilter;
 import clusterless.cls.substrate.uri.ManifestURI;
 
-public class TransformProps implements Struct {
+public class BoundaryProps implements Struct {
     @JsonRequiredProperty
     protected String lotUnit;
     @JsonRequiredProperty

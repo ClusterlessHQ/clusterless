@@ -6,14 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform.s3put;
+package clusterless.aws.lambda.boundary.frequents3put;
 
 import clusterless.aws.lambda.EventObserver;
 
 import java.net.URI;
 import java.time.OffsetDateTime;
 
-public interface PutEventTransformObserver extends EventObserver {
+public interface FrequentPutEventBoundaryObserver extends EventObserver {
     default void applyLotId(String lotId) {
 
     }
@@ -26,7 +26,7 @@ public interface PutEventTransformObserver extends EventObserver {
 
     }
 
-    default void applyEvent(OffsetDateTime time, String bucket, String key) {
+    default void applyEvent(OffsetDateTime time) {
 
     }
 

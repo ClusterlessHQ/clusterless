@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform.frequents3put;
+package clusterless.aws.lambda.boundary.frequents3put;
 
 import clusterless.aws.lambda.EventHandler;
 import clusterless.aws.lambda.arc.ArcNotifyEventPublisher;
@@ -41,13 +41,13 @@ import java.util.stream.Collectors;
 
 import static software.amazon.awssdk.utils.StringUtils.isEmpty;
 
-public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, FrequentPutEventTransformObserver> {
-    private static final Logger LOG = LogManager.getLogger(FrequentPutEventTransformHandler.class);
+public class FrequentPutEventBoundaryHandler extends EventHandler<AWSEvent, FrequentPutEventBoundaryObserver> {
+    private static final Logger LOG = LogManager.getLogger(FrequentPutEventBoundaryHandler.class);
     public static final PojoSerializer<S3Event> serializer = LambdaEventSerializers.serializerFor(S3Event.class, S3Event.class.getClassLoader());
     protected final SQS sqs = new SQS();
-    protected final FrequentS3PutTransformProps transformProps = Env.fromEnv(
-            FrequentS3PutTransformProps.class,
-            () -> FrequentS3PutTransformProps.builder()
+    protected final FrequentS3PutBoundaryProps transformProps = Env.fromEnv(
+            FrequentS3PutBoundaryProps.class,
+            () -> FrequentS3PutBoundaryProps.builder()
                     .build()
     );
 
@@ -71,12 +71,12 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
             .withExcludes(transformProps.filter().excludes())
             .build();
 
-    public FrequentPutEventTransformHandler() {
+    public FrequentPutEventBoundaryHandler() {
         super(AWSEvent.class);
     }
 
-    protected FrequentPutEventTransformObserver observer() {
-        return new FrequentPutEventTransformObserver() {
+    protected FrequentPutEventBoundaryObserver observer() {
+        return new FrequentPutEventBoundaryObserver() {
             @Override
             public void applyLotId(String lotId) {
                 LOG.info("using lot: {}", lotId);
@@ -100,7 +100,7 @@ public class FrequentPutEventTransformHandler extends EventHandler<AWSEvent, Fre
     }
 
     @Override
-    public void handleEvent(AWSEvent event, Context context, FrequentPutEventTransformObserver eventObserver) {
+    public void handleEvent(AWSEvent event, Context context, FrequentPutEventBoundaryObserver eventObserver) {
         OffsetDateTime scheduledTime = event.getTime();
 
         eventObserver.applyEvent(scheduledTime);

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform.s3put;
+package clusterless.aws.lambda.boundary.s3put;
 
 /**
  *

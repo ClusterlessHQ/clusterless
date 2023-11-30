@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.transform.s3put;
+package clusterless.aws.lambda.boundary.s3put;
 
 import clusterless.aws.lambda.EventHandler;
 import clusterless.aws.lambda.arc.ArcNotifyEventPublisher;
@@ -29,13 +29,13 @@ import java.util.List;
 /**
  *
  */
-public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTransformObserver> {
-    private static final Logger LOG = LogManager.getLogger(PutEventTransformHandler.class);
+public class PutEventBoundaryHandler extends EventHandler<AWSEvent, PutEventBoundaryObserver> {
+    private static final Logger LOG = LogManager.getLogger(PutEventBoundaryHandler.class);
     protected static final S3 s3 = new S3();
 
-    protected final S3PutTransformProps transformProps = Env.fromEnv(
-            S3PutTransformProps.class,
-            () -> S3PutTransformProps.builder()
+    protected final S3PutBoundaryProps transformProps = Env.fromEnv(
+            S3PutBoundaryProps.class,
+            () -> S3PutBoundaryProps.builder()
                     .build()
     );
     protected final IntervalBuilder intervalBuilder = new IntervalBuilder(transformProps.lotUnit());
@@ -58,12 +58,12 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
             .withExcludes(transformProps.filter().excludes())
             .build();
 
-    public PutEventTransformHandler() {
+    public PutEventBoundaryHandler() {
         super(AWSEvent.class);
     }
 
-    protected PutEventTransformObserver observer() {
-        return new PutEventTransformObserver() {
+    protected PutEventBoundaryObserver observer() {
+        return new PutEventBoundaryObserver() {
             @Override
             public void applyLotId(String lotId) {
                 LOG.info("using lot: {}", lotId);
@@ -91,7 +91,7 @@ public class PutEventTransformHandler extends EventHandler<AWSEvent, PutEventTra
     }
 
     @Override
-    public void handleEvent(AWSEvent event, Context context, PutEventTransformObserver eventObserver) {
+    public void handleEvent(AWSEvent event, Context context, PutEventBoundaryObserver eventObserver) {
         OffsetDateTime time = event.getTime();
         String bucket = event.getDetail().getBucket().getName();
         String key = event.getDetail().getObject().getKey();
