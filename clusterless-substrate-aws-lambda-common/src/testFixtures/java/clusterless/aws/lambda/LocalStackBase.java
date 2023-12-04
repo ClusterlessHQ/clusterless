@@ -31,15 +31,17 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
     }
 
     // pro disabled in favor of mocking glue apis in the tests
-    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:2.3.2");
+    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:3.0.2");
 
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withEnv("LOCALSTACK_API_KEY", Optional.ofNullable(System.getenv("LOCALSTACK_API_KEY"))
-                    .or(() -> loadGradleProperties("localstack.api.key")).orElseThrow())
+                    .or(() -> loadGradleProperties("localstack.api.key"))
+                    .orElse(null))
             .withServices(
                     LocalStackContainer.Service.S3,
                     LocalStackContainer.Service.SQS,
+                    LocalStackContainer.Service.CLOUDWATCHLOGS,
                     LocalStackContainer.EnabledService.named("events"),
                     LocalStackContainer.EnabledService.named("glue")
             );
@@ -63,7 +65,8 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
             .set("AWS_S3_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.S3).toString())
             .set("AWS_EVENTS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("events")).toString())
             .set("AWS_GLUE_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("glue")).toString())
-            .set("AWS_SQS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+            .set("AWS_SQS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString())
+            .set("AWS_CLOUDWATCHLOGS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.CLOUDWATCHLOGS).toString());
 
     @BeforeEach
     public void bootstrap() {
@@ -71,9 +74,11 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Manifest, defaultPlacement()))
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Arc, defaultPlacement()))
                 .applyBucket(Stores.bootstrapStoreName(StateStore.Meta, defaultPlacement()))
+                .applyBucket(bucketName())
                 .applyEventbus(eventBusName())
                 .applySQSQueue(sqsQueueName())
                 .applyBucket(usesGlue(), glueDatabaseName())
-                .applyGlueDatabase(usesGlue(), glueDatabaseName(), glueTableName(), "s3://%s".formatted(glueDatabaseName()), glueTableColumns(), glueTablePartitions());
+                .applyGlueDatabase(usesGlue(), glueDatabaseName(), glueTableName(), "s3://%s".formatted(glueDatabaseName()), glueTableColumns(), glueTablePartitions())
+                .logResources();
     }
 }

@@ -37,6 +37,9 @@ dependencies {
     implementation(project(":clusterless-substrate-aws-lambda-transform-model"))
 
     implementation("software.amazon.awssdk:sqs")
+    implementation("software.amazon.awssdk:cloudwatchlogs")
+
+//    implementation("com.cronutils:cron-utils")
 
     implementation("com.amazonaws:aws-lambda-java-events")
     implementation("com.amazonaws:aws-lambda-java-serialization")

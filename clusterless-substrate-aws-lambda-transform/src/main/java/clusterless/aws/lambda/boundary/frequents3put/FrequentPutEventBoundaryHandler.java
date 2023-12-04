@@ -107,11 +107,11 @@ public class FrequentPutEventBoundaryHandler extends EventHandler<AWSEvent, Freq
 
         // skip any message that happened in the current lot interval
         // a small attempt to maintain flow control
-        Instant filterTime = intervalBuilder.truncate(scheduledTime).toInstant();
+        Instant filterTime = intervalBuilder.truncate(scheduledTime.toInstant());
 
         // use the lot previous to the current event time
         // this roughly accumulates events that occurred during the previous period
-        Instant lotTime = intervalBuilder.previous(intervalBuilder.truncate(scheduledTime.toInstant()));
+        Instant lotTime = intervalBuilder.previous(filterTime);
 
         String lotId = intervalBuilder.format(lotTime);
 

@@ -29,6 +29,7 @@ dependencies {
     implementation("software.amazon.awssdk:sqs")
     implementation("software.amazon.awssdk:glue")
     implementation("software.amazon.awssdk:athena")
+    implementation("software.amazon.awssdk:cloudwatchlogs")
 
     implementation("org.apache.logging.log4j:log4j-slf4j-impl") // awssdk
 }

@@ -22,7 +22,11 @@ public class ExecutionExceptionHandler implements CommandLine.IExecutionExceptio
     public int handleExecutionException(Exception ex, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
         CommandLine.Help.ColorScheme colorScheme = commandLine.getColorScheme();
 
-        commandLine.getErr().println(colorScheme.errorText(ex.getMessage()));
+        String message = ex.getMessage();
+        if (message == null || message.isEmpty()) {
+            message = ex.getClass().getSimpleName();
+        }
+        commandLine.getErr().println(colorScheme.errorText(message));
 
         if (startup.verbosity().level() > 0) {
             commandLine.getErr().println();

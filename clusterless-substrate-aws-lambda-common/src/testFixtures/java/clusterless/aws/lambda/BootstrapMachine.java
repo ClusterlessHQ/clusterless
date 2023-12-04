@@ -28,6 +28,17 @@ public class BootstrapMachine {
     public BootstrapMachine() {
     }
 
+    public BootstrapMachine logResources() {
+        S3.Response list = s3.list();
+
+        list.isSuccessOrThrowRuntime();
+
+        s3.list(list)
+                .forEach(bucket -> LOG.info("available bucket: {}", bucket));
+
+        return this;
+    }
+
     public BootstrapMachine applyBucket(boolean enabled, String bucketName) {
         if (!enabled) {
             return this;

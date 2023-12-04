@@ -20,13 +20,13 @@ public abstract class Activity extends Support {
     private String name;
 
     @JsonRequiredProperty
-    private String schedule;
+    private String interval;
 
     public String name() {
         return name;
     }
 
-    public String schedule() {
-        return schedule;
+    public String interval() {
+        return interval;
     }
 }

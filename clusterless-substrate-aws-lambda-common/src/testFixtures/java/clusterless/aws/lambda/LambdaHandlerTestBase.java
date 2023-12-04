@@ -64,6 +64,10 @@ public abstract class LambdaHandlerTestBase {
 
     protected abstract Struct getProps();
 
+    protected String bucketName() {
+        return "test-bucket";
+    }
+
     @NotNull
     protected String eventBusName() {
         return "forwarding-bus";
