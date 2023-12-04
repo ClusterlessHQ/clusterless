@@ -107,6 +107,7 @@ dependencies {
         implementation("org.jetbrains:annotations:24.0.0")
         implementation("info.picocli:picocli:4.7.5")
         implementation("com.github.jknack:handlebars:4.3.1")
+//        implementation("com.cronutils:cron-utils:9.2.0")
 
         val log4j = "2.20.0"
         implementation("org.apache.logging.log4j:log4j-api:$log4j")
@@ -132,9 +133,10 @@ dependencies {
         implementationAndTestFixture("one.util:streamex:0.8.2")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
-        val awsSdk = "2.21.13"
+        val awsSdk = "2.21.33"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
+        implementationAndTestFixture("software.amazon.awssdk:cloudwatchlogs:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:eventbridge:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:sqs:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:glue:$awsSdk")
@@ -143,15 +145,15 @@ dependencies {
         // https://github.com/aws/aws-lambda-java-libs
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.3")
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-events:3.11.3")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-serialization:1.0.1")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-log4j2:1.5.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-serialization:1.1.4")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-log4j2:1.6.0")
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-tests:1.1.1")
 
         implementationAndTestFixture("javax.annotation:javax.annotation-api:1.3.2")
 
         implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.0.2")
 
-        testImplementationAndTestFixture("org.mockito:mockito-core:5.6.0")
+        testImplementationAndTestFixture("org.mockito:mockito-core:5.7.0")
 
         // https://github.com/junit-pioneer/junit-pioneer/releases
         val junitPioneer = "2.1.0"
