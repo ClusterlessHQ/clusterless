@@ -96,7 +96,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruc
         Function transformEventFunction = Function.Builder.create(this, functionLabel.camelCase())
                 .functionName(functionName)
                 .code(Assets.find(Pattern.compile("^.*-aws-lambda-transform-.*\\.zip$"))) // get packaged code
-                .handler("clusterless.aws.lambda.boundary.s3put.PutEventTransformHandler") // get handler class name
+                .handler("clusterless.aws.lambda.boundary.s3put.PutEventBoundaryHandler") // get handler class name
                 .environment(environment)
                 .runtime(Functions.defaultJVM())
                 .memorySize(model().runtimeProps().memorySizeMB())
