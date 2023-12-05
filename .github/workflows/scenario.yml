@@ -17,6 +17,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+          args: --ssh
+
       - name: Checkout Repo
         uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -42,7 +50,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
         run: |
-          ./gradlew --no-daemon --info --stacktrace scenarios
+          ./gradlew --no-daemon --info --stacktrace scenarios | tee clusterless-scenario/build/scenarios.log
 
       - name: Archive Scenario Results
         uses: actions/upload-artifact@v3
@@ -50,6 +58,7 @@ jobs:
         with:
           name: scenario-results
           path: |
+            clusterless-scenario/build/scenarios.log
             clusterless-scenario/build/scenarios/*
             !clusterless-scenario/build/scenarios/**/cdk.out
           retention-days: 5
