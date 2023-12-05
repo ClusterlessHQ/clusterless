@@ -9,6 +9,7 @@
 package clusterless.cls.model.deploy;
 
 import clusterless.cls.json.ExtensibleResolver;
+import clusterless.cls.json.JsonRequiredProperty;
 import clusterless.cls.json.Views;
 import clusterless.cls.model.Model;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -30,6 +31,8 @@ public abstract class Extensible extends Model {
     // can't use @JsonRequiredProperty here
     @JsonView(Views.Required.class)
     String type;
+    @JsonRequiredProperty
+    String name;
     boolean exclude = false;
 
     public Extensible() {
@@ -58,6 +61,10 @@ public abstract class Extensible extends Model {
 
     public String type() {
         return type;
+    }
+
+    public String name() {
+        return name;
     }
 
     /**

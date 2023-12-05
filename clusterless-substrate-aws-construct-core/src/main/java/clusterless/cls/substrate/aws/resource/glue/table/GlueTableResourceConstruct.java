@@ -13,6 +13,7 @@ import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import clusterless.cls.util.URIs;
+import clusterless.commons.naming.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
     private static final Logger LOG = LogManager.getLogger(GlueTableResourceConstruct.class);
 
     public GlueTableResourceConstruct(@NotNull ManagedComponentContext context, @NotNull GlueTableResource model) {
-        super(context, model, model.tableName());
+        super(context, model, Label.of(model.tableName()));
 
         CommonConfig config = context.configurations().get("common");
 
@@ -43,7 +44,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
 
         LOG.info("using database resolving ref: {}", model().databaseRef());
 
-        IDatabase database = resolveArnRef(model().databaseRef(), arn -> {
+        IDatabase database = importArnRef(model().databaseRef(), arn -> {
             LOG.info("using database arn: {}", arn);
             return Database.fromDatabaseArn(this, "Database", arn);
         });
@@ -72,7 +73,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
 
         TagsUtil.applyTags(table, model().tags());
 
-        addArnRefFor(model(), table, table.getTableArn(), "glue table arn");
+        exportArnRefFor(model(), table, table.getTableArn(), "glue table arn");
     }
 
     private DataFormat formatFrom(String format) {

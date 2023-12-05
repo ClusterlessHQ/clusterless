@@ -138,7 +138,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         LOG.info("resolving computeEnvironment ref: {}", computeEnvironmentRef);
 
-        return resolveArnRef(computeEnvironmentRef, arn -> {
+        return importArnRef(computeEnvironmentRef, arn -> {
             LOG.info("using computeEnvironment arn: {}", arn);
             return FargateComputeEnvironment.fromFargateComputeEnvironmentArn(
                     this,

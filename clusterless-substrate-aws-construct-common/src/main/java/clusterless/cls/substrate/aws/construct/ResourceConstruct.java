@@ -11,13 +11,14 @@ package clusterless.cls.substrate.aws.construct;
 import clusterless.cls.managed.component.ResourceComponent;
 import clusterless.cls.model.deploy.Resource;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
+import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 
 /**
  *
  */
-public class ResourceConstruct<M extends Resource> extends ModelConstruct<M> implements ResourceComponent {
-    public ResourceConstruct(@NotNull ManagedComponentContext context, @NotNull M model, @NotNull String id) {
-        super(context, model, id);
+public class ResourceConstruct<M extends Resource> extends ExtensibleConstruct<M> implements ResourceComponent {
+    public ResourceConstruct(@NotNull ManagedComponentContext context, @NotNull M model, @NotNull Label discriminator) {
+        super(context, model, discriminator);
     }
 }

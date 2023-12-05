@@ -13,6 +13,7 @@ import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.resources.Buckets;
 import clusterless.cls.substrate.aws.util.TagsUtil;
+import clusterless.commons.naming.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
     private final IBucket bucket;
 
     public S3BucketResourceConstruct(@NotNull ManagedComponentContext context, @NotNull S3BucketResource model) {
-        super(context, model, model.bucketName());
+        super(context, model, Label.of(model.bucketName()));
 
         CommonConfig config = context.configurations().get("common");
 
@@ -55,7 +56,7 @@ public class S3BucketResourceConstruct extends ResourceConstruct<S3BucketResourc
 
         TagsUtil.applyTags(bucket, model().tags());
 
-        addArnRefFor(model(), (Construct) bucket, bucket().getBucketArn(), "s3 bucket arn");
+        exportArnRefFor(model(), (Construct) bucket, bucket().getBucketArn(), "s3 bucket arn");
     }
 
     public IBucket bucket() {

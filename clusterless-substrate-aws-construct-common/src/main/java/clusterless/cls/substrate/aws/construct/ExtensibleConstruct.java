@@ -8,7 +8,6 @@
 
 package clusterless.cls.substrate.aws.construct;
 
-import clusterless.cls.model.Model;
 import clusterless.cls.model.deploy.Extensible;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedConstruct;
@@ -31,26 +30,36 @@ import java.util.function.Supplier;
 /**
  *
  */
-public class ModelConstruct<M extends Model> extends ManagedConstruct {
-    private static final Logger LOG = LogManager.getLogger(ModelConstruct.class);
+public class ExtensibleConstruct<E extends Extensible> extends ManagedConstruct {
+    private static final Logger LOG = LogManager.getLogger(ExtensibleConstruct.class);
 
     private final Map<String, IBucket> buckets = new HashMap<>(); // cache the construct to prevent collisions
     private final Map<String, ITable> tables = new HashMap<>(); // cache the construct to prevent collisions
-    private final M model;
+    private final E model;
 
-    public ModelConstruct(@NotNull ManagedComponentContext context, @NotNull M model, @NotNull String id) {
-        super(context, uniqueId(model, id));
+    public ExtensibleConstruct(@NotNull ManagedComponentContext context, @NotNull E model) {
+        super(context, uniqueId(model, Label.of(model.name())));
         this.model = model;
     }
 
-    private static Label uniqueId(@NotNull Model model, @NotNull String id) {
-        return model
-                .label()
-                .with(id);
+    public ExtensibleConstruct(@NotNull ManagedComponentContext context, @NotNull E model, @NotNull Label discriminator) {
+        super(context, uniqueId(model, discriminator));
+        this.model = model;
     }
 
-    public M model() {
+    private static Label uniqueId(@NotNull Extensible model, @NotNull Label discriminator) {
+        return model
+                .label()
+                .with(discriminator);
+    }
+
+    @NotNull
+    public E model() {
         return model;
+    }
+
+    public String name() {
+        return model().name();
     }
 
     protected String id(String value) {
@@ -61,8 +70,8 @@ public class ModelConstruct<M extends Model> extends ManagedConstruct {
     }
 
     protected <R extends IConstruct> R constructWithinHandler(Supplier<R> supplier) {
-        if (model() instanceof Extensible) {
-            return ErrorsUtil.construct(((Extensible) model()).type(), supplier, LOG);
+        if (model() != null) {
+            return ErrorsUtil.construct(model().type(), supplier, LOG);
         }
 
         return ErrorsUtil.construct(null, supplier, LOG);

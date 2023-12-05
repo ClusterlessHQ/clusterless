@@ -16,12 +16,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
-public class IngressBoundaryConstruct<M extends IngressBoundary> extends ModelConstruct<M> implements BoundaryComponent {
+public abstract class IngressBoundaryConstruct<M extends IngressBoundary> extends ExtensibleConstruct<M> implements BoundaryComponent {
     public IngressBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
-        super(context, model, model.name());
-    }
-
-    public IngressBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull M model, @NotNull String id) {
-        super(context, model, id);
+        super(context, model);
     }
 }

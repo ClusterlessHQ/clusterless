@@ -21,11 +21,10 @@ import java.net.URI;
 public class CloudWatchExportActivity extends Activity {
     @JsonRequiredProperty
     private String logGroupName;
-
     private String logStreamPrefix;
-
+    private String bucketRef;
     @JsonRequiredProperty
-    private URI destinationURI;
+    private URI pathURI;
 
     LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
             Memory.MEM_1_024MB,
@@ -44,8 +43,12 @@ public class CloudWatchExportActivity extends Activity {
         return logStreamPrefix;
     }
 
-    public URI destinationURI() {
-        return destinationURI;
+    public String bucketRef() {
+        return bucketRef;
+    }
+
+    public URI pathURI() {
+        return pathURI;
     }
 
     public LambdaJavaRuntimeProps runtimeProps() {

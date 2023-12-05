@@ -15,6 +15,8 @@ import clusterless.commons.naming.Label;
 import clusterless.commons.naming.Stage;
 import clusterless.commons.naming.Version;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import software.amazon.awscdk.AppProps;
 import software.amazon.awscdk.TagProps;
 import software.constructs.Construct;
@@ -26,6 +28,7 @@ import java.util.List;
  *
  */
 public class ManagedApp extends ScopedApp implements Managed {
+    private final Multimap<Class<? extends Construct>, Construct> constructs = LinkedListMultimap.create();
     private final List<Deployable> deployableModel;
     private final List<ManagedStack> stacks = new LinkedList<>();
 
@@ -51,10 +54,13 @@ public class ManagedApp extends ScopedApp implements Managed {
         applyTags();
     }
 
+    public Multimap<Class<? extends Construct>, Construct> constructs() {
+        return constructs;
+    }
+
     public List<Deployable> projectModels() {
         return deployableModel;
     }
-
 
     public List<ManagedStack> stacks() {
         return stacks;

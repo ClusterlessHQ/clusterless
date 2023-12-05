@@ -12,6 +12,7 @@ import clusterless.aws.lambda.LocalStackBase;
 import clusterless.aws.lambda.TestLots;
 import clusterless.aws.lambda.transform.json.event.AWSEvent;
 import clusterless.cls.json.JSONUtil;
+import clusterless.cls.util.URIs;
 import clusterless.commons.temporal.IntervalUnit;
 import com.adelean.inject.resources.junit.jupiter.GivenJsonResource;
 import com.adelean.inject.resources.junit.jupiter.TestWithResources;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -40,7 +40,7 @@ public class CloudWatchExportActivityHandlerTest extends LocalStackBase {
     protected CloudWatchExportActivityProps getProps() {
         return CloudWatchExportActivityProps.builder()
                 .withLogGroupName("test-log-group")
-                .withDestinationURI(URI.create("s3://%s/test-prefix/".formatted(bucketName())))
+                .withPathURI(URIs.create("s3", bucketName(), "/test-prefix/"))
                 .withInterval(IntervalUnit.TWELFTHS.name())
                 .build();
     }

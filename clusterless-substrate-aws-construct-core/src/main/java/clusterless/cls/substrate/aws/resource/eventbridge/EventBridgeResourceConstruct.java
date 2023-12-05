@@ -9,7 +9,7 @@
 package clusterless.cls.substrate.aws.resource.eventbridge;
 
 import clusterless.cls.managed.component.ResourceComponent;
-import clusterless.cls.substrate.aws.construct.ModelConstruct;
+import clusterless.cls.substrate.aws.construct.ExtensibleConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
@@ -18,19 +18,19 @@ import software.amazon.awscdk.services.events.EventBus;
 /**
  *
  */
-public class EventBridgeResourceConstruct extends ModelConstruct<EventBridgeResource> implements ResourceComponent {
+public class EventBridgeResourceConstruct extends ExtensibleConstruct<EventBridgeResource> implements ResourceComponent {
 
     private final EventBus eventBus;
 
     public EventBridgeResourceConstruct(@NotNull ManagedComponentContext context, @NotNull EventBridgeResource model) {
-        super(context, model, model.eventBusName());
+        super(context, model, Label.of(model.eventBusName()));
 
         eventBus = EventBus.Builder.create(this, Label.of(model.eventBusName()).camelCase())
                 .eventBusName(model.eventBusName())
                 .build();
 
-        addArnRefFor(model(), eventBus(), eventBus().getEventBusArn(), "event bus arn");
-        addNameRefFor(model(), eventBus(), model().eventBusName(), "event bus name");
+        exportArnRefFor(model(), eventBus(), eventBus().getEventBusArn(), "event bus arn");
+        exportNameRefFor(model(), eventBus(), model().eventBusName(), "event bus name");
     }
 
     public EventBus eventBus() {

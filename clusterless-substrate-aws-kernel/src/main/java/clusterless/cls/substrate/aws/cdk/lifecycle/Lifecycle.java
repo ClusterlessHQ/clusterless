@@ -22,10 +22,7 @@ import clusterless.cls.model.deploy.Workload;
 import clusterless.cls.substrate.aws.arc.ArcStack;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
 import clusterless.cls.substrate.aws.cdk.Provider;
-import clusterless.cls.substrate.aws.construct.ArcConstruct;
-import clusterless.cls.substrate.aws.construct.EgressBoundaryConstruct;
-import clusterless.cls.substrate.aws.construct.IngressBoundaryConstruct;
-import clusterless.cls.substrate.aws.construct.ResourceConstruct;
+import clusterless.cls.substrate.aws.construct.*;
 import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
@@ -53,7 +50,6 @@ public class Lifecycle {
     private static final Logger LOG = LogManager.getLogger(Lifecycle.class);
 
     ComponentServices componentServices = ComponentServices.INSTANCE;
-
     StackGroups stackGroups = new StackGroups();
     Configurations configurations;
 
@@ -177,7 +173,6 @@ public class Lifecycle {
 
             stack.applyArcWorkloadComponent(construct);
         }
-
     }
 
     private void constructIndependentStacks(DatasetResolver resolver, ManagedApp managedApp, Deployable deployable, ModelType[] isolatable) {
@@ -189,7 +184,9 @@ public class Lifecycle {
         }
 
         // constructs a stack for every isolated declared model
-        construct(new ManagedComponentContext(configurations, resolver, managedApp, deployable), isolated);
+        ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable);
+
+        construct(context, isolated);
     }
 
     private void constructGroupedStack(DatasetResolver resolver, ManagedApp managedApp, Deployable deployable, ModelType[] includable) {
@@ -206,12 +203,12 @@ public class Lifecycle {
         // make the new stack dependent on the prior stacks so order is retained during deployment
         managedApp.stacks().forEach(stack::addDependency);
 
-        ComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable, stack);
+        ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable, stack);
 
         construct(context, included);
     }
 
-    private static void construct(ComponentContext context, Map<Extensible, ComponentService<ComponentContext, Model, Component>> containers) {
+    private static void construct(ManagedComponentContext context, Map<Extensible, ComponentService<ComponentContext, Model, Component>> containers) {
         Multimap<Class<? extends Construct>, Construct> map = LinkedListMultimap.create();
 
         containers.entrySet().stream().filter(e -> e.getValue() != null).forEach(e -> {
@@ -231,11 +228,18 @@ public class Lifecycle {
                     .ifPresent(type -> map.put(type, (Construct) component));
         });
 
+        // add dependencies across constructs within this managed stack
         for (Construct resource : map.get(ResourceConstruct.class)) {
             map.get(ArcConstruct.class).forEach(c -> c.getNode().addDependency(resource));
+            map.get(ActivityConstruct.class).forEach(c -> c.getNode().addDependency(resource));
             map.get(EgressBoundaryConstruct.class).forEach(c -> c.getNode().addDependency(resource));
             map.get(IngressBoundaryConstruct.class).forEach(c -> c.getNode().addDependency(resource));
         }
+
+        // enable cross stack references
+        context.managedApp()
+                .constructs()
+                .putAll(map);
     }
 
     private static Optional<Class<? extends Construct>> lookupModel(Component component) {
@@ -244,6 +248,9 @@ public class Lifecycle {
         }
         if (component instanceof ResourceConstruct<?>) {
             return Optional.of(ResourceConstruct.class);
+        }
+        if (component instanceof ActivityConstruct<?>) {
+            return Optional.of(ActivityConstruct.class);
         }
         if (component instanceof EgressBoundaryConstruct<?>) {
             return Optional.of(EgressBoundaryConstruct.class);
@@ -291,5 +298,4 @@ public class Lifecycle {
 
         return values;
     }
-
 }

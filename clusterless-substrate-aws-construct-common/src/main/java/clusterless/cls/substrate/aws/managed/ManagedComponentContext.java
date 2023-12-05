@@ -45,7 +45,7 @@ public class ManagedComponentContext implements ComponentContext {
         return resolver;
     }
 
-    public ManagedApp managedProject() {
+    public ManagedApp managedApp() {
         return managedApp;
     }
 

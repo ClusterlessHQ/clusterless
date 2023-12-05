@@ -136,7 +136,7 @@ public class URIs {
      * Returns the path part of the uri without the leading slash, for use in S3 request.
      *
      * @param uri
-     * @return
+     * @return null if the path is empty
      */
     public static String asKey(URI uri) {
         if (uri == null) {
@@ -145,19 +145,57 @@ public class URIs {
 
         String normalize = uri.normalize().getPath();
 
-        if (normalize.isEmpty()) {
+        return asKey(normalize);
+    }
+
+    /**
+     * Returns the path part of the uri without the leading slash, for use in S3 request.
+     *
+     * @param path
+     * @return null if the path is empty
+     */
+    public static String asKey(String path) {
+        if (path == null || path.isEmpty()) {
             return null;
         }
 
-        if (normalize.charAt(0) == '/') {
-            if (normalize.length() == 1) {
+        if (path.charAt(0) == '/') {
+            if (path.length() == 1) {
                 return null;
             }
 
-            return normalize.substring(1);
+            return path.substring(1);
         }
 
-        return normalize;
+        return path;
+    }
+
+    public static String asKeyPrefix(URI path) {
+        if (path == null) {
+            return null;
+        }
+
+        return asKeyPrefix(path.getPath());
+    }
+
+    /**
+     * Removes the first slash and trailing slash, if any.
+     *
+     * @param path the path to remove the first and trailing slash from
+     * @return the path without the first and trailing slash
+     */
+    public static String asKeyPrefix(String path) {
+        path = asKey(path);
+
+        if (path == null || path.isEmpty()) {
+            return null;
+        }
+
+        if (path.charAt(path.length() - 1) == '/') {
+            return path.substring(0, path.length() - 1);
+        }
+
+        return path;
     }
 
     public static URI fromTo(URI fromBase, URI from, URI toBase) {

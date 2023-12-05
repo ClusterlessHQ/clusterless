@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
-public class EgressBoundaryConstruct<M extends EgressBoundary> extends ModelConstruct<M> implements BoundaryComponent {
+public abstract class EgressBoundaryConstruct<M extends EgressBoundary> extends ExtensibleConstruct<M> implements BoundaryComponent {
     public EgressBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
-        super(context, model, model.name());
+        super(context, model);
     }
 }

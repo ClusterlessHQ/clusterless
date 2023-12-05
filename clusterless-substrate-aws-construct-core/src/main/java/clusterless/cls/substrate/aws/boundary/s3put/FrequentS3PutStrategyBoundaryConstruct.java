@@ -11,7 +11,7 @@ package clusterless.cls.substrate.aws.boundary.s3put;
 import clusterless.aws.lambda.boundary.frequents3put.FrequentS3PutBoundaryProps;
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.manifest.ManifestState;
-import clusterless.cls.substrate.aws.construct.ModelConstruct;
+import clusterless.cls.substrate.aws.construct.ExtensibleConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resource.s3.S3BucketResourceConstruct;
@@ -47,11 +47,11 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class FrequentS3PutStrategyBoundaryConstruct extends ModelConstruct<S3PutListenerBoundary> {
+public class FrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<S3PutListenerBoundary> {
     private static final Logger LOG = LogManager.getLogger(FrequentS3PutStrategyBoundaryConstruct.class);
 
     public FrequentS3PutStrategyBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
-        super(context, model, Label.of("Frequent").with(model.name()).camelCase());
+        super(context, model, Label.of("Frequent").with(model.name()));
 
         // confirm unit exits
         TemporalUnit temporalUnit = IntervalUnits.find(model().lotUnit());

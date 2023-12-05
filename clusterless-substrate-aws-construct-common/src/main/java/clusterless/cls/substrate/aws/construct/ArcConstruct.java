@@ -30,12 +30,12 @@ import java.util.function.Consumer;
 /**
  *
  */
-public abstract class ArcConstruct<M extends Arc<?>> extends ModelConstruct<M> implements ArcComponent {
+public abstract class ArcConstruct<M extends Arc<?>> extends ExtensibleConstruct<M> implements ArcComponent {
 
     private final Lazy<IBucket> manifestBucket = Lazy.of(() -> BootstrapStores.manifestBucket(this));
 
     public ArcConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
-        super(context, model, model.name());
+        super(context, model);
     }
 
     protected void grantManifestAndDatasetPermissionsTo(IGrantable grantable) {

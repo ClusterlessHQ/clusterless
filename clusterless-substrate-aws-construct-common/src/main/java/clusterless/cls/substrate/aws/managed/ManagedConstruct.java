@@ -46,32 +46,30 @@ public class ManagedConstruct extends ScopedConstruct implements Managed {
                 .build();
     }
 
-    protected void addIdRefFor(Resource resource, Construct construct, String value, String description) {
+    protected void exportIdRefFor(Resource resource, Construct construct, String value, String description) {
         Ref ref = Ref.ref()
                 .withResourceNs(resource.resourceNs())
                 .withResourceType(resource.resourceType())
                 .withResourceName(resource.name());
 
-        addIdRefFor(ref, construct, value, description);
+        exportIdRefFor(ref, construct, value, description);
     }
 
-    protected void addArnRefFor(Resource resource, Construct construct, String value, String description) {
+    protected void exportArnRefFor(Resource resource, Construct construct, String value, String description) {
         Ref ref = Ref.ref()
                 .withResourceNs(resource.resourceNs())
                 .withResourceType(resource.resourceType())
                 .withResourceName(resource.name());
 
-        addArnRefFor(ref, construct, value, description);
+        exportArnRefFor(ref, construct, value, description);
     }
 
-    protected void addNameRefFor(Resource resource, Construct construct, String value, String description) {
+    protected void exportNameRefFor(Resource resource, Construct construct, String value, String description) {
         Ref ref = Ref.ref()
                 .withResourceNs(resource.resourceNs())
                 .withResourceType(resource.resourceType())
                 .withResourceName(resource.name());
 
-        addNameRefFor(ref, construct, value, description);
+        exportNameRefFor(ref, construct, value, description);
     }
-
-
 }

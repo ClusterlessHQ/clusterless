@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
-public class ActivityConstruct<M extends Activity> extends ModelConstruct<M> implements ActivityComponent {
-    public ActivityConstruct(@NotNull ManagedComponentContext context, @NotNull M model, @NotNull String id) {
-        super(context, model, id);
+public class ActivityConstruct<M extends Activity> extends ExtensibleConstruct<M> implements ActivityComponent {
+    public ActivityConstruct(@NotNull ManagedComponentContext context, @NotNull M model) {
+        super(context, model);
     }
 }

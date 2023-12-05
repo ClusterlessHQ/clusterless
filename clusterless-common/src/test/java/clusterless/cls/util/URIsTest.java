@@ -79,7 +79,6 @@ public class URIsTest {
         Assertions.assertEquals("foo/", URIs.asKey(URI.create("s3://bucket/foo//")));
         Assertions.assertEquals("foo/", URIs.asKey(URI.create("s3://bucket//foo//")));
         Assertions.assertNull(URIs.asKey(URI.create("/")));
-        Assertions.assertNull(URIs.asKey(URI.create("/")));
         Assertions.assertNull(URIs.asKey(URI.create("s3://bucket")));
         Assertions.assertNull(URIs.asKey(URI.create("s3://bucket/")));
     }
@@ -93,9 +92,17 @@ public class URIsTest {
         Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket/foo//")));
         Assertions.assertEquals("foo/", URIs.asKeyPath(URI.create("s3://bucket//foo//")));
         Assertions.assertNull(URIs.asKeyPath(URI.create("/")));
-        Assertions.assertNull(URIs.asKeyPath(URI.create("/")));
         Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket")));
         Assertions.assertNull(URIs.asKeyPath(URI.create("s3://bucket/")));
+    }
+
+    @Test
+    void asKeyPrefix() {
+        Assertions.assertEquals("foo", URIs.asKeyPrefix(URI.create("s3://bucket/foo")));
+        Assertions.assertEquals("foo", URIs.asKeyPrefix(URI.create("s3://bucket/foo/")));
+        Assertions.assertEquals("foo", URIs.asKeyPrefix("/foo"));
+        Assertions.assertEquals("foo", URIs.asKeyPrefix("/foo/"));
+        Assertions.assertNull(URIs.asKeyPrefix("/"));
     }
 
     public static Stream<Arguments> copyAppend() {

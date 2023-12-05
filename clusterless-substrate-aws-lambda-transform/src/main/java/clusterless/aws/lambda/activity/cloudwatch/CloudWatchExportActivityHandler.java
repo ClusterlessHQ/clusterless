@@ -83,7 +83,7 @@ public class CloudWatchExportActivityHandler extends EventHandler<AWSEvent, Clou
         String taskName = "export-" + interval;
         String logGroupName = activityProps.logGroupName();
         String logStreamPrefix = activityProps.logStreamPrefix();
-        URI path = activityProps.destinationURI();
+        URI destination = activityProps.pathURI();
 
         if (!eventObserver.enableExport()) {
             LOG.info("export disabled");
@@ -91,11 +91,11 @@ public class CloudWatchExportActivityHandler extends EventHandler<AWSEvent, Clou
         }
 
         getStopwatch.start();
-        CloudWatchLogs.Response response = cloudWatchLogs.createExportLogGroupTask(taskName, logGroupName, logStreamPrefix, path, startTimeInclusive, endTimeInclusive);
+        CloudWatchLogs.Response response = cloudWatchLogs.createExportLogGroupTask(taskName, logGroupName, logStreamPrefix, destination, startTimeInclusive, endTimeInclusive);
         getStopwatch.stop();
 
         response.isSuccessOrThrowRuntime(
-                r -> String.format("unable to create export task: %s, %s, %s", logGroupName, path, r.errorMessage())
+                r -> String.format("unable to create export task: %s, %s, %s", logGroupName, destination, r.errorMessage())
         );
 
         Duration getElapsed = getStopwatch.elapsed();

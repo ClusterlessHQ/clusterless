@@ -45,6 +45,7 @@ else
 repositories {
     mavenCentral()
 
+//    mavenLocal()
 //    maven {
 //        url = uri("https://maven.pkg.github.com/heretical/*")
 //
@@ -98,7 +99,7 @@ dependencies {
     constraints {
         // manage dependency versions here
 
-        val commons = "0.9"
+        val commons = "0.10"
         implementationAndTestFixture("io.clusterless:clusterless-commons-core:$commons")
         implementationAndTestFixture("io.clusterless:clusterless-commons-aws:$commons")
 

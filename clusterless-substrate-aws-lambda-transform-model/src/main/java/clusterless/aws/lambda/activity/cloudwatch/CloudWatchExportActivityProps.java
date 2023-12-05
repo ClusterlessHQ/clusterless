@@ -20,7 +20,7 @@ public class CloudWatchExportActivityProps implements Struct {
     String logGroupName;
     String logStreamPrefix;
     @JsonRequiredProperty
-    URI destinationURI;
+    URI pathURI;
 
     public static Builder builder() {
         return Builder.builder();
@@ -38,15 +38,15 @@ public class CloudWatchExportActivityProps implements Struct {
         return logStreamPrefix;
     }
 
-    public URI destinationURI() {
-        return destinationURI;
+    public URI pathURI() {
+        return pathURI;
     }
 
     public static final class Builder {
         String interval;
         String logGroupName;
         String logStreamPrefix;
-        URI destinationURI;
+        URI pathURI;
 
         private Builder() {
         }
@@ -70,17 +70,17 @@ public class CloudWatchExportActivityProps implements Struct {
             return this;
         }
 
-        public Builder withDestinationURI(URI destinationURI) {
-            this.destinationURI = destinationURI;
+        public Builder withPathURI(URI pathURI) {
+            this.pathURI = pathURI;
             return this;
         }
 
         public CloudWatchExportActivityProps build() {
             CloudWatchExportActivityProps cloudWatchExportActivityProps = new CloudWatchExportActivityProps();
-            cloudWatchExportActivityProps.destinationURI = this.destinationURI;
-            cloudWatchExportActivityProps.interval = this.interval;
+            cloudWatchExportActivityProps.pathURI = this.pathURI;
             cloudWatchExportActivityProps.logGroupName = this.logGroupName;
             cloudWatchExportActivityProps.logStreamPrefix = this.logStreamPrefix;
+            cloudWatchExportActivityProps.interval = this.interval;
             return cloudWatchExportActivityProps;
         }
     }

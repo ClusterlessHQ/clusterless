@@ -12,6 +12,7 @@ import clusterless.cls.config.CommonConfig;
 import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.util.TagsUtil;
+import clusterless.commons.naming.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,7 @@ public class GlueDatabaseResourceConstruct extends ResourceConstruct<GlueDatabas
     private static final Logger LOG = LogManager.getLogger(GlueDatabaseResourceConstruct.class);
 
     public GlueDatabaseResourceConstruct(@NotNull ManagedComponentContext context, @NotNull GlueDatabaseResource model) {
-        super(context, model, model.databaseName());
+        super(context, model, Label.of(model.databaseName()));
 
         CommonConfig config = context.configurations().get("common");
 
@@ -43,6 +44,6 @@ public class GlueDatabaseResourceConstruct extends ResourceConstruct<GlueDatabas
 
         TagsUtil.applyTags(database, model().tags());
 
-        addArnRefFor(model(), database, database.getDatabaseArn(), "glue database arn");
+        exportArnRefFor(model(), database, database.getDatabaseArn(), "glue database arn");
     }
 }

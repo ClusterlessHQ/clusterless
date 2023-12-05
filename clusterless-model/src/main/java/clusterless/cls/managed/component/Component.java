@@ -12,4 +12,5 @@ package clusterless.cls.managed.component;
  *
  */
 public interface Component {
+    String name();
 }

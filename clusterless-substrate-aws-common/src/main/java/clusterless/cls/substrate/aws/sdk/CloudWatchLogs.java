@@ -54,7 +54,7 @@ public class CloudWatchLogs extends ClientBase<CloudWatchLogsClient> {
                 .from(from.toEpochMilli())
                 .to(to.toEpochMilli())
                 .destination(destination.getHost())
-                .destinationPrefix(URIs.asKey(destination))
+                .destinationPrefix(URIs.asKeyPrefix(destination))
                 .logStreamNamePrefix(logStreamPrefix)
                 .build();
 

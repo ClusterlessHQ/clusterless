@@ -17,9 +17,28 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
  */
 @ProvidesComponent(
         type = "aws:core:cloudWatchExport",
-        synopsis = "Export CloudWatch logs.",
+        synopsis = "Export CloudWatch logs to S3.",
         description = """
-                Periodically will extract a CloudWatch log group to an S3 bucket.
+                Periodically will extract a CloudWatch log group to an S3 bucket, under a prefix.
+                                
+                interval: Fourths|Sixth|Twelfths|etc
+                    (Future versions will support rates and cron expressions.)
+                    
+                logGroupName: string
+                    The name of the log group to export. e.g '/aws/lambda/my-lambda'
+                                
+                logStreamPrefix: string (optional)
+                    The prefix of the log streams to export.
+                                
+                bucketRef: string (optional, see below)
+                    The reference to the bucket created in this project to export to, created by `aws:core:s3Bucket`.
+                                
+                pathURI: an s3 URI
+                    The destination URI to export to.
+                    Use `s3:///prefix` or `/prefix` so that he bucketRef value is used for the bucket name.
+                    
+                    If a bucket name is given in the URI, the bucket must allow 'logs.amazonaws.com' permission
+                    for 's3:GetBucketAcl'.
                 """
 )
 public class CloudWatchExportActivityProvider implements ActivityComponentService<ManagedComponentContext, CloudWatchExportActivity, CloudWatchExportActivityConstruct> {
