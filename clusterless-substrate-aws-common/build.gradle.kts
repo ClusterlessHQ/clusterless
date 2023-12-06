@@ -22,6 +22,8 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-joda")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    implementation("io.github.resilience4j:resilience4j-retry")
+
     api("com.jayway.jsonpath:json-path")
 
     implementation("software.amazon.awssdk:s3")

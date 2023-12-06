@@ -65,9 +65,7 @@ public abstract class ProcessExec {
                 return process(environment, args);
             }
 
-            if (retry()) {
-                LOG.info("enabled retrying command: {} {} times", args, retries);
-            }
+            LOG.info("enabled retrying command: {} {} times", args, retries);
 
             RetryConfig config = RetryConfig.<Integer>custom()
                     .maxAttempts(retries)

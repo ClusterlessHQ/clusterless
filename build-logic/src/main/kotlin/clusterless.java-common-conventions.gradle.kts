@@ -152,7 +152,7 @@ dependencies {
 
         implementationAndTestFixture("javax.annotation:javax.annotation-api:1.3.2")
 
-        implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.0.2")
+        implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.1.0")
 
         testImplementationAndTestFixture("org.mockito:mockito-core:5.7.0")
 
