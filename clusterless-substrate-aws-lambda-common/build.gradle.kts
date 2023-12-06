@@ -56,6 +56,4 @@ dependencies {
     testFixturesImplementation("uk.org.webcompere:system-stubs-core")
     testFixturesImplementation("uk.org.webcompere:system-stubs-jupiter")
     testFixturesImplementation("org.mockito:mockito-inline")
-
-//    implementation("io.github.resilience4j:resilience4j-retry")
 }

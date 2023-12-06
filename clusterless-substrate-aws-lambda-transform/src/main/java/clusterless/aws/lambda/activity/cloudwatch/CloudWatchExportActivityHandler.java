@@ -10,6 +10,7 @@ package clusterless.aws.lambda.activity.cloudwatch;
 
 import clusterless.aws.lambda.EventHandler;
 import clusterless.aws.lambda.transform.json.event.AWSEvent;
+import clusterless.cls.substrate.aws.sdk.ClientRetry;
 import clusterless.cls.substrate.aws.sdk.CloudWatchLogs;
 import clusterless.cls.util.Env;
 import clusterless.commons.temporal.IntervalBuilder;
@@ -17,6 +18,8 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.base.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
+import software.amazon.awssdk.services.cloudwatchlogs.model.LimitExceededException;
 
 import java.net.URI;
 import java.time.Duration;
@@ -31,7 +34,9 @@ public class CloudWatchExportActivityHandler extends EventHandler<AWSEvent, Clou
                     .build()
     );
 
-    CloudWatchLogs cloudWatchLogs = new CloudWatchLogs();
+    protected final CloudWatchLogs cloudWatchLogs = new CloudWatchLogs();
+
+    protected final ClientRetry<CloudWatchLogsClient> retryClient = new ClientRetry<>("cloudwatchlogs", 5, r -> r.exception() instanceof LimitExceededException);
 
     protected final IntervalBuilder intervalBuilder = new IntervalBuilder(activityProps.interval);
 
@@ -90,8 +95,11 @@ public class CloudWatchExportActivityHandler extends EventHandler<AWSEvent, Clou
             return;
         }
 
+        // there is a service quota here: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html
+        // Export task: One active (running or pending) export task at a time, per account. This quota can't be changed.
+        // Caused by: software.amazon.awssdk.services.cloudwatchlogs.model.LimitExceededException: Resource limit exceeded. (Service: CloudWatchLogs, Status Code: 400, Request ID: 79069256-8403-4435-a85c-17013c7d7c4c)
         getStopwatch.start();
-        CloudWatchLogs.Response response = cloudWatchLogs.createExportLogGroupTask(taskName, logGroupName, logStreamPrefix, destination, startTimeInclusive, endTimeInclusive);
+        CloudWatchLogs.Response response = retryClient.invoke(() -> cloudWatchLogs.createExportLogGroupTask(taskName, logGroupName, logStreamPrefix, destination, startTimeInclusive, endTimeInclusive));
         getStopwatch.stop();
 
         response.isSuccessOrThrowRuntime(
