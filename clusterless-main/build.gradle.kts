@@ -250,6 +250,22 @@ tasks.register<Exec>("generateBoundariesIndex") {
     mustRunAfter("generateResourceIndex")
 }
 
+tasks.register<Exec>("generateActivitiesIndex") {
+    dependsOn("installDist")
+
+    workingDir = file("build/install/clusterless/bin")
+    commandLine = listOf(
+        "./cls",
+        "show",
+        "activity",
+        "--list",
+        "--output-path",
+        "${buildDir}/generated-docs/modules/components/",
+        "--append=true"
+    )
+    mustRunAfter("generateBoundariesIndex")
+}
+
 tasks.register<Exec>("generateComponentPartial") {
     dependsOn("installDist")
 
@@ -322,6 +338,7 @@ tasks.register<Copy>("generateDocs") {
     dependsOn("generateArcIndex")
     dependsOn("generateBarriersIndex")
     dependsOn("generateBoundariesIndex")
+    dependsOn("generateActivitiesIndex")
     dependsOn("generateComponentPartial")
     dependsOn("generateModelModels")
     dependsOn("generateModelModelsRequired")

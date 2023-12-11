@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
                 ShowBoundaries.class,
                 ShowBarriers.class,
                 ShowArcs.class,
+                ShowActivities.class,
                 ShowModels.class,
                 CommandLine.HelpCommand.class
         }
