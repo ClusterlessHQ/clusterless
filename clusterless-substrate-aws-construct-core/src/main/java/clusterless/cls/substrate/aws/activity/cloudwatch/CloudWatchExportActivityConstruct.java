@@ -108,6 +108,7 @@ public class CloudWatchExportActivityConstruct extends ActivityConstruct<CloudWa
                 .withLogGroupName(model.logGroupName())
                 .withLogStreamPrefix(model.logStreamPrefix())
                 .withInterval(model.interval())
+                .withTimeoutMin(model().runtimeProps().timeoutMin())
                 .build();
 
         Map<String, String> environment = Env.toEnv(activityProps);

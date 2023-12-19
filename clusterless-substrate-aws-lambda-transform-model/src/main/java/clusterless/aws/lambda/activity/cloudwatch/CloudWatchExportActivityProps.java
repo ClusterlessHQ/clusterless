@@ -21,6 +21,7 @@ public class CloudWatchExportActivityProps implements Struct {
     String logStreamPrefix;
     @JsonRequiredProperty
     URI pathURI;
+    int timeoutMin;
 
     public static Builder builder() {
         return Builder.builder();
@@ -42,11 +43,16 @@ public class CloudWatchExportActivityProps implements Struct {
         return pathURI;
     }
 
+    public int timeoutMin() {
+        return timeoutMin;
+    }
+
     public static final class Builder {
         String interval;
         String logGroupName;
         String logStreamPrefix;
         URI pathURI;
+        int timeoutMin;
 
         private Builder() {
         }
@@ -75,11 +81,17 @@ public class CloudWatchExportActivityProps implements Struct {
             return this;
         }
 
+        public Builder withTimeoutMin(int timeoutMin) {
+            this.timeoutMin = timeoutMin;
+            return this;
+        }
+
         public CloudWatchExportActivityProps build() {
             CloudWatchExportActivityProps cloudWatchExportActivityProps = new CloudWatchExportActivityProps();
-            cloudWatchExportActivityProps.pathURI = this.pathURI;
-            cloudWatchExportActivityProps.logGroupName = this.logGroupName;
             cloudWatchExportActivityProps.logStreamPrefix = this.logStreamPrefix;
+            cloudWatchExportActivityProps.logGroupName = this.logGroupName;
+            cloudWatchExportActivityProps.pathURI = this.pathURI;
+            cloudWatchExportActivityProps.timeoutMin = this.timeoutMin;
             cloudWatchExportActivityProps.interval = this.interval;
             return cloudWatchExportActivityProps;
         }

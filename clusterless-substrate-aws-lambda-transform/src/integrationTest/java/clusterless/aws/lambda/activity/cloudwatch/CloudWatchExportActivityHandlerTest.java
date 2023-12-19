@@ -42,6 +42,7 @@ public class CloudWatchExportActivityHandlerTest extends LocalStackBase {
                 .withLogGroupName("test-log-group")
                 .withPathURI(URIs.create("s3", bucketName(), "/test-prefix/"))
                 .withInterval(IntervalUnit.TWELFTHS.name())
+                .withTimeoutMin(15)
                 .build();
     }
 

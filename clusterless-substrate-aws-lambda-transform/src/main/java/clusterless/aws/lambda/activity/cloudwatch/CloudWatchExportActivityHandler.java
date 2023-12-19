@@ -36,7 +36,13 @@ public class CloudWatchExportActivityHandler extends EventHandler<AWSEvent, Clou
 
     protected final CloudWatchLogs cloudWatchLogs = new CloudWatchLogs();
 
-    protected final ClientRetry<CloudWatchLogsClient> retryClient = new ClientRetry<>("cloudwatchlogs", 5, r -> r.exception() instanceof LimitExceededException);
+    protected final ClientRetry<CloudWatchLogsClient> retryClient = new ClientRetry<>(
+            "cloudwatchlogs",
+            // attempt to match the lambda timeout period, minus a small fudge factor
+            Duration.ofMinutes(activityProps.timeoutMin()).minusSeconds(5),
+            ClientRetry.exponentialBackoff(Duration.ofSeconds(3), 2.0, Duration.ofMinutes(3)),
+            r -> r.exception() instanceof LimitExceededException
+    );
 
     protected final IntervalBuilder intervalBuilder = new IntervalBuilder(activityProps.interval);
 
