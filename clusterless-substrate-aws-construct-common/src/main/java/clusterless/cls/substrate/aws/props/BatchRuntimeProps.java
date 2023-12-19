@@ -17,7 +17,7 @@ public class BatchRuntimeProps implements Struct {
 
     private int memorySizeMB = MEM_DEFAULT;
 
-    private int retryAttempts = 1;
+    private int retryAttempts = 0;
 
     private int timeoutMin = 60;
 

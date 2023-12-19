@@ -19,7 +19,7 @@ public class LambdaJavaRuntimeProps extends RuntimeProps {
 
     private int memorySizeMB = MEM_DEFAULT;
 
-    private int retryAttempts = 3;
+    private int retryAttempts = 0;
 
     private int timeoutMin = 5;
 
