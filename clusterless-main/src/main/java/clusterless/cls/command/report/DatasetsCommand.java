@@ -31,7 +31,7 @@ public class DatasetsCommand extends CommandWrapper<DatasetsCommandOptions> {
                     "",
                     "- complete: manifest is complete",
                     "- partial: manifest exists, but some data is missing",
-                    "- empty: manifest has no data, possibly due to error, or missing upstream data",
+                    "- empty: manifest exists, but has no data, possibly due to missing upstream data",
                     "- removed: the manifest and its data has been removed",
                     "",
                     "The --list option will output all manifest instances instead of summarizing."

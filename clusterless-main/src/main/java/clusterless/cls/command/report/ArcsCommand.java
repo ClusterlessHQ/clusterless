@@ -32,7 +32,7 @@ public class ArcsCommand extends CommandWrapper<ArcsCommandOptions> {
                     "- running: workload is in process",
                     "- complete: workload finished successfully",
                     "- partial: workload finished but some data is missing",
-                    "- missing: no data, possibly due to error, or missing upstream data",
+                    "- missing: workload finished but no data, possibly due to missing upstream data",
                     "",
                     "The --list option will output all arc instances instead of summarizing."
             }
