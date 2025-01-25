@@ -372,7 +372,7 @@ val picoliExecution by configurations.creating() {
 }
 
 dependencies {
-    picoliExecution("info.picocli:picocli-codegen:4.7.4")
+    picoliExecution("info.picocli:picocli-codegen:4.7.6")
 }
 
 tasks.register<JavaExec>("generateCLIDocs") {
