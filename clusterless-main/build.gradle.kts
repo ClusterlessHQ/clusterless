@@ -125,7 +125,7 @@ tasks.register<Exec>("generateComponentModels") {
         "component",
         "--model-all",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components").toString()
+        layout.buildDirectory.dir("generated-docs/modules/components").get().asFile.toString()
     )
 }
 
@@ -140,7 +140,7 @@ tasks.register<Exec>("generateComponentModelsRequired") {
         "--model-all",
         "--required",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components").toString()
+        layout.buildDirectory.dir("generated-docs/modules/components").get().asFile.toString()
     )
 }
 
@@ -154,7 +154,7 @@ tasks.register<Exec>("generateModelModels") {
         "model",
         "--model-all",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/models").toString()
+        layout.buildDirectory.dir("generated-docs/modules/models").get().asFile.toString()
     )
 }
 
@@ -169,7 +169,7 @@ tasks.register<Exec>("generateModelModelsRequired") {
         "--model-all",
         "--required",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/models").toString()
+        layout.buildDirectory.dir("generated-docs/modules/models").get().asFile.toString()
     )
 }
 
@@ -183,7 +183,7 @@ tasks.register<Exec>("generateComponentDocs") {
         "component",
         "--describe-all",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components").toString()
+        layout.buildDirectory.dir("generated-docs/modules/components").get().asFile.toString()
     )
 }
 
@@ -197,7 +197,7 @@ tasks.register<Exec>("generateResourceIndex") {
         "resource",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components/").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/components/").get().asFile.toString(),
         "--append=false"
     )
 }
@@ -212,7 +212,7 @@ tasks.register<Exec>("generateArcIndex") {
         "arc",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components/").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/components/").get().asFile.toString(),
         "--append=true"
     )
     mustRunAfter("generateBoundariesIndex")
@@ -228,7 +228,7 @@ tasks.register<Exec>("generateBarriersIndex") {
         "barrier",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components/").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/components/").get().asFile.toString(),
         "--append=true"
     )
     mustRunAfter("generateArcIndex")
@@ -244,7 +244,7 @@ tasks.register<Exec>("generateBoundariesIndex") {
         "boundary",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components/").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/components/").get().asFile.toString(),
         "--append=true"
     )
     mustRunAfter("generateResourceIndex")
@@ -260,7 +260,7 @@ tasks.register<Exec>("generateActivitiesIndex") {
         "activity",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components/").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/components/").get().asFile.toString(),
         "--append=true"
     )
     mustRunAfter("generateBoundariesIndex")
@@ -276,7 +276,7 @@ tasks.register<Exec>("generateComponentPartial") {
         "component",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/components/partials").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/components/partials").get().asFile.toString(),
         "--name",
         "components.adoc",
         "--template",
@@ -294,7 +294,7 @@ tasks.register<Exec>("generateModelDocs") {
         "model",
         "--describe-all",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/models").toString()
+        layout.buildDirectory.dir("generated-docs/modules/models").get().asFile.toString()
     )
 }
 
@@ -308,7 +308,7 @@ tasks.register<Exec>("generateModelIndex") {
         "model",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/models/").toString()
+        layout.buildDirectory.dir("generated-docs/modules/models/").get().asFile.toString()
     )
 }
 
@@ -322,7 +322,7 @@ tasks.register<Exec>("generateModelPartial") {
         "model",
         "--list",
         "--output-path",
-        layout.buildDirectory.dir("generated-docs/modules/models/partials").toString(),
+        layout.buildDirectory.dir("generated-docs/modules/models/partials").get().asFile.toString(),
         "--name",
         "models.adoc",
         "--template",
