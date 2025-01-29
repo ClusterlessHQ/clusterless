@@ -22,9 +22,7 @@ public class S3BucketResource extends Resource {
     @JsonRequiredProperty
     private String bucketName;
     private boolean versioned = false;
-
     private boolean enableEventBridge = true;
-
     /**
      * When true, the bucket and it's data will be removed when the project is destroyed.
      * <p>

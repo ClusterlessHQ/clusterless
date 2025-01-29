@@ -20,23 +20,28 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
         synopsis = "Export CloudWatch logs to S3.",
         description = """
                 Periodically will extract a CloudWatch log group to an S3 bucket, under a prefix.
-                                
-                interval: Fourths|Sixth|Twelfths|etc
-                    (Future versions will support rates and cron expressions.)
-                    
+                
+                schedule: Fourths|Sixth|Twelfths|etc or a cron(...) or rate(...) expression
+                    Either a lot unit can be provided, or a cron expression or rate expression.
+                    See https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html
+                
+                enabled: true|false
+                    Whether to enable the rule that schedules the activity.
+                    Toggle this value to simply disable the schedule without deleting/removing the activity.
+                
                 logGroupName: string
                     The name of the log group to export. e.g '/aws/lambda/my-lambda'
-                                
+                
                 logStreamPrefix: string (optional)
                     The prefix of the log streams to export.
-                                
+                
                 bucketRef: string (optional, see below)
                     The reference to the bucket created in this project to export to, created by `aws:core:s3Bucket`.
-                                
+                
                 pathURI: an s3 URI
                     The destination URI to export to.
                     Use `s3:///prefix` or `/prefix` so that he bucketRef value is used for the bucket name.
-                    
+                
                     If a bucket name is given in the URI, the bucket must allow 'logs.amazonaws.com' permission
                     for 's3:GetBucketAcl'.
                 """

@@ -12,6 +12,7 @@ import clusterless.aws.lambda.boundary.s3put.S3PutBoundaryProps;
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.construct.ExtensibleConstruct;
+import clusterless.cls.substrate.aws.construct.IsScheduled;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resource.s3.S3BucketResourceConstruct;
@@ -24,7 +25,6 @@ import clusterless.commons.collection.SafeList;
 import clusterless.commons.naming.Label;
 import clusterless.commons.substrate.aws.cdk.construct.LambdaLogGroupConstruct;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
-import clusterless.commons.temporal.IntervalUnits;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Duration;
@@ -38,7 +38,6 @@ import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
 
 import java.net.URI;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -46,15 +45,14 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class InfrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<S3PutListenerBoundary> {
+public class InfrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<S3PutListenerBoundary> implements IsScheduled {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(InfrequentS3PutStrategyBoundaryConstruct.class);
 
     public InfrequentS3PutStrategyBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
         super(context, model, Label.of("Infrequent").with(model.name()));
 
         // confirm unit exits
-        TemporalUnit temporalUnit = IntervalUnits.find(model().lotUnit());
-        IntervalUnits.verifyHasFormatter(temporalUnit);
+        verifiedTemporalUnit(model().lotUnit());
 
         URI listenURI = URIs.normalizeURI(model().dataset().pathURI());
 
@@ -118,7 +116,7 @@ public class InfrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruc
         // note that multiple boundaries can share the same bucket, if they all enable eventbridge, there can be
         // a type of race condition in cloudformation.
         // it's best this is enabled once during a deploy
-        if (model().infrequent.enableEventBridge()) {
+        if (model().infrequent().enableEventBridge()) {
             // todo: inject warning about
             //  Custom::S3BucketNotifications
             //  Received response status [FAILED] from custom resource. Message returned: Error: An error occurred (OperationAborted) when calling the PutBucketNotificationConfiguration operation: A conflicting conditional operation is currently in progress against this resource. Please try again.. See the details in CloudWatch Log

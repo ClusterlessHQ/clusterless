@@ -26,12 +26,10 @@ public class ComputeResource extends Resource {
 
     @JsonIgnore
     private ComputeType computeType = ComputeType.fargate;
-
     @JsonIgnore
     private boolean useSpot = false;
     @JsonRequiredProperty
     private String computeEnvironmentName;
-
     @JsonIgnore
     private Map<String, String> tags = new LinkedHashMap<>();
 

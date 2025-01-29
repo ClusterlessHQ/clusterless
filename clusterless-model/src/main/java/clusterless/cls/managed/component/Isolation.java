@@ -20,7 +20,6 @@ public enum Isolation {
      * A grouped provider returns a resource grouped into a common support stack
      */
     grouped,
-
     /**
      * A managed provider is embedded in a unique stack that manages the constructs
      */

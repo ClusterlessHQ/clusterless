@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.substrate.aws.arc.batch;
+package clusterless.cls.substrate.aws.common.batch;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -15,16 +15,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-class BatchPayloadCommand {
+public class BatchPayloadCommand {
     private final List<String> declared;
     List<String> command = new LinkedList<>();
     Map<String, String> payload = new LinkedHashMap<>();
 
     public BatchPayloadCommand(List<String> declared) {
         this.declared = declared;
-        int count = 0;
 
-        init(declared, count);
+        init(this.declared);
     }
 
     public List<String> declared() {
@@ -39,7 +38,9 @@ class BatchPayloadCommand {
         return payload;
     }
 
-    private void init(List<String> declared, int count) {
+    private void init(List<String> declared) {
+        int count = 0;
+
         for (String arg : declared) {
             if (arg.equals("$") || arg.startsWith("$.") || arg.startsWith("$$.")) {
                 String parameter = String.format("param_%d", count++);
@@ -53,7 +54,7 @@ class BatchPayloadCommand {
         }
     }
 
-    public List<String> fill(String stepContext, String arcExecContext) {
+    public List<String> fillWithArcContext(String stepContext, String arcExecContext) {
         List<String> results = new LinkedList<>();
 
         for (String arg : declared()) {

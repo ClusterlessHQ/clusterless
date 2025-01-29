@@ -10,24 +10,21 @@ package clusterless.cls.substrate.aws.activity.cloudwatch;
 
 import clusterless.aws.lambda.activity.cloudwatch.CloudWatchExportActivityProps;
 import clusterless.cls.substrate.aws.construct.ActivityConstruct;
+import clusterless.cls.substrate.aws.construct.IsScheduled;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resource.s3.S3BucketResourceConstruct;
 import clusterless.cls.substrate.aws.resources.Assets;
 import clusterless.cls.substrate.aws.resources.Functions;
-import clusterless.cls.substrate.aws.resources.Rules;
 import clusterless.cls.util.Env;
 import clusterless.cls.util.URIs;
 import clusterless.commons.collection.OrderedSafeMaps;
 import clusterless.commons.naming.Label;
 import clusterless.commons.substrate.aws.cdk.construct.LambdaLogGroupConstruct;
-import clusterless.commons.temporal.IntervalUnits;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Duration;
-import software.amazon.awscdk.services.events.CronOptions;
-import software.amazon.awscdk.services.events.Rule;
-import software.amazon.awscdk.services.events.Schedule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
 import software.amazon.awscdk.services.iam.*;
 import software.amazon.awscdk.services.lambda.Function;
@@ -45,8 +42,8 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CloudWatchExportActivityConstruct extends ActivityConstruct<CloudWatchExportActivity> {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(CloudWatchExportActivityConstruct.class);
+public class CloudWatchExportActivityConstruct extends ActivityConstruct<CloudWatchExportActivity> implements IsScheduled {
+    private static final Logger LOG = LoggerFactory.getLogger(CloudWatchExportActivityConstruct.class);
 
     public CloudWatchExportActivityConstruct(@NotNull ManagedComponentContext context, @NotNull CloudWatchExportActivity model) {
         super(context, model);
@@ -67,6 +64,7 @@ public class CloudWatchExportActivityConstruct extends ActivityConstruct<CloudWa
             if (bucketName == null) {
                 throw new IllegalStateException("failed to resolve bucket name for: " + bucketRef);
             }
+
             pathURI = URIs.create("s3", bucketName, pathURI.getPath());
 
             // https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/S3ExportTasks.html
@@ -97,16 +95,13 @@ public class CloudWatchExportActivityConstruct extends ActivityConstruct<CloudWa
         grant.assertSuccess();
 
         // confirm unit exits
-        // currently only support IntervalUnits
-        // todo: add support for rate and cron
-        TemporalUnit temporalUnit = IntervalUnits.find(model().interval());
-        IntervalUnits.verifyHasFormatter(temporalUnit);
+        TemporalUnit temporalUnit = verifiedTemporalUnit(model().schedule());
 
         CloudWatchExportActivityProps activityProps = CloudWatchExportActivityProps.builder()
                 .withPathURI(pathURI)
                 .withLogGroupName(model.logGroupName())
                 .withLogStreamPrefix(model.logStreamPrefix())
-                .withInterval(model.interval())
+                .withInterval(model.schedule())
                 .withTimeoutMin(model().runtimeProps().timeoutMin())
                 .build();
 
@@ -135,24 +130,6 @@ public class CloudWatchExportActivityConstruct extends ActivityConstruct<CloudWa
 
         declaredLogGroup.grant(function, "logs:CreateExportTask");
 
-        // https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-cron-expressions.html
-        if (temporalUnit.getDuration().toMinutes() > 60) {
-            throw new UnsupportedOperationException("interval greater than 60 minutes: " + model().interval());
-        }
-        String cronMinute = String.format("0/%d", temporalUnit.getDuration().toMinutes());
-        Schedule schedule = Schedule.cron(CronOptions.builder()
-                .minute(cronMinute)
-                .build());
-
-        LOG.info("creating rule interval using: {}", schedule);
-
-        String listenerRuleName = Rules.ruleName(this, model.name()).lowerHyphen();
-
-        Rule.Builder.create(this, "ListenerEvent")
-                .ruleName(listenerRuleName)
-                .enabled(true)
-                .schedule(schedule)
-                .targets(List.of(lambdaFunction))
-                .build();
+        createScheduledRule(LOG, this, model.name(), model.schedule(), lambdaFunction, model().enabled());
     }
 }

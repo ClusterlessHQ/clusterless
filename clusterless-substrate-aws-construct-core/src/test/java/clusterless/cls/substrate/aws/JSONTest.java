@@ -13,6 +13,10 @@ import clusterless.cls.json.JSONUtil;
 import clusterless.cls.model.Model;
 import clusterless.cls.model.deploy.Extensible;
 import clusterless.cls.model.deploy.WorkloadProps;
+import clusterless.cls.substrate.aws.activity.batch.BatchExecActivity;
+import clusterless.cls.substrate.aws.activity.cloudwatch.CloudWatchExportActivity;
+import clusterless.cls.substrate.aws.arc.batch.BatchExecArc;
+import clusterless.cls.substrate.aws.arc.glue.GlueAddPartitionsArc;
 import clusterless.cls.substrate.aws.arc.s3copy.S3CopyArc;
 import clusterless.cls.substrate.aws.boundary.s3put.S3PutListenerBoundary;
 import clusterless.cls.substrate.aws.resource.batch.ComputeResource;
@@ -37,11 +41,15 @@ public class JSONTest {
     @ValueSource(classes = {
             S3PutListenerBoundary.class,
             S3CopyArc.class,
+            BatchExecArc.class,
+            GlueAddPartitionsArc.class,
             EventBridgeResource.class,
             S3BucketResource.class,
             ComputeResource.class,
             GlueDatabaseResource.class,
-            GlueTableResource.class
+            GlueTableResource.class,
+            CloudWatchExportActivity.class,
+            BatchExecActivity.class,
     })
     void serialize(Class<? extends Extensible> originalClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 

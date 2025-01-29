@@ -20,17 +20,17 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
         synopsis = "Create an AWS Glue Database.",
         description = """
                 A simple way to create a managed Glue database within a project.
-                                
+                
                 name: string
                     The name referenced as databaseRef in aws:core:glueTable.
-                               
+                
                 databaseName: string
                     The name of the database. Regionally unique.
-                    
+                
                 removeOnDestroy: true|false
                     Configured with the following:
                         .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)
-                                    
+                
                 tags: { key: value, ... }
                     Tags to apply to the bucket.
                 """

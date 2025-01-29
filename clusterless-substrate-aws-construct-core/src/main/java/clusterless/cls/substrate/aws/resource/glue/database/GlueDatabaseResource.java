@@ -21,7 +21,6 @@ import java.util.Map;
 public class GlueDatabaseResource extends Resource {
     @JsonRequiredProperty
     private String databaseName;
-
     /**
      * When true, the bucket and it's data will be removed when the project is destroyed.
      * <p>
