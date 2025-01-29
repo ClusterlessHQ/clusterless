@@ -21,23 +21,23 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
         description = """
                 This are listens for lot availability events and extracts the partition values from the dataset
                 manifest.
-                                
+                
                 It then adds those partitions to the given AWS Glue table specified by the sink pathURI, having the
                 format:
                     glue://[catalog]/database/table
-                                
+                
                 Where the catalog is only required if writing to a different account.
-                                
+                
                 The resulting manifest file will contain uris of the format:
                     glue://[catalog]/database/table/value1/value2/...
-                                
+                
                 partitionType: value|named
                     the default named takes on the form name=value, name is the partition name and value is the
                     partition value
-                                
+                
                 namedPartitionDelimiter: defaults to '='
                     the delimiter used to separate the partition name from the partition value
-                                
+                
                 partitionResults: none|all|added
                     none: do not list any partitions in the manifest, just the glue:// uri
                     all: list all partitions found in the source manifest

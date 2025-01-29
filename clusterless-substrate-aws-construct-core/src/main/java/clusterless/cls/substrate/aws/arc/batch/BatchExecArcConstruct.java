@@ -10,6 +10,7 @@ package clusterless.cls.substrate.aws.arc.batch;
 
 import clusterless.cls.substrate.aws.arc.common.WorkloadManagedConstruct;
 import clusterless.cls.substrate.aws.arc.props.ArcEnvBuilder;
+import clusterless.cls.substrate.aws.common.batch.BatchPayloadCommand;
 import clusterless.cls.substrate.aws.construct.ArcConstruct;
 import clusterless.cls.substrate.aws.event.ArcStateContext;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
@@ -19,6 +20,7 @@ import clusterless.cls.substrate.aws.resources.Policies;
 import clusterless.commons.naming.Label;
 import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
@@ -36,12 +38,13 @@ import software.amazon.awscdk.services.stepfunctions.*;
 import software.amazon.awscdk.services.stepfunctions.tasks.BatchSubmitJob;
 import software.amazon.awscdk.services.stepfunctions.tasks.LambdaInvoke;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(BatchExecArcConstruct.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BatchExecArcConstruct.class);
     private final Label regionalName;
     private final RetentionDays retentionDays = RetentionDays.ONE_DAY;
     private final RemovalPolicy removalPolicy = RemovalPolicy.DESTROY;
@@ -57,8 +60,9 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         regionalName = ResourceNames.regionUniqueScopedLabel(this, modelName);
 
-        Map<String, String> environment = new ArcEnvBuilder(placement(), model())
-                .asEnvironment();
+        Map<String, String> environment = new LinkedHashMap<>(model().workload().environment());
+
+        environment.putAll(new ArcEnvBuilder(placement(), model()).asEnvironment());
 
         AssetImage image = ContainerImage.fromAsset(
                 model().workload().imagePath().toString(),

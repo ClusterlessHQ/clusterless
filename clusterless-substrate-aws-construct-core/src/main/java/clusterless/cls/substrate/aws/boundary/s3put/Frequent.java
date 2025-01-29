@@ -12,8 +12,13 @@ import clusterless.cls.model.Struct;
 
 public class Frequent implements Struct {
     int queueFetchWaitSec = 0;
+    boolean enabled = true;
 
     public int queueFetchWaitSec() {
         return queueFetchWaitSec;
+    }
+
+    public boolean enabled() {
+        return enabled;
     }
 }

@@ -20,16 +20,15 @@ import clusterless.cls.substrate.aws.props.Memory;
  */
 public class S3PutListenerBoundary extends IngressBoundary {
     @JsonRequiredProperty
-    EventArrival eventArrival = EventArrival.infrequent;
-    LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
+    private EventArrival eventArrival = EventArrival.infrequent;
+    private LambdaJavaRuntimeProps runtimeProps = new LambdaJavaRuntimeProps(
             Memory.MEM_1_024MB,
             3,
             15
     );
-    Infrequent infrequent = new Infrequent();
-    Frequent frequent = new Frequent();
-
-    PathFilter filter = new PathFilter();
+    private Infrequent infrequent = new Infrequent();
+    private Frequent frequent = new Frequent();
+    private PathFilter filter = new PathFilter();
 
     public S3PutListenerBoundary() {
     }

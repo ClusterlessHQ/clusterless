@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.local;
 
-import clusterless.cls.managed.component.ArcLocalExecutor;
+import clusterless.cls.managed.component.ExecCommand;
 import clusterless.commons.util.Runtimes;
 
 import java.util.List;
@@ -21,12 +21,12 @@ public class ShellWriter {
         this.runtime = runtime;
     }
 
-    public String toScript(List<ArcLocalExecutor.Command> commands) {
+    public String toScript(List<ExecCommand> commands) {
         StringBuilder buffer = new StringBuilder();
 
         buffer.append("#!/bin/bash\n");
 
-        for (ArcLocalExecutor.Command command : commands) {
+        for (ExecCommand command : commands) {
             if (command.headerComment() != null) {
                 writeMultiLineComment(buffer, command.headerComment());
             }

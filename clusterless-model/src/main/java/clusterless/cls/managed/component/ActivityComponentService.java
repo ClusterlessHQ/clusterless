@@ -10,6 +10,7 @@ package clusterless.cls.managed.component;
 
 import clusterless.cls.managed.ModelType;
 import clusterless.cls.model.deploy.Activity;
+import clusterless.cls.model.deploy.Placement;
 
 /**
  *
@@ -19,4 +20,8 @@ import clusterless.cls.model.deploy.Activity;
         isolation = Isolation.grouped
 )
 public interface ActivityComponentService<CC extends ComponentContext, M extends Activity, C extends ActivityComponent> extends ComponentService<CC, M, C> {
+    default ActivityLocalExecutor executor(Placement placement, Activity activity) {
+        throw new UnsupportedOperationException("local exec is unsupported by this activity :" + activity.type());
+    }
+
 }

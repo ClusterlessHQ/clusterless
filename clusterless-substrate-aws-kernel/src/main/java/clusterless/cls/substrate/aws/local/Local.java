@@ -13,10 +13,7 @@ import clusterless.cls.managed.component.*;
 import clusterless.cls.managed.dataset.DatasetResolver;
 import clusterless.cls.model.DeployableLoader;
 import clusterless.cls.model.Model;
-import clusterless.cls.model.deploy.Arc;
-import clusterless.cls.model.deploy.Deployable;
-import clusterless.cls.model.deploy.Placement;
-import clusterless.cls.model.deploy.Workload;
+import clusterless.cls.model.deploy.*;
 import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.cdk.Provider;
 import clusterless.commons.util.Runtimes;
@@ -52,6 +49,27 @@ public class Local extends CommonCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         List<Deployable> deployables = loadProjectModels(commandOptions.projectFiles());
 
+        List<ExecCommand> commands = findArcs(deployables);
+
+        if (commands.isEmpty()) {
+            commands = findActivities(deployables);
+        }
+
+        if (commands.isEmpty()) {
+            System.err.println("no arcs or activities found for: " + commandOptions.name());
+            return 1;
+        }
+
+        ShellWriter shellWriter = new ShellWriter(Runtimes.current());
+
+        String script = shellWriter.toScript(commands);
+
+        System.out.println(script);
+
+        return 0;
+    }
+
+    protected List<ExecCommand> findArcs(List<Deployable> deployables) {
         DatasetResolver resolver = new DatasetResolver(deployables);
 
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
@@ -59,7 +77,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
         for (Deployable deployable : deployables) {
 
             List<Arc<?>> arcs = deployable.arcs().stream()
-                    .filter(a -> a.name().equalsIgnoreCase(commandOptions.arc()))
+                    .filter(a -> a.name().equalsIgnoreCase(commandOptions.name()))
                     .collect(Collectors.toList());
 
             if (!arcs.isEmpty()) {
@@ -74,11 +92,13 @@ public class Local extends CommonCommand implements Callable<Integer> {
                 .toList();
 
         if (arcs.isEmpty()) {
-            System.err.println("no arcs found for: " + commandOptions.arc());
+            return List.of();
         }
 
         if (arcs.size() > 1) {
-            System.err.println("too many arcs found for: " + commandOptions.arc() + ", found: " + arcs.stream().map(Arc::name).collect(Collectors.toList()));
+            System.err.println("too many arcs found for: " + commandOptions.name() + ", found: " + arcs.stream()
+                    .map(Arc::name)
+                    .toList());
         }
 
         Deployable deployable = found.keySet().stream().findFirst().orElseThrow();
@@ -87,20 +107,52 @@ public class Local extends CommonCommand implements Callable<Integer> {
         ArcLocalExecutor executor = executorFor(deployable.placement(), arc);
 
         String lotId = prompt(commandOptions.lotId(), "Enter lot id: ");
-        List<ArcLocalExecutor.Command> commands = executor.commands(
+
+        return executor.commands(
                 commandOptions.role(),
                 lotId,
                 commandOptions.manifestState(),
                 source -> resolver.locate(deployable.placement(), deployable.project(), source)
         );
+    }
 
-        ShellWriter shellWriter = new ShellWriter(Runtimes.current());
+    protected List<ExecCommand> findActivities(List<Deployable> deployables) {
+        Map<Deployable, List<Activity>> found = new LinkedHashMap<>();
 
-        String script = shellWriter.toScript(commands);
+        for (Deployable deployable : deployables) {
 
-        System.out.println(script);
+            List<Activity> activities = deployable.activities().stream()
+                    .filter(a -> a.name().equalsIgnoreCase(commandOptions.name()))
+                    .collect(Collectors.toList());
 
-        return 0;
+            if (!activities.isEmpty()) {
+                found.put(deployable, activities);
+            }
+        }
+
+        List<Activity> activities = found
+                .values()
+                .stream()
+                .flatMap(List::stream)
+                .toList();
+
+        if (activities.isEmpty()) {
+            return List.of();
+        }
+
+        if (activities.size() > 1) {
+            System.err.println("too many activities found for: " + commandOptions.name() + ", found: " + activities.stream()
+                    .map(Activity::name)
+                    .toList());
+        }
+
+        Deployable deployable = found.keySet().stream().findFirst().orElseThrow();
+
+        Activity activity = found.get(deployable).get(0);
+
+        ActivityLocalExecutor executor = executorFor(deployable.placement(), activity);
+
+        return executor.commands();
     }
 
     private ArcLocalExecutor executorFor(Placement placement, Arc<? extends Workload<?>> arc) {
@@ -111,5 +163,15 @@ public class Local extends CommonCommand implements Callable<Integer> {
         }
 
         return ((ArcComponentService<?, ?, ?>) componentService.get()).executor(placement, arc);
+    }
+
+    private ActivityLocalExecutor executorFor(Placement placement, Activity activity) {
+        Optional<ComponentService<ComponentContext, Model, Component>> componentService = componentServices.componentServicesForActivity(activity);
+
+        if (componentService.isEmpty()) {
+            throw new IllegalStateException("unknown component type: " + activity.type());
+        }
+
+        return ((ActivityComponentService<?, ?, ?>) componentService.get()).executor(placement, activity);
     }
 }

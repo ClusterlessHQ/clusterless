@@ -17,6 +17,8 @@ plugins {
 
 rootProject.name = "clusterless"
 
+//includeBuild("../clusterless-commons")
+
 include("clusterless-common")
 include("clusterless-model")
 include("clusterless-main-common")

@@ -10,6 +10,7 @@ package clusterless.cls.managed.component;
 
 import clusterless.cls.managed.ModelType;
 import clusterless.cls.model.Model;
+import clusterless.cls.model.deploy.Activity;
 import clusterless.cls.model.deploy.Arc;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.model.deploy.Extensible;
@@ -82,6 +83,10 @@ public class ComponentServices {
 
     public Optional<ComponentService<ComponentContext, Model, Component>> componentServicesForArc(Arc<?> deployableModel) {
         return componentServiceFor(deployableModel, Isolation.managed, ModelType.Arc);
+    }
+
+    public Optional<ComponentService<ComponentContext, Model, Component>> componentServicesForActivity(Activity deployableModel) {
+        return componentServiceFor(deployableModel, Isolation.grouped, ModelType.Activity);
     }
 
     public Optional<ComponentService<ComponentContext, Model, Component>> componentServiceFor(Extensible extensible, Isolation isolation, ModelType modelType) {

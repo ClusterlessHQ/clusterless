@@ -17,7 +17,6 @@ import software.amazon.awssdk.services.glue.model.Column;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -31,7 +30,7 @@ public abstract class LambdaHandlerTestBase {
         try {
             properties.load(new FileReader("%s/.gradle/gradle.properties".formatted(System.getProperty("user.home"))));
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            return Optional.empty();
         }
 
         return Optional.ofNullable(properties.getProperty(key));

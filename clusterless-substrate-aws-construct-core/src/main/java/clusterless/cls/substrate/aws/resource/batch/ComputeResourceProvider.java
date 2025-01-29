@@ -21,7 +21,7 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
         description = """
                 When using an aws:core:batchExecArc, a compute environment is required to execute the Docker image.
                 Currently only Fargate is supported.
-                                
+                
                 computeEnvironmentName: The unique name of the compute environment to create
                 """
 )

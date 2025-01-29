@@ -221,6 +221,7 @@ public class CDKProcessExec extends ProcessExec {
     protected Map<String, String> getCommonEnvironment() {
         return OrderedSafeMaps.of(
                 "JSII_SILENCE_WARNING_DEPRECATED_NODE_VERSION", "true",
+                "JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION", "true",
                 "LOCALSTACK_HOSTNAME", getLocalStackHostName(),
                 "EDGE_PORT", getLocalStackPort()
         );

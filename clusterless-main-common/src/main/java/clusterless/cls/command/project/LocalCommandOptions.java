@@ -17,11 +17,12 @@ import picocli.CommandLine;
 @CommandLine.Command(description = "Enable execution of the specified arc locally for testing.")
 public class LocalCommandOptions extends ProjectCommandOptions {
     @CommandLine.Option(
-            names = {"-a", "--arc"},
-            description = "The arc name to execute.",
+            names = {"-n", "--name"},
+            description = "The arc or activity name to execute.",
             required = true
     )
-    String arc;
+    String name;
+
     @CommandLine.Option(
             names = {"-l", "--lot"},
             description = "The lot id of the manifest to source.",
@@ -46,8 +47,8 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     )
     ManifestState manifestState = ManifestState.complete;
 
-    public String arc() {
-        return arc;
+    public String name() {
+        return name;
     }
 
     public String lotId() {

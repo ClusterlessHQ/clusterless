@@ -12,6 +12,7 @@ import clusterless.aws.lambda.boundary.frequents3put.FrequentS3PutBoundaryProps;
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.construct.ExtensibleConstruct;
+import clusterless.cls.substrate.aws.construct.IsScheduled;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resource.s3.S3BucketResourceConstruct;
@@ -22,12 +23,13 @@ import clusterless.cls.util.URIs;
 import clusterless.commons.naming.Label;
 import clusterless.commons.substrate.aws.cdk.construct.LambdaLogGroupConstruct;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
-import clusterless.commons.temporal.IntervalUnits;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
-import software.amazon.awscdk.services.events.*;
+import software.amazon.awscdk.services.events.EventBus;
+import software.amazon.awscdk.services.events.IEventBus;
+import software.amazon.awscdk.services.events.Schedule;
 import software.amazon.awscdk.services.events.targets.LambdaFunction;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.s3.Bucket;
@@ -39,22 +41,22 @@ import software.amazon.awscdk.services.sqs.QueueEncryption;
 
 import java.net.URI;
 import java.time.temporal.TemporalUnit;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
  *
  */
-public class FrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<S3PutListenerBoundary> {
+public class FrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<S3PutListenerBoundary> implements IsScheduled {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(FrequentS3PutStrategyBoundaryConstruct.class);
 
     public FrequentS3PutStrategyBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
         super(context, model, Label.of("Frequent").with(model.name()));
 
+        Frequent frequent = model().frequent();
+
         // confirm unit exits
-        TemporalUnit temporalUnit = IntervalUnits.find(model().lotUnit());
-        IntervalUnits.verifyHasFormatter(temporalUnit);
+        TemporalUnit temporalUnit = verifiedTemporalUnit(model().lotUnit());
 
         URI listenURI = URIs.normalizeURI(model().dataset().pathURI());
 
@@ -62,7 +64,6 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<
         String listenPathPrefix = URIs.asKeyPath(listenURI); // slash at end
         String manifestBucketNameRef = BootstrapStores.manifestStoreNameRef(this);
         String eventBusRef = Events.arcEventBusNameRef(this);
-        String listenerRuleName = Rules.ruleName(this, model.name()).lowerHyphen();
 
         IBucket listenBucket = Bucket.fromBucketName(this, "ListenBucket", listenBucketName);
         IBucket manifestBucket = Bucket.fromBucketName(this, "ManifestBucket", manifestBucketNameRef);
@@ -97,7 +98,7 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<
         FrequentS3PutBoundaryProps transformProps = FrequentS3PutBoundaryProps.builder()
                 .withEventBusName(eventBusRef)
                 .withSqsQueueName(queueName)
-                .withSqsWaitTimeSeconds(model().frequent().queueFetchWaitSec())
+                .withSqsWaitTimeSeconds(frequent.queueFetchWaitSec())
                 .withDataset(SinkDataset.Builder.builder()
                         .withName(model().dataset().name())
                         .withVersion(model.dataset().version())
@@ -145,22 +146,7 @@ public class FrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<
                         .build()
         );
 
-        // https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-cron-expressions.html
-        if (temporalUnit.getDuration().toMinutes() > 60) {
-            throw new UnsupportedOperationException("temporal unit greater than 60 minutes: " + model().lotUnit());
-        }
-        String cronMinute = String.format("0/%d", temporalUnit.getDuration().toMinutes());
-        Schedule schedule = Schedule.cron(CronOptions.builder()
-                .minute(cronMinute)
-                .build());
-
-        LOG.info("creating rule schedule with cron minute: {}", cronMinute);
-
-        Rule.Builder.create(this, "ListenerEvent")
-                .ruleName(listenerRuleName)
-                .enabled(true)
-                .schedule(schedule)
-                .targets(List.of(lambdaFunction))
-                .build();
+        Schedule schedule = scheduleFromTemporalUnit(temporalUnit).orElseThrow(() -> new UnsupportedOperationException("unsupported temporal unit: " + temporalUnit));
+        createScheduledRule(LOG, this, model().name(), lambdaFunction, schedule, frequent.enabled());
     }
 }
