@@ -13,6 +13,7 @@ import clusterless.cls.substrate.aws.construct.ResourceConstruct;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import clusterless.cls.util.URIs;
+import clusterless.commons.collection.OrderedMaps;
 import clusterless.commons.naming.Label;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,9 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
                 .enablePartitionFiltering(false)
                 .dataFormat(formatFrom(model.schema().dataFormat()))
                 // .encryption(TableEncryption.S3_MANAGED) // cannot be set if setting a bucket
+                // this doesn't work, even though they are documented as storage parameters
+                // .storageParameters(List.of(StorageParameter.skipHeaderLineCount(model.tableParams().skipHeaderLines())))
+                .parameters(OrderedMaps.of("skip.header.line.count", String.valueOf(model.tableParams().skipHeaderLines()))) // this works
                 .build());
 
         table.applyRemovalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN);
