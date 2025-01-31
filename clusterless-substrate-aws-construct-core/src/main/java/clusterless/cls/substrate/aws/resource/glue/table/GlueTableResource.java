@@ -27,6 +27,7 @@ public class GlueTableResource extends Resource {
     private GlueTableSchema schema = new GlueTableSchema();
     @JsonRequiredProperty
     private URI pathURI;
+    private GlueTableParams tableParams = new GlueTableParams();
     private boolean removeOnDestroy = false;
     private Map<String, String> tags = new LinkedHashMap<>();
 
@@ -47,6 +48,10 @@ public class GlueTableResource extends Resource {
 
     public GlueTableSchema schema() {
         return schema;
+    }
+
+    public GlueTableParams tableParams() {
+        return tableParams;
     }
 
     public URI pathURI() {

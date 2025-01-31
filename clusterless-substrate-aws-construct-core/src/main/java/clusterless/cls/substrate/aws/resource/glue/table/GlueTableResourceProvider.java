@@ -38,6 +38,9 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
                 
                 schema.dataFormat: parquet|orc|avro|json|csv|tsv|cloudtrail_logs|apache_logs
                 
+                tableParams.skipHeaderLines: int
+                    The number of lines to skip at the beginning of the file.
+                
                 removeOnDestroy: true|false
                     Configured with the following:
                         .removalPolicy(removeOnDestroy ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN)

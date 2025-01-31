@@ -34,11 +34,10 @@ public class GlueTableSchema implements Struct {
     }
 
     @JsonRequiredProperty
-    List<GlueColumn> columns = new LinkedList<>();
-    List<GlueColumn> partitions = new LinkedList<>();
-
+    private List<GlueColumn> columns = new LinkedList<>();
+    private List<GlueColumn> partitions = new LinkedList<>();
     @JsonRequiredProperty
-    String dataFormat;
+    private String dataFormat;
 
     public List<GlueColumn> columns() {
         return columns;
