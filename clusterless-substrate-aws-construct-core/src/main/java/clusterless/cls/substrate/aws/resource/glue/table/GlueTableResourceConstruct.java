@@ -53,7 +53,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
 
         IBucket tableLocation = getBucketFor("TableLocation", uri.getHost());
 
-        Table table = constructWithinHandler(() -> Table.Builder.create(this, id(model().tableName()))
+        S3Table table = constructWithinHandler(() -> S3Table.Builder.create(this, id(model().tableName()))
                 .database(database)
                 .tableName(model().tableName())
                 .description(model().description())
@@ -68,7 +68,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
                 .dataFormat(formatFrom(model.schema().dataFormat()))
                 // .encryption(TableEncryption.S3_MANAGED) // cannot be set if setting a bucket
                 // this doesn't work, even though they are documented as storage parameters
-                // .storageParameters(List.of(StorageParameter.skipHeaderLineCount(model.tableParams().skipHeaderLines())))
+//                 .storageParameters(List.of(StorageParameter.skipHeaderLineCount(model.tableParams().skipHeaderLines())))
                 .parameters(OrderedMaps.of("skip.header.line.count", String.valueOf(model.tableParams().skipHeaderLines()))) // this works
                 .build());
 
