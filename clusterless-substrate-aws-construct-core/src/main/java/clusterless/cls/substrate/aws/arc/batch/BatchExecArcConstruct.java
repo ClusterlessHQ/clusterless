@@ -60,9 +60,10 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         regionalName = ResourceNames.regionUniqueScopedLabel(this, modelName);
 
-        Map<String, String> environment = new LinkedHashMap<>(model().workload().environment());
+        Map<String, String> arcEnvironment = new ArcEnvBuilder(placement(), model()).asEnvironment();
+        Map<String, String> ecsEnvironment = new LinkedHashMap<>(arcEnvironment);
 
-        environment.putAll(new ArcEnvBuilder(placement(), model()).asEnvironment());
+        ecsEnvironment.putAll(model().workload().environment());
 
         AssetImage image = ContainerImage.fromAsset(
                 model().workload().imagePath().toString(),
@@ -98,7 +99,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                         .streamPrefix(Label.of("Fargate").lowerHyphen())
                         .logGroup(logGroup)
                         .build()))
-                .environment(environment)
+                .environment(ecsEnvironment)
                 .command(payloadCommand.command())
                 .cpu(.25) // vcpu - 1 vCPU is equivalent to 1,024 CPU
                 .memory(Size.mebibytes(model().workload().batchRuntimeProps().memorySizeMB()))
@@ -126,7 +127,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 .workload()
                 .lambdaRuntimeProps();
 
-        function = new WorkloadManagedConstruct(context, baseId, modelName, handler, lambdaJavaRuntimeProps, environment)
+        function = new WorkloadManagedConstruct(context, baseId, modelName, handler, lambdaJavaRuntimeProps, arcEnvironment)
                 .function();
 
         grantManifestRead(function());
