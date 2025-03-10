@@ -69,6 +69,7 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                 model().workload().imagePath().toString(),
                 AssetImageProps.builder()
                         .networkMode(NetworkMode.HOST)
+                        .buildArgs(model().workload().imageBuildArgs())
                         .platform(Lookup.platform(model().workload().batchRuntimeProps().architecture()))
                         .build()
         );

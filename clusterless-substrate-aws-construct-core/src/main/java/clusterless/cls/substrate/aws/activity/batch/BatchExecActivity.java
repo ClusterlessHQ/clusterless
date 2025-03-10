@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023-2025 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package clusterless.cls.substrate.aws.activity.batch;
 
 import clusterless.cls.json.JsonRequiredProperty;
@@ -18,6 +26,7 @@ public class BatchExecActivity extends Activity {
     private String computeEnvironmentRef;
     @JsonRequiredProperty
     private Path imagePath;
+    Map<String, String> imageBuildArgs = new LinkedHashMap<>();
     private Map<String, String> environment = new LinkedHashMap<>();
     private List<String> command = new LinkedList<>();
     private String bucketRef;
@@ -34,6 +43,10 @@ public class BatchExecActivity extends Activity {
 
     public Path imagePath() {
         return imagePath;
+    }
+
+    public Map<String, String> imageBuildArgs() {
+        return imageBuildArgs;
     }
 
     public Map<String, String> environment() {

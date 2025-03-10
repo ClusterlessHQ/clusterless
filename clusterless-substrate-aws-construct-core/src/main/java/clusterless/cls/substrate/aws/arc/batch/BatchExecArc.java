@@ -40,6 +40,7 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
         String computeEnvironmentRef;
         @JsonRequiredProperty
         Path imagePath;
+        Map<String, String> imageBuildArgs = new LinkedHashMap<>();
         Map<String, String> environment = new LinkedHashMap<>();
         List<String> command = new LinkedList<>();
 
@@ -61,6 +62,10 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
 
         public Path imagePath() {
             return imagePath;
+        }
+
+        public Map<String, String> imageBuildArgs() {
+            return imageBuildArgs;
         }
 
         public Map<String, String> environment() {
