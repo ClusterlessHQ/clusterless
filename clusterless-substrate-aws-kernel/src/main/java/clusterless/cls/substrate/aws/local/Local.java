@@ -62,7 +62,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());
 
-        String script = shellWriter.toScript(commands);
+        String script = shellWriter.toScript(commands, commandOptions.dockerImage());
 
         System.out.println(script);
 
@@ -108,11 +108,14 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         String lotId = prompt(commandOptions.lotId(), "Enter lot id: ");
 
+        boolean runInDocker = commandOptions.dockerImage() != null;
+
         return executor.commands(
                 commandOptions.role(),
                 lotId,
                 commandOptions.manifestState(),
-                source -> resolver.locate(deployable.placement(), deployable.project(), source)
+                source -> resolver.locate(deployable.placement(), deployable.project(), source),
+                runInDocker
         );
     }
 
@@ -152,7 +155,9 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         ActivityLocalExecutor executor = executorFor(deployable.placement(), activity);
 
-        return executor.commands();
+        boolean runInDocker = commandOptions.dockerImage() != null;
+
+        return executor.commands(runInDocker);
     }
 
     private ArcLocalExecutor executorFor(Placement placement, Arc<? extends Workload<?>> arc) {

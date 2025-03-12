@@ -11,5 +11,5 @@ package clusterless.cls.managed.component;
 import java.util.List;
 
 public interface ActivityLocalExecutor {
-    List<ExecCommand> commands();
+    List<ExecCommand> commands(boolean runInDocker);
 }

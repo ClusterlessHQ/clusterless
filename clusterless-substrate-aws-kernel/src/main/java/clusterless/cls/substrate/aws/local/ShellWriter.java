@@ -21,7 +21,7 @@ public class ShellWriter {
         this.runtime = runtime;
     }
 
-    public String toScript(List<ExecCommand> commands) {
+    public String toScript(List<ExecCommand> commands, String dockerImage) {
         StringBuilder buffer = new StringBuilder();
 
         buffer.append("#!/bin/bash\n");
@@ -42,6 +42,23 @@ public class ShellWriter {
 
             if (command.commandComment() != null) {
                 writeMultiLineComment(buffer, command.commandComment());
+            }
+
+            // insert docker voodoo
+            if (dockerImage != null) {
+                buffer.append("\n\n# \"assume -x\" will export all env vars\n");
+                buffer.append("docker run -it --rm \\\n");
+                buffer.append("  -e AWS_REGION=\"$AWS_REGION\" \\\n");
+                buffer.append("  -e AWS_ACCESS_KEY_ID=\"$AWS_ACCESS_KEY_ID\" \\\n");
+                buffer.append("  -e AWS_SECRET_ACCESS_KEY=\"$AWS_SECRET_ACCESS_KEY\" \\\n");
+
+                for (String key : command.environment().keySet()) {
+                    buffer.append(String.format("  -e %s=\"$%s\" \\\n", key, key));
+                }
+
+                buffer.append("  ");
+                buffer.append(dockerImage);
+                buffer.append("\\\n  ");
             }
 
             buffer.append(String.join(" ", command.command()));

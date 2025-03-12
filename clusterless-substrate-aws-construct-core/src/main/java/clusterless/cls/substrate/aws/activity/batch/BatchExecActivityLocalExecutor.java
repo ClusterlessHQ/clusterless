@@ -29,7 +29,7 @@ public class BatchExecActivityLocalExecutor implements ActivityLocalExecutor, Ba
     }
 
     @Override
-    public List<ExecCommand> commands() {
+    public List<ExecCommand> commands(boolean runInDocker) {
 
         Schedule scheduleFrom = createScheduleFrom(activity.schedule());
 
@@ -51,8 +51,8 @@ public class BatchExecActivityLocalExecutor implements ActivityLocalExecutor, Ba
         localComments.put("CLS_ACTIVITY_PROPS_JSON", "provides all project metadata");
         localComments.put("CLS_ACTIVITY_PROPS_JAVA", "same as CLS_ACT_PROPS_JSON but for loading into an Java object via Jackson");
 
-        addProvided(localComments, localEnvironment);
-        addHelper(localComments, localEnvironment);
+        addProvided(localComments, localEnvironment, runInDocker);
+        addHelper(localComments, localEnvironment, runInDocker);
 
         BatchPayloadCommand payloadCommand = new BatchPayloadCommand(activity.command());
 

@@ -28,6 +28,7 @@ import clusterless.cls.substrate.aws.report.Placements;
 import clusterless.cls.substrate.aws.report.Projects;
 import clusterless.cls.util.ExecutionExceptionHandler;
 import clusterless.cls.util.ExitCodeExceptionMapper;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
         }
 )
 public class Kernel extends Startup implements SubstrateProvider {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Kernel.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Kernel.class);
 
     public static void main(String[] args) {
         System.exit(new Kernel().execute(args));

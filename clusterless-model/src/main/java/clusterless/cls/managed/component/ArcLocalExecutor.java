@@ -14,5 +14,5 @@ import clusterless.cls.model.manifest.ManifestState;
 import java.util.List;
 
 public interface ArcLocalExecutor {
-    List<ExecCommand> commands(String role, String lotId, ManifestState manifestState, DatasetOwnerLookup ownerLookup);
+    List<ExecCommand> commands(String role, String lotId, ManifestState manifestState, DatasetOwnerLookup ownerLookup, boolean runInDocker);
 }

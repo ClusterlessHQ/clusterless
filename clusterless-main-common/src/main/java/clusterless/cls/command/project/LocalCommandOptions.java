@@ -47,6 +47,14 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     )
     ManifestState manifestState = ManifestState.complete;
 
+    @CommandLine.Option(
+            names = {"-d", "--docker"},
+            description = {
+                    "Run commands via the supplied Docker image."
+            }
+    )
+    String dockerImage;
+
     public String name() {
         return name;
     }
@@ -61,5 +69,9 @@ public class LocalCommandOptions extends ProjectCommandOptions {
 
     public ManifestState manifestState() {
         return manifestState;
+    }
+
+    public String dockerImage() {
+        return dockerImage;
     }
 }

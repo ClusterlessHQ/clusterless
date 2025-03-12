@@ -62,7 +62,7 @@ public class BatchExecArcLocalExecutor implements ArcLocalExecutor, BatchLocalEx
     }
 
     @Override
-    public List<ExecCommand> commands(String role, String lotId, ManifestState manifestState, DatasetOwnerLookup ownerLookup) {
+    public List<ExecCommand> commands(String role, String lotId, ManifestState manifestState, DatasetOwnerLookup ownerLookup, boolean runInDocker) {
         ArcEnvBuilder arcEnvBuilder = new ArcEnvBuilder(placement, arc);
         Map<String, String> arcEnvironment = arcEnvBuilder.asEnvironment();
 
@@ -75,8 +75,8 @@ public class BatchExecArcLocalExecutor implements ArcLocalExecutor, BatchLocalEx
         localComments.put("CLS_ARC_PROPS_JSON", "provides all project metadata");
         localComments.put("CLS_ARC_PROPS_JAVA", "same as CLS_ARC_PROPS_JSON but for loading into an Java object via Jackson");
 
-        addProvided(localComments, localEnvironment);
-        addHelper(localComments, localEnvironment);
+        addProvided(localComments, localEnvironment, runInDocker);
+        addHelper(localComments, localEnvironment, runInDocker);
 
         BatchPayloadCommand payloadCommand = new BatchPayloadCommand(arc.workload().command());
 
