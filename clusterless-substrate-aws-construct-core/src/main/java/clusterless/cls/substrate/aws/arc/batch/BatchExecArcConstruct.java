@@ -14,6 +14,7 @@ import clusterless.cls.substrate.aws.common.batch.BatchPayloadCommand;
 import clusterless.cls.substrate.aws.construct.ArcConstruct;
 import clusterless.cls.substrate.aws.event.ArcStateContext;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
+import clusterless.cls.substrate.aws.props.BatchRuntimeProps;
 import clusterless.cls.substrate.aws.props.LambdaJavaRuntimeProps;
 import clusterless.cls.substrate.aws.props.Lookup;
 import clusterless.cls.substrate.aws.resources.Policies;
@@ -65,12 +66,13 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
 
         ecsEnvironment.putAll(model().workload().environment());
 
+        BatchRuntimeProps batchRuntimeProps = model().workload().batchRuntimeProps();
         AssetImage image = ContainerImage.fromAsset(
                 model().workload().imagePath().toString(),
                 AssetImageProps.builder()
                         .networkMode(NetworkMode.HOST)
                         .buildArgs(model().workload().imageBuildArgs())
-                        .platform(Lookup.platform(model().workload().batchRuntimeProps().architecture()))
+                        .platform(Lookup.platform(batchRuntimeProps.architecture()))
                         .build()
         );
 
@@ -102,15 +104,15 @@ public class BatchExecArcConstruct extends ArcConstruct<BatchExecArc> {
                         .build()))
                 .environment(ecsEnvironment)
                 .command(payloadCommand.command())
-                .cpu(.25) // vcpu - 1 vCPU is equivalent to 1,024 CPU
-                .memory(Size.mebibytes(model().workload().batchRuntimeProps().memorySizeMB()))
+                .cpu(batchRuntimeProps.vCpu())
+                .memory(Size.mebibytes(batchRuntimeProps.memorySizeMB()))
                 .build();
 
         jobDefinition = EcsJobDefinition.Builder.create(this, "JobDef")
                 .jobDefinitionName(regionalName.lowerHyphen()) // physical name
                 .container(container)
-                .retryAttempts(model().workload().batchRuntimeProps().retryAttempts())
-                .timeout(Duration.minutes(model().workload().batchRuntimeProps().timeoutMin()))
+                .retryAttempts(batchRuntimeProps.retryAttempts())
+                .timeout(Duration.minutes(batchRuntimeProps.timeoutMin()))
                 .build();
 
         IManagedComputeEnvironment computeEnvironment = resolveComputeEnvironment(model().workload().computeEnvironmentRef());

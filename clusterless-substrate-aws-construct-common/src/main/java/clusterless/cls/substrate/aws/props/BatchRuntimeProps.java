@@ -17,6 +17,12 @@ public class BatchRuntimeProps implements Struct {
 
     private int memorySizeMB = MEM_DEFAULT;
 
+    /**
+     * 1 vCPU is equivalent to 1,024 CPU shares
+     * <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html">CPU Memory Combinations</a>
+     */
+    private float vCpu = 0.25f;
+
     private int retryAttempts = 1;
 
     private int timeoutMin = 60;
@@ -30,6 +36,14 @@ public class BatchRuntimeProps implements Struct {
     public BatchRuntimeProps setMemorySizeMB(int memorySizeMB) {
         this.memorySizeMB = memorySizeMB;
         return this;
+    }
+
+    public float vCpu() {
+        return vCpu;
+    }
+
+    public void setvCpu(float vCpu) {
+        this.vCpu = vCpu;
     }
 
     public int retryAttempts() {
