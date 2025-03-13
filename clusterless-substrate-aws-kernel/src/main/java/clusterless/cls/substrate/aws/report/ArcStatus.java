@@ -15,6 +15,7 @@ import clusterless.cls.substrate.aws.report.scanner.ArcScanner;
 import clusterless.cls.util.Moment;
 import picocli.CommandLine;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
@@ -64,7 +65,8 @@ public class ArcStatus implements Callable<Integer> {
 
             try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
                 reporter.report(arcStream
-                        .map(arcRecord -> new ArcScanner(profile, arcRecord, earliest, latest, arcStateSupplier))
+                        .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                        .filter(Objects::nonNull)
                         .flatMap(ArcScanner::scan)
                 );
             }
@@ -73,12 +75,21 @@ public class ArcStatus implements Callable<Integer> {
 
             try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
                 reporter.report(arcStream
-                        .map(arcRecord -> new ArcScanner(profile, arcRecord, earliest, latest, arcStateSupplier))
+                        .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                        .filter(Objects::nonNull)
                         .map(ArcScanner::summarizeScan)
                 );
             }
         }
 
         return 0;
+    }
+
+    private static ArcScanner scannerOrNull(ArcRecord arcRecord, String profile, Moment earliest, Moment latest, Supplier<Optional<Predicate<ArcState>>> arcStateSupplier) {
+        try {
+            return new ArcScanner(profile, arcRecord, earliest, latest, arcStateSupplier);
+        } catch (IllegalStateException e) {
+            return null;
+        }
     }
 }

@@ -14,6 +14,7 @@ import clusterless.cls.substrate.aws.report.scanner.ManifestScanner;
 import clusterless.cls.util.Moment;
 import picocli.CommandLine;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -51,7 +52,8 @@ public class DatasetStatus implements Callable<Integer> {
 
             try (Stream<DatasetRecord> datasetStream = datasetsCommand.listAllDatasets(datasetRecordPredicate)) {
                 reporter.report(datasetStream
-                        .map(datasetRecord -> new ManifestScanner(profile, datasetRecord, earliest, latest))
+                        .map(datasetRecord -> scannerOrNull(datasetRecord, profile, earliest, latest))
+                        .filter(Objects::nonNull)
                         .flatMap(ManifestScanner::scan)
                 );
             }
@@ -60,13 +62,22 @@ public class DatasetStatus implements Callable<Integer> {
 
             try (Stream<DatasetRecord> datasetRecordStream = datasetsCommand.listAllDatasets(datasetRecordPredicate)) {
                 reporter.report(datasetRecordStream
-                        .map(arcRecord -> new ManifestScanner(profile, arcRecord, earliest, latest))
+                        .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest))
+                        .filter(Objects::nonNull)
                         .map(ManifestScanner::summarizeScan)
                 );
             }
         }
 
         return 0;
+    }
+
+    private static ManifestScanner scannerOrNull(DatasetRecord datasetRecord, String profile, Moment earliest, Moment latest) {
+        try {
+            return new ManifestScanner(profile, datasetRecord, earliest, latest);
+        } catch (IllegalStateException e) {
+            return null;
+        }
     }
 
 }
