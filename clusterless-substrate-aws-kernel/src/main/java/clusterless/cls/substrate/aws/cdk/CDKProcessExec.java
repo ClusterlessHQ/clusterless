@@ -20,6 +20,7 @@ import clusterless.commons.collection.OrderedSafeMaps;
 import clusterless.commons.collection.SafeList;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
  *                            (default: cdk.out)                           [string] </pre>
  */
 public class CDKProcessExec extends ProcessExec {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(CDKProcessExec.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CDKProcessExec.class);
     public static final String CLS_CDK_COMMAND = "CLS_CDK_COMMAND";
     public static final String CLS_CDK_OUTPUT_PATH = "CLS_CDK_OUTPUT_PATH";
     public static final String CLS_CDK_PROFILE = "CLS_CDK_PROFILE";

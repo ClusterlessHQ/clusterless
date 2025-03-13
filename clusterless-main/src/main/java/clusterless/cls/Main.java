@@ -31,6 +31,7 @@ import clusterless.cls.util.ExitCodeExceptionMapper;
 import clusterless.cls.util.ParameterExceptionHandler;
 import clusterless.cls.util.VersionProvider;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
@@ -63,7 +64,7 @@ import java.util.concurrent.Callable;
         }
 )
 public class Main extends Startup implements Callable<Integer> {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     /**
      * This provides a global --providers predicate, but when calling a provider, we need to sort out a way

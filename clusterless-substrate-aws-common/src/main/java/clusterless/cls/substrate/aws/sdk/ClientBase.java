@@ -10,6 +10,7 @@ package clusterless.cls.substrate.aws.sdk;
 
 import com.google.common.base.Throwables;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.awscore.AwsClient;
@@ -35,7 +36,7 @@ import java.util.function.Predicate;
  *
  */
 public abstract class ClientBase<C extends AwsClient> {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ClientBase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClientBase.class);
     protected static final boolean localStackEnabled = Boolean.getBoolean("clusterless.localstack.enabled");
     protected static final String defaultRegion = Optional.ofNullable(System.getenv("AWS_REGION")).orElse(System.getenv("AWS_DEFAULT_REGION"));
     protected static final String defaultProfile = System.getenv("AWS_PROFILE");

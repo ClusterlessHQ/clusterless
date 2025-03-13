@@ -33,6 +33,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.constructs.Construct;
 
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  *
  */
 public class Lifecycle {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Lifecycle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Lifecycle.class);
 
     ComponentServices componentServices = ComponentServices.INSTANCE;
     StackGroups stackGroups = new StackGroups();
@@ -130,7 +131,8 @@ public class Lifecycle {
                         return Optional.empty();
                     }
 
-                    return Optional.of(JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {}));
+                    return Optional.of(JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {
+                    }));
                 }
         );
     }

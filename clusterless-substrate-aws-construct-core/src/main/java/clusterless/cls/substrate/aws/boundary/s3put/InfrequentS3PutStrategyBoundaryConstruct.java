@@ -26,6 +26,7 @@ import clusterless.commons.naming.Label;
 import clusterless.commons.substrate.aws.cdk.construct.LambdaLogGroupConstruct;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.events.EventBus;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
  *
  */
 public class InfrequentS3PutStrategyBoundaryConstruct extends ExtensibleConstruct<S3PutListenerBoundary> implements IsScheduled {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(InfrequentS3PutStrategyBoundaryConstruct.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InfrequentS3PutStrategyBoundaryConstruct.class);
 
     public InfrequentS3PutStrategyBoundaryConstruct(@NotNull ManagedComponentContext context, @NotNull S3PutListenerBoundary model) {
         super(context, model, Label.of("Infrequent").with(model.name()));

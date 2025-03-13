@@ -15,6 +15,7 @@ import clusterless.cls.substrate.aws.cdk.CDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
 import clusterless.cls.substrate.aws.meta.Metadata;
 import clusterless.cls.substrate.aws.util.TagsUtil;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
@@ -27,7 +28,7 @@ import java.util.concurrent.Callable;
         hidden = true
 )
 public class Synth extends BaseCDKCommand implements Callable<Integer> {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Synth.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Synth.class);
     @CommandLine.Mixin
     ProjectCommandOptions commandOptions = new ProjectCommandOptions();
     Lifecycle lifecycle = new Lifecycle();

@@ -18,6 +18,7 @@ import clusterless.commons.naming.Ref;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedApp;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.RemovalPolicy;
@@ -43,7 +44,7 @@ import static clusterless.cls.substrate.store.StateStore.*;
  * - ImageRepositoryName
  */
 public class BootstrapStack extends ScopedStack {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(BootstrapStack.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BootstrapStack.class);
 
     public BootstrapStack(@NotNull ScopedApp app, @NotNull StackProps props) {
         super(app, "ClusterlessBootstrapStack", props);

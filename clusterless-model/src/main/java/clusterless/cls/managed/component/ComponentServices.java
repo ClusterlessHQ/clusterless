@@ -15,6 +15,7 @@ import clusterless.cls.model.deploy.Arc;
 import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.model.deploy.Extensible;
 import clusterless.cls.util.Annotations;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
@@ -23,7 +24,7 @@ import java.util.*;
  *
  */
 public class ComponentServices {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ComponentServices.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentServices.class);
 
     public static final ComponentServices INSTANCE = new ComponentServices();
 

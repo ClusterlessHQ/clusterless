@@ -12,6 +12,7 @@ import clusterless.cls.model.deploy.*;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * to declare read permissions against datasets they do not own.
  */
 public class DatasetResolver {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(DatasetResolver.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatasetResolver.class);
     private final List<Deployable> deployables;
     private final Map<Placement, Map<ReferencedDataset, OwnedDataset>> resolved = new HashMap<>();
     private final RemoteDatasetOwnerLookup remoteLookup;
