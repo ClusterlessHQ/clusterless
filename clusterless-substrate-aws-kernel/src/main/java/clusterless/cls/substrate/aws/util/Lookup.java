@@ -38,11 +38,13 @@ public class Lookup {
                             .build()
                             .uri();
 
-                    LOG.info("Looking up dataset at: {}", datasetURI);
+                    LOG.info("looking up dataset at: {}", datasetURI);
 
                     S3.Response response = s3.get(datasetURI);
 
                     if (!s3.exists(response)) {
+                        response.isSuccessOrLog(r -> String.format("dataset lookup failed at: %s, %s", datasetURI, r.errorMessage()));
+
                         return Optional.empty();
                     }
 

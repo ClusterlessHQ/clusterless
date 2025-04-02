@@ -84,7 +84,6 @@ public class Local extends CommonCommand implements Callable<Integer> {
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
 
         for (Deployable deployable : deployables) {
-
             List<Arc<?>> arcs = deployable.arcs().stream()
                     .filter(a -> a.name().equalsIgnoreCase(commandOptions.name()))
                     .collect(Collectors.toList());
