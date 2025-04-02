@@ -9,7 +9,6 @@
 package clusterless.cls.substrate.aws.cdk.lifecycle;
 
 import clusterless.cls.config.Configurations;
-import clusterless.cls.json.JSONUtil;
 import clusterless.cls.managed.ModelType;
 import clusterless.cls.managed.component.*;
 import clusterless.cls.managed.dataset.DatasetResolver;
@@ -26,20 +25,16 @@ import clusterless.cls.substrate.aws.construct.*;
 import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
-import clusterless.cls.substrate.aws.sdk.S3;
-import clusterless.cls.substrate.uri.DatasetURI;
+import clusterless.cls.substrate.aws.util.Lookup;
 import clusterless.commons.naming.Label;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.constructs.Construct;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,7 +81,7 @@ public class Lifecycle {
 
         String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
 
-        DatasetResolver resolver = createResolver(profile, deployables);
+        DatasetResolver resolver = Lookup.createResolver(profile, deployables);
 
         ManagedApp managedApp = new ManagedApp(name, version, stage, deployables);
 
@@ -110,31 +105,6 @@ public class Lifecycle {
         }
 
         return managedApp;
-    }
-
-    @NotNull
-    private static DatasetResolver createResolver(String profile, List<Deployable> deployables) {
-        return new DatasetResolver(
-                deployables,
-                (placement, source) -> {
-                    S3 s3 = new S3(profile, placement.region());
-
-                    URI datasetURI = DatasetURI.builder()
-                            .withPlacement(placement)
-                            .withDataset(source)
-                            .build()
-                            .uri();
-
-                    S3.Response response = s3.get(datasetURI);
-
-                    if (!s3.exists(response)) {
-                        return Optional.empty();
-                    }
-
-                    return Optional.of(JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {
-                    }));
-                }
-        );
     }
 
     private void constructManagedStacks(DatasetResolver resolver, ManagedApp managedApp, Deployable deployable, ModelType[] independent) {

@@ -16,7 +16,10 @@ import clusterless.cls.model.Model;
 import clusterless.cls.model.deploy.*;
 import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.cdk.Provider;
+import clusterless.cls.substrate.aws.util.Lookup;
 import clusterless.commons.util.Runtimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -35,6 +38,8 @@ import java.util.stream.Collectors;
         name = "local"
 )
 public class Local extends CommonCommand implements Callable<Integer> {
+    private static final Logger LOG = LoggerFactory.getLogger(Local.class);
+
     @CommandLine.Mixin
     LocalCommandOptions commandOptions = new LocalCommandOptions();
 
@@ -70,7 +75,11 @@ public class Local extends CommonCommand implements Callable<Integer> {
     }
 
     protected List<ExecCommand> findArcs(List<Deployable> deployables) {
-        DatasetResolver resolver = new DatasetResolver(deployables);
+        String profile = System.getenv().get("AWS_PROFILE");
+
+        LOG.info("using AWS_PROFILE for lookup: {}", profile);
+
+        DatasetResolver resolver = Lookup.createResolver(profile, deployables);
 
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
 

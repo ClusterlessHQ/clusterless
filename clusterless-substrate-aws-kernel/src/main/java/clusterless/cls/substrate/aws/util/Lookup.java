@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2023-2025 Chris K Wensel <chris@wensel.net>. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package clusterless.cls.substrate.aws.util;
+
+import clusterless.cls.json.JSONUtil;
+import clusterless.cls.managed.dataset.DatasetResolver;
+import clusterless.cls.model.deploy.Deployable;
+import clusterless.cls.substrate.aws.sdk.S3;
+import clusterless.cls.substrate.uri.DatasetURI;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+
+public class Lookup {
+    private static final Logger LOG = LoggerFactory.getLogger(Lookup.class);
+
+    @NotNull
+    public static DatasetResolver createResolver(String profile, List<Deployable> deployables) {
+        return new DatasetResolver(
+                deployables,
+                (placement, source) -> {
+                    S3 s3 = new S3(profile, placement.region());
+
+                    URI datasetURI = DatasetURI.builder()
+                            .withPlacement(placement)
+                            .withDataset(source)
+                            .build()
+                            .uri();
+
+                    LOG.info("Looking up dataset at: {}", datasetURI);
+
+                    S3.Response response = s3.get(datasetURI);
+
+                    if (!s3.exists(response)) {
+                        return Optional.empty();
+                    }
+
+                    return Optional.of(JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {
+                    }));
+                }
+        );
+    }
+}
