@@ -17,6 +17,9 @@ public class OwnedDataset implements Struct {
     Project owner;
     SinkDataset dataset;
 
+    public OwnedDataset() {
+    }
+
     public OwnedDataset(Project owner, SinkDataset dataset) {
         this.owner = owner;
         this.dataset = dataset;
