@@ -19,6 +19,8 @@ import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.awscore.internal.AwsErrorCode;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.exception.SdkServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -212,10 +214,36 @@ public abstract class ClientBase<C extends AwsClient> {
             return exception;
         }
 
+        public String errorCode() {
+            if (exception instanceof AwsServiceException serviceException) {
+                return serviceException.awsErrorDetails().errorCode();
+            }
+
+            return null;
+        }
+
+        public int statusCode() {
+            if (exception instanceof SdkServiceException serviceException) {
+                return serviceException.statusCode();
+            }
+
+            return 0;
+        }
+
+        public boolean isMissingCredentials() {
+            // brittle but there isn't a specialized exception for this
+            if (exception instanceof SdkClientException clientException) {
+                return clientException.getMessage().contains("Unable to load credentials");
+            }
+
+            return false;
+        }
+
         public boolean isAccessDenied() {
             if (exception instanceof AwsServiceException serviceException) {
                 AwsErrorDetails awsErrorDetails = serviceException.awsErrorDetails();
-                return awsErrorDetails.errorCode().equals("AccessDenied");
+                String errorCode = awsErrorDetails.errorCode();
+                return errorCode.equals("AccessDenied");
             }
 
             return false;

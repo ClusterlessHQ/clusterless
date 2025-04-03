@@ -43,7 +43,13 @@ public class Lookup {
                     S3.Response response = s3.get(datasetURI);
 
                     if (!s3.exists(response)) {
-                        response.isSuccessOrLog(r -> String.format("dataset lookup failed at: %s, %s", datasetURI, r.errorMessage()));
+                        response.isSuccessOrLog(r -> {
+                            if (r.isAccessDenied() || r.isMissingCredentials()) {
+                                return String.format("access denied to dataset, ensure profile is set via --profile or AWS_PROFILE: %s, %s", datasetURI, r.errorMessage());
+                            } else {
+                                return String.format("dataset lookup failed at: %s, status: %d, error: %s, %s", datasetURI, r.statusCode(), r.errorCode(), r.errorMessage());
+                            }
+                        });
 
                         return Optional.empty();
                     }
