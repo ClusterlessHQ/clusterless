@@ -48,12 +48,20 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     ManifestState manifestState = ManifestState.complete;
 
     @CommandLine.Option(
-            names = {"-d", "--docker"},
+            names = {"-i", "--image"},
             description = {
-                    "Run commands via the supplied Docker image."
+                    "Run commands via the supplied container image."
             }
     )
-    String dockerImage;
+    String image;
+
+    @CommandLine.Option(
+            names = {"-e", "--entrypoint"},
+            description = {
+                    "Prefix this to the commands, should be the script referenced by the Dockerfile entrypoint."
+            }
+    )
+    String entryPoint;
 
     public String name() {
         return name;
@@ -71,7 +79,11 @@ public class LocalCommandOptions extends ProjectCommandOptions {
         return manifestState;
     }
 
-    public String dockerImage() {
-        return dockerImage;
+    public String image() {
+        return image;
+    }
+
+    public String entryPoint() {
+        return entryPoint;
     }
 }

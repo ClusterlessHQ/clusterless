@@ -67,7 +67,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());
 
-        String script = shellWriter.toScript(commands, commandOptions.dockerImage());
+        String script = shellWriter.toScript(commands, commandOptions.image(), commandOptions.entryPoint());
 
         System.out.println(script);
 
@@ -116,7 +116,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         String lotId = prompt(commandOptions.lotId(), "Enter lot id: ");
 
-        boolean runInDocker = commandOptions.dockerImage() != null;
+        boolean runInDocker = commandOptions.image() != null;
 
         return executor.commands(
                 commandOptions.role(),
@@ -163,7 +163,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         ActivityLocalExecutor executor = executorFor(deployable.placement(), activity);
 
-        boolean runInDocker = commandOptions.dockerImage() != null;
+        boolean runInDocker = commandOptions.image() != null;
 
         return executor.commands(runInDocker);
     }

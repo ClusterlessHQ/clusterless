@@ -21,7 +21,7 @@ public class ShellWriter {
         this.runtime = runtime;
     }
 
-    public String toScript(List<ExecCommand> commands, String dockerImage) {
+    public String toScript(List<ExecCommand> commands, String dockerImage, String entryPoint) {
         StringBuilder buffer = new StringBuilder();
 
         buffer.append("#!/bin/bash\n");
@@ -59,6 +59,11 @@ public class ShellWriter {
                 buffer.append("  ");
                 buffer.append(dockerImage);
                 buffer.append("\\\n  ");
+            }
+
+            if (entryPoint != null) {
+                buffer.append(entryPoint);
+                buffer.append(" ");
             }
 
             buffer.append(String.join(" ", command.command()));
