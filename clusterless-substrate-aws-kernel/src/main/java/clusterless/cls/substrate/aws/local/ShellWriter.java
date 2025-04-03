@@ -11,6 +11,7 @@ package clusterless.cls.substrate.aws.local;
 import clusterless.cls.managed.component.ExecCommand;
 import clusterless.commons.util.Runtimes;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +63,10 @@ public class ShellWriter {
             }
 
             if (entryPoint != null) {
+                if (entryPoint.startsWith("../")) {
+                    entryPoint = Path.of(entryPoint).toAbsolutePath().normalize().toString();
+                }
+
                 buffer.append(entryPoint);
                 buffer.append(" ");
             }
