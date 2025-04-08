@@ -16,6 +16,7 @@ import java.util.List;
 public class ArcReportOptions extends ReportOptions {
     @CommandLine.Option(
             names = {"--project"},
+            split = ",",
             description = "Filter results by project, and optionally version. (e.g. 'project:version')"
     )
     List<String> projects = new LinkedList<>();

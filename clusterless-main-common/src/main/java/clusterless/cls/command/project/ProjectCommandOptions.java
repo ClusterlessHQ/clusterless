@@ -25,6 +25,7 @@ public class ProjectCommandOptions extends ExecCommandOptions {
     @CommandLine.Option(
             names = {"-p", "--project"},
             description = "The files that declare the project to be deployed, or `-` to read from stdin.",
+            split = ",",
             converter = StdInToFileConverter.class
     )
     List<File> projectFiles = new ArrayList<>();
