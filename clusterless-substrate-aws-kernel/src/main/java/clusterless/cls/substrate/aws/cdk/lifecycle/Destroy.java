@@ -29,6 +29,9 @@ public class Destroy extends BaseCDKCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        // need to be resilient to the project already deleted
+        commandOptions.setResolveDeployedDatasets(false);
+
         Integer exitCode = processExec.executeLifecycleProcess(
                 getCommonConfig(),
                 getProviderConfig(),

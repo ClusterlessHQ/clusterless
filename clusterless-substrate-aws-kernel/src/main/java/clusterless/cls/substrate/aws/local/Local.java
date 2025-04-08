@@ -79,7 +79,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         LOG.info("using AWS_PROFILE for lookup: {}", profile);
 
-        DatasetResolver resolver = Lookup.createResolver(profile, deployables);
+        DatasetResolver resolver = Lookup.createResolver(commandOptions.resolveDeployedDatasets().orElse(true), profile, deployables);
 
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
 

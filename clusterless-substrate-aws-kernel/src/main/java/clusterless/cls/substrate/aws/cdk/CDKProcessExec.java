@@ -143,6 +143,7 @@ public class CDKProcessExec extends ProcessExec {
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-arc", commandOptions.excludeArcNames().isEmpty() ? null : String.join(",", commandOptions.excludeArcNames()))));
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--only-resource", commandOptions.onlyResourceNames().isEmpty() ? null : String.join(",", commandOptions.onlyResourceNames()))));
         kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--exclude-all-tags", commandOptions.excludeAllTags().map(b -> Boolean.toString(b)).orElse(null))));
+        kernelArgs.addAll(Lists.list(OrderedSafeMaps.of("--resolve-deployed-datasets", commandOptions.resolveDeployedDatasets().map(b -> Boolean.toString(b)).orElse(null))));
         kernelArgs.addAll(SafeList.of(verbosity.get() == 0 ? null : String.format("-%s", "v".repeat(verbosity.get()))));
 
         return executeCDKApp(commonConfig, awsConfig, cdkCommand, cdkCommandArgs, "synth", kernelArgs);

@@ -26,7 +26,11 @@ public class Lookup {
     private static final Logger LOG = LoggerFactory.getLogger(Lookup.class);
 
     @NotNull
-    public static DatasetResolver createResolver(String profile, List<Deployable> deployables) {
+    public static DatasetResolver createResolver(Boolean resolveDeployedDatasets, String profile, List<Deployable> deployables) {
+        if (!resolveDeployedDatasets) {
+            return new DatasetResolver(deployables);
+        }
+
         return new DatasetResolver(
                 deployables,
                 (placement, source) -> {

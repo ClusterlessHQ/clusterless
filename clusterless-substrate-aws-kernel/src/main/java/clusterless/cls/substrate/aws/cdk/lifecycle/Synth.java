@@ -70,7 +70,7 @@ public class Synth extends BaseCDKCommand implements Callable<Integer> {
             TagsUtil.disable();
         }
 
-        lifecycle.synthProjectModels(deployables);
+        lifecycle.synthProjectModels(commandOptions.resolveDeployedDatasets().orElse(true), deployables);
 
         CDKCommand cdkCommand = CDKProcessExec.currentCommand();
         if (cdkCommand == CDKCommand.DEPLOY || cdkCommand == CDKCommand.DESTROY) {

@@ -55,12 +55,8 @@ public class Lifecycle {
         this.configurations = configurations;
     }
 
-    public void synthProject(List<File> projectFiles) throws IOException {
-        synthProjectModels(loadProjectModels(projectFiles));
-    }
-
-    public void synthProjectModels(List<Deployable> deployableModels) {
-        ManagedApp managedApp = mapProject(deployableModels);
+    public void synthProjectModels(Boolean resolveDeployedDatasets, List<Deployable> deployableModels) {
+        ManagedApp managedApp = mapProject(resolveDeployedDatasets, deployableModels);
 
         managedApp.synth();
     }
@@ -70,7 +66,7 @@ public class Lifecycle {
                 .readObjects(Provider.NAME);
     }
 
-    public ManagedApp mapProject(List<Deployable> deployables) {
+    public ManagedApp mapProject(Boolean resolveDeployedDatasets, List<Deployable> deployables) {
         Set<String> names = verifyNonNull("name", deployables.stream().map(d -> d.project().name()).collect(Collectors.toSet()));
         Set<String> versions = verifyNonNull("version", deployables.stream().map(d -> d.project().version()).collect(Collectors.toSet()));
         Set<String> stages = verify("stage", deployables.stream().map(d -> d.placement().stage()).collect(Collectors.toSet()));
@@ -81,7 +77,7 @@ public class Lifecycle {
 
         String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
 
-        DatasetResolver resolver = Lookup.createResolver(profile, deployables);
+        DatasetResolver resolver = Lookup.createResolver(resolveDeployedDatasets, profile, deployables);
 
         ManagedApp managedApp = new ManagedApp(name, version, stage, deployables);
 

@@ -60,6 +60,15 @@ public class ProjectCommandOptions extends ExecCommandOptions {
     )
     Optional<Boolean> excludeAllTags;
 
+    @CommandLine.Option(
+            names = "--resolve-deployed-datasets",
+            description = "Attempt to resolve deployed datasets.",
+            defaultValue = CommandLine.Option.NULL_VALUE,
+            fallbackValue = "true",
+            arity = "0..1"
+    )
+    Optional<Boolean> resolveDeployedDatasets;
+
     public List<File> projectFiles() {
         return projectFiles;
     }
@@ -82,6 +91,15 @@ public class ProjectCommandOptions extends ExecCommandOptions {
 
     public ProjectCommandOptions setExcludeAllTags(boolean excludeAllTags) {
         this.excludeAllTags = Optional.of(excludeAllTags);
+        return this;
+    }
+
+    public Optional<Boolean> resolveDeployedDatasets() {
+        return resolveDeployedDatasets;
+    }
+
+    public ProjectCommandOptions setResolveDeployedDatasets(boolean resolveDeployedDatasets) {
+        this.resolveDeployedDatasets = Optional.of(resolveDeployedDatasets);
         return this;
     }
 }
