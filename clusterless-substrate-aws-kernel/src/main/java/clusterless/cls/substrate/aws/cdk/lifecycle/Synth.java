@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -40,7 +41,6 @@ public class Synth extends BaseCDKCommand implements Callable<Integer> {
         lifecycle.setConfigurations(kernel.configurations());
 
         List<Deployable> deployables = lifecycle.loadProjectModels(commandOptions.projectFiles());
-
         if (commandOptions.excludeAllArcs().orElse(false)) {
             LOG.info("exec synth without all arcs");
             for (Deployable deployable : deployables) {
@@ -70,7 +70,15 @@ public class Synth extends BaseCDKCommand implements Callable<Integer> {
             TagsUtil.disable();
         }
 
-        lifecycle.synthProjectModels(commandOptions.resolveDeployedDatasets().orElse(true), deployables);
+        List<Deployable> resolves = Collections.emptyList();
+
+        if (!commandOptions.projectResolveFiles().isEmpty()) {
+            resolves = lifecycle.loadProjectModels(commandOptions.projectResolveFiles());
+
+            LOG.info("exec synth resolveables: {}", commandOptions.projectResolveFiles());
+        }
+
+        lifecycle.synthProjectModels(commandOptions.resolveDeployedDatasets().orElse(true), deployables, resolves);
 
         CDKCommand cdkCommand = CDKProcessExec.currentCommand();
         if (cdkCommand == CDKCommand.DEPLOY || cdkCommand == CDKCommand.DESTROY) {

@@ -28,15 +28,17 @@ import java.util.stream.Collectors;
 public class DatasetResolver {
     private static final Logger LOG = LoggerFactory.getLogger(DatasetResolver.class);
     private final List<Deployable> deployables;
+    private final List<Deployable> resolveables;
     private final Map<Placement, Map<ReferencedDataset, OwnedDataset>> resolved = new HashMap<>();
     private final RemoteDatasetOwnerLookup remoteLookup;
 
-    public DatasetResolver(List<Deployable> deployables) {
-        this(deployables, (placement, source) -> Optional.empty());
+    public DatasetResolver(List<Deployable> deployables, List<Deployable> resolveables) {
+        this(deployables, resolveables, (placement, source) -> Optional.empty());
     }
 
-    public DatasetResolver(List<Deployable> deployables, RemoteDatasetOwnerLookup remoteLookup) {
+    public DatasetResolver(List<Deployable> deployables, List<Deployable> resolveables, RemoteDatasetOwnerLookup remoteLookup) {
         this.deployables = deployables;
+        this.resolveables = resolveables;
         this.remoteLookup = remoteLookup;
         build();
     }
@@ -66,12 +68,36 @@ public class DatasetResolver {
             }
         }
 
+        Multimap<Placement, OwnedDataset> resolverOwned = ArrayListMultimap.create();
+        for (Deployable resolveable : resolveables) {
+            Placement placement = resolveable.placement();
+            Project project = resolveable.project();
+            resolveable.boundaries().stream()
+                    .map(boundary -> new OwnedDataset(project, boundary.dataset()))
+                    .forEach(o -> resolverOwned.put(placement, o));
+
+            for (Arc<? extends Workload<?>> arc : resolveable.arcs()) {
+                arc.sinks().values()
+                        .stream()
+                        .map(sink -> new OwnedDataset(project, sink))
+                        .forEach(o -> resolverOwned.put(placement, o));
+            }
+        }
+
         for (Map.Entry<Placement, Collection<ReferencedDataset>> entry : locallyReferenced.asMap().entrySet()) {
             for (ReferencedDataset referencedDataset : entry.getValue()) {
                 Placement placement = entry.getKey();
                 Set<OwnedDataset> ownedDatasets = locallyOwned.get(placement).stream()
                         .filter(ownedDataset -> ownedDataset.dataset().sameDataset(referencedDataset.dataset()))
                         .collect(Collectors.toSet());
+
+                // we may want to be strict and always check
+                if (ownedDatasets.isEmpty() && !resolverOwned.isEmpty()) {
+                    LOG.info("dataset owner not found locally, looking up in resolved: {}", referencedDataset.dataset().id());
+                    ownedDatasets = resolverOwned.get(placement).stream()
+                            .filter(ownedDataset -> ownedDataset.dataset().sameDataset(referencedDataset.dataset()))
+                            .collect(Collectors.toSet());
+                }
 
                 // we may want to be strict and always check
                 if (ownedDatasets.isEmpty()) {

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,12 +28,18 @@ public class Lookup {
 
     @NotNull
     public static DatasetResolver createResolver(Boolean resolveDeployedDatasets, String profile, List<Deployable> deployables) {
+        return createResolver(resolveDeployedDatasets, profile, deployables, Collections.emptyList());
+    }
+
+    @NotNull
+    public static DatasetResolver createResolver(Boolean resolveDeployedDatasets, String profile, List<Deployable> deployables, List<Deployable> resolveables) {
         if (!resolveDeployedDatasets) {
-            return new DatasetResolver(deployables);
+            return new DatasetResolver(deployables, resolveables);
         }
 
         return new DatasetResolver(
                 deployables,
+                resolveables,
                 (placement, source) -> {
                     S3 s3 = new S3(profile, placement.region());
 

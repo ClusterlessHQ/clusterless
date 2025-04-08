@@ -29,6 +29,7 @@ public class KernelTest {
 
     private String[] args = new String[]{
             "synth", // runs app.synth() in the current jvm
+            "-vv",
             "-p",
             "-"
     };

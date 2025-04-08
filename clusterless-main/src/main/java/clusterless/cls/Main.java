@@ -119,6 +119,9 @@ public class Main extends Startup implements Callable<Integer> {
         List<String> declaredProviders = loader.getStringsAt(Deployable.PROVIDER_POINTER);
 
         LOG.info("files: {}", command.projectFiles());
+        if (!command.projectFiles().isEmpty()) {
+            LOG.info("resolve: {}", command.projectResolveFiles());
+        }
         LOG.info("declared: {}", declaredProviders);
 
         String[] argsArray = replaceWithTemp(command);

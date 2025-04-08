@@ -31,6 +31,13 @@ public class ProjectCommandOptions extends ExecCommandOptions {
     List<File> projectFiles = new ArrayList<>();
 
     @CommandLine.Option(
+            names = {"--project-resolve"},
+            description = "The files that declare resources required by the main project file(s).",
+            split = ","
+    )
+    List<File> projectResolveFiles = new ArrayList<>();
+
+    @CommandLine.Option(
             names = {"--exclude-arc"},
             description = "Exclude the named arc from the deployment."
     )
@@ -72,6 +79,10 @@ public class ProjectCommandOptions extends ExecCommandOptions {
 
     public List<File> projectFiles() {
         return projectFiles;
+    }
+
+    public List<File> projectResolveFiles() {
+        return projectResolveFiles;
     }
 
     public List<String> excludeArcNames() {
