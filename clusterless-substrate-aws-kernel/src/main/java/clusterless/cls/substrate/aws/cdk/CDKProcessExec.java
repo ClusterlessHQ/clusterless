@@ -19,6 +19,7 @@ import clusterless.cls.util.URIs;
 import clusterless.commons.collection.OrderedSafeMaps;
 import clusterless.commons.collection.SafeList;
 import com.google.common.base.Joiner;
+import org.apache.commons.lang3.stream.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,6 +186,10 @@ public class CDKProcessExec extends ProcessExec {
                         cdkCommand != CDKCommand.IMPORT ? "--all" : null // deploy all stacks
                 )
         );
+
+        if (verbosity.get() != 0) {
+            cdkCommands.addAll(Streams.of("-v".repeat(verbosity.get())).toList());
+        }
 
         cdkCommands.addAll(commandArgs);
 
