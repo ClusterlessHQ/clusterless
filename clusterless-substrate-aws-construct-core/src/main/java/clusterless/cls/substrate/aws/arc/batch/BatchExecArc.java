@@ -41,6 +41,8 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
         @JsonRequiredProperty
         Path imagePath;
         Map<String, String> imageBuildArgs = new LinkedHashMap<>();
+        boolean imageBuildCacheEnabled = true;
+        String imageExtraHash;
         Map<String, String> environment = new LinkedHashMap<>();
         List<String> command = new LinkedList<>();
 
@@ -66,6 +68,14 @@ public class BatchExecArc extends Arc<BatchExecArc.BatchWorkload> {
 
         public Map<String, String> imageBuildArgs() {
             return imageBuildArgs;
+        }
+
+        public boolean imageBuildCacheEnabled() {
+            return imageBuildCacheEnabled;
+        }
+
+        public String imageExtraHash() {
+            return imageExtraHash;
         }
 
         public Map<String, String> environment() {

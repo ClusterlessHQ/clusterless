@@ -21,17 +21,19 @@ import java.util.Map;
 
 
 public class BatchExecActivity extends Activity {
-    private BatchRuntimeProps batchRuntimeProps = new BatchRuntimeProps();
+    BatchRuntimeProps batchRuntimeProps = new BatchRuntimeProps();
     @JsonRequiredProperty
-    private String computeEnvironmentRef;
+    String computeEnvironmentRef;
     @JsonRequiredProperty
-    private Path imagePath;
+    Path imagePath;
     Map<String, String> imageBuildArgs = new LinkedHashMap<>();
-    private Map<String, String> environment = new LinkedHashMap<>();
-    private List<String> command = new LinkedList<>();
-    private String bucketRef;
+    boolean imageBuildCacheEnabled = true;
+    String imageExtraHash;
+    Map<String, String> environment = new LinkedHashMap<>();
+    List<String> command = new LinkedList<>();
+    String bucketRef;
     @JsonRequiredProperty
-    private URI pathURI;
+    URI pathURI;
 
     public BatchRuntimeProps batchRuntimeProps() {
         return batchRuntimeProps;
@@ -47,6 +49,14 @@ public class BatchExecActivity extends Activity {
 
     public Map<String, String> imageBuildArgs() {
         return imageBuildArgs;
+    }
+
+    public boolean imageBuildCacheEnabled() {
+        return imageBuildCacheEnabled;
+    }
+
+    public String imageExtraHash() {
+        return imageExtraHash;
     }
 
     public Map<String, String> environment() {

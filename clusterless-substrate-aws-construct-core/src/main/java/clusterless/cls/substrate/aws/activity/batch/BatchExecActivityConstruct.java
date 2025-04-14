@@ -115,6 +115,8 @@ public class BatchExecActivityConstruct extends ActivityConstruct<BatchExecActiv
                 AssetImageProps.builder()
                         .networkMode(NetworkMode.HOST)
                         .buildArgs(model().imageBuildArgs())
+                        .cacheDisabled(!model.imageBuildCacheEnabled())
+                        .extraHash(model().imageExtraHash())
                         .platform(Lookup.platform(batchRuntimeProps.architecture()))
                         .build()
         );

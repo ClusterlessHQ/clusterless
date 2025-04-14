@@ -43,6 +43,16 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
                 imagePath: A relative path
                     The path to the Docker image to build.
                 
+                imageBuildArgs: {key: value, ...}
+                    The arguments to pass to the Docker build tool.
+                
+                imageBuildCacheEnabled:  true|false
+                    Whether to enable the Docker build cache. Disable to force a rebuild of the image specified by
+                    the imagePath.
+                
+                imageExtraHash: A string value
+                    An extra value to include in the image hash. Use this to force a rebuild of the image.
+                
                 environment: {key: value, ...}
                     The environment variables to set in the Docker image.
                 
