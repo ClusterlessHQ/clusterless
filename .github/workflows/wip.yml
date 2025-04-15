@@ -70,3 +70,7 @@ jobs:
           JRELEASER_HOMEBREW_GITHUB_TOKEN: ${{ secrets.JRELEASER_HOMEBREW_GITHUB_TOKEN }}
         run: |
           ./gradlew --no-daemon --info --stacktrace release
+
+      - name: Trigger Netlify Doc Deploy
+        run: |
+          curl -X POST -d '{}' https://api.netlify.com/build_hooks/67fe72e7760e879248fa36c4
