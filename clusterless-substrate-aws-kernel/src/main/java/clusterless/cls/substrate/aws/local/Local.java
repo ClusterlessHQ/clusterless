@@ -67,7 +67,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         ShellWriter shellWriter = new ShellWriter(Runtimes.current());
 
-        String script = shellWriter.toScript(commands, commandOptions.image(), commandOptions.entryPoint());
+        String script = shellWriter.toScript(commands, commandOptions.image(), commandOptions.entryPoint(), commandOptions.runOptions());
 
         System.out.println(script);
 

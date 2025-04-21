@@ -9,6 +9,7 @@
 package clusterless.cls.command.project;
 
 import clusterless.cls.model.manifest.ManifestState;
+import clusterless.cls.util.DashedParameterConsumer;
 import picocli.CommandLine;
 
 /**
@@ -63,6 +64,15 @@ public class LocalCommandOptions extends ProjectCommandOptions {
     )
     String entryPoint;
 
+    @CommandLine.Option(
+            names = {"-o", "--run-options"},
+            description = {
+                    "Pass these options to the container run command. E.g. '-p=5005:5005'",
+            },
+            parameterConsumer = DashedParameterConsumer.class
+    )
+    String runOptions;
+
     public String name() {
         return name;
     }
@@ -85,5 +95,9 @@ public class LocalCommandOptions extends ProjectCommandOptions {
 
     public String entryPoint() {
         return entryPoint;
+    }
+
+    public String runOptions() {
+        return runOptions;
     }
 }
