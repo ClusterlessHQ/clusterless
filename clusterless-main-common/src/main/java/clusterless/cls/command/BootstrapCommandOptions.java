@@ -8,7 +8,7 @@
 
 package clusterless.cls.command;
 
-import clusterless.cls.command.exec.ExecCommandOptions;
+import clusterless.cls.command.provision.ProvisionCommandOptions;
 import picocli.CommandLine;
 
 import java.util.Optional;
@@ -17,7 +17,7 @@ import java.util.Optional;
  *
  */
 @CommandLine.Command(description = "Initialize the given environment.")
-public class BootstrapCommandOptions extends ExecCommandOptions {
+public class BootstrapCommandOptions extends ProvisionCommandOptions {
     @CommandLine.Option(
             names = {"--destroy"},
             description = "Remove the bootstrap for the given placement."

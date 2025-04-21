@@ -9,7 +9,7 @@
 package clusterless.cls.command.project;
 
 
-import clusterless.cls.command.exec.ExecCommandOptions;
+import clusterless.cls.command.provision.ProvisionCommandOptions;
 import clusterless.cls.util.StdInToFileConverter;
 import picocli.CommandLine;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  *
  */
-public class ProjectCommandOptions extends ExecCommandOptions {
+public class ProjectCommandOptions extends ProvisionCommandOptions {
     @CommandLine.Option(
             names = {"-p", "--project"},
             description = "The files that declare the project to be deployed, or `-` to read from stdin.",

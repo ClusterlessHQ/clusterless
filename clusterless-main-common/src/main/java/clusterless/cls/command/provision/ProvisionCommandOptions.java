@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.exec;
+package clusterless.cls.command.provision;
 
 import clusterless.cls.command.CommonCommandOptions;
 import picocli.CommandLine;
@@ -14,7 +14,7 @@ import picocli.CommandLine;
 @CommandLine.Command(
         subcommands = {CommandLine.HelpCommand.class}
 )
-public class ExecCommandOptions extends CommonCommandOptions {
+public class ProvisionCommandOptions extends CommonCommandOptions {
     @CommandLine.Option(
             names = "--dry-run",
             description = "Do not execute underlying cdk binary."
