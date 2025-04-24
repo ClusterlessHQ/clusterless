@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.aws.lambda.arc;
+package clusterless.cls.substrate.aws.io;
 
 import clusterless.cls.model.deploy.SinkDataset;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;

@@ -8,8 +8,6 @@
 
 package clusterless.cls.util;
 
-import clusterless.commons.temporal.IntervalUnit;
-import clusterless.commons.temporal.IntervalUnits;
 import heretical.parser.common.ParserSyntaxException;
 import heretical.parser.temporal.AbsoluteDateTimeParser;
 import heretical.parser.temporal.Context;
@@ -22,19 +20,13 @@ import picocli.CommandLine;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class MomentTypeConverter implements CommandLine.ITypeConverter<Moment> {
     /**
      * Locks the clock to now for the lifetime of the jvm so that earliest now and latest now are the same.
      */
     private static final Lazy<Clock> clockLazy = Lazy.of(() -> Clock.fixed(Clock.system(ZoneOffset.UTC).instant(), ZoneOffset.UTC));
-    private static final Map<String, DateTimeFormatter> units = Arrays.stream(IntervalUnit.values())
-            .collect(Collectors.toMap(u -> u.getDuration().toString(), IntervalUnits::formatter));
 
     RelativeDateTimeAdjusterParser adjusterParser;
     AbsoluteDateTimeParser absoluteParser;
@@ -55,11 +47,7 @@ public class MomentTypeConverter implements CommandLine.ITypeConverter<Moment> {
     }
 
     private Instant parse(String moment) throws ParserSyntaxException {
-        Optional<Instant> first = units.entrySet()
-                .stream()
-                .filter(e -> moment.contains(e.getKey()))
-                .map(e -> e.getValue().parse(moment).query(Instant::from))
-                .findFirst();
+        Optional<Instant> first = IntervalUnitParser.parseIntervalUnit(moment);
 
         if (first.isPresent()) {
             return first.get();

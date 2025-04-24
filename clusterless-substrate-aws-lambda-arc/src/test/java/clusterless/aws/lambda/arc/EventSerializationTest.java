@@ -15,6 +15,7 @@ import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.model.state.ArcState;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.event.ArcStateContext;
+import clusterless.cls.substrate.aws.io.ArcNotifyEventPublisher;
 import clusterless.cls.substrate.uri.ArcStateURI;
 import clusterless.cls.util.Env;
 import org.junit.jupiter.api.Assertions;

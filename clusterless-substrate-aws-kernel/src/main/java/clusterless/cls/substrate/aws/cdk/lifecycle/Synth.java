@@ -13,6 +13,7 @@ import clusterless.cls.model.deploy.Deployable;
 import clusterless.cls.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
+import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.meta.Metadata;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import org.slf4j.Logger;
@@ -78,11 +79,12 @@ public class Synth extends BaseCDKCommand implements Callable<Integer> {
             LOG.info("exec synth resolveables: {}", commandOptions.projectResolveFiles());
         }
 
-        lifecycle.synthProjectModels(commandOptions.resolveDeployedDatasets().orElse(true), deployables, resolves);
+        ManagedApp managedApp = lifecycle.synthProjectModels(commandOptions.resolveDeployedDatasets().orElse(true), deployables, resolves);
 
         CDKCommand cdkCommand = CDKProcessExec.currentCommand();
-        if (cdkCommand == CDKCommand.DEPLOY || cdkCommand == CDKCommand.DESTROY) {
+        if (cdkCommand == CDKCommand.DEPLOY || cdkCommand == CDKCommand.DESTROY || cdkCommand == CDKCommand.SYNTH) {
             Metadata.writeProjectMetaLocal(deployables);
+            Metadata.writeArcMetaLocal(managedApp.arcMeta());
         }
 
         return 0;

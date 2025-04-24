@@ -11,7 +11,6 @@ package clusterless.aws.lambda.workload.glue;
 import clusterless.aws.lambda.arc.ArcEventHandler;
 import clusterless.aws.lambda.arc.ArcEventObserver;
 import clusterless.aws.lambda.manifest.AttemptCounter;
-import clusterless.aws.lambda.manifest.ManifestReader;
 import clusterless.aws.lambda.manifest.ManifestWriter;
 import clusterless.cls.model.UriType;
 import clusterless.cls.model.deploy.SinkDataset;
@@ -19,6 +18,7 @@ import clusterless.cls.model.manifest.Manifest;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.event.ArcWorkloadContext;
+import clusterless.cls.substrate.aws.io.ManifestReader;
 import clusterless.cls.substrate.aws.sdk.Glue;
 import clusterless.cls.util.URIs;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -62,7 +62,7 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
         String lotId = notifyEvent.lot();
         URI incomingManifestIdentifier = notifyEvent.manifest();
 
-        Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
+        Manifest incomingManifest = manifestReader.retrieve(incomingManifestIdentifier);
 
         eventObserver.applyFromManifest(incomingManifestIdentifier, incomingManifest);
 

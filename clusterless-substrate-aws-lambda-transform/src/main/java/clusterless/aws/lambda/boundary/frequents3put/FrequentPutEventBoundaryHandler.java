@@ -9,11 +9,11 @@
 package clusterless.aws.lambda.boundary.frequents3put;
 
 import clusterless.aws.lambda.EventHandler;
-import clusterless.aws.lambda.arc.ArcNotifyEventPublisher;
 import clusterless.aws.lambda.manifest.ManifestWriter;
 import clusterless.aws.lambda.transform.json.event.AWSEvent;
 import clusterless.aws.lambda.util.PathMatcher;
 import clusterless.cls.model.UriType;
+import clusterless.cls.substrate.aws.io.ArcNotifyEventPublisher;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.aws.sdk.SQS;
 import clusterless.cls.util.Env;

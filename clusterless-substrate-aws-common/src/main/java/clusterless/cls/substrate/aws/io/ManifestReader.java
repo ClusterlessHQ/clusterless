@@ -6,9 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.substrate.aws.io;
 
-import clusterless.cls.command.common.CommonOptions;
+import clusterless.cls.model.manifest.Manifest;
 
-public class DatasetReportOptions extends CommonOptions {
+public class ManifestReader extends MetaReader<Manifest> {
+    public ManifestReader() {
+        super(Manifest.class);
+    }
 }

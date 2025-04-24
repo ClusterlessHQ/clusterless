@@ -8,11 +8,13 @@
 
 package clusterless.cls.command.report;
 
+import clusterless.cls.command.common.CommonCommandOptions;
+import clusterless.cls.command.common.CommonOptions;
 import picocli.CommandLine;
 
-public class ProjectsCommandOptions extends ReportCommandOptions {
+public class ProjectsCommandOptions extends CommonCommandOptions {
     @CommandLine.Mixin
-    ReportOptions reportOptions = new ReportOptions();
+    CommonOptions reportOptions = new CommonOptions();
 
     @Override
     public String profile() {

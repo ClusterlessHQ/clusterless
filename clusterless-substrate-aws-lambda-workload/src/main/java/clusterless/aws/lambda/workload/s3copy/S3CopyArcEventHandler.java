@@ -11,7 +11,6 @@ package clusterless.aws.lambda.workload.s3copy;
 import clusterless.aws.lambda.arc.ArcEventHandler;
 import clusterless.aws.lambda.arc.ArcEventObserver;
 import clusterless.aws.lambda.manifest.AttemptCounter;
-import clusterless.aws.lambda.manifest.ManifestReader;
 import clusterless.aws.lambda.manifest.ManifestWriter;
 import clusterless.aws.lambda.util.PathMatcher;
 import clusterless.cls.model.UriType;
@@ -20,6 +19,7 @@ import clusterless.cls.model.manifest.Manifest;
 import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.event.ArcWorkloadContext;
+import clusterless.cls.substrate.aws.io.ManifestReader;
 import clusterless.cls.substrate.aws.sdk.ClientBase;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.util.Tuple2;
@@ -61,7 +61,7 @@ public class S3CopyArcEventHandler extends ArcEventHandler<S3CopyProps> {
         String lotId = notifyEvent.lot();
         URI incomingManifestIdentifier = notifyEvent.manifest();
 
-        Manifest incomingManifest = manifestReader.getManifest(incomingManifestIdentifier);
+        Manifest incomingManifest = manifestReader.retrieve(incomingManifestIdentifier);
 
         eventObserver.applyFromManifest(incomingManifestIdentifier, incomingManifest);
 

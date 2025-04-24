@@ -6,9 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.substrate.aws.io;
 
-import clusterless.cls.command.common.CommonOptions;
+import clusterless.cls.substrate.aws.runtime.ArcMeta;
 
-public class DatasetReportOptions extends CommonOptions {
+public class ArcReader extends MetaReader<ArcMeta> {
+    public ArcReader() {
+        super(ArcMeta.class);
+    }
 }

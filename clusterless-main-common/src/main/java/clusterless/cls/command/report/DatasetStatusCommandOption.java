@@ -9,6 +9,8 @@
 package clusterless.cls.command.report;
 
 import clusterless.cls.command.CommonCommandOptions;
+import clusterless.cls.command.common.CommonOptions;
+import clusterless.cls.command.common.RangeOptions;
 import clusterless.cls.util.Moment;
 import picocli.CommandLine;
 
@@ -56,19 +58,19 @@ public class DatasetStatusCommandOption extends CommonCommandOptions {
     }
 
 
-    public ReportOptions setProfile(String profile) {
+    public CommonOptions setProfile(String profile) {
         return datasetReportOptions.setProfile(profile);
     }
 
-    public ReportOptions setAccount(String account) {
+    public CommonOptions setAccount(String account) {
         return datasetReportOptions.setAccount(account);
     }
 
-    public ReportOptions setRegion(String region) {
+    public CommonOptions setRegion(String region) {
         return datasetReportOptions.setRegion(region);
     }
 
-    public ReportOptions setStage(String stage) {
+    public CommonOptions setStage(String stage) {
         return datasetReportOptions.setStage(stage);
     }
 

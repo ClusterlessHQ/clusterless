@@ -64,8 +64,16 @@ public class Printer {
         strings.forEach(this::println);
     }
 
+    public void println() {
+        out.println();
+    }
+
     public void println(String string) {
         out.println(string);
+    }
+
+    public void print(String string) {
+        out.print(string);
     }
 
     public BufferedWriter writer() {

@@ -12,6 +12,7 @@ import clusterless.cls.json.JSONUtil;
 import clusterless.cls.model.deploy.*;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
 import clusterless.cls.substrate.aws.cdk.bootstrap.BootstrapMeta;
+import clusterless.cls.substrate.aws.runtime.ArcMeta;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.ArcURI;
 import clusterless.cls.substrate.uri.DatasetURI;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Metadata {
@@ -53,6 +55,15 @@ public class Metadata {
     @NotNull
     public static Path createProjectMetaPath(Path outputPath) {
         return outputPath.resolve("deployables").resolve("project.json");
+    }
+
+    public static void writeArcMetaLocal(List<ArcMeta> arcMetas) {
+        writeMetaLocal(arcMetas, Metadata::createArcMetaPath);
+    }
+
+    @NotNull
+    public static Path createArcMetaPath(Path outputPath) {
+        return outputPath.resolve("arcs").resolve("meta.json");
     }
 
     private static void writeMetaLocal(Object struct, Function<Path, Path> pathResolver) {
@@ -106,7 +117,7 @@ public class Metadata {
         return deployablesMetadata(outputPath, dryRun, Metadata::removeDeployablesMetadata);
     }
 
-    protected static int deployablesMetadata(String outputPath, boolean dryRun, Function<List<Deployable>, Integer> f) {
+    protected static int deployablesMetadata(String outputPath, boolean dryRun, BiFunction<List<Deployable>, List<ArcMeta>, Integer> f) {
         Path projectMetaPath = createProjectMetaPath(Paths.get(outputPath));
 
         LOG.info("reading metadata from: {}", projectMetaPath.toAbsolutePath());
@@ -118,16 +129,30 @@ public class Metadata {
 
         List<Deployable> deployables;
         try {
-            deployables = JSONUtil.readAsObject(projectMetaPath, new TypeReference<>() {});
+            deployables = JSONUtil.readAsObject(projectMetaPath, new TypeReference<>() {
+            });
         } catch (IOException e) {
             LOG.info("unable to read metadata from: {}", projectMetaPath.toAbsolutePath(), e);
             return 1;
         }
 
-        return f.apply(deployables);
+        Path arcMetaPath = createArcMetaPath(Paths.get(outputPath));
+
+        LOG.info("reading metadata from: {}", arcMetaPath.toAbsolutePath());
+
+        List<ArcMeta> arcsMeta;
+        try {
+            arcsMeta = JSONUtil.readAsObject(arcMetaPath, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            LOG.info("unable to read metadata from: {}", arcMetaPath.toAbsolutePath(), e);
+            return 1;
+        }
+
+        return f.apply(deployables, arcsMeta);
     }
 
-    public static int pushDeployablesMetadata(List<Deployable> deployables) {
+    public static int pushDeployablesMetadata(List<Deployable> deployables, List<ArcMeta> arcsMeta) {
         String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
 
         for (Deployable deployable : deployables) {
@@ -167,7 +192,11 @@ public class Metadata {
                 materials.add(arcURI);
                 LOG.info("putting metadata in: {}", arcURI);
 
-                result = s3.put(arcURI, "application/json", arc)
+                Optional<ArcMeta> arcMeta = arcsMeta.stream()
+                        .filter(m -> m.project().equals(project))
+                        .filter(m -> m.arc().name().equals(arc.name())).findFirst();
+
+                result = s3.put(arcURI, "application/json", arcMeta.orElseThrow(() -> new IllegalStateException("arc deploy metadata not found")))
                         .isSuccessOrLog(r -> String.format("unable to upload arc metadata to: %s, %s", arcURI, r.errorMessage()));
 
                 if (result.isPresent()) {
@@ -219,7 +248,7 @@ public class Metadata {
         return 0;
     }
 
-    public static int removeDeployablesMetadata(List<Deployable> deployables) {
+    public static int removeDeployablesMetadata(List<Deployable> deployables, List<ArcMeta> arcsMeta) {
         String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
 
         for (Deployable deployable : deployables) {
@@ -243,7 +272,8 @@ public class Metadata {
                 throw new IllegalStateException("materials not found: " + uri, response.exception());
             }
 
-            List<URI> materials = JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {});
+            List<URI> materials = JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {
+            });
 
             boolean failed = false;
             for (URI material : materials) {
@@ -265,5 +295,4 @@ public class Metadata {
 
         return 0;
     }
-
 }

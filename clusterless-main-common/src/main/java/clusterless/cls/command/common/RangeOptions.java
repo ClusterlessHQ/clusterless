@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.common;
 
 import clusterless.cls.util.Moment;
 import clusterless.cls.util.MomentTypeConverter;
@@ -16,7 +16,7 @@ public class RangeOptions {
     @CommandLine.Option(
             names = {"--earliest"},
             description = {
-                    "Earliest time to include in report, inclusive.",
+                    "Earliest time to include, inclusive.",
                     "Where the time can be most any date/time format, or",
                     "an adjuster such as '1h' or '1d'.",
                     "(default: ${DEFAULT-VALUE})"
@@ -28,7 +28,7 @@ public class RangeOptions {
     @CommandLine.Option(
             names = {"--latest"},
             description = {
-                    "Latest time to include in report, exclusive.",
+                    "Latest time to include, exclusive.",
                     "Where the time can be most any date/time format, or",
                     "an adjuster such as '1h' or '1d'.",
                     "(default: ${DEFAULT-VALUE})"

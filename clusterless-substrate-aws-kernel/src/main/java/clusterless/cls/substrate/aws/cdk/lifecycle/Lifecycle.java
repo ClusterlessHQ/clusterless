@@ -25,7 +25,7 @@ import clusterless.cls.substrate.aws.construct.*;
 import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
-import clusterless.cls.substrate.aws.util.Lookup;
+import clusterless.cls.substrate.aws.util.DatasetLookup;
 import clusterless.commons.naming.Label;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
@@ -55,10 +55,12 @@ public class Lifecycle {
         this.configurations = configurations;
     }
 
-    public void synthProjectModels(Boolean resolveDeployedDatasets, List<Deployable> deployableModels, List<Deployable> resolveableModels) {
+    public ManagedApp synthProjectModels(Boolean resolveDeployedDatasets, List<Deployable> deployableModels, List<Deployable> resolveableModels) {
         ManagedApp managedApp = mapProject(resolveDeployedDatasets, deployableModels, resolveableModels);
 
         managedApp.synth();
+
+        return managedApp;
     }
 
     public List<Deployable> loadProjectModels(List<File> deployFiles) throws IOException {
@@ -77,7 +79,7 @@ public class Lifecycle {
 
         String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
 
-        DatasetResolver resolver = Lookup.createResolver(resolveDeployedDatasets, profile, deployables, resolveables);
+        DatasetResolver resolver = DatasetLookup.createResolver(resolveDeployedDatasets, profile, deployables, resolveables);
 
         ManagedApp managedApp = new ManagedApp(name, version, stage, deployables);
 

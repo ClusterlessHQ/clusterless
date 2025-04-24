@@ -45,4 +45,14 @@ public class ArcStatusRecord implements StatusRecord<ArcState>, Struct {
     public ArcState state() {
         return arcState;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ArcStatusRecord{");
+        sb.append("arcRecord=").append(arcRecord);
+        sb.append(", lotId='").append(lotId).append('\'');
+        sb.append(", arcState=").append(arcState);
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -6,9 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.entity;
 
 import clusterless.cls.command.CommandWrapper;
+import clusterless.cls.command.report.DatasetStatusCommandOption;
+import clusterless.cls.command.report.DatasetsCommandOptions;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;

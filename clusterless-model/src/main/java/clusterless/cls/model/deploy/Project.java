@@ -25,9 +25,9 @@ import static java.util.Objects.requireNonNull;
         synopsis = "The project descriptor.",
         description = """
                 Names the project to be deployed
-
+                
                 name: The name of the project. Required.
-                                
+                
                 version: The version of the project. Required.
                          It's recommended to use a date for the version, such as "20230101".
                 """
@@ -44,6 +44,20 @@ public class Project implements Struct {
         }
 
         return new Project(split[0], split[1]);
+    }
+
+    public static int compare(Project o1, Project o2) {
+        int i = o1.name().compareTo(o2.name());
+
+        if (i == 0) {
+            return 0;
+        }
+
+        if (o1.version() == null || o2.version() == null) {
+            return i;
+        }
+
+        return o1.version().compareTo(o2.version());
     }
 
     @JsonRequiredProperty
@@ -76,6 +90,14 @@ public class Project implements Struct {
     @JsonIgnore
     public String id() {
         return String.format("%s/%s", name(), version());
+    }
+
+    @JsonIgnore
+    public String display() {
+        if (version == null) {
+            return name();
+        }
+        return String.format("%s:%s", name(), version());
     }
 
     @Override

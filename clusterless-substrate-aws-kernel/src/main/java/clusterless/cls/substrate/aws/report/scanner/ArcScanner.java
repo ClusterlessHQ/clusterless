@@ -26,6 +26,14 @@ public class ArcScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcStatusSum
 
     private final Supplier<Optional<Predicate<ArcState>>> arcStateSupplier;
 
+    public static ArcScanner scannerOrNull(ArcRecord arcRecord, String profile, Moment earliest, Moment latest, Supplier<Optional<Predicate<ArcState>>> arcStateSupplier) {
+        try {
+            return new ArcScanner(profile, arcRecord, earliest, latest, arcStateSupplier);
+        } catch (IllegalStateException e) {
+            return null;
+        }
+    }
+
     public ArcScanner(String profile, ArcRecord arcRecord, Moment earliest, Moment latest, Supplier<Optional<Predicate<ArcState>>> arcStateSupplier) {
         super(profile, arcRecord, earliest, latest);
         this.arcStateSupplier = arcStateSupplier;
@@ -50,6 +58,7 @@ public class ArcScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcStatusSum
             arcStateURIStream = arcStateURIStream.filter(uri -> predicate.test(uri.state()));
         }
 
+        // detect gaps here and invert the stream if filling gaps
         return arcStateURIStream
                 .map(uri -> new ArcStatusRecord(record, uri.lotId(), uri.state()));
     }
@@ -67,7 +76,7 @@ public class ArcScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcStatusSum
     }
 
     @Override
-    protected ArcStateURI parseStateURU(String uri) {
+    protected ArcStateURI parseStateURI(String uri) {
         return ArcStateURI.parse(uri);
     }
 

@@ -13,6 +13,7 @@ import clusterless.cls.model.manifest.ManifestState;
 import clusterless.cls.model.state.ArcState;
 import clusterless.cls.substrate.aws.event.ArcStateContext;
 import clusterless.cls.substrate.aws.event.ArcWorkloadContext;
+import clusterless.cls.substrate.aws.io.ArcNotifyEventPublisher;
 import clusterless.cls.substrate.uri.ManifestURI;
 import clusterless.cls.substrate.uri.StateURI;
 import clusterless.cls.util.Env;

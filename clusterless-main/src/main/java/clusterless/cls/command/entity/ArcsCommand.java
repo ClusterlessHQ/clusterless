@@ -6,9 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.entity;
 
 import clusterless.cls.command.CommandWrapper;
+import clusterless.cls.command.exec.ArcExecCommandOptions;
+import clusterless.cls.command.report.ArcStatusCommandOption;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -16,7 +18,10 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
         name = "arcs",
         description = "List all deployed arcs.",
-        subcommands = {ArcsCommand.ArcStatusCommand.class}
+        subcommands = {
+                ArcsCommand.ArcStatusCommand.class,
+                ArcsCommand.ArcExecCommand.class
+        }
 )
 public class ArcsCommand extends CommandWrapper<ArcsCommandOptions> {
     public ArcsCommand() {
@@ -47,6 +52,31 @@ public class ArcsCommand extends CommandWrapper<ArcsCommandOptions> {
         @Override
         public Integer call() throws Exception {
             return arcsCommand.main().run(arcStatusCommandOption);
+        }
+    }
+
+    @CommandLine.Command(
+            name = "exec",
+            description = {
+                    "Execute the given arcs (within the time range or lots).",
+                    "Where status is one of:",
+                    "",
+                    "- running: workload is in process",
+                    "- complete: workload finished successfully",
+                    "- partial: workload finished but some data is missing",
+                    "- missing: workload finished but no data, possibly due to missing upstream data",
+            }
+    )
+    public static class ArcExecCommand implements Callable<Integer> {
+        @CommandLine.ParentCommand
+        ArcsCommand arcsCommand;
+
+        @CommandLine.Mixin
+        ArcExecCommandOptions arcExecCommandOptions = new ArcExecCommandOptions();
+
+        @Override
+        public Integer call() throws Exception {
+            return arcsCommand.main().run(arcExecCommandOptions);
         }
     }
 }

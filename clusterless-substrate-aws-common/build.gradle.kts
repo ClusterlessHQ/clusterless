@@ -31,4 +31,5 @@ dependencies {
     implementation("software.amazon.awssdk:glue")
     implementation("software.amazon.awssdk:athena")
     implementation("software.amazon.awssdk:cloudwatchlogs")
+    implementation("software.amazon.awssdk:sfn")
 }

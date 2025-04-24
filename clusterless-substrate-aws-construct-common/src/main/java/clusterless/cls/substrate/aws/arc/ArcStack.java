@@ -18,6 +18,8 @@ import clusterless.cls.substrate.aws.managed.ManagedApp;
 import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.managed.ManagedStack;
 import clusterless.cls.substrate.aws.resources.Stacks;
+import clusterless.cls.substrate.aws.runtime.ArcDeployment;
+import clusterless.cls.substrate.aws.runtime.ArcMeta;
 import clusterless.commons.naming.Label;
 
 /**
@@ -63,7 +65,7 @@ public class ArcStack extends ManagedStack {
                 .withArc(arc)
                 .withPlacement(deployable.placement())
                 .withProject(deployable.project())
-                .withArcDeployment(ArcMeta.ArcDeployment.Builder.builder()
+                .withArcDeployment(ArcDeployment.Builder.builder()
                         .withStackName(this.getStackName())
                         .withStepFunctionName(orchestration.stateMachineName().lowerHyphen())
                         .withListenerRuleName(arcListener.ruleName().lowerHyphen())

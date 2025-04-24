@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.exec;
 
 import clusterless.cls.command.CommonCommandOptions;
 import clusterless.cls.command.common.CommonOptions;
@@ -19,15 +19,29 @@ import picocli.CommandLine;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ArcStatusCommandOption extends CommonCommandOptions {
+public class ArcExecCommandOptions extends CommonCommandOptions {
     @CommandLine.Mixin
     ArcCommonOptions arcCommonOptions = new ArcCommonOptions();
 
+    static class RangeOrLot {
+        @CommandLine.ArgGroup(
+                exclusive = false,
+                heading = "Time Range Options:%n"
+        )
+        RangeOptions rangeOptions = new RangeOptions();
+
+        @CommandLine.Option(
+                names = {"--lot"},
+                split = ",",
+                description = "Apply to only these lots."
+        )
+        List<String> lots = new LinkedList<>();
+    }
+
     @CommandLine.ArgGroup(
-            exclusive = false,
-            heading = "Time Range Options:%n"
+            heading = "Time Range or Lot Options:%n"
     )
-    RangeOptions rangeOptions = new RangeOptions();
+    RangeOrLot rangeOrLot = new RangeOrLot();
 
     @CommandLine.Option(
             names = {"--name"},
@@ -43,28 +57,28 @@ public class ArcStatusCommandOption extends CommonCommandOptions {
     )
     List<ArcState> states = new LinkedList<>();
 
-    @CommandLine.Option(names = {"--list"}, description = {"List all arc instances instead of summarizing."})
-    boolean list = false;
+    @CommandLine.Option(
+            names = {"--source"},
+            split = ",",
+            description = "Execute against this given source."
+    )
+    List<String> sources = new LinkedList<>();
 
-    public ArcStatusCommandOption setNames(List<String> names) {
+    public ArcExecCommandOptions setNames(List<String> names) {
         this.names = names;
         return this;
     }
 
-    public boolean list() {
-        return list;
-    }
-
     public RangeOptions rangeOptions() {
-        return rangeOptions;
+        return rangeOrLot.rangeOptions;
     }
 
     public Moment earliest() {
-        return rangeOptions.earliest();
+        return rangeOrLot.rangeOptions.earliest();
     }
 
     public Moment latest() {
-        return rangeOptions.latest();
+        return rangeOrLot.rangeOptions.latest();
     }
 
     public ArcCommonOptions arcCommonOptions() {
@@ -111,11 +125,19 @@ public class ArcStatusCommandOption extends CommonCommandOptions {
         return arcCommonOptions.stage();
     }
 
+    public List<String> lots() {
+        return rangeOrLot.lots;
+    }
+
     public List<String> names() {
         return names;
     }
 
     public List<ArcState> states() {
         return states;
+    }
+
+    public List<String> sources() {
+        return sources;
     }
 }

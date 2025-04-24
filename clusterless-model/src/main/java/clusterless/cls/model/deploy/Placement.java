@@ -24,14 +24,14 @@ import java.util.Objects;
         synopsis = "The cloud environment to deploy to.",
         description = """
                 Where will the project be deployed in the declared provider environment.
-
+                
                 provider: Currently only "aws". Required.
-                                
+                
                 account: The AWS account number to deploy to. Required.
-                                       
+                
                 stage: The stage of the deployment, such as "dev", "test", "prod". Optional.
                        This allows for multiple deployments of the same project to the same provider region.
-                       
+                
                 region: Any valid AWS region, such as "us-east-1", "us-west-2", etc. Required.
                 """
 )
@@ -122,6 +122,11 @@ public class Placement implements Struct {
     @JsonIgnore
     public String id() {
         return String.format("%s:%s:%s:%s", provider, stage, account, region);
+    }
+
+    @JsonIgnore
+    public String display() {
+        return id();
     }
 
     @Override

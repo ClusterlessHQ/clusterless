@@ -6,14 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.entity;
 
+import clusterless.cls.command.common.CommonOptions;
 import picocli.CommandLine;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class ArcReportOptions extends ReportOptions {
+public class ArcCommonOptions extends CommonOptions {
     @CommandLine.Option(
             names = {"--project"},
             split = ",",
@@ -21,7 +22,7 @@ public class ArcReportOptions extends ReportOptions {
     )
     List<String> projects = new LinkedList<>();
 
-    public ArcReportOptions setProjects(List<String> projects) {
+    public ArcCommonOptions setProjects(List<String> projects) {
         this.projects = projects;
         return this;
     }

@@ -53,6 +53,14 @@ public class Dataset extends Model {
         return String.format("%s/%s", name(), version());
     }
 
+    @JsonIgnore
+    public String display() {
+        if (version == null) {
+            return name();
+        }
+        return String.format("%s:%s", name(), version());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

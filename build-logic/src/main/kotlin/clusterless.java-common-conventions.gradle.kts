@@ -151,6 +151,7 @@ dependencies {
         implementationAndTestFixture("software.amazon.awssdk:sqs:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:glue:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:athena:$awsSdk")
+        implementationAndTestFixture("software.amazon.awssdk:sfn:$awsSdk")
 
         // https://github.com/aws/aws-lambda-java-libs
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.3")

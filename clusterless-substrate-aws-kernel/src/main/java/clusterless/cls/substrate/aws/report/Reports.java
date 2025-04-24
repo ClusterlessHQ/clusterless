@@ -8,7 +8,7 @@
 
 package clusterless.cls.substrate.aws.report;
 
-import clusterless.cls.command.report.ReportCommandOptions;
+import clusterless.cls.command.common.CommonCommandOptions;
 import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.sdk.S3;
@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 public class Reports extends CommonCommand {
 
     @NotNull
-    protected Stream<ProjectRecord> listAllProjects(ReportCommandOptions commandOptions) {
+    protected Stream<ProjectRecord> listAllProjects(CommonCommandOptions commandOptions) {
         List<Placement> placements = filterPlacements(commandOptions);
 
         Stream<ProjectRecord> records = StreamEx.empty();
@@ -65,7 +65,7 @@ public class Reports extends CommonCommand {
     }
 
     @NotNull
-    protected Stream<DatasetRecord> listAllDatasets(ReportCommandOptions commandOptions) {
+    protected Stream<DatasetRecord> listAllDatasets(CommonCommandOptions commandOptions) {
         List<Placement> placements = filterPlacements(commandOptions);
 
         Stream<DatasetRecord> records = StreamEx.empty();
@@ -116,7 +116,7 @@ public class Reports extends CommonCommand {
     }
 
     @NotNull
-    protected List<Placement> filterPlacements(ReportCommandOptions commandOptions) {
+    protected List<Placement> filterPlacements(CommonCommandOptions commandOptions) {
         String profile = commandOptions.profile();
         String stage = commandOptions.stage();
         String account = commandOptions.account();

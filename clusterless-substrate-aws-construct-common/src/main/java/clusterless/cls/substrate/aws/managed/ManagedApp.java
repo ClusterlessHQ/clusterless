@@ -9,6 +9,8 @@
 package clusterless.cls.substrate.aws.managed;
 
 import clusterless.cls.model.deploy.Deployable;
+import clusterless.cls.substrate.aws.arc.ArcStack;
+import clusterless.cls.substrate.aws.runtime.ArcMeta;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import clusterless.commons.collection.OrderedMaps;
 import clusterless.commons.naming.Label;
@@ -93,5 +95,11 @@ public class ManagedApp extends ScopedApp implements Managed {
 //                .applyToLaunchedInstances(true)
 //                .priority(100)
 //                .build());
+    }
+
+    public List<ArcMeta> arcMeta() {
+        return stacks.stream().filter(stack -> stack instanceof ArcStack)
+                .map(stack -> ((ArcStack) stack).arcMeta())
+                .toList();
     }
 }

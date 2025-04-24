@@ -48,7 +48,6 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
         this.temporalUnit = findTemporalKeyFor(this.stateURI);
 
         LOG.info("using temporal unit: {}", this.temporalUnit);
-
         LOG.info("using moment earliest: {}, latest: {}", earliest.print(), latest.print());
 
         this.earliestInstant = earliest.instant();
@@ -62,6 +61,10 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
         this.endLotInclusive = IntervalUnits.formatter(this.temporalUnit).format(this.latestInstant.minus(1, temporalUnit));
 
         LOG.info("using lot earliest: {}, latest: {}", startLotInclusive, endLotExclusive);
+    }
+
+    public Rec record() {
+        return record;
     }
 
     protected abstract StateURI<?, ?> createStateURIFrom(Rec record);
@@ -111,7 +114,7 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
         }
 
         LOG.info("parsing: {}", paths.get(0));
-        StateURI<?, ?> found = parseStateURU(paths.get(0));
+        StateURI<?, ?> found = parseStateURI(paths.get(0));
 
         return IntervalUnits.findDurationWithin(found.lotId())
                 .orElseThrow(() -> new IllegalStateException("no TemporalUnit found: " + found.lotId()));
@@ -130,7 +133,7 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
     @NotNull
     protected abstract StatusSummaryRec createSummaryRecord(long count);
 
-    protected abstract StateURI<?, ?> parseStateURU(String uri);
+    protected abstract StateURI<?, ?> parseStateURI(String uri);
 
     protected abstract String objectName();
 }

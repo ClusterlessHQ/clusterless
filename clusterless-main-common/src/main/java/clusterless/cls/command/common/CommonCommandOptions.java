@@ -6,9 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.common;
 
-import clusterless.cls.command.CommonCommandOptions;
 import picocli.CommandLine;
 
 /**
@@ -18,7 +17,7 @@ import picocli.CommandLine;
         description = "",
         subcommands = {CommandLine.HelpCommand.class}
 )
-public abstract class ReportCommandOptions extends CommonCommandOptions {
+public abstract class CommonCommandOptions extends clusterless.cls.command.CommonCommandOptions {
     public abstract String profile();
 
     public abstract String account();

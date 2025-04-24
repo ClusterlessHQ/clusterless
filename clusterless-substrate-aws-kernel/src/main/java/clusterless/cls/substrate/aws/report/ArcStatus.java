@@ -28,17 +28,12 @@ import java.util.stream.Stream;
 public class ArcStatus implements Callable<Integer> {
     @CommandLine.ParentCommand
     Arcs arcsCommand;
-
     @CommandLine.Mixin
     ArcStatusCommandOption arcStatusCommandOption = new ArcStatusCommandOption();
 
     @Override
     public Integer call() throws Exception {
-        arcsCommand.commandOptions.setProfile(arcStatusCommandOption.profile());
-        arcsCommand.commandOptions.setAccount(arcStatusCommandOption.account());
-        arcsCommand.commandOptions.setRegion(arcStatusCommandOption.region());
-        arcsCommand.commandOptions.setStage(arcStatusCommandOption.stage());
-        arcsCommand.commandOptions.setProjects(arcStatusCommandOption.projects());
+        arcsCommand.commandOptions.setArcCommonOptions(arcStatusCommandOption.arcCommonOptions());
 
         Predicate<ArcRecord> arcRecordPredicate = arcRecord -> true;
 
@@ -65,7 +60,7 @@ public class ArcStatus implements Callable<Integer> {
 
             try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
                 reporter.report(arcStream
-                        .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                        .map(arcRecord -> ArcScanner.scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
                         .filter(Objects::nonNull)
                         .flatMap(ArcScanner::scan)
                 );
@@ -75,7 +70,7 @@ public class ArcStatus implements Callable<Integer> {
 
             try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
                 reporter.report(arcStream
-                        .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                        .map(arcRecord -> ArcScanner.scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
                         .filter(Objects::nonNull)
                         .map(ArcScanner::summarizeScan)
                 );
@@ -85,11 +80,4 @@ public class ArcStatus implements Callable<Integer> {
         return 0;
     }
 
-    private static ArcScanner scannerOrNull(ArcRecord arcRecord, String profile, Moment earliest, Moment latest, Supplier<Optional<Predicate<ArcState>>> arcStateSupplier) {
-        try {
-            return new ArcScanner(profile, arcRecord, earliest, latest, arcStateSupplier);
-        } catch (IllegalStateException e) {
-            return null;
-        }
-    }
 }

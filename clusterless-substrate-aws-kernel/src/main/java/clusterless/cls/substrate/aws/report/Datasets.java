@@ -9,7 +9,6 @@
 package clusterless.cls.substrate.aws.report;
 
 import clusterless.cls.command.report.DatasetsCommandOptions;
-import clusterless.cls.model.deploy.Dataset;
 import clusterless.cls.substrate.aws.report.reporter.Reporter;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.DatasetURI;
@@ -37,20 +36,6 @@ public class Datasets extends Reports implements Callable<Integer> {
 
     @CommandLine.Mixin
     DatasetsCommandOptions commandOptions = new DatasetsCommandOptions();
-
-    private static int compare(Dataset o1, Dataset o2) {
-        int i = o1.name().compareTo(o2.name());
-
-        if (i == 0) {
-            return 0;
-        }
-
-        if (o1.version() == null || o2.version() == null) {
-            return i;
-        }
-
-        return o1.version().compareTo(o2.version());
-    }
 
     @Override
     public Integer call() throws Exception {

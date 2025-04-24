@@ -51,7 +51,7 @@ public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord,
     }
 
     @Override
-    protected ManifestURI parseStateURU(String uri) {
+    protected ManifestURI parseStateURI(String uri) {
         return ManifestURI.parse(uri);
     }
 

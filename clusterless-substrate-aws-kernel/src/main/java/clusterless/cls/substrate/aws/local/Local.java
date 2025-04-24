@@ -16,7 +16,7 @@ import clusterless.cls.model.Model;
 import clusterless.cls.model.deploy.*;
 import clusterless.cls.substrate.aws.CommonCommand;
 import clusterless.cls.substrate.aws.cdk.Provider;
-import clusterless.cls.substrate.aws.util.Lookup;
+import clusterless.cls.substrate.aws.util.DatasetLookup;
 import clusterless.commons.util.Runtimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public class Local extends CommonCommand implements Callable<Integer> {
 
         LOG.info("using AWS_PROFILE for lookup: {}", profile);
 
-        DatasetResolver resolver = Lookup.createResolver(commandOptions.resolveDeployedDatasets().orElse(true), profile, deployables);
+        DatasetResolver resolver = DatasetLookup.createResolver(commandOptions.resolveDeployedDatasets().orElse(true), profile, deployables);
 
         Map<Deployable, List<Arc<?>>> found = new LinkedHashMap<>();
 

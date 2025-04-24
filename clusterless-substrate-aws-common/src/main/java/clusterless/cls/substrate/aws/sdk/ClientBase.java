@@ -67,6 +67,10 @@ public abstract class ClientBase<C extends AwsClient> {
         this.region = region == null ? defaultRegion : region;
     }
 
+    public String region() {
+        return region;
+    }
+
     @NotNull
     protected abstract String getEndpointEnvVar();
 

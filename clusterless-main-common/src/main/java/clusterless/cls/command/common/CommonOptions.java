@@ -6,11 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package clusterless.cls.command.report;
+package clusterless.cls.command.common;
 
 import picocli.CommandLine;
 
-public class ReportOptions {
+public class CommonOptions {
     @CommandLine.Option(
             names = "--profile",
             description = "Cloud profile."
@@ -34,22 +34,22 @@ public class ReportOptions {
     )
     String stage;
 
-    public ReportOptions setProfile(String profile) {
+    public CommonOptions setProfile(String profile) {
         this.profile = profile;
         return this;
     }
 
-    public ReportOptions setAccount(String account) {
+    public CommonOptions setAccount(String account) {
         this.account = account;
         return this;
     }
 
-    public ReportOptions setRegion(String region) {
+    public CommonOptions setRegion(String region) {
         this.region = region;
         return this;
     }
 
-    public ReportOptions setStage(String stage) {
+    public CommonOptions setStage(String stage) {
         this.stage = stage;
         return this;
     }
