@@ -11,7 +11,7 @@ package clusterless.cls.substrate.aws.report;
 import clusterless.cls.command.report.ArcStatusCommandOption;
 import clusterless.cls.model.state.ArcState;
 import clusterless.cls.substrate.aws.report.reporter.Reporter;
-import clusterless.cls.substrate.aws.report.scanner.ArcScanner;
+import clusterless.cls.substrate.aws.report.scanner.ArcStatusScanner;
 import clusterless.cls.util.Moment;
 import picocli.CommandLine;
 
@@ -60,9 +60,9 @@ public class ArcStatus implements Callable<Integer> {
 
             try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
                 reporter.report(arcStream
-                        .map(arcRecord -> ArcScanner.scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                        .map(arcRecord -> ArcStatusScanner.scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier, false))
                         .filter(Objects::nonNull)
-                        .flatMap(ArcScanner::scan)
+                        .flatMap(ArcStatusScanner::scan)
                 );
             }
         } else {
@@ -70,9 +70,9 @@ public class ArcStatus implements Callable<Integer> {
 
             try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
                 reporter.report(arcStream
-                        .map(arcRecord -> ArcScanner.scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                        .map(arcRecord -> ArcStatusScanner.scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier, false))
                         .filter(Objects::nonNull)
-                        .map(ArcScanner::summarizeScan)
+                        .map(ArcStatusScanner::summarizeScan)
                 );
             }
         }

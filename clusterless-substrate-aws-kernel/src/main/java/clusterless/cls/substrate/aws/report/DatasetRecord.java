@@ -8,14 +8,16 @@
 
 package clusterless.cls.substrate.aws.report;
 
+import clusterless.cls.model.HasDisplay;
 import clusterless.cls.model.Struct;
 import clusterless.cls.model.deploy.Dataset;
 import clusterless.cls.model.deploy.Placement;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @JsonPropertyOrder({"placement", "dataset"})
-public class DatasetRecord implements Struct {
+public class DatasetRecord implements Struct, HasDisplay {
     @JsonUnwrapped(prefix = "placement.")
     Placement placement;
     @JsonUnwrapped(prefix = "dataset.")
@@ -32,6 +34,11 @@ public class DatasetRecord implements Struct {
 
     public Dataset dataset() {
         return dataset;
+    }
+
+    @JsonIgnore
+    public String display() {
+        return String.format("%s:%s", placement.display(), dataset.display());
     }
 
     @Override

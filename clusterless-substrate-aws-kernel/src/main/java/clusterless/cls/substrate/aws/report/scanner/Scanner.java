@@ -8,6 +8,7 @@
 
 package clusterless.cls.substrate.aws.report.scanner;
 
+import clusterless.cls.model.HasDisplay;
 import clusterless.cls.model.State;
 import clusterless.cls.substrate.aws.report.StatusRecord;
 import clusterless.cls.substrate.aws.report.StatusSummaryRecord;
@@ -25,10 +26,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSummaryRec extends StatusSummaryRecord<S>, S extends State> {
-    protected static final Logger LOG = LoggerFactory.getLogger(ArcScanner.class);
+public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRecord<S>, StatusSummaryRec extends StatusSummaryRecord<S>, S extends State> {
+    protected static final Logger LOG = LoggerFactory.getLogger(ArcStatusScanner.class);
     protected final String profile;
     protected final Rec record;
     protected final StateURI<?, ?> stateURI;
@@ -36,16 +38,18 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
     protected final String startLotInclusive;
     protected final String endLotInclusive;
     protected final String endLotExclusive;
-    private final Instant earliestInstant;
-    private final Instant latestInstant;
+    protected final Instant earliestInstant;
+    protected final Instant latestInstant;
+    protected final boolean fillGaps;
 
-    public Scanner(String profile, Rec record, Moment earliest, Moment latest) {
+    public Scanner(String profile, Rec record, Moment earliest, Moment latest, boolean fillGaps) {
         this.profile = profile;
         this.record = record;
-        LOG.info("creating scanner for: {}", record);
+        this.fillGaps = fillGaps;
+        LOG.info("creating scanner for: {}", record.display());
 
         this.stateURI = createStateURIFrom(record);
-        this.temporalUnit = findTemporalKeyFor(this.stateURI);
+        this.temporalUnit = findTemporalKeyFor(this.stateURI, earliest, latest);
 
         LOG.info("using temporal unit: {}", this.temporalUnit);
         LOG.info("using moment earliest: {}, latest: {}", earliest.print(), latest.print());
@@ -79,13 +83,13 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
         URI endExclusive = stateURI.withLot(endLotExclusive).uriPath();
         final ClientBase<?>.Response[] response = new ClientBase.Response[]{null};
 
-        LOG.info("scanning earliest: {}, latest: {}", startInclusive, endExclusive);
+        LOG.info("scanning earliest inclusive: {}, latest exclusive: {}", startInclusive, endExclusive);
         S3.Responses responses = s3.listObjectsIterable(path, startInclusive);
 
         Stream<String> resultStream = s3.listChildrenStream(responses, endExclusive, objectName(), r -> response[0] = r);
 
         try {
-            return parseStreamIntoUri(resultStream);
+            return parseUriStreamIntoStatusRec(resultStream);
         } finally {
             if (response[0] != null) {
                 response[0].isSuccessOrThrow(e -> new RuntimeException("unable to list objects at: " + path, e));
@@ -94,7 +98,14 @@ public abstract class Scanner<Rec, StatusRec extends StatusRecord<S>, StatusSumm
     }
 
     @NotNull
-    protected abstract Stream<StatusRec> parseStreamIntoUri(Stream<String> resultStream);
+    protected abstract Stream<StatusRec> parseUriStreamIntoStatusRec(Stream<String> resultStream);
+
+    protected TemporalUnit findTemporalKeyFor(StateURI<?, ?> stateURI, Moment earliest, Moment latest) {
+        Optional<TemporalUnit> temporalUnit = IntervalUnits.findDurationWithin(earliest.moment())
+                .or(() -> IntervalUnits.findDurationWithin(latest.moment()));
+
+        return temporalUnit.orElseGet(() -> findTemporalKeyFor(stateURI));
+    }
 
     protected TemporalUnit findTemporalKeyFor(StateURI<?, ?> stateURI) {
         // discover interval

@@ -15,7 +15,7 @@ import clusterless.cls.model.state.ArcState;
 import clusterless.cls.printer.Printer;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.io.ArcReader;
-import clusterless.cls.substrate.aws.report.scanner.ArcScanner;
+import clusterless.cls.substrate.aws.report.scanner.ArcStatusScanner;
 import clusterless.cls.substrate.aws.runtime.ArcDeployment;
 import clusterless.cls.substrate.aws.runtime.ArcMeta;
 import clusterless.cls.substrate.aws.sdk.StepFunction;
@@ -26,6 +26,7 @@ import clusterless.cls.util.IntervalUnitParser;
 import clusterless.cls.util.Moment;
 import clusterless.cls.util.Tuple2;
 import clusterless.commons.collection.OrderedSafeMaps;
+import clusterless.commons.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 
@@ -35,7 +36,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static clusterless.cls.substrate.aws.report.scanner.ArcScanner.scannerOrNull;
+import static clusterless.cls.substrate.aws.report.scanner.ArcStatusScanner.scannerOrNull;
 
 @CommandLine.Command(
         name = "exec"
@@ -48,6 +49,8 @@ public class ArcExec implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        Printer printer = arcsCommand.kernel().printer();
+
         arcsCommand.commandOptions.setArcCommonOptions(arcExecCommandOptions.arcCommonOptions());
 
         Predicate<ArcRecord> arcRecordPredicate = arcRecord -> true;
@@ -71,6 +74,10 @@ public class ArcExec implements Callable<Integer> {
         Moment latest = arcExecCommandOptions.latest();
         List<String> lots = arcExecCommandOptions.lots();
 
+        // if lots are provided, it is probably missing and it should be executed
+        // should be an option with the range
+        boolean fillGaps = !lots.isEmpty();
+
         List<Tuple2<Moment, Moment>> ranges;
         if (!lots.isEmpty()) {
             ranges = toRanges(lots);
@@ -84,86 +91,112 @@ public class ArcExec implements Callable<Integer> {
         StepFunction stepFunction = new StepFunction(profile);
 
         for (Tuple2<Moment, Moment> range : ranges) {
-            @NotNull List<ArcScanner> arcScanners = scanViaRange(arcRecordPredicate, profile, range.get_1(), range.get_2(), arcStateSupplier);
+            Moment currentEarliest = range.get_1();
+            Moment currentLatest = range.get_2();
+            printer.println("handling range: " + currentEarliest + ":" + currentLatest);
 
-            for (ArcScanner arcScanner : arcScanners) {
-                ArcRecord record = arcScanner.record();
+            @NotNull List<ArcStatusScanner> arcStatusScanners = scanViaRange(arcRecordPredicate, profile, currentEarliest, currentLatest, arcStateSupplier, fillGaps);
 
-                // do the exec
-                // must target the step function directly
-                Placement placement = record.placement();
-                Project project = record.project();
-                String arcName = record.name();
-                ArcURI arcURI = ArcURI.builder()
-                        .withPlacement(placement)
-                        .withProject(project)
-                        .withArcName(arcName)
-                        .build();
+            if (arcStatusScanners.isEmpty()) {
+                printer.println("no arcs found in range " + currentEarliest + ":" + currentLatest + " for projects " + arcExecCommandOptions.projects() + " and arcs " + arcExecCommandOptions.names());
+                continue;
+            }
 
-                ArcMeta arcMeta = arcReader.retrieve(arcURI.uri());
-
-                List<String> sourceNames = arcExecCommandOptions.sources();
-
-                Map<String, SourceDataset> arcSources = arcMeta.arc().sources();
-                List<SourceDataset> datasets = new ArrayList<>();
-
-                if (sourceNames.isEmpty()) {
-                    datasets.addAll(arcSources.values());
-                } else {
-                    sourceNames.forEach(sourceName -> {
-                        if (!arcSources.containsKey(sourceName)) {
-                            throw new IllegalArgumentException("source " + sourceName + " not found in arc sources, available " + arcSources.keySet());
-                        }
-                        datasets.add(arcSources.get(sourceName));
-                    });
-                }
-
-                RemoteDatasetOwnerLookup lookup = DatasetLookup.getRemoteDatasetOwnerLookup(arcExecCommandOptions.profile());
-
-                for (SourceDataset dataset : datasets) {
-                    // get the arc metadata
-                    Optional<OwnedDataset> locatedDataset = lookup.lookup(placement, dataset);
-
-                    ManifestURI manifestURI = ManifestURI.builder()
-                            .withPlacement(placement)
-                            .withDataset(dataset)
-                            .build();
-
-                    arcScanner.scan()
-                            .forEach(arcStatusRecord -> {
-                                SinkDataset sink = locatedDataset.orElseThrow().dataset();
-
-                                Printer printer = arcsCommand.kernel().printer();
-                                printer.print("starting arc exec for ");
-                                printer.print("placement: " + arcStatusRecord.arcRecord().placement().display());
-                                printer.print("project: " + arcStatusRecord.arcRecord().project().display());
-                                printer.print("arc: " + arcStatusRecord.arcRecord().name());
-                                printer.print("dataset: " + sink.display());
-                                printer.print("state: " + arcStatusRecord.state());
-                                printer.print("lot: " + arcStatusRecord.lotId());
-                                printer.println();
-
-                                ArcNotifyEvent notifyEvent = ArcNotifyEvent.builder()
-                                        .withDataset(sink)
-                                        .withLot(arcStatusRecord.lotId())
-                                        .withManifest(manifestURI.uri())
-                                        .build();
-
-                                Map<String, Object> payload = OrderedSafeMaps.of("detail", notifyEvent);
-
-                                ArcDeployment arcDeployment = arcMeta.arcDeployment();
-                                String stepFunctionName = arcDeployment.stepFunctionName();
-
-                                stepFunction.start(placement.account(), stepFunctionName, payload)
-                                        .isSuccessOrThrow(e -> {
-                                            throw new IllegalStateException("unable to start step function: " + stepFunctionName + ", " + e.getMessage(), e);
-                                        });
-                            });
-                }
+            for (ArcStatusScanner arcStatusScanner : arcStatusScanners) {
+                handleScanner(printer, arcStatusScanner, arcReader, stepFunction);
             }
         }
 
         return 0;
+    }
+
+    private void handleScanner(Printer printer, ArcStatusScanner arcStatusScanner, ArcReader arcReader, StepFunction stepFunction) {
+        ArcRecord record = arcStatusScanner.record();
+
+        // do the exec
+        // must target the step function directly
+        Placement placement = record.placement();
+        Project project = record.project();
+        String arcName = record.name();
+        ArcURI arcURI = ArcURI.builder()
+                .withPlacement(placement)
+                .withProject(project)
+                .withArcName(arcName)
+                .build();
+
+        ArcMeta arcMeta = arcReader.retrieve(arcURI.uri());
+
+        List<String> sourceNames = arcExecCommandOptions.sources();
+
+        List<SourceDataset> datasets = findSourceDatasetsFor(arcMeta, sourceNames);
+
+        RemoteDatasetOwnerLookup datasetOwnerLookup = DatasetLookup.getRemoteDatasetOwnerLookup(arcExecCommandOptions.profile());
+
+        for (SourceDataset sourceDataset : datasets) {
+            Optional<OwnedDataset> locatedDataset = datasetOwnerLookup.lookup(placement, sourceDataset);
+
+            ManifestURI manifestURI = ManifestURI.builder()
+                    .withPlacement(placement)
+                    .withDataset(sourceDataset)
+                    .build();
+
+            SinkDataset sink = locatedDataset.orElseThrow().dataset();
+
+            Stream<ArcStatusRecord> scanStream = arcStatusScanner.scan();
+
+            scanStream
+                    .forEach(arcStatusRecord -> {
+                        execStepFunction(printer, stepFunction, arcStatusRecord, sink, manifestURI, arcMeta, placement);
+                    });
+        }
+    }
+
+    private static void execStepFunction(Printer printer, StepFunction stepFunction, ArcStatusRecord arcStatusRecord, SinkDataset sink, ManifestURI manifestURI, ArcMeta arcMeta, Placement placement) {
+        printer.print("starting arc exec for ");
+        printer.print("placement: " + arcStatusRecord.arcRecord().placement().display());
+        printer.print(" project: " + arcStatusRecord.arcRecord().project().display());
+        printer.print(" arc: " + arcStatusRecord.arcRecord().name());
+        printer.print(" dataset: " + sink.display());
+        printer.print(" state: " + Strings.nullToEmpty(arcStatusRecord.state()));
+        printer.print(" lot: " + arcStatusRecord.lotId());
+        printer.println();
+
+        ArcNotifyEvent notifyEvent = ArcNotifyEvent.builder()
+                .withDataset(sink)
+                .withLot(arcStatusRecord.lotId())
+                .withManifest(manifestURI.uri())
+                .build();
+
+        Map<String, Object> payload = OrderedSafeMaps.of("detail", notifyEvent);
+
+        ArcDeployment arcDeployment = arcMeta.arcDeployment();
+        String stepFunctionName = arcDeployment.stepFunctionName();
+
+        stepFunction.start(placement.account(), stepFunctionName, payload)
+                .isSuccessOrThrow(e -> {
+                    throw new IllegalStateException("unable to start step function: " + stepFunctionName + ", " + e.getMessage(), e);
+                });
+    }
+
+    private static @NotNull List<SourceDataset> findSourceDatasetsFor(ArcMeta arcMeta, List<String> sourceNames) {
+        Map<String, SourceDataset> arcSources = arcMeta.arc().sources();
+        List<SourceDataset> datasets = new ArrayList<>();
+
+        if (sourceNames.isEmpty()) {
+            datasets.addAll(arcSources.values());
+        } else {
+            sourceNames.forEach(sourceName -> {
+                if (!arcSources.containsKey(sourceName)) {
+                    throw new IllegalArgumentException("source " + sourceName + " not found in arc sources, available " + arcSources.keySet());
+                }
+                datasets.add(arcSources.get(sourceName));
+            });
+        }
+
+        if (datasets.isEmpty()) {
+            throw new IllegalArgumentException("no sources found in arc " + arcMeta.arc().name() + " for source names " + sourceNames);
+        }
+        return datasets;
     }
 
     private static @NotNull List<Tuple2<Moment, Moment>> toRanges(List<String> lots) {
@@ -173,12 +206,12 @@ public class ArcExec implements Callable<Integer> {
                 .toList();
     }
 
-    private @NotNull List<ArcScanner> scanViaRange(Predicate<ArcRecord> arcRecordPredicate, String profile, Moment earliest, Moment latest, Supplier<Optional<Predicate<ArcState>>> arcStateSupplier) {
-        List<ArcScanner> list;
+    private @NotNull List<ArcStatusScanner> scanViaRange(Predicate<ArcRecord> arcRecordPredicate, String profile, Moment earliest, Moment latest, Supplier<Optional<Predicate<ArcState>>> arcStateSupplier, boolean fillGaps) {
+        List<ArcStatusScanner> list;
         try (Stream<ArcRecord> arcStream = arcsCommand.listAllArcs(arcRecordPredicate)) {
             // convert this to a list of lots within an arc
             list = arcStream
-                    .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier))
+                    .map(arcRecord -> scannerOrNull(arcRecord, profile, earliest, latest, arcStateSupplier, fillGaps))
                     .filter(Objects::nonNull)
                     .toList();
         }

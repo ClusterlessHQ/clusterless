@@ -14,6 +14,8 @@ import clusterless.cls.substrate.aws.report.reporter.Reporter;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.ArcURI;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.net.URI;
@@ -38,6 +40,7 @@ import java.util.stream.Stream;
         }
 )
 public class Arcs extends Reports implements Callable<Integer> {
+    private static final Logger LOG = LoggerFactory.getLogger(Arcs.class);
 
     @CommandLine.Mixin
     ArcsCommandOptions commandOptions = new ArcsCommandOptions();
@@ -69,7 +72,8 @@ public class Arcs extends Reports implements Callable<Integer> {
                 .map(r -> Map.entry(r.placement, listAllArcKeys(s3, r)))
                 .flatMap(e -> e.getValue().stream().map(a -> Map.entry(e.getKey(), ArcURI.parse("/" + a))))
                 .map(e -> new ArcRecord(e.getKey(), e.getValue().project(), e.getValue().arcName()))
-                .filter(arcRecordPredicate);
+                .filter(arcRecordPredicate)
+                .peek(a -> LOG.info("found arc: {}", a.display()));
     }
 
     @NotNull

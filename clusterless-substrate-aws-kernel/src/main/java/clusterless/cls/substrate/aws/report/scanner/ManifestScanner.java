@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord, DatasetStatusSummaryRecord, ManifestState> {
 
     public ManifestScanner(String profile, DatasetRecord datasetRecord, Moment earliest, Moment latest) {
-        super(profile, datasetRecord, earliest, latest);
+        super(profile, datasetRecord, earliest, latest, false);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord,
     }
 
     @NotNull
-    protected Stream<DatasetStatusRecord> parseStreamIntoUri(Stream<String> resultStream) {
+    protected Stream<DatasetStatusRecord> parseUriStreamIntoStatusRec(Stream<String> resultStream) {
         return resultStream.map(ManifestURI::parse)
                 .map(uri -> new DatasetStatusRecord(record, uri.lotId(), uri.state()));
     }

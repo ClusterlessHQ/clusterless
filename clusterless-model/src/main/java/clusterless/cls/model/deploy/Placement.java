@@ -10,6 +10,7 @@ package clusterless.cls.model.deploy;
 
 import clusterless.cls.json.JsonRequiredProperty;
 import clusterless.cls.managed.component.DocumentsModel;
+import clusterless.cls.model.HasDisplay;
 import clusterless.cls.model.Struct;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,7 +37,7 @@ import java.util.Objects;
                 """
 )
 @JsonPropertyOrder({"provider", "stage", "account", "region"})
-public class Placement implements Struct {
+public class Placement implements Struct, HasDisplay {
     @JsonRequiredProperty
     String provider;
     String stage;

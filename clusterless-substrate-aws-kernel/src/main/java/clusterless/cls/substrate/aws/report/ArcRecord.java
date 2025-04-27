@@ -8,14 +8,16 @@
 
 package clusterless.cls.substrate.aws.report;
 
+import clusterless.cls.model.HasDisplay;
 import clusterless.cls.model.Struct;
 import clusterless.cls.model.deploy.Placement;
 import clusterless.cls.model.deploy.Project;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @JsonPropertyOrder({"placement", "project", "name"})
-public class ArcRecord implements Struct {
+public class ArcRecord implements Struct, HasDisplay {
     @JsonUnwrapped(prefix = "placement.")
     Placement placement;
     @JsonUnwrapped(prefix = "project.")
@@ -38,6 +40,11 @@ public class ArcRecord implements Struct {
 
     public String name() {
         return name;
+    }
+
+    @JsonIgnore
+    public String display() {
+        return String.format("%s:%s:%s", placement.display(), project.display(), name);
     }
 
     @Override

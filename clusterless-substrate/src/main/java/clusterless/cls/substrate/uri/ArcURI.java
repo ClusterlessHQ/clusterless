@@ -29,15 +29,6 @@ import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 
-/**
- * Path
- * <p>
- * {@code {providerService}://{stateStore}/{projectName}/{projectVersion}/{arcName}/}
- * <p>
- * Identifier
- * <p>
- * {@code {providerService}://{stateStore}/{projectName}/{projectVersion}/{arcName}/{lot}/{state}.arc}
- */
 @JsonSerialize(using = ArcURI.Serializer.class)
 @JsonDeserialize(using = ArcURI.DeSerializer.class)
 public class ArcURI extends MetaURI<Project, ArcURI> {

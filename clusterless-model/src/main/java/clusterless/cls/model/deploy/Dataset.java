@@ -9,6 +9,7 @@
 package clusterless.cls.model.deploy;
 
 import clusterless.cls.json.JsonRequiredProperty;
+import clusterless.cls.model.HasDisplay;
 import clusterless.cls.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,7 +18,7 @@ import java.util.Objects;
 /**
  *
  */
-public class Dataset extends Model {
+public class Dataset extends Model implements HasDisplay {
     @JsonRequiredProperty
     String name;
     @JsonRequiredProperty

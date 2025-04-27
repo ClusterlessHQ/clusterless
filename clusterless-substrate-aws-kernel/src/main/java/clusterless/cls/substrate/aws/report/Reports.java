@@ -19,6 +19,8 @@ import clusterless.cls.substrate.uri.ProjectURI;
 import clusterless.commons.util.Strings;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Reports extends CommonCommand {
+    private static final Logger LOG = LoggerFactory.getLogger(Reports.class);
 
     @NotNull
     protected Stream<ProjectRecord> listAllProjects(CommonCommandOptions commandOptions) {
@@ -39,6 +42,7 @@ public class Reports extends CommonCommand {
             Stream<ProjectRecord> recordStream = children.stream().map("/"::concat)
                     .map(ProjectURI::parse)
                     .map(ProjectURI::project)
+                    .peek(p -> LOG.info("found project: {}", p.display()))
                     .map(p -> new ProjectRecord(placement, p));
 
             records = Stream.concat(records, recordStream);
@@ -76,6 +80,7 @@ public class Reports extends CommonCommand {
             Stream<DatasetRecord> recordStream = children.stream().map("/"::concat)
                     .map(DatasetURI::parse)
                     .map(DatasetURI::dataset)
+                    .peek(d -> LOG.info("found dataset: {}", d.display()))
                     .map(p -> new DatasetRecord(placement, p));
 
             records = Stream.concat(records, recordStream);
