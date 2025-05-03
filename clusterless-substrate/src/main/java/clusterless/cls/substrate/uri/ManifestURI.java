@@ -54,6 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
     public static final String DATASETS = "datasets";
+    public static final String OBJECT_NAME_DEFAULT = "manifest.json";
 
     static class Serializer extends StdScalarSerializer<ManifestURI> {
         protected Serializer() {
@@ -89,6 +90,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
     // todo: make attempt supplier a strategy class/enum so that we can json serialize it
     protected transient Supplier<String> attemptSupplier = Lazy.of(() -> String.valueOf(System.currentTimeMillis()));
 
+    protected String objectName = OBJECT_NAME_DEFAULT;
     protected Dataset dataset;
 
     protected ManifestURI() {
@@ -99,6 +101,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
         super(other);
         this.dataset = other.dataset;
         this.attemptSupplier = other.attemptSupplier;
+        this.objectName = other.objectName;
     }
 
     public static Builder builder() {
@@ -128,16 +131,32 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
         Format format = isOnlyPath(DATASETS, template);
         int index = format.offset();
-        String storeName = format == Format.full ? value(split, 2) : null;
-        return new ManifestURI()
-                .setStoreName(storeName)
+        ManifestURI manifestURI = new ManifestURI()
                 .setDataset(LocatedDataset.Builder.builder()
                         .withName(value(split, index++))
                         .withVersion(value(split, index++))
                         .build())
                 .setLotId(value(split, index++))
-                .setState(ManifestState.parse(Optionals.optional(index++, split).orElse(null)))
-                .setAttemptId(value(split, index));
+                .setState(ManifestState.parse(Optionals.optional(index++, split).orElse(null)));
+
+        String storeName = format == Format.full ? value(split, 2) : null;
+        if (storeName != null) {
+            manifestURI.setStoreName(storeName);
+        }
+
+        String attempt = value(split, index);
+
+        if (attempt != null) {
+            manifestURI.setAttemptId(attempt);
+        }
+
+        int objectIndex = template.indexOf(OBJECT_NAME_DEFAULT);
+
+        if (objectIndex != -1) {
+            manifestURI.setObjectName(template.substring(objectIndex));
+        }
+
+        return manifestURI;
     }
 
     @Override
@@ -173,7 +192,7 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
             manifest = manifest
                     .with(attempt)
-                    .with("manifest.json");
+                    .with(objectName);
         }
 
         String path = Partition.of(DATASETS)
@@ -210,13 +229,19 @@ public class ManifestURI extends StateURI<ManifestState, ManifestURI> {
 
         manifest = manifest
                 .with(attempt)
-                .with("manifest.json");
+                .with(OBJECT_NAME_DEFAULT);
 
         return Partition.namedOf("name", Optional.ofNullable(dataset.name()).orElse("{datasetName}"))
                 .withNamed("version", Optional.ofNullable(dataset.version()).orElse("{datasetVersion}"))
                 .withNamed("lot", Optional.ofNullable(lotId).orElse("{lot}")) // retain case
                 .with(manifest)
                 .partition();
+    }
+
+    @JsonIgnore
+    protected ManifestURI setObjectName(String objectName) {
+        this.objectName = objectName;
+        return this;
     }
 
     @JsonIgnore

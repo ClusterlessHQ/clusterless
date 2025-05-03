@@ -36,7 +36,7 @@ public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord,
     @NotNull
     protected Stream<DatasetStatusRecord> parseUriStreamIntoStatusRec(Stream<String> resultStream) {
         return resultStream.map(ManifestURI::parse)
-                .map(uri -> new DatasetStatusRecord(record, uri.lotId(), uri.state()));
+                .map(uri -> new DatasetStatusRecord(record, uri));
     }
 
     @Override

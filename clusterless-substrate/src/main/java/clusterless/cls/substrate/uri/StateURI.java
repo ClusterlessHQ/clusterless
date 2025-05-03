@@ -26,12 +26,14 @@ public abstract class StateURI<S extends State, T extends StateURI<S, T>> extend
     protected S state;
     protected Supplier<String> storeName = Lazy.of(this::storeName);
 
-    public StateURI(StateURI<S, T> other) {
+    protected StateURI(StateURI<S, T> other) {
         this.stateStore = other.stateStore;
         this.placement = other.placement;
         this.lotId = other.lotId;
         this.state = other.state;
-        this.storeName = other.storeName;
+        // the lazy version holds the old StateURI instance so we must use our local one if
+        // the other instance hasn't resolved
+        this.storeName = other.storeName instanceof Lazy<String> ? this::storeName : other.storeName;
     }
 
     protected StateURI(StateStore stateStore) {
@@ -83,6 +85,10 @@ public abstract class StateURI<S extends State, T extends StateURI<S, T>> extend
     }
 
     protected abstract T self();
+
+    public T withPlacement(Placement placement) {
+        return copy().setPlacement(placement);
+    }
 
     public T withLot(String lotId) {
         return copy().setLotId(lotId);

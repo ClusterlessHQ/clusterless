@@ -30,11 +30,11 @@ public class BaseURI {
         }
     }
 
-    private static final Pattern COMPILE = Pattern.compile("^.+=");
+    private static final Pattern HAS_KEY = Pattern.compile("^.+=");
 
     protected static String value(String[] split, int index) {
         return Optionals.optional(index, split)
-                .map(s -> COMPILE.matcher(s).replaceAll(""))
+                .map(s -> HAS_KEY.matcher(s).replaceAll(""))
                 .filter(BaseURI::isNotTemplate)
                 .orElse(null);
     }
@@ -42,7 +42,6 @@ public class BaseURI {
     protected static boolean isNotTemplate(String s) {
         return !s.startsWith("{") || !s.endsWith("}");
     }
-
 
     protected static Format isOnlyPath(String root, String template) {
         if (template.charAt(0) == '/') return Format.path;

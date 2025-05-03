@@ -16,6 +16,7 @@ import clusterless.cls.printer.Printer;
 import clusterless.cls.substrate.aws.event.ArcNotifyEvent;
 import clusterless.cls.substrate.aws.io.ArcReader;
 import clusterless.cls.substrate.aws.report.scanner.ArcStatusScanner;
+import clusterless.cls.substrate.aws.report.scanner.ManifestScanner;
 import clusterless.cls.substrate.aws.runtime.ArcDeployment;
 import clusterless.cls.substrate.aws.runtime.ArcMeta;
 import clusterless.cls.substrate.aws.sdk.StepFunction;
@@ -135,30 +136,29 @@ public class ArcExec implements Callable<Integer> {
         for (SourceDataset sourceDataset : datasets) {
             Optional<OwnedDataset> locatedDataset = datasetOwnerLookup.lookup(placement, sourceDataset);
 
-            ManifestURI manifestURI = ManifestURI.builder()
-                    .withPlacement(placement)
-                    .withDataset(sourceDataset)
-                    .build();
-
             SinkDataset sink = locatedDataset.orElseThrow().dataset();
 
             Stream<ArcStatusRecord> scanStream = arcStatusScanner.scan();
 
             scanStream
                     .forEach(arcStatusRecord -> {
-                        execStepFunction(printer, stepFunction, arcStatusRecord, sink, manifestURI, arcMeta, placement);
+                        Moment moment = IntervalUnitParser.convert(arcStatusRecord.lotId);
+                        ManifestScanner manifestScanner = new ManifestScanner(arcStatusScanner.profile(), new DatasetRecord(record.placement, sourceDataset), moment, moment);
+
+                        manifestScanner.scan().forEach(statusRecord -> execStepFunction(printer, stepFunction, arcStatusRecord, sink, statusRecord.uri(), arcMeta, placement));
                     });
         }
     }
 
     private static void execStepFunction(Printer printer, StepFunction stepFunction, ArcStatusRecord arcStatusRecord, SinkDataset sink, ManifestURI manifestURI, ArcMeta arcMeta, Placement placement) {
-        printer.print("starting arc exec for ");
-        printer.print("placement: " + arcStatusRecord.arcRecord().placement().display());
+        printer.print("starting arc exec for");
+        printer.print(" placement: " + arcStatusRecord.arcRecord().placement().display());
         printer.print(" project: " + arcStatusRecord.arcRecord().project().display());
         printer.print(" arc: " + arcStatusRecord.arcRecord().name());
         printer.print(" dataset: " + sink.display());
         printer.print(" state: " + Strings.nullToEmpty(arcStatusRecord.state()));
         printer.print(" lot: " + arcStatusRecord.lotId());
+        printer.print(" manifest: " + manifestURI.uri());
         printer.println();
 
         ArcNotifyEvent notifyEvent = ArcNotifyEvent.builder()

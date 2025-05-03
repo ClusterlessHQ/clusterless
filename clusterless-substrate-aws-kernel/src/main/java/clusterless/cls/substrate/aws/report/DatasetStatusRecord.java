@@ -10,6 +10,7 @@ package clusterless.cls.substrate.aws.report;
 
 import clusterless.cls.model.Struct;
 import clusterless.cls.model.manifest.ManifestState;
+import clusterless.cls.substrate.uri.ManifestURI;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -22,11 +23,14 @@ public class DatasetStatusRecord implements StatusRecord<ManifestState>, Struct 
     DatasetRecord datasetRecord;
     String lotId;
     ManifestState manifestState;
+    @JsonUnwrapped
+    ManifestURI uri;
 
-    public DatasetStatusRecord(DatasetRecord datasetRecord, String lotId, ManifestState manifestState) {
-        this.datasetRecord = datasetRecord;
-        this.lotId = lotId;
-        this.manifestState = manifestState;
+    public DatasetStatusRecord(DatasetRecord record, ManifestURI uri) {
+        this.datasetRecord = record;
+        this.lotId = uri.lotId();
+        this.manifestState = uri.state();
+        this.uri = uri.withPlacement(record.placement());
     }
 
     public DatasetRecord datasetRecord() {
@@ -44,5 +48,9 @@ public class DatasetStatusRecord implements StatusRecord<ManifestState>, Struct 
     @Override
     public ManifestState state() {
         return manifestState();
+    }
+
+    public ManifestURI uri() {
+        return uri;
     }
 }

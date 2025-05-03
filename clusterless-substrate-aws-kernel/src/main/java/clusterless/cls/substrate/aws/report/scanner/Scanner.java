@@ -67,6 +67,10 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
         LOG.info("using lot earliest: {}, latest: {}", startLotInclusive, endLotExclusive);
     }
 
+    public String profile() {
+        return profile;
+    }
+
     public Rec record() {
         return record;
     }

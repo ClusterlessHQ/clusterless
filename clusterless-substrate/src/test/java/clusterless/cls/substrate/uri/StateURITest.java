@@ -103,8 +103,8 @@ public class StateURITest {
         String template = manifestState.template();
         Assertions.assertEquals("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot={lot}/state={state}{/attempt*}/manifest.json", template);
 
-        ManifestURI parsedArcState = ManifestURI.parse(template);
-        Assertions.assertEquals(manifestState.uri(), parsedArcState.uri());
+        ManifestURI parsedManifestState = ManifestURI.parse(template);
+        Assertions.assertEquals(manifestState.uri(), parsedManifestState.uri());
 
         manifestState = manifestState.withLot("20211112PT5M000");
 
@@ -134,15 +134,26 @@ public class StateURITest {
         template = manifestState.template();
         Assertions.assertEquals("s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=partial/attempt=" + attempt + "/manifest.json", template);
 
-        parsedArcState = ManifestURI.parse(template);
-        Assertions.assertEquals(manifestState.uri(), parsedArcState.uri());
+        parsedManifestState = ManifestURI.parse(template);
+        Assertions.assertEquals(manifestState.uri(), parsedManifestState.uri());
 
         String jsonFromRaw = JSONUtil.writeAsStringSafe(manifestState);
 
         Assertions.assertEquals("\"s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=partial/attempt=" + attempt + "/manifest.json\"", jsonFromRaw);
 
-        String jsonFromParsed = JSONUtil.writeAsStringSafe(parsedArcState);
+        String jsonFromParsed = JSONUtil.writeAsStringSafe(parsedManifestState);
         Assertions.assertEquals("\"s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=partial/attempt=" + attempt + "/manifest.json\"", jsonFromParsed);
+    }
+
+    @Test
+    void manifestWithObject() {
+        String full = "s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=complete/manifest.json/manifest-data.json";
+        ManifestURI fullParsed = ManifestURI.parse(full);
+        Assertions.assertEquals(URI.create(full), fullParsed.uri());
+
+        String fullAttempt = "s3://prod-clusterless-manifest-00000000-us-west-2/datasets/name=test-dataset/version=20230101/lot=20211112PT5M000/state=partial/attempt=99/manifest.json/manifest-data.json";
+        ManifestURI fullAttemptParsed = ManifestURI.parse(fullAttempt);
+        Assertions.assertEquals(URI.create(fullAttempt), fullAttemptParsed.uri());
     }
 
     @Test
