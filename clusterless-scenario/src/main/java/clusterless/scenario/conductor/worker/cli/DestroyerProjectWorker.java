@@ -10,6 +10,8 @@ package clusterless.scenario.conductor.worker.cli;
 
 import clusterless.scenario.Options;
 import clusterless.scenario.conductor.task.cli.DestroyerProject;
+import com.netflix.conductor.common.metadata.tasks.Task;
+import com.netflix.conductor.common.metadata.tasks.TaskResult;
 
 public class DestroyerProjectWorker extends ClusterlessProjectWorker {
 
@@ -20,5 +22,24 @@ public class DestroyerProjectWorker extends ClusterlessProjectWorker {
     @Override
     public String getTaskDefName() {
         return DestroyerProject.CLS_PROJECT_DESTROYER;
+    }
+
+    @Override
+    public TaskResult execute(Task task) {
+
+        // we have an issue where the destroy operation begins before some logs
+        // arrive in cloud watch. this forces the log group to re-appear
+        // and then blocks the next test run
+        // assuming this is a race condition, we should have a delay
+        // todo: make this configurable
+        if (!getDryRun()) {
+            try {
+                Thread.sleep(60 * 1000);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+
+        return super.execute(task);
     }
 }
