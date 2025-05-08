@@ -134,10 +134,10 @@ public class Glue extends ClientBase<GlueClient> {
         String tableName = table.name();
         StorageDescriptor storageDescriptor = table.storageDescriptor();
 
-        return addPartitions(catalog, storageDescriptor, databaseName, tableName, partitions);
+        return addPartitions(catalog, storageDescriptor, databaseName, tableName, partitions, table.partitionKeys().size());
     }
 
-    public Response addPartitions(String catalog, StorageDescriptor storageDescriptor, String databaseName, String tableName, Map<URI, List<String>> partitions) {
+    public ClientBase<GlueClient>.Response addPartitions(String catalog, StorageDescriptor storageDescriptor, String databaseName, String tableName, Map<URI, List<String>> partitions, int size) {
         if (partitions.size() > 100) {
             throw new IllegalArgumentException("cannot add more than 100 partitions at a time, got: " + partitions.size());
         }
@@ -147,7 +147,7 @@ public class Glue extends ClientBase<GlueClient> {
         List<PartitionInput> partitionInputList = partitions.entrySet().stream()
                 .map(
                         partition -> PartitionInput.builder()
-                                .values(partition.getValue())
+                                .values(partition.getValue().subList(partition.getValue().size() - size, partition.getValue().size()))
                                 .storageDescriptor(storageDescriptor
                                         .toBuilder()
                                         .location(partition.getKey().toString())
