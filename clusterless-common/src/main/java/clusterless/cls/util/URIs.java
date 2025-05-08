@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -68,6 +70,27 @@ public class URIs {
 
         try {
             return new URI(uri.getScheme(), uri.getAuthority(), path, null, null);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("unable to copy uri", e);
+        }
+    }
+
+    public static URI copyTrim(URI uri) {
+
+        Path path = Paths.get(uri.getPath()).getParent();
+
+        if (path == null) {
+            return uri;
+        }
+
+        String key = path.toString();
+
+        if (key.charAt(key.length() - 1) != '/') {
+            key = key.concat("/");
+        }
+
+        try {
+            return new URI(uri.getScheme(), uri.getAuthority(), key, null, null);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("unable to copy uri", e);
         }

@@ -192,4 +192,13 @@ public class URIsTest {
         Assertions.assertEquals("foo/%7Bbar%7D", URIs.encodeOnly("{}", "foo/{bar}"));
         Assertions.assertEquals("foo/%7Bb+a+r%7D", URIs.encodeOnly("{} ", "foo/{b a r}"));
     }
+
+    @Test
+    void copyTrim() {
+        Assertions.assertEquals(URI.create("s3://bucket/"), URIs.copyTrim(URI.create("s3://bucket/"))); // seems safest way to approach this
+        Assertions.assertEquals(URI.create("s3://bucket/"), URIs.copyTrim(URI.create("s3://bucket/foo")));
+        Assertions.assertEquals(URI.create("s3://bucket/"), URIs.copyTrim(URI.create("s3://bucket/foo/")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/"), URIs.copyTrim(URI.create("s3://bucket/foo/bar")));
+        Assertions.assertEquals(URI.create("s3://bucket/foo/"), URIs.copyTrim(URI.create("s3://bucket/foo/bar/")));
+    }
 }
