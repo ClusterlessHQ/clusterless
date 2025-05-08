@@ -68,25 +68,21 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
 
         Map<String, URI> result = new LinkedHashMap<>();
 
-        URI fromDatasetPath = notifyEvent.dataset().pathURI();
-        Path parent = Paths.get(fromDatasetPath.getPath());
         List<URI> fromUris = incomingManifest.uris();
 
-        Set<Path> uniquePaths = fromUris.stream()
-                .map(u -> parent.relativize(Paths.get(u.getPath())))
-                .map(p -> incomingManifest.uriType() == UriType.path ? p : p.getParent()) // remove filename or prefix if not a path
+        // we will trip the partition values length when we submit the values to glue since we know
+        // the number of expected partitions at that point
+        Set<URI> uniquePaths = fromUris.stream()
+                .map(p -> incomingManifest.uriType() == UriType.path ? p : URIs.copyTrim(p)) // remove filename or prefix if not a path
                 .collect(Collectors.toSet());
 
         Map<URI, List<String>> partitions = uniquePaths.stream()
                 .collect(Collectors.toMap(
-                        p -> URIs.copyAppendAsPath(fromDatasetPath, p.toString()),
-                        p -> {
-                            List<String> partitionValues = new LinkedList<>();
-                            for (int i = 0; i < p.getNameCount(); i++) {
-                                partitionValues.add(partitionParser.apply(p.getName(i).getFileName().toString()));
-                            }
-                            return partitionValues;
-                        }
+                        p -> p,
+                        p -> Streams.stream(Paths.get(p.getPath()))
+                                .map(n -> partitionParser.apply(n.getFileName().toString()))
+                                .filter(Objects::nonNull)
+                                .toList()
                 ));
 
         for (Map.Entry<String, SinkDataset> sinkRoleEntry : arcProps().sinks().entrySet()) {
@@ -124,7 +120,7 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
             // get descriptor from table and reuse it with the new partition and location information
             Table table = tableDescriptor(databaseName, tableName);
 
-            LOG.info("database: {}, table: {}, storageDescriptor: {}", table.databaseName(), table.name(), table.storageDescriptor());
+            LOG.info("database: {}, table: {}, storageDescriptor: {}, partitionKeys: {}", table.databaseName(), table.name(), table.storageDescriptor(), table.partitionKeys());
 
             List<String> errors = new LinkedList<>();
             List<List<String>> failed = new LinkedList<>();
@@ -136,8 +132,10 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
                 Glue.Response response = glue.addPartitions(catalog, table, batch);
 
                 // fail if the api call outright fails
+                // actually this fails on, so maybe don't throw on failure
+                // Caused by: software.amazon.awssdk.services.glue.model.InvalidInputException: The number of partition keys do not match the number of partition values (Service: Glue, Status Code: 400, Request ID: ab2d62fb-4ab5-4216-bfbd-8c499412c5dc)
                 response.isSuccessOrThrowRuntime(
-                        r -> String.format("unable to create partitions in: %s/%s, %s", databaseName, tableName, r.errorMessage())
+                        r -> String.format("unable to create partitions in: %s/%s, expected partition keys: %s, %s", databaseName, tableName, table.partitionKeys().toString(), r.errorMessage())
                 );
 
                 // if the batch request has errors, log them
@@ -246,6 +244,11 @@ public class GlueAddPartitionsArcEventHandler extends ArcEventHandler<GlueAddPar
 
     private String createNamedPartitionValue(String path) {
         int i = path.indexOf(workloadProperties().namedPartitionDelimiter());
+
+        if (i == -1) {
+            return null;
+        }
+
         return path.substring(i + 1);
     }
 }

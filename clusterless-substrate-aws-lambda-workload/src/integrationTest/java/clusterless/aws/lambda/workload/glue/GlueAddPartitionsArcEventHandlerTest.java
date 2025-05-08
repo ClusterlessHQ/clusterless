@@ -23,9 +23,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import software.amazon.awssdk.services.glue.model.Column;
 import software.amazon.awssdk.services.glue.model.Table;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -132,6 +134,7 @@ public class GlueAddPartitionsArcEventHandlerTest extends LocalStackBase {
         Table table = Table.builder()
                 .databaseName(glueDatabaseName())
                 .name(glueTableName())
+                .partitionKeys(List.of(Column.builder().name("lot").build()))
                 .build();
         when(glue.getTable(any())).thenReturn(table);
         when(glue.addPartitions(nullable(String.class), any(Table.class), anyMap())).thenReturn(partitionResponse);
