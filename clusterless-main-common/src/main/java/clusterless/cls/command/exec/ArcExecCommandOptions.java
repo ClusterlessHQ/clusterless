@@ -23,6 +23,12 @@ public class ArcExecCommandOptions extends CommonCommandOptions {
     @CommandLine.Mixin
     ArcCommonOptions arcCommonOptions = new ArcCommonOptions();
 
+    @CommandLine.Option(
+            names = "--dry-run",
+            description = "Do not execute the arc."
+    )
+    private boolean dryRun = false;
+
     static class RangeOrLot {
         @CommandLine.ArgGroup(
                 exclusive = false,
@@ -67,6 +73,10 @@ public class ArcExecCommandOptions extends CommonCommandOptions {
     public ArcExecCommandOptions setNames(List<String> names) {
         this.names = names;
         return this;
+    }
+
+    public boolean dryRun() {
+        return dryRun;
     }
 
     public RangeOptions rangeOptions() {

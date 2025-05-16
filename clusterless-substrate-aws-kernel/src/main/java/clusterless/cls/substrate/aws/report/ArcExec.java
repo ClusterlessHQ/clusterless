@@ -150,7 +150,7 @@ public class ArcExec implements Callable<Integer> {
         }
     }
 
-    private static void execStepFunction(Printer printer, StepFunction stepFunction, ArcStatusRecord arcStatusRecord, SinkDataset sink, ManifestURI manifestURI, ArcMeta arcMeta, Placement placement) {
+    private void execStepFunction(Printer printer, StepFunction stepFunction, ArcStatusRecord arcStatusRecord, SinkDataset sink, ManifestURI manifestURI, ArcMeta arcMeta, Placement placement) {
         printer.print("starting arc exec for");
         printer.print(" placement: " + arcStatusRecord.arcRecord().placement().display());
         printer.print(" project: " + arcStatusRecord.arcRecord().project().display());
@@ -158,7 +158,7 @@ public class ArcExec implements Callable<Integer> {
         printer.print(" dataset: " + sink.display());
         printer.print(" state: " + Strings.nullToEmpty(arcStatusRecord.state()));
         printer.print(" lot: " + arcStatusRecord.lotId());
-        printer.print(" manifest: " + manifestURI.uri());
+        printer.print(" source manifest: " + manifestURI.uri());
         printer.println();
 
         ArcNotifyEvent notifyEvent = ArcNotifyEvent.builder()
@@ -171,6 +171,11 @@ public class ArcExec implements Callable<Integer> {
 
         ArcDeployment arcDeployment = arcMeta.arcDeployment();
         String stepFunctionName = arcDeployment.stepFunctionName();
+
+        if (arcExecCommandOptions.dryRun()) {
+            printer.println("dry-run, not executing arc");
+            return;
+        }
 
         stepFunction.start(placement.account(), stepFunctionName, payload)
                 .isSuccessOrThrow(e -> {

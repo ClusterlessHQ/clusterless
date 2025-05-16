@@ -26,6 +26,11 @@ public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord,
     }
 
     @Override
+    protected String scannerType() {
+        return "ManifestStatus";
+    }
+
+    @Override
     protected StateURI<?, ?> createStateURIFrom(DatasetRecord record) {
         return ManifestURI.builder()
                 .withPlacement(record.placement())
@@ -36,6 +41,7 @@ public class ManifestScanner extends Scanner<DatasetRecord, DatasetStatusRecord,
     @NotNull
     protected Stream<DatasetStatusRecord> parseUriStreamIntoStatusRec(Stream<String> resultStream) {
         return resultStream.map(ManifestURI::parse)
+                .filter(uri -> uri.lotId().compareTo(startLotInclusive) >= 0 && uri.lotId().compareTo(endLotExclusive) < 0)
                 .map(uri -> new DatasetStatusRecord(record, uri));
     }
 

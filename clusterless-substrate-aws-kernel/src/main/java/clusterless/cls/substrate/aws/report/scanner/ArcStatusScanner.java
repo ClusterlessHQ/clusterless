@@ -42,6 +42,11 @@ public class ArcStatusScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcSta
     }
 
     @Override
+    protected String scannerType() {
+        return "ArcStatus";
+    }
+
+    @Override
     protected StateURI<?, ?> createStateURIFrom(ArcRecord record) {
         return ArcStateURI.builder()
                 .withPlacement(record.placement())
@@ -56,11 +61,13 @@ public class ArcStatusScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcSta
         Stream<ArcStatusRecord> arcStatusRecordStream;
 
         arcStatusRecordStream = resultStream.map(ArcStateURI::parse)
+                .filter(uri -> uri.lotId().compareTo(startLotInclusive) >= 0 && uri.lotId().compareTo(endLotExclusive) < 0)
                 .map(uri -> new ArcStatusRecord(record, uri.lotId(), uri.state()));
 
         if (fillGaps) {
             // there has to be a better way to zip together ordered streams and remove any dupes by a predicate or
             // bifunction
+            LOG.info("filling gaps for inclusive start: {}, exclusive end: {}", startLotInclusive, endLotExclusive);
             arcStatusRecordStream = StreamEx.of(LotStream.stream(startLotInclusive, endLotExclusive))
                     .map(lot -> new ArcStatusRecord(record, lot, null))
                     .append(arcStatusRecordStream)
@@ -68,7 +75,10 @@ public class ArcStatusScanner extends Scanner<ArcRecord, ArcStatusRecord, ArcSta
                     .collapse(
                             (l, r) -> l.lotId().equals(r.lotId()),
                             (l, r) -> l.state() == null ? r : l
-                    );
+                    )
+                    .peek(arcStatusRecord -> {
+                        LOG.info("using arc record: {}", arcStatusRecord);
+                    });
         }
 
         Optional<Predicate<ArcState>> supplied = arcStateSupplier.get();

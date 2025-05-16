@@ -46,7 +46,7 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
         this.profile = profile;
         this.record = record;
         this.fillGaps = fillGaps;
-        LOG.info("creating scanner for: {}", record.display());
+        LOG.info("creating {} scanner for: {}", scannerType(), record.display());
 
         this.stateURI = createStateURIFrom(record);
         this.temporalUnit = findTemporalKeyFor(this.stateURI, earliest, latest);
@@ -66,6 +66,8 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
 
         LOG.info("using lot earliest: {}, latest: {}", startLotInclusive, endLotExclusive);
     }
+
+    protected abstract String scannerType();
 
     public String profile() {
         return profile;
