@@ -183,7 +183,7 @@ dependencies {
         testImplementationAndTestFixture("org.mockito:mockito-inline:5.1.1")
 
         // https://mvnrepository.com/artifact/org.testcontainers
-        val testContainers = "1.20.4"
+        val testContainers = "1.21.4"
         testImplementationAndTestFixture("org.testcontainers:testcontainers:$testContainers")
         testImplementationAndTestFixture("org.testcontainers:junit-jupiter:$testContainers")
         testImplementationAndTestFixture("org.testcontainers:localstack:$testContainers")
