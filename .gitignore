@@ -1,8 +1,10 @@
 .idea
 .gradle
 .kotlin
+.claude
 out
 build
 workspace
 cdk.out
 gradle.properties
+_*
