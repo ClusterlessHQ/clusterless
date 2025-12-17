@@ -7,3 +7,4 @@ build
 workspace
 cdk.out
 gradle.properties
+_*
