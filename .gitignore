@@ -2,6 +2,7 @@
 .gradle
 .kotlin
 .claude
+.beads
 out
 build
 workspace
