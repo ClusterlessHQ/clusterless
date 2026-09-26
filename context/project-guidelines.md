@@ -360,8 +360,9 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
   scripts break configuration cache / isolated projects.
 - **Jackson typed wire format:** `__type` class names in lambda env vars mean
   package renames and a Jackson 3 migration change the deployed contract.
-- **CDK feature flags are not applied** (no `cdk.json`; the shipped
-  `etc/context.json` is unused). Enabling recommended flags can change
+- **CDK feature flags are not applied** (no `cdk.json`;
+  `clusterless-substrate-aws-kernel/src/main/cdk/context.json`, shipped as
+  `etc/context.json` in the distribution, is unused). Enabling recommended flags can change
   logical ids — `cdk diff` against a deployed stack before adopting any.
 - **LocalStack stays pinned at `localstack/localstack:3.0.2` — do not bump
   it.** Since 2026-03-23 every current LocalStack image requires an account
@@ -430,9 +431,16 @@ without an RDR, and don't "fix" them piecemeal:
   X", write a throwaway test that logs the value, run it, ground-truth the
   assumption, and delete it before committing.
 - **Look up idioms before inventing a shape.** Docs/standards →
-  `arc search` on `DevRef` / `CodeMaintenance`. No Java/CDK code corpus
-  exists yet; read dependency source from the Gradle cache
-  (`~/.gradle/caches/modules-2/files-2.1/`) instead of guessing API shape.
+  `arc search` on `DevRef` / `CodeMaintenance`. Code → **semble first**,
+  never an arc corpus: dependency source lives in sparse checkouts under
+  `../thirdparty/` pinned to the versions we build against —
+  `aws-cdk` (TypeScript; the Java jars are jsii bindings, so CDK behavior is
+  only readable here), `aws-sdk-java-v2` (core + the service clients we
+  use), `aws-lambda-java-libs`. Search with
+  `semble search "<behavior>" ../thirdparty/<repo>`; when a dependency is
+  bumped, `git -C ../thirdparty/<repo> checkout <new tag>` so the source
+  matches the build. Compiled-API questions (signatures of generated
+  bindings) → `javap` against the jar in `~/.gradle/caches/modules-2/`.
 - **Skipped tests as invariant docs.** When an invariant can't be fixed in
   this commit, add the test now with `@Disabled("blocked by kata #N")`; the
   resolving commit removes the annotation.
