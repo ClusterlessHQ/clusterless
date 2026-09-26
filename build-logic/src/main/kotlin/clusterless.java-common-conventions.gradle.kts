@@ -182,12 +182,10 @@ dependencies {
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-jupiter:$systemStubs")
 
         // https://mvnrepository.com/artifact/org.testcontainers
-        val testContainers = "1.21.4"
+        val testContainers = "2.0.5"
         testImplementationAndTestFixture("org.testcontainers:testcontainers:$testContainers")
-        testImplementationAndTestFixture("org.testcontainers:junit-jupiter:$testContainers")
-        testImplementationAndTestFixture("org.testcontainers:localstack:$testContainers")
-        // https://github.com/testcontainers/testcontainers-java/issues/1442#issuecomment-694342883
-        testImplementationAndTestFixture("com.amazonaws:aws-java-sdk-s3:1.11.860")
+        testImplementationAndTestFixture("org.testcontainers:testcontainers-junit-jupiter:$testContainers")
+        testImplementationAndTestFixture("org.testcontainers:testcontainers-localstack:$testContainers")
 
         testImplementationAndTestFixture("ch.qos.logback:logback-classic:$logback")
         testImplementationAndTestFixture("ch.qos.logback:logback-core:$logback")
@@ -223,9 +221,8 @@ testing {
             dependencies {
                 implementation(project())
                 implementation("org.testcontainers:testcontainers")
-                implementation("org.testcontainers:junit-jupiter")
-                implementation("org.testcontainers:localstack")
-                implementation("com.amazonaws:aws-java-sdk-s3")
+                implementation("org.testcontainers:testcontainers-junit-jupiter")
+                implementation("org.testcontainers:testcontainers-localstack")
             }
 
             targets {

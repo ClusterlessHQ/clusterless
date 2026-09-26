@@ -13,7 +13,7 @@ import clusterless.cls.substrate.store.Stores;
 import clusterless.cls.util.Env;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -38,13 +38,7 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
             .withEnv("LOCALSTACK_API_KEY", Optional.ofNullable(System.getenv("LOCALSTACK_API_KEY"))
                     .or(() -> loadGradleProperties("localstack.api.key"))
                     .orElse(null))
-            .withServices(
-                    LocalStackContainer.Service.S3,
-                    LocalStackContainer.Service.SQS,
-                    LocalStackContainer.Service.CLOUDWATCHLOGS,
-                    LocalStackContainer.EnabledService.named("events"),
-                    LocalStackContainer.EnabledService.named("glue")
-            );
+            .withServices("s3", "sqs", "logs", "events", "glue");
 
     @Override
     protected String defaultRegion() {
@@ -62,11 +56,12 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
             .set("AWS_ACCESS_KEY_ID", localstack.getAccessKey())
             .set("AWS_SECRET_ACCESS_KEY", localstack.getSecretKey())
             .set("AWS_DEFAULT_REGION", localstack.getRegion())
-            .set("AWS_S3_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.S3).toString())
-            .set("AWS_EVENTS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("events")).toString())
-            .set("AWS_GLUE_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.EnabledService.named("glue")).toString())
-            .set("AWS_SQS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString())
-            .set("AWS_CLOUDWATCHLOGS_ENDPOINT", localstack.getEndpointOverride(LocalStackContainer.Service.CLOUDWATCHLOGS).toString());
+            // localstack serves every service from its single edge endpoint
+            .set("AWS_S3_ENDPOINT", localstack.getEndpoint().toString())
+            .set("AWS_EVENTS_ENDPOINT", localstack.getEndpoint().toString())
+            .set("AWS_GLUE_ENDPOINT", localstack.getEndpoint().toString())
+            .set("AWS_SQS_ENDPOINT", localstack.getEndpoint().toString())
+            .set("AWS_CLOUDWATCHLOGS_ENDPOINT", localstack.getEndpoint().toString());
 
     @BeforeEach
     public void bootstrap() {

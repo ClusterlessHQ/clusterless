@@ -50,9 +50,8 @@ dependencies {
     testFixturesImplementation("org.mockito:mockito-core")
 
     testFixturesImplementation("org.testcontainers:testcontainers")
-    testFixturesImplementation("org.testcontainers:junit-jupiter")
-    testFixturesImplementation("org.testcontainers:localstack")
-    testFixturesImplementation("com.amazonaws:aws-java-sdk-s3")
+    testFixturesImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testFixturesImplementation("org.testcontainers:testcontainers-localstack")
     testFixturesImplementation("io.hosuaby:inject-resources-core")
     testFixturesImplementation("io.hosuaby:inject-resources-junit-jupiter")
     testFixturesImplementation("uk.org.webcompere:system-stubs-core")
