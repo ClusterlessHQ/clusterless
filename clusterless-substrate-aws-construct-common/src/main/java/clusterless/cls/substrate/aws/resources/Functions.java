@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class Functions {
     public static Runtime defaultJVM() {
-        return Runtime.JAVA_17;
+        return Runtime.JAVA_17_AL2023;
     }
 
     public static String functionName(Construct scope, String modelName, String functionName) {
