@@ -109,16 +109,16 @@ dependencies {
         implementation("com.github.jknack:handlebars:4.4.0")
 //        implementation("com.cronutils:cron-utils:9.2.0")
 
-        val slf4j = "2.0.16"
+        val slf4j = "2.0.20"
         implementation("org.slf4j:slf4j-api:$slf4j")
 
-        val logback = "1.5.16"
+        val logback = "1.6.4"
         implementation("ch.qos.logback:logback-classic:$logback")
         implementation("ch.qos.logback:logback-core:$logback")
 
         // only used by lambdas
         // https://mvnrepository.com/artifact/org.apache.logging.log4j
-        val log4j = "2.24.3"
+        val log4j = "2.26.1"
         implementation("org.apache.logging.log4j:log4j-api:$log4j")
         implementation("org.apache.logging.log4j:log4j-core:$log4j")
         implementation("org.apache.logging.log4j:log4j-jul:$log4j")
