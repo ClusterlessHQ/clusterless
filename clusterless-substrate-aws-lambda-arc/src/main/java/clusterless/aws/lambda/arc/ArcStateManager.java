@@ -83,9 +83,8 @@ public class ArcStateManager {
 
         S3.Response response = s3.listPaths(path);
 
-        if (!response.isSuccess()) {
-            return Optional.empty();
-        }
+        // a failed listing is an unknown state, not an absent one
+        response.isSuccessOrThrow(r -> "unable to list arc states at: " + path, IllegalStateException::new);
 
         List<String> paths = s3.listChildren(response);
 
@@ -112,6 +111,7 @@ public class ArcStateManager {
                 return value;
             }
         }
-        return null;
+
+        throw new IllegalStateException("unrecognized arc state: " + s + ", under: " + arcStatePath.uri());
     }
 }
