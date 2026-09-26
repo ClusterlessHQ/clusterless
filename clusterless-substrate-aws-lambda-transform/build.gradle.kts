@@ -44,6 +44,9 @@ dependencies {
     implementation("com.amazonaws:aws-lambda-java-events")
     implementation("com.amazonaws:aws-lambda-java-serialization")
 
+    // the openapi generated models annotate with javax.annotation.Nonnull; guava no longer provides it
+    compileOnly("com.google.code.findbugs:jsr305")
+
     testImplementation(testFixtures(project(":clusterless-substrate-aws-lambda-common")))
 }
 

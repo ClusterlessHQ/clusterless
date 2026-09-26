@@ -104,9 +104,9 @@ dependencies {
 
         implementation("io.heretical:mini-parsers-temporal:2.0.0")
 
-        implementation("org.jetbrains:annotations:24.0.0")
-        implementation("info.picocli:picocli:4.7.6")
-        implementation("com.github.jknack:handlebars:4.4.0")
+        implementation("org.jetbrains:annotations:26.1.0")
+        implementation("info.picocli:picocli:4.7.7")
+        implementation("com.github.jknack:handlebars:4.5.5")
 //        implementation("com.cronutils:cron-utils:9.2.0")
 
         val slf4j = "2.0.20"
@@ -127,8 +127,8 @@ dependencies {
         implementation("org.apache.logging.log4j:log4j-web:$log4j")
         implementation("org.apache.logging.log4j:log4j-layout-template-json:$log4j")
 
-        implementationAndTestFixture("com.jayway.jsonpath:json-path:2.9.0")
-        implementationAndTestFixture("com.google.guava:guava:33.4.0-jre")
+        implementationAndTestFixture("com.jayway.jsonpath:json-path:2.10.0")
+        implementationAndTestFixture("com.google.guava:guava:33.7.1-jre")
 
         // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
         val jackson = "2.22.3"
@@ -140,7 +140,7 @@ dependencies {
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:$jackson")
 
-        implementationAndTestFixture("one.util:streamex:0.8.2")
+        implementationAndTestFixture("one.util:streamex:0.9.0")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
         val awsSdk = "2.55.6"
@@ -161,8 +161,9 @@ dependencies {
         implementationAndTestFixture("com.amazonaws:aws-lambda-java-tests:1.1.2")
 
         implementationAndTestFixture("javax.annotation:javax.annotation-api:1.3.2")
+        implementation("com.google.code.findbugs:jsr305:3.0.2")
 
-        implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.1.0")
+        implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.4.0")
 
         testImplementationAndTestFixture("org.mockito:mockito-core:5.24.0")
 

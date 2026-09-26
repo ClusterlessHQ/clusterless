@@ -11,7 +11,7 @@ package clusterless.cls.util;
 import clusterless.commons.naming.Partition;
 import com.google.common.base.Strings;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
