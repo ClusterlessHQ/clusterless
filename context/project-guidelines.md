@@ -366,7 +366,11 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
   it.** Since 2026-03-23 every current LocalStack image requires an account
   auth token and the free plan is non-commercial only (no Glue); pinned prior
   tags still run without a token. Replacing it with moto server is deferred
-  until the modernization is stable (kata 6eta).
+  until the modernization is stable (kata 6eta). 3.0.2 predates the AWS SDK's
+  default flexible checksums (2.30+) and answers S3 puts carrying them with a
+  500, so `LocalStackBase` sets `AWS_REQUEST_CHECKSUM_CALCULATION` /
+  `AWS_RESPONSE_CHECKSUM_VALIDATION=WHEN_REQUIRED` — a test-only setting;
+  production keeps the SDK defaults.
 - **Scenario module is end-of-life stack** (Spring Boot 2.7, Conductor 3.14,
   Nashorn, slf4j 1.7 pins) and blocks logging/Java upgrades there.
 - **External `io.clusterless:clusterless-commons-*`** (naming, `Ref`,

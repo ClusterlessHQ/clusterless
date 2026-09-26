@@ -143,7 +143,7 @@ dependencies {
         implementationAndTestFixture("one.util:streamex:0.8.2")
 
         // https://mvnrepository.com/artifact/software.amazon.awssdk
-        val awsSdk = "2.29.51"
+        val awsSdk = "2.55.6"
         implementationAndTestFixture("software.amazon.awssdk:s3:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatch:$awsSdk")
         implementationAndTestFixture("software.amazon.awssdk:cloudwatchlogs:$awsSdk")
