@@ -57,6 +57,8 @@ val openApiGenerateObjectCreated =
         configOptions.put("library", "native")
         configOptions.put("serializationLibrary", "jackson")
         configOptions.put("dateLibrary", "java8")
+        // AWS adds fields to its event schemas without notice; never fail on one we do not declare
+        configOptions.put("additionalModelTypeAnnotations", "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)")
 
         globalProperties.put("modelDocs", "false")
 
@@ -80,6 +82,8 @@ val openApiGenerateScheduledEvent =
         configOptions.put("library", "native")
         configOptions.put("serializationLibrary", "jackson")
         configOptions.put("dateLibrary", "java8")
+        // AWS adds fields to its event schemas without notice; never fail on one we do not declare
+        configOptions.put("additionalModelTypeAnnotations", "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)")
 
         globalProperties.put("modelDocs", "false")
 
