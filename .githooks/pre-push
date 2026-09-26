@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# roborev pre-push hook v3 - flushes pending post-commit batches before push
+_roborev_flush() {
+ROBOREV="/opt/homebrew/bin/roborev"
+if [ ! -x "$ROBOREV" ]; then
+    ROBOREV=$(command -v roborev 2>/dev/null)
+    [ -z "$ROBOREV" ] || [ ! -x "$ROBOREV" ] && return 0
+fi
+_roborev_input=$(mktemp "${TMPDIR:-/tmp}/roborev-pre-push.XXXXXX") || return 0
+cat > "$_roborev_input"
+"$ROBOREV" post-commit --flush-push < "$_roborev_input" 2>/dev/null || true
+exec 0< "$_roborev_input"
+rm -f "$_roborev_input"
+}
+_roborev_flush
+# roborev hook end
+# Pre-push hook: refuse to publish commits that are unsigned or carry
+# agent attribution.
+#
+# Every pushed commit must carry a signature that is not BAD. This is
+# unconditional: it does not read commit.gpgsign, because a stray
+# repo-local `commit.gpgsign=false` is exactly what silenced both signing
+# and the reference-transaction backstop (which only enforces when the
+# repo asks for signing) and let unsigned commits pile up on a branch.
+# Push is the publication gate; unsigned history must not cross it.
+#
+# Banned in a commit message:
+#   Co-Authored-By: ...                   any co-author trailer
+#   Claude-<Anything>: ...                e.g. Claude-Session, Claude-Model
+#   Generated with ... Claude Code        attribution blurb
+#   claude.ai/code                        session links
+#
+# Authorship in this repository is the commit's single Author header.
+#
+# The commit-msg hook checks the same patterns, but it does not run for
+# rebase, merge, cherry-pick, revert or --no-verify -- which is exactly how
+# such trailers reach a branch tip in practice. This push-time check reads
+# the refs git feeds it on stdin, so it judges what is actually being
+# published rather than whatever happens to be checked out.
+#
+# Bypass with `git push --no-verify` if you must.
+
+set -uo pipefail
+
+zero=$(git hash-object --stdin </dev/null | tr '[:xdigit:]' '0')
+attrib_failed=0
+unsigned_failed=0
+
+# A ref update whose commits cannot be enumerated cannot be cleared either.
+# This hook reads only local objects and refs that the push decision already
+# requires, so a failure here is a real local-repo problem (missing object,
+# corrupt ref) rather than a network hiccup -- report it instead of waving
+# the push through unscanned. `git push --no-verify` remains the bypass.
+refuse() {
+	echo "pre-push: $1; refusing push" >&2
+	exit 1
+}
+
+while read -r local_ref local_sha _remote_ref remote_sha; do
+	# Branch deletion: nothing to inspect.
+	[ "$local_sha" = "$zero" ] && continue
+
+	if [ "$remote_sha" = "$zero" ]; then
+		# New branch on the remote. Bound the walk to commits not already
+		# reachable from some other remote ref, so creating a branch does
+		# not re-scan (and re-litigate) all of published history.
+		# Built with a read loop, not mapfile: mapfile is bash 4+, and
+		# the bundled macOS /bin/bash is 3.2. Both the declaration and
+		# the count guard are load-bearing under `set -u`: bash 3.2
+		# calls "${arr[@]}" unbound when arr is unset OR empty, which
+		# empties $commits and silently skips the scan below.
+		#
+		# for-each-ref is captured into a variable first, not fed
+		# through `done < <(...)`: that form reports the loop's status,
+		# never the producer's, so a failed ref listing would be
+		# indistinguishable from "no remote refs" and silently widen
+		# the scan. Capturing it makes the failure checkable.
+		excludes=$(git for-each-ref --format='^%(refname)' refs/remotes/) || refuse \
+			"unable to list remote refs for $local_ref (git for-each-ref failed)"
+		range_args=()
+		while IFS= read -r ref_exclude; do
+			[ -n "$ref_exclude" ] && range_args+=("$ref_exclude")
+		done <<<"$excludes"
+		if [ "${#range_args[@]}" -gt 0 ]; then
+			commits=$(git rev-list "$local_sha" "${range_args[@]}") || refuse \
+				"unable to enumerate commits for $local_ref (git rev-list failed)"
+		else
+			commits=$(git rev-list "$local_sha") || refuse \
+				"unable to enumerate commits for $local_ref (git rev-list failed)"
+		fi
+	else
+		commits=$(git rev-list "$remote_sha..$local_sha") || refuse \
+			"unable to enumerate commits for $local_ref (git rev-list failed)"
+	fi
+
+	# Only reached with a zero status above, so empty means genuinely
+	# empty rather than a failed enumeration.
+	[ -z "$commits" ] && continue
+
+	while read -r sha; do
+		[ -z "$sha" ] && continue
+
+		# N is no signature, B a bad one. An empty status means git could
+		# not read the commit, which clears nothing.
+		sig=$(git log -1 --pretty='%G?' "$sha" 2>/dev/null) || sig=""
+		case "$sig" in
+		N | B | '')
+			if [ "$unsigned_failed" -eq 0 ]; then
+				echo "pre-push: refusing to push unsigned commits:" >&2
+				echo "" >&2
+			fi
+			echo "  [${sig:-?}] $(git log -1 --pretty='%h %s' "$sha")" >&2
+			unsigned_failed=1
+			;;
+		esac
+
+		# Report which shape hit so the fix is obvious without re-reading
+		# the commit.
+		msg=$(git log -1 --pretty='%B' "$sha")
+		trailer=""
+		if printf '%s\n' "$msg" | grep -Eiq '^[[:space:]]*Co-Authored-By[[:space:]]*:'; then
+			trailer="Co-Authored-By"
+		elif printf '%s\n' "$msg" | grep -Eiq '^[[:space:]]*Claude-[A-Za-z0-9_-]+[[:space:]]*:'; then
+			trailer="Claude-*"
+		elif printf '%s\n' "$msg" | grep -Eiq 'Generated with .*Claude Code|claude\.ai/code'; then
+			trailer="Claude Code link"
+		fi
+
+		if [ -n "$trailer" ]; then
+			if [ "$attrib_failed" -eq 0 ]; then
+				echo "pre-push: refusing to push commits with agent-attribution trailers:" >&2
+				echo "" >&2
+			fi
+			echo "  [$trailer] $(git log -1 --pretty='%h %s' "$sha")" >&2
+			attrib_failed=1
+		fi
+	done <<<"$commits"
+done
+
+if [ "$unsigned_failed" -ne 0 ]; then
+	cat >&2 <<'EOF'
+
+Every pushed commit must be signed ([N] unsigned, [B] bad signature).
+First check `git config --show-origin --get-all commit.gpgsign`: a
+repo-local `false` overrides the global setting and silences signing.
+
+Then re-sign the range with `git commit-tree -S`, exporting each original's
+GIT_AUTHOR_* and GIT_COMMITTER_* (NAME, EMAIL, DATE) so identity and dates
+survive, and move the branch in one `git update-ref <ref> <new> <old>`.
+Set MAX_UNSIGNED_SCAN=<n> when the range exceeds the reference-transaction
+hook's 50-commit bound. (filter-branch is refused there: its refs/original
+backup points at the unsigned commits.)
+
+EOF
+fi
+
+if [ "$attrib_failed" -ne 0 ]; then
+	cat >&2 <<'EOF'
+
+Commit messages in this repository must not carry agent attribution:
+Co-Authored-By trailers, Claude-* trailers (Claude-Session and friends), or
+"Generated with Claude Code" / claude.ai/code links. Authorship is the
+Author header alone.
+
+Rewrite the named commits before pushing, e.g. to strip them across a range:
+
+    git filter-branch -f --msg-filter \
+      'grep -Eiv "^[[:space:]]*(Co-Authored-By|Claude-[A-Za-z0-9_-]+)[[:space:]]*:|Generated with .*Claude Code|claude\.ai/code"' \
+      <base>..HEAD
+
+Bypass (not recommended — published attribution requires a force-push to
+remove):
+    git push --no-verify
+EOF
+	exit 1
+fi
+
+[ "$unsigned_failed" -ne 0 ] && exit 1
+exit 0

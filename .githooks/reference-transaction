@@ -1,0 +1,115 @@
+#!/bin/sh
+# Backstop: refuse to land an unsigned commit on a local branch.
+#
+# `git commit` honors commit.gpgsign, but PLUMBING does not: `commit-tree`
+# ignores that config and runs no commit hooks, so a tool built on it can
+# push unsigned objects into history silently. That is exactly how 85
+# unsigned commits accumulated here. This hook sits at ref-update time,
+# which every path -- porcelain, plumbing, or rebase -- must pass through.
+#
+# Only enforced when the repo asks for signing. Escape hatch for a
+# deliberate exception:  ALLOW_UNSIGNED=1 <git command>
+
+[ "$ALLOW_UNSIGNED" = "1" ] && exit 0
+[ "$1" = "prepared" ] || exit 0          # check once, before the txn commits
+
+# Read the setting through --bool, which collapses every spelling Git
+# itself accepts -- True, YES, On, 1, and an implicit bare key -- to
+# exactly true or false. Matching the raw string against a closed
+# lowercase enum missed those and fell through to "not signing", turning
+# a repo that genuinely asked for signatures into one with no backstop.
+#
+# --bool exits nonzero for two different reasons. Key unset is the
+# ordinary case: no config, no enforcement. A key set to something that
+# is not a boolean is a config error, and treating it as "not signing"
+# would let a typo disable this hook silently -- the exact failure mode
+# above. Tell them apart and refuse the malformed one out loud.
+if gpgsign=$(git config --bool --get commit.gpgsign 2>/dev/null); then
+  [ "$gpgsign" = "true" ] || exit 0
+elif git config --get commit.gpgsign >/dev/null 2>&1; then
+  echo "reference-transaction: REFUSED — commit.gpgsign is set to" >&2
+  echo "  '$(git config --get commit.gpgsign 2>/dev/null)', which is not a boolean." >&2
+  echo "  Set it to true or false; refusing rather than assuming unsigned is ok." >&2
+  exit 1
+else
+  exit 0                                 # key unset: no config, no enforcement
+fi
+
+# Most commits this hook will enumerate for one ref update. Past it the
+# update is refused, not sampled. Raise it, or ALLOW_UNSIGNED=1, for a
+# deliberate bulk import.
+MAX_COMMITS=${MAX_UNSIGNED_SCAN:-50}
+
+# No sequencer exemption. A rebase/merge/cherry-pick in progress used to
+# short-circuit the whole hook on the theory that the final ref update
+# would be re-checked afterwards -- it is not. `git update-ref` straight
+# to refs/heads/* while rebase-merge exists lands unsigned and is never
+# revisited. The refs/heads/* filter below is the real narrowing: the
+# sequencer's own churn rides on HEAD, REBASE_HEAD, and the rebase-merge
+# state files, not on refs/heads/*. The one branch update a rebase does
+# make is the concluding move, which is exactly what must be checked.
+
+rc=0
+while read -r old new ref; do
+  case "$ref" in refs/heads/*) ;; *) continue ;; esac
+  case "$new" in *[!0]*) ;; *) continue ;; esac          # deletion
+  # What this update actually INTRODUCES.
+  #
+  # `$old` is unreliable: git reports all-zeros in the prepared phase for a
+  # plain update to an EXISTING branch just as it does for a creation, so it
+  # cannot tell the two apart. The ref itself can. In the prepared phase the
+  # transaction has not landed, so `refs/heads/x` still resolves to its old
+  # value on an update and is absent on a creation. Resolve it and prefer
+  # that over `$old`.
+  prev=$(git rev-parse --verify -q "$ref^{commit}" 2>/dev/null) || prev=""
+  case "$old" in
+    0000000000000000000000000000000000000000) ;;
+    *) prev="$old" ;;
+  esac
+
+  set --
+  if [ -n "$prev" ]; then
+    # Update to an existing branch: exactly the commits it adds.
+    range="$prev..$new"
+  else
+    # True creation. `$new` alone would be its whole ancestry, so
+    # `git branch feature` off a long signed history would trip the bound
+    # despite introducing nothing. Exclude every other local branch tip:
+    # what survives is only what this ref makes newly reachable.
+    range="$new"
+    for t in $(git for-each-ref --format='%(refname)' refs/heads/ 2>/dev/null); do
+      [ "$t" = "$ref" ] && continue
+      set -- "$@" "$t"
+    done
+    [ "$#" -gt 0 ] && set -- --not "$@"
+  fi
+  # Every new commit this update introduces -- the whole range, not a
+  # sample. A cap keeps a big import fast, but exceeding it refuses
+  # rather than silently skipping the commits past the bound: a partial
+  # look is indistinguishable from a clean one.
+  count=$(git rev-list --count "$range" "$@" 2>/dev/null) || count=""
+  case "$count" in ''|*[!0-9]*) count=0 ;; esac
+  if [ "$count" -gt "$MAX_COMMITS" ]; then
+    echo "reference-transaction: REFUSED — $range introduces $count commits on $ref," >&2
+    echo "  over the $MAX_COMMITS-commit inspection bound; signatures cannot be verified." >&2
+    rc=1
+    continue
+  fi
+  for c in $(git rev-list "$range" "$@" 2>/dev/null); do
+    [ "$(git log -1 --pretty=%G? "$c" 2>/dev/null)" = "N" ] || continue
+    echo "reference-transaction: REFUSED — unsigned commit $(git rev-parse --short "$c") on $ref" >&2
+    echo "  $(git log -1 --pretty=%s "$c" 2>/dev/null | cut -c1-70)" >&2
+    rc=1
+  done
+done
+
+if [ "$rc" -ne 0 ]; then
+  echo "" >&2
+  echo "commit.gpgsign=true, so unsigned commits are refused here." >&2
+  echo "If a tool built this commit, it likely used 'git commit-tree'" >&2
+  echo "without -S: that plumbing ignores commit.gpgsign entirely." >&2
+  echo "A range over the inspection bound is refused for the same reason:" >&2
+  echo "raise it with MAX_UNSIGNED_SCAN=<n> once you have vetted the range." >&2
+  echo "Deliberate exception: ALLOW_UNSIGNED=1 <git command>" >&2
+fi
+exit $rc

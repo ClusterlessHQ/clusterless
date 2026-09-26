@@ -1,0 +1,84 @@
+#!/bin/sh
+# Enforce Conventional Commits on the subject line.
+#
+#   type(scope)?(!)?: subject
+#
+# type  ∈ feat fix docs refactor test chore build ci perf revert
+# scope   optional, free-form (e.g. cli, config, version)
+# !       optional breaking-change marker
+# subject non-empty, should be imperative and lowercase with no trailing period
+#
+# Merge/revert/fixup commits and comment/blank-only messages are skipped.
+
+msg_file="$1"
+
+# --- Gate 0: agent-attribution trailers ---------------------------------
+#
+# Authorship is the commit's single Author header, not a message trailer.
+# Banned: Co-Authored-By, Claude-* (Claude-Session and friends), and
+# "Generated with Claude Code" / claude.ai/code links.
+#
+# This hook does not run for rebase, merge, cherry-pick, revert or
+# --no-verify; the pre-push hook is the gate that actually holds. Keep the
+# two patterns in sync.
+attrib_body=$(grep -v '^#' "$msg_file")
+
+attrib_fail() {
+	echo "commit-msg: rejected — $1" >&2
+	echo "" >&2
+	echo "Authorship is the Author header alone. Remove the trailer and retry." >&2
+	exit 1
+}
+
+if printf '%s\n' "$attrib_body" | grep -Eiq '^[[:space:]]*Co-Authored-By[[:space:]]*:'; then
+	attrib_fail "Co-Authored-By trailers are not allowed"
+fi
+
+if printf '%s\n' "$attrib_body" | grep -Eiq '^[[:space:]]*Claude-[A-Za-z0-9_-]+[[:space:]]*:'; then
+	attrib_fail "Claude-* trailers are not allowed"
+fi
+
+if printf '%s\n' "$attrib_body" | grep -Eiq 'Generated with .*Claude Code|claude\.ai/code'; then
+	attrib_fail "Claude Code attribution links are not allowed"
+fi
+
+# First non-comment, non-blank line is the subject. Portable across
+# BSD/GNU: filter comments, drop leading blanks, take the first line.
+subject="$(grep -v '^#' "$msg_file" | sed '/./,$!d' | head -n 1)"
+
+# Skip empty subjects (e.g. an aborted commit) and let git handle them.
+[ -z "$subject" ] && exit 0
+
+# Skip merge and revert auto-messages and rebase fixup/squash markers.
+case "$subject" in
+	"Merge "*|"Revert "*|"fixup! "*|"squash! "*|"amend! "*) exit 0 ;;
+esac
+
+types='feat|fix|docs|refactor|test|chore|build|ci|perf|revert'
+pattern="^(${types})(\([a-z0-9._-]+\))?!?: .+"
+
+if printf '%s\n' "$subject" | grep -Eq "$pattern"; then
+	# Warn (don't block) on a trailing period or an over-long subject.
+	case "$subject" in
+		*.) echo "commit-msg: warning: subject ends with a period" >&2 ;;
+	esac
+	if [ "$(printf '%s' "$subject" | wc -c)" -gt 72 ]; then
+		echo "commit-msg: warning: subject exceeds 72 characters" >&2
+	fi
+	exit 0
+fi
+
+cat >&2 <<EOF
+commit-msg: rejected — subject must follow Conventional Commits.
+
+  got:    $subject
+  format: type(scope)?: subject
+  types:  feat fix docs refactor test chore build ci perf revert
+
+examples:
+  feat(cli): add version verb
+  fix(config): reject unknown schema version
+  docs: document output contract
+  chore(deps): bump cobra to 1.10.2
+EOF
+exit 1
