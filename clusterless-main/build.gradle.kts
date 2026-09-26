@@ -12,7 +12,7 @@ import org.jreleaser.model.Stereotype
 
 plugins {
     id("clusterless.java-application-conventions")
-    id("org.jreleaser") version "1.8.0"
+    id("org.jreleaser") version "1.26.0"
 }
 
 dependencies {
@@ -48,6 +48,7 @@ sourceSets.main {
 }
 
 val versionBranch = project.ext["versionBranch"].toString()
+val versionLabel = project.ext["versionLabel"].toString()
 
 distributions {
     main {
@@ -78,9 +79,11 @@ jreleaser {
     }
 
     signing {
-        armored.set(true)
         active.set(Active.ALWAYS)
-        verify.set(false)
+        pgp {
+            armored.set(true)
+            verify.set(false)
+        }
     }
 
     release {
@@ -358,7 +361,7 @@ tasks.register<Copy>("generateDocs") {
 
     from("src/main/antora") {
         filter {
-            it.replace("{{projectVersion}}", project.ext["versionLabel"].toString())
+            it.replace("{{projectVersion}}", versionLabel)
         }
         rename {
             it.replace(".adoc.template", ".adoc")
@@ -375,7 +378,7 @@ tasks.register<Copy>("generateDocs") {
     into(layout.buildDirectory.dir("docs/"))
 }
 
-val picoliExecution by configurations.creating() {
+val picoliExecution = configurations.create("picoliExecution") {
     extendsFrom(configurations.testImplementation.get())
 }
 
