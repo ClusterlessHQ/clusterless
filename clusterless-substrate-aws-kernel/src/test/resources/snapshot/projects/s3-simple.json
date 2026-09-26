@@ -1,0 +1,50 @@
+{
+   "arcs": [
+      {
+         "name": "copyA",
+         "sinks": {
+            "main": {
+               "name": "copy-a-simple",
+               "pathURI": "s3://clusterless-simple-test-000000000000-us-west-2/copy-a/",
+               "version": "20230101"
+            }
+         },
+         "sources": {
+            "main": {
+               "name": "ingress-simple",
+               "version": "20220101"
+            }
+         },
+         "type": "aws:core:s3CopyArc"
+      }
+   ],
+   "boundaries": [
+      {
+         "dataset": {
+            "name": "ingress-simple",
+            "pathURI": "s3://clusterless-simple-test-000000000000-us-west-2/ingress/",
+            "version": "20220101"
+         },
+         "lotUnit": "Twelfths",
+         "name": "IngressPutListener",
+         "type": "aws:core:s3PutListenerBoundary"
+      }
+   ],
+   "placement": {
+      "account": "000000000000",
+      "provider": "aws",
+      "region": "us-west-2",
+      "stage": "test"
+   },
+   "project": {
+      "name": "S3Simple",
+      "version": "20230101-00"
+   },
+   "resources": [
+      {
+         "bucketName": "clusterless-simple-test-000000000000-us-west-2",
+         "name": "bucket",
+         "type": "aws:core:s3Bucket"
+      }
+   ]
+}

@@ -1,0 +1,81 @@
+{
+   "arcs": [
+      {
+         "name": "addPartitions",
+         "sinks": {
+            "main": {
+               "name": "partitions",
+               "pathURI": "glue:///clusterless-glue-test-db/clusterless-glue-test-table",
+               "version": "20220101"
+            }
+         },
+         "sources": {
+            "main": {
+               "name": "ingress-glue",
+               "version": "20220101"
+            }
+         },
+         "type": "aws:core:glueAddPartitionsArc"
+      }
+   ],
+   "boundaries": [
+      {
+         "dataset": {
+            "name": "ingress-glue",
+            "pathURI": "s3://clusterless-glue-test-000000000000-us-west-2/ingress/",
+            "version": "20220101"
+         },
+         "lotUnit": "Twelfths",
+         "name": "IngressPutListener",
+         "type": "aws:core:s3PutListenerBoundary"
+      }
+   ],
+   "placement": {
+      "account": "000000000000",
+      "provider": "aws",
+      "region": "us-west-2",
+      "stage": "test"
+   },
+   "project": {
+      "name": "GlueSimple",
+      "version": "20230101-00"
+   },
+   "resources": [
+      {
+         "bucketName": "clusterless-glue-test-000000000000-us-west-2",
+         "name": "bucket",
+         "type": "aws:core:s3Bucket"
+      },
+      {
+         "databaseName": "clusterless-glue-test-db",
+         "name": "database",
+         "type": "aws:core:glueDatabase"
+      },
+      {
+         "databaseRef": "database",
+         "name": "table",
+         "pathURI": "s3://clusterless-glue-test-000000000000-us-west-2/ingress/",
+         "schema": {
+            "columns": [
+               {
+                  "name": "id",
+                  "type": "int"
+               },
+               {
+                  "name": "value",
+                  "type": "string"
+               }
+            ],
+            "dataFormat": "csv",
+            "partitions": [
+               {
+                  "name": "partition",
+                  "type": "string"
+               }
+            ]
+         },
+         "tableName": "clusterless-glue-test-table",
+         "type": "aws:core:glueTable"
+      }
+   ]
+}

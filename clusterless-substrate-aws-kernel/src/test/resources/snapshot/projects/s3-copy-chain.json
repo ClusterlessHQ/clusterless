@@ -1,0 +1,89 @@
+{
+   "arcs": [
+      {
+         "name": "copyA",
+         "sinks": {
+            "main": {
+               "name": "copy-a-chain",
+               "pathURI": "s3://clusterless-chain-test-000000000000-us-west-2/copy-a/",
+               "version": "20230101"
+            }
+         },
+         "sources": {
+            "main": {
+               "name": "ingress-chain",
+               "version": "20220101"
+            }
+         },
+         "type": "aws:core:s3CopyArc"
+      },
+      {
+         "name": "copyB",
+         "sinks": {
+            "main": {
+               "name": "copy-b-chain",
+               "pathURI": "s3://clusterless-chain-test-000000000000-us-west-2/copy-b/",
+               "version": "20230101"
+            }
+         },
+         "sources": {
+            "main": {
+               "name": "copy-a-chain",
+               "version": "20230101"
+            }
+         },
+         "type": "aws:core:s3CopyArc",
+         "workload": {
+            "workloadProps": {
+               "failArcOnPartialPercent": 0.10000000000000001
+            }
+         }
+      },
+      {
+         "name": "copyC",
+         "sinks": {
+            "main": {
+               "name": "copy-c-chain",
+               "pathURI": "s3://clusterless-chain-test-000000000000-us-west-2/copy-c/",
+               "version": "20230101"
+            }
+         },
+         "sources": {
+            "main": {
+               "name": "copy-b-chain",
+               "version": "20230101"
+            }
+         },
+         "type": "aws:core:s3CopyArc"
+      }
+   ],
+   "boundaries": [
+      {
+         "dataset": {
+            "name": "ingress-chain",
+            "pathURI": "s3://clusterless-chain-test-000000000000-us-west-2/ingress/",
+            "version": "20220101"
+         },
+         "lotUnit": "Twelfths",
+         "name": "IngressPutListener",
+         "type": "aws:core:s3PutListenerBoundary"
+      }
+   ],
+   "placement": {
+      "account": "000000000000",
+      "provider": "aws",
+      "region": "us-west-2",
+      "stage": "test"
+   },
+   "project": {
+      "name": "S3Chain",
+      "version": "20230101-00"
+   },
+   "resources": [
+      {
+         "bucketName": "clusterless-chain-test-000000000000-us-west-2",
+         "name": "bucket",
+         "type": "aws:core:s3Bucket"
+      }
+   ]
+}

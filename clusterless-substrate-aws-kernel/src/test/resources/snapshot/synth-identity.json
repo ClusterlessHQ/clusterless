@@ -1,0 +1,1142 @@
+{
+  "bootstrap" : {
+    "TEST-clusterless-bootstrap" : {
+      "Exports" : {
+        "OutputmetaArcStatestoreArnmetaArcStatestoreFC6CD49C" : "ref:aws:arn:test:bootstrap:1:meta:arcState:store",
+        "OutputmetaArcStatestoreNamemetaArcStatestore094F09B5" : "ref:aws:name:test:bootstrap:1:meta:arcState:store",
+        "OutputmetaEventBusarceventbusNamemetaEventBusarceventbus14ABD6AD" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus",
+        "OutputmetaManifeststoreArnmetaManifeststoreF40B375E" : "ref:aws:arn:test:bootstrap:1:meta:manifest:store",
+        "OutputmetaManifeststoreNamemetaManifeststore9A1068F5" : "ref:aws:name:test:bootstrap:1:meta:manifest:store",
+        "OutputmetaMetadatastoreArnmetaMetadatastore6AC83830" : "ref:aws:arn:test:bootstrap:1:meta:metadata:store",
+        "OutputmetaMetadatastoreNamemetaMetadatastoreC8AB4C0E" : "ref:aws:name:test:bootstrap:1:meta:metadata:store",
+        "OutputmetaVpccommonvpcArnmetaVpccommonvpcB946CBFB" : "ref:aws:arn:test:bootstrap:1:meta:vpc:common-vpc",
+        "OutputmetaVpccommonvpcIdmetaVpccommonvpc45948BFD" : "ref:aws:id:test:bootstrap:1:meta:vpc:common-vpc",
+        "OutputmetaVpccommonvpcNamemetaVpccommonvpc5A9BB698" : "ref:aws:name:test:bootstrap:1:meta:vpc:common-vpc"
+      },
+      "Resources" : {
+        "ArcEventBus1EED059A" : {
+          "Name" : "TEST-arc-events-us-west-2",
+          "Type" : "AWS::Events::EventBus"
+        },
+        "BootstrapVpcFB0B491B" : {
+          "Type" : "AWS::EC2::VPC"
+        },
+        "BootstrapVpcIGWFD5C5205" : {
+          "Type" : "AWS::EC2::InternetGateway"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet1DefaultRoute7CAE5807" : {
+          "Type" : "AWS::EC2::Route"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet1RouteTable65FC4544" : {
+          "Type" : "AWS::EC2::RouteTable"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet1RouteTableAssociation7B3E1EA9" : {
+          "Type" : "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet1SubnetD432CC84" : {
+          "Type" : "AWS::EC2::Subnet"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet2DefaultRouteCB1F4BDD" : {
+          "Type" : "AWS::EC2::Route"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet2RouteTable19385292" : {
+          "Type" : "AWS::EC2::RouteTable"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet2RouteTableAssociation10B63610" : {
+          "Type" : "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet2Subnet01C695CB" : {
+          "Type" : "AWS::EC2::Subnet"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet3DefaultRoute04089CD8" : {
+          "Type" : "AWS::EC2::Route"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet3RouteTable08DE8152" : {
+          "Type" : "AWS::EC2::RouteTable"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet3RouteTableAssociationDBF997FF" : {
+          "Type" : "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "BootstrapVpcTESTclusterlesssubnetSubnet3SubnetB49EB81F" : {
+          "Type" : "AWS::EC2::Subnet"
+        },
+        "BootstrapVpcVPCGW810EB8B9" : {
+          "Type" : "AWS::EC2::VPCGatewayAttachment"
+        },
+        "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F" : {
+          "Handler" : "index.handler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "testclusterlessarcstate000000000000uswest20348B36E" : {
+          "BucketName" : "test-clusterless-arc-state-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "testclusterlessarcstate000000000000uswest2AutoDeleteObjectsCustomResource8E21EDCB" : {
+          "BucketName" : {
+            "Ref" : "testclusterlessarcstate000000000000uswest20348B36E"
+          },
+          "Type" : "Custom::S3AutoDeleteObjects"
+        },
+        "testclusterlessarcstate000000000000uswest2Policy1344CA06" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "testclusterlessmanifest000000000000uswest212268E10" : {
+          "BucketName" : "test-clusterless-manifest-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "testclusterlessmanifest000000000000uswest2AutoDeleteObjectsCustomResource22E08F21" : {
+          "BucketName" : {
+            "Ref" : "testclusterlessmanifest000000000000uswest212268E10"
+          },
+          "Type" : "Custom::S3AutoDeleteObjects"
+        },
+        "testclusterlessmanifest000000000000uswest2Policy726EA4E7" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "testclusterlessmetadata000000000000uswest2A4DCB793" : {
+          "BucketName" : "test-clusterless-metadata-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "testclusterlessmetadata000000000000uswest2AutoDeleteObjectsCustomResource534D071D" : {
+          "BucketName" : {
+            "Ref" : "testclusterlessmetadata000000000000uswest2A4DCB793"
+          },
+          "Type" : "Custom::S3AutoDeleteObjects"
+        },
+        "testclusterlessmetadata000000000000uswest2Policy74A5BDA6" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        }
+      }
+    }
+  },
+  "glue-simple.json" : {
+    "TEST-glue-simple-arc-add-partitions-20230101-00-us-west-2" : {
+      "Resources" : {
+        "AddPartitionsListenerTESTGlueSimpleAddPartitions2023010100Rule066A397D" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-glue-simple-add-partitions-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "AddPartitionsOrchestrationLogGroupTESTGlueSimpleAddPartitions20230101006B39A32F" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-glue-simple-add-partitions-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions20230101003F19D756" : {
+          "StateMachineName" : "TEST-glue-simple-add-partitions-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions2023010100EventsRole08E74C3C" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions2023010100EventsRoleDefaultPolicyCFA2AA0C" : {
+          "PolicyName" : "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions2023010100EventsRoleDefaultPolicyCFA2AA0C",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions2023010100Role76DE32F1" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions2023010100RoleDefaultPolicyBE951FB2" : {
+          "PolicyName" : "AddPartitionsOrchestrationTESTGlueSimpleAddPartitions2023010100RoleDefaultPolicyBE951FB2",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-glue-simple-add-partitions-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "FuncAddPartitionsFuncF9216A66" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-glue-simple-add-partitions-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.glue.GlueAddPartitionsArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncAddPartitionsFuncServiceRoleDefaultPolicyEC7CB4C2" : {
+          "PolicyName" : "FuncAddPartitionsFuncServiceRoleDefaultPolicyEC7CB4C2",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncAddPartitionsFuncServiceRoleF1E24DBA" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncLambdaLogGroupAddPartitionsFunc8F7A8C75" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncAddPartitionsFuncF9216A66"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-glue-simple-add-partitions-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-glue-simple-resource-activity-boundary-20230101-00-us-west-2" : {
+      "Exports" : {
+        "OutputcoreGlueDatabasedatabaseArncoreGlueDatabasedatabase662C4742" : "ref:aws:arn:test:glue-simple:20230101-00:core:glue-database:database",
+        "OutputcoreGlueTabletableArncoreGlueTabletable393BE893" : "ref:aws:arn:test:glue-simple:20230101-00:core:glue-table:table",
+        "OutputcoreS3BucketbucketArncoreS3BucketbucketD56EEDEF" : "ref:aws:arn:test:glue-simple:20230101-00:core:s3-bucket:bucket"
+      },
+      "Resources" : {
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691" : {
+          "Handler" : "index.handler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
+          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "GlueDatabaseResourceClusterlessGlueTestDbA8AC5EBD" : {
+          "DatabaseInput.Name" : "clusterless-glue-test-db",
+          "Type" : "AWS::Glue::Database"
+        },
+        "GlueTableResourceClusterlessGlueTestTable2B1AE57A" : {
+          "DatabaseName" : {
+            "Ref" : "GlueDatabaseResourceClusterlessGlueTestDbA8AC5EBD"
+          },
+          "TableInput.Name" : "clusterless-glue-test-table",
+          "Type" : "AWS::Glue::Table"
+        },
+        "S3BucketResourceClusterlessGlueTest000000000000UsWest2D37D2FE0" : {
+          "BucketName" : "clusterless-glue-test-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "S3BucketResourceClusterlessGlueTest000000000000UsWest2Notifications3D2F477F" : {
+          "BucketName" : {
+            "Ref" : "S3BucketResourceClusterlessGlueTest000000000000UsWest2D37D2FE0"
+          },
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessGlueTest000000000000UsWest2Policy1FD7F2F1" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357" : {
+          "Environment.Variables" : [ "CLS_S3_PUT_BOUNDARY_PROPS_JAVA", "CLS_S3_PUT_BOUNDARY_PROPS_JSON" ],
+          "FunctionName" : "TEST-glue-simple-ingress-put-listener-int-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.boundary.s3put.PutEventBoundaryHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleBB4DCB49" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleDefaultPolicyBE9EB7B7" : {
+          "PolicyName" : "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleDefaultPolicyBE9EB7B7",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerLambdaLogGroupIngressPutListenerInt690B1C43" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntE9CA8777F623D77F" : {
+          "FunctionName" : {
+            "Fn::GetAtt" : [ "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357", "Arn" ]
+          },
+          "Type" : "AWS::Lambda::Permission"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerListenerEventFD473347" : {
+          "Name" : "TEST-glue-simple-ingress-put-listener-20230101-00-us-west-2",
+          "Type" : "AWS::Events::Rule"
+        }
+      }
+    }
+  },
+  "s3-copy-chain.json" : {
+    "TEST-s3-chain-arc-copy-a-20230101-00-us-west-2" : {
+      "Resources" : {
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-a-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAListenerTESTS3ChainCopyA2023010100RuleAB41B271" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-s3-chain-copy-a-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "CopyAOrchestrationLogGroupTESTS3ChainCopyA2023010100CBA7C2AA" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-s3-chain-copy-a-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAOrchestrationTESTS3ChainCopyA20230101003D04CEFD" : {
+          "StateMachineName" : "TEST-s3-chain-copy-a-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "CopyAOrchestrationTESTS3ChainCopyA2023010100EventsRole5570C3AF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3ChainCopyA2023010100EventsRoleDefaultPolicyCA8584E2" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3ChainCopyA2023010100EventsRoleDefaultPolicyCA8584E2",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CopyAOrchestrationTESTS3ChainCopyA2023010100Role32151E83" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3ChainCopyA2023010100RoleDefaultPolicy546BB681" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3ChainCopyA2023010100RoleDefaultPolicy546BB681",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncCopyAFunc6ABB97AA" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-a-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.s3copy.S3CopyArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncCopyAFuncServiceRoleCB281F03" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92" : {
+          "PolicyName" : "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncLambdaLogGroupCopyAFunc2023A497" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncCopyAFunc6ABB97AA"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-a-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-s3-chain-arc-copy-b-20230101-00-us-west-2" : {
+      "Resources" : {
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-b-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyBListenerTESTS3ChainCopyB2023010100Rule9462540B" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-s3-chain-copy-b-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "CopyBOrchestrationLogGroupTESTS3ChainCopyB2023010100C46D5CB4" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-s3-chain-copy-b-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyBOrchestrationTESTS3ChainCopyB20230101000825D511" : {
+          "StateMachineName" : "TEST-s3-chain-copy-b-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "CopyBOrchestrationTESTS3ChainCopyB2023010100EventsRole46937481" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyBOrchestrationTESTS3ChainCopyB2023010100EventsRoleDefaultPolicy93CF599B" : {
+          "PolicyName" : "CopyBOrchestrationTESTS3ChainCopyB2023010100EventsRoleDefaultPolicy93CF599B",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CopyBOrchestrationTESTS3ChainCopyB2023010100Role40033F4E" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyBOrchestrationTESTS3ChainCopyB2023010100RoleDefaultPolicyD878914D" : {
+          "PolicyName" : "CopyBOrchestrationTESTS3ChainCopyB2023010100RoleDefaultPolicyD878914D",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncCopyBFunc1A5F3FCD" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-b-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.s3copy.S3CopyArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncCopyBFuncServiceRole3769EB92" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncCopyBFuncServiceRoleDefaultPolicy18062BD2" : {
+          "PolicyName" : "FuncCopyBFuncServiceRoleDefaultPolicy18062BD2",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncLambdaLogGroupCopyBFunc5813BBF3" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncCopyBFunc1A5F3FCD"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-b-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-s3-chain-arc-copy-c-20230101-00-us-west-2" : {
+      "Resources" : {
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-c-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyCListenerTESTS3ChainCopyC2023010100Rule9F51CA7E" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-s3-chain-copy-c-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "CopyCOrchestrationLogGroupTESTS3ChainCopyC2023010100DA249938" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-s3-chain-copy-c-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyCOrchestrationTESTS3ChainCopyC202301010012CBDC3C" : {
+          "StateMachineName" : "TEST-s3-chain-copy-c-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "CopyCOrchestrationTESTS3ChainCopyC2023010100EventsRole9155D0B0" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyCOrchestrationTESTS3ChainCopyC2023010100EventsRoleDefaultPolicy6BABCBF1" : {
+          "PolicyName" : "CopyCOrchestrationTESTS3ChainCopyC2023010100EventsRoleDefaultPolicy6BABCBF1",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CopyCOrchestrationTESTS3ChainCopyC2023010100Role12274527" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyCOrchestrationTESTS3ChainCopyC2023010100RoleDefaultPolicy72E7BC19" : {
+          "PolicyName" : "CopyCOrchestrationTESTS3ChainCopyC2023010100RoleDefaultPolicy72E7BC19",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncCopyCFuncF187560B" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-c-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.s3copy.S3CopyArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncCopyCFuncServiceRole84162904" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncCopyCFuncServiceRoleDefaultPolicy134429F3" : {
+          "PolicyName" : "FuncCopyCFuncServiceRoleDefaultPolicy134429F3",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncLambdaLogGroupCopyCFunc1F46DB84" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncCopyCFuncF187560B"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-copy-c-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-s3-chain-resource-activity-boundary-20230101-00-us-west-2" : {
+      "Exports" : {
+        "OutputcoreS3BucketbucketArncoreS3BucketbucketD56EEDEF" : "ref:aws:arn:test:s3-chain:20230101-00:core:s3-bucket:bucket"
+      },
+      "Resources" : {
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691" : {
+          "Handler" : "index.handler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
+          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3BucketResourceClusterlessChainTest000000000000UsWest23CAFA4BF" : {
+          "BucketName" : "clusterless-chain-test-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "S3BucketResourceClusterlessChainTest000000000000UsWest2Notifications156D4F2C" : {
+          "BucketName" : {
+            "Ref" : "S3BucketResourceClusterlessChainTest000000000000UsWest23CAFA4BF"
+          },
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessChainTest000000000000UsWest2Policy7E9E09CD" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357" : {
+          "Environment.Variables" : [ "CLS_S3_PUT_BOUNDARY_PROPS_JAVA", "CLS_S3_PUT_BOUNDARY_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-chain-ingress-put-listener-int-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.boundary.s3put.PutEventBoundaryHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleBB4DCB49" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleDefaultPolicyBE9EB7B7" : {
+          "PolicyName" : "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleDefaultPolicyBE9EB7B7",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerLambdaLogGroupIngressPutListenerInt690B1C43" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntE9CA8777F623D77F" : {
+          "FunctionName" : {
+            "Fn::GetAtt" : [ "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357", "Arn" ]
+          },
+          "Type" : "AWS::Lambda::Permission"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerListenerEventFD473347" : {
+          "Name" : "TEST-s3-chain-ingress-put-listener-20230101-00-us-west-2",
+          "Type" : "AWS::Events::Rule"
+        }
+      }
+    }
+  },
+  "s3-frequent-filter-boundary.json" : {
+    "TEST-s3-freq-filt-bndy-arc-copy-a-20230101-00-us-west-2" : {
+      "Resources" : {
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-bndy-copy-a-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAListenerTESTS3FreqFiltBndyCopyA2023010100Rule0E4079B6" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-s3-freq-filt-bndy-copy-a-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "CopyAOrchestrationLogGroupTESTS3FreqFiltBndyCopyA202301010015A68346" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-s3-freq-filt-bndy-copy-a-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltBndyCopyA202301010033F1D4E2" : {
+          "StateMachineName" : "TEST-s3-freq-filt-bndy-copy-a-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltBndyCopyA2023010100EventsRole25AD5144" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltBndyCopyA2023010100EventsRoleDefaultPolicy31996224" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3FreqFiltBndyCopyA2023010100EventsRoleDefaultPolicy31996224",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltBndyCopyA2023010100RoleC5CE703E" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltBndyCopyA2023010100RoleDefaultPolicyBC164694" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3FreqFiltBndyCopyA2023010100RoleDefaultPolicyBC164694",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncCopyAFunc6ABB97AA" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-bndy-copy-a-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.s3copy.S3CopyArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncCopyAFuncServiceRoleCB281F03" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92" : {
+          "PolicyName" : "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncLambdaLogGroupCopyAFunc2023A497" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncCopyAFunc6ABB97AA"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-bndy-copy-a-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-s3-freq-filt-bndy-resource-activity-boundary-20230101-00-us-west-2" : {
+      "Exports" : {
+        "OutputcoreS3BucketbucketArncoreS3BucketbucketD56EEDEF" : "ref:aws:arn:test:s3-freq-filt-bndy:20230101-00:core:s3-bucket:bucket"
+      },
+      "Resources" : {
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691" : {
+          "Handler" : "index.handler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
+          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest253EA279C" : {
+          "BucketName" : "clusterless-freq-filter-bndry-test-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest2Notifications8680B894" : {
+          "BucketName" : {
+            "Ref" : "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest253EA279C"
+          },
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest2Policy61169171" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt75017FC0" : {
+          "Environment.Variables" : [ "CLS_FREQUENT_S3_PUT_BOUNDARY_PROPS_JAVA", "CLS_FREQUENT_S3_PUT_BOUNDARY_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-bndy-freq-put-lstnr-int-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.boundary.frequents3put.FrequentPutEventBoundaryHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrIntServiceRoleDFF32A80" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrIntServiceRoleDefaultPolicyF10E7E51" : {
+          "PolicyName" : "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrIntServiceRoleDefaultPolicyF10E7E51",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrLambdaLogGroupFreqPutLstnrIntC4389E31" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt75017FC0"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsF2DDBF45" : {
+          "BucketName" : "clusterless-freq-filter-bndry-test-000000000000-us-west-2",
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt1A10A1471EB30A54" : {
+          "FunctionName" : {
+            "Fn::GetAtt" : [ "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt75017FC0", "Arn" ]
+          },
+          "Type" : "AWS::Lambda::Permission"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenerEventBE483D94" : {
+          "Name" : "TEST-s3-freq-filt-bndy-freq-put-lstnr-20230101-00-us-west-2",
+          "Type" : "AWS::Events::Rule"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrS3EventQueueFBC56526" : {
+          "QueueName" : "TEST-s3-freq-filt-bndy-freq-put-lstnr-20230101-00",
+          "Type" : "AWS::SQS::Queue"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrS3EventQueuePolicyEA5C871A" : {
+          "Type" : "AWS::SQS::QueuePolicy"
+        }
+      }
+    }
+  },
+  "s3-frequent-filter-copy.json" : {
+    "TEST-s3-freq-filt-cp-arc-copy-a-20230101-00-us-west-2" : {
+      "Resources" : {
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-cp-copy-a-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAListenerTESTS3FreqFiltCpCopyA2023010100Rule5342A84C" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-s3-freq-filt-cp-copy-a-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "CopyAOrchestrationLogGroupTESTS3FreqFiltCpCopyA202301010032423B15" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-s3-freq-filt-cp-copy-a-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100DED395B1" : {
+          "StateMachineName" : "TEST-s3-freq-filt-cp-copy-a-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100EventsRole43EB5F77" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100EventsRoleDefaultPolicyE0FB4703" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100EventsRoleDefaultPolicyE0FB4703",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100Role5DB92BA9" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100RoleDefaultPolicy30561B8F" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3FreqFiltCpCopyA2023010100RoleDefaultPolicy30561B8F",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncCopyAFunc6ABB97AA" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-cp-copy-a-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.s3copy.S3CopyArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncCopyAFuncServiceRoleCB281F03" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92" : {
+          "PolicyName" : "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncLambdaLogGroupCopyAFunc2023A497" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncCopyAFunc6ABB97AA"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-cp-copy-a-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-s3-freq-filt-cp-resource-activity-boundary-20230101-00-us-west-2" : {
+      "Exports" : {
+        "OutputcoreS3BucketbucketArncoreS3BucketbucketD56EEDEF" : "ref:aws:arn:test:s3-freq-filt-cp:20230101-00:core:s3-bucket:bucket"
+      },
+      "Resources" : {
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691" : {
+          "Handler" : "index.handler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
+          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2B1978CA2" : {
+          "BucketName" : "clusterless-freq-filter-copy-test-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2Notifications528F60C8" : {
+          "BucketName" : {
+            "Ref" : "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2B1978CA2"
+          },
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2Policy7DC23691" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt75017FC0" : {
+          "Environment.Variables" : [ "CLS_FREQUENT_S3_PUT_BOUNDARY_PROPS_JAVA", "CLS_FREQUENT_S3_PUT_BOUNDARY_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-freq-filt-cp-freq-put-lstnr-int-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.boundary.frequents3put.FrequentPutEventBoundaryHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrIntServiceRoleDFF32A80" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrIntServiceRoleDefaultPolicyF10E7E51" : {
+          "PolicyName" : "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrIntServiceRoleDefaultPolicyF10E7E51",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrLambdaLogGroupFreqPutLstnrIntC4389E31" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt75017FC0"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsF2DDBF45" : {
+          "BucketName" : "clusterless-freq-filter-copy-test-000000000000-us-west-2",
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt1A10A1471EB30A54" : {
+          "FunctionName" : {
+            "Fn::GetAtt" : [ "S3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt75017FC0", "Arn" ]
+          },
+          "Type" : "AWS::Lambda::Permission"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenerEventBE483D94" : {
+          "Name" : "TEST-s3-freq-filt-cp-freq-put-lstnr-20230101-00-us-west-2",
+          "Type" : "AWS::Events::Rule"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrS3EventQueueFBC56526" : {
+          "QueueName" : "TEST-s3-freq-filt-cp-freq-put-lstnr-20230101-00",
+          "Type" : "AWS::SQS::Queue"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrS3EventQueuePolicyEA5C871A" : {
+          "Type" : "AWS::SQS::QueuePolicy"
+        }
+      }
+    }
+  },
+  "s3-simple.json" : {
+    "TEST-s3-simple-arc-copy-a-20230101-00-us-west-2" : {
+      "Resources" : {
+        "CompleteCompleteFunction8CFEA6A1" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-simple-copy-a-complete-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateCompleteHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "CompleteCompleteFunctionServiceRoleC6D4906B" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4" : {
+          "PolicyName" : "CompleteCompleteFunctionServiceRoleDefaultPolicy56BC9AD4",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CompleteLambdaLogGroupCompleteFunctionA1935CE9" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "CompleteCompleteFunction8CFEA6A1"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAListenerTESTS3SimpleCopyA2023010100Rule41991DCD" : {
+          "EventBusName" : {
+            "Fn::ImportValue" : "ref:aws:name:test:bootstrap:1:meta:event-bus:arc-event-bus"
+          },
+          "Name" : "TEST-s3-simple-copy-a-20230101-00-rule",
+          "Type" : "AWS::Events::Rule"
+        },
+        "CopyAOrchestrationLogGroupTESTS3SimpleCopyA2023010100422C11AC" : {
+          "LogGroupName" : "/aws/vendedlogs/states/TEST-s3-simple-copy-a-20230101-00",
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "CopyAOrchestrationTESTS3SimpleCopyA2023010100E9B735BA" : {
+          "StateMachineName" : "TEST-s3-simple-copy-a-20230101-00",
+          "Type" : "AWS::StepFunctions::StateMachine"
+        },
+        "CopyAOrchestrationTESTS3SimpleCopyA2023010100EventsRoleDD11C960" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3SimpleCopyA2023010100EventsRoleDefaultPolicy76C9E7DD" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3SimpleCopyA2023010100EventsRoleDefaultPolicy76C9E7DD",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "CopyAOrchestrationTESTS3SimpleCopyA2023010100RoleA30458F3" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "CopyAOrchestrationTESTS3SimpleCopyA2023010100RoleDefaultPolicy53315F93" : {
+          "PolicyName" : "CopyAOrchestrationTESTS3SimpleCopyA2023010100RoleDefaultPolicy53315F93",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncCopyAFunc6ABB97AA" : {
+          "Environment.Variables" : [ "CLS_ARC_PROPS_JAVA", "CLS_ARC_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-simple-copy-a-func-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.workload.s3copy.S3CopyArcEventHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "FuncCopyAFuncServiceRoleCB281F03" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92" : {
+          "PolicyName" : "FuncCopyAFuncServiceRoleDefaultPolicy72D7CE92",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "FuncLambdaLogGroupCopyAFunc2023A497" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "FuncCopyAFunc6ABB97AA"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartLambdaLogGroupStartFunctionEB6CD92E" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "StartStartFunction5E28EF5E"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "StartStartFunction5E28EF5E" : {
+          "Environment.Variables" : [ "CLS_ARC_STATE_PROPS_JAVA", "CLS_ARC_STATE_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-simple-copy-a-start-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.arc.ArcStateStartHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "StartStartFunctionServiceRole3589D3BF" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "StartStartFunctionServiceRoleDefaultPolicyD92D18FB" : {
+          "PolicyName" : "StartStartFunctionServiceRoleDefaultPolicyD92D18FB",
+          "Type" : "AWS::IAM::Policy"
+        }
+      }
+    },
+    "TEST-s3-simple-resource-activity-boundary-20230101-00-us-west-2" : {
+      "Exports" : {
+        "OutputcoreS3BucketbucketArncoreS3BucketbucketD56EEDEF" : "ref:aws:arn:test:s3-simple:20230101-00:core:s3-bucket:bucket"
+      },
+      "Resources" : {
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691" : {
+          "Handler" : "index.handler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
+          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3BucketResourceClusterlessSimpleTest000000000000UsWest2454CD0FB" : {
+          "BucketName" : "clusterless-simple-test-000000000000-us-west-2",
+          "Type" : "AWS::S3::Bucket"
+        },
+        "S3BucketResourceClusterlessSimpleTest000000000000UsWest2Notifications30967482" : {
+          "BucketName" : {
+            "Ref" : "S3BucketResourceClusterlessSimpleTest000000000000UsWest2454CD0FB"
+          },
+          "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessSimpleTest000000000000UsWest2PolicyABBC4CFD" : {
+          "Type" : "AWS::S3::BucketPolicy"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357" : {
+          "Environment.Variables" : [ "CLS_S3_PUT_BOUNDARY_PROPS_JAVA", "CLS_S3_PUT_BOUNDARY_PROPS_JSON" ],
+          "FunctionName" : "TEST-s3-simple-ingress-put-listener-int-20230101-00-us-west-2",
+          "Handler" : "clusterless.aws.lambda.boundary.s3put.PutEventBoundaryHandler",
+          "Type" : "AWS::Lambda::Function"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleBB4DCB49" : {
+          "Type" : "AWS::IAM::Role"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleDefaultPolicyBE9EB7B7" : {
+          "PolicyName" : "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntServiceRoleDefaultPolicyBE9EB7B7",
+          "Type" : "AWS::IAM::Policy"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerLambdaLogGroupIngressPutListenerInt690B1C43" : {
+          "LogGroupName" : {
+            "Fn::Join" : [ "", [ "/aws/lambda/", {
+              "Ref" : "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357"
+            } ] ]
+          },
+          "Type" : "AWS::Logs::LogGroup"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerIntE9CA8777F623D77F" : {
+          "FunctionName" : {
+            "Fn::GetAtt" : [ "S3PutListenerBoundaryInfrequentIngressPutListenerIngressPutListenerInt2F07F357", "Arn" ]
+          },
+          "Type" : "AWS::Lambda::Permission"
+        },
+        "S3PutListenerBoundaryInfrequentIngressPutListenerListenerEventFD473347" : {
+          "Name" : "TEST-s3-simple-ingress-put-listener-20230101-00-us-west-2",
+          "Type" : "AWS::Events::Rule"
+        }
+      }
+    }
+  }
+}

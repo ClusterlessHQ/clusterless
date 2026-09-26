@@ -1,0 +1,60 @@
+{
+   "arcs": [
+      {
+         "name": "copyA",
+         "sinks": {
+            "main": {
+               "name": "copy-a-frequent-copy",
+               "pathURI": "s3://clusterless-freq-filter-copy-test-000000000000-us-west-2/copy-a/",
+               "version": "20230101"
+            }
+         },
+         "sources": {
+            "main": {
+               "name": "ingress-frequent-copy",
+               "version": "20220101"
+            }
+         },
+         "type": "aws:core:s3CopyArc",
+         "workload": {
+            "workloadProps": {
+               "filter": {
+                  "excludes": [
+                     "**/_*"
+                  ]
+               }
+            }
+         }
+      }
+   ],
+   "boundaries": [
+      {
+         "dataset": {
+            "name": "ingress-frequent-copy",
+            "pathURI": "s3://clusterless-freq-filter-copy-test-000000000000-us-west-2/ingress/",
+            "version": "20220101"
+         },
+         "eventArrival": "frequent",
+         "lotUnit": "Twelfths",
+         "name": "FreqPutLstnr",
+         "type": "aws:core:s3PutListenerBoundary"
+      }
+   ],
+   "placement": {
+      "account": "000000000000",
+      "provider": "aws",
+      "region": "us-west-2",
+      "stage": "test"
+   },
+   "project": {
+      "name": "S3FreqFiltCp",
+      "version": "20230101-00"
+   },
+   "resources": [
+      {
+         "bucketName": "clusterless-freq-filter-copy-test-000000000000-us-west-2",
+         "name": "bucket",
+         "type": "aws:core:s3Bucket"
+      }
+   ]
+}
