@@ -336,7 +336,10 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 - **Tests:** unit `*Test` under `src/test`; handler integration tests under
   `src/integrationTest`, extend `LocalStackBase`, mostly `@TestFactory`;
   shared fixtures in lambda-common `testFixtures` (`TestArcs`,
-  `TestDatasets`, `TestLots`, `BootstrapMachine`). Kernel synth is covered by
+  `TestDatasets`, `TestLots`, `BootstrapMachine`). **One test per
+  `LocalStackBase` class:** its bootstrap recreates the store buckets before
+  each test, so a second test in the same class fails with
+  `BucketAlreadyOwnedByYouException` — add a new class instead. Kernel synth is covered by
   `KernelTest` (fake account, `CLS_ASSETS_PATH`). Testcontainers fails loudly
   without Docker — keep it that way; a test that skips when its environment
   is missing looks green while proving nothing.
