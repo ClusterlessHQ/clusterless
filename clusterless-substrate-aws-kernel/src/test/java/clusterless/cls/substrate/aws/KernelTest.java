@@ -44,7 +44,7 @@ public class KernelTest {
             "placement": {
                 "stage": "prod",
                 "provider": "aws",
-                "account": "abc123",
+                "account": "000000000000",
                 "region": "us-east-2"
             },
             "resources" : [
@@ -78,7 +78,7 @@ public class KernelTest {
               "placement": {
                 "stage": "prod",
                 "provider": "aws",
-                "account": "abc123",
+                "account": "000000000000",
                 "region": "us-east-2"
               },
               "boundaries": [
