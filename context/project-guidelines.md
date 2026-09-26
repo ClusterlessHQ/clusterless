@@ -127,9 +127,9 @@ copied.
   `LOG.error` is invisible by default. Log for diagnosis; *report* for the
   user.
 - **stdout is data, stderr is everything else.** Logs, progress, prompts,
-  advisories, and errors go to stderr. Today `logback.xml`'s console
-  appender targets stdout, so `-v --output json` interleaves log lines with
-  JSON — don't build on that; fix it when touched.
+  advisories, and errors go to stderr. The single `logback.xml` lives in
+  `clusterless-main-common` (so both `cls` and the `cls-aws` CDK app load
+  it) and its console appender targets stderr; `CLITest` guards the split.
 - **One output gateway.** Tabular/record output goes through
   `Reporter.instance(printer, RecordClass)` and honours the global
   `--output {table,json,csv,tsv}`. Don't `System.out.println` from a command
