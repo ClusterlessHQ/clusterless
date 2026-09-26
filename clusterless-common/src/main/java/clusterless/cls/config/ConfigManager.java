@@ -135,13 +135,19 @@ public class ConfigManager {
             configs.add(valueToObjectNodeNoNulls(readPropertiesSafe(properties, configOptions.configNamespace(), configOptions.configClass())));
         }
 
+        // nearest local config wins: walk up from cwd to and including $HOME, or to the
+        // filesystem root when cwd is outside $HOME (getParent() returns null at the root)
         Path currentDir = configOptions.localPath();
 
-        while (!currentDir.equals(configOptions.homePath())) {
+        while (currentDir != null) {
             Path path = currentDir.resolve(configOptions.localConfigName());
 
             if (Files.exists(path)) {
                 configs.add(readTreeSafe(path.toFile()));
+                break;
+            }
+
+            if (currentDir.equals(configOptions.homePath())) {
                 break;
             }
 

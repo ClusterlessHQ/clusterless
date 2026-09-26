@@ -160,7 +160,8 @@ copied.
   annotations and `templates/*.hbs`. Fix help text at the annotation, not in
   a copy. The README help snapshot is hand-maintained and stale.
 - **Config precedence:** `-D ns.key=value` > nearest `.clsconfig[-ns]`
-  walking up from cwd (first hit only) > `~/.cls/config[-ns]`; all TOML;
+  walking up from cwd (first hit only) up to and including `$HOME`, or to
+  `/` when cwd is outside `$HOME` > `~/.cls/config[-ns]`; all TOML;
   merge is shallow (a nested table in a higher layer replaces the whole
   table). There is no env-var layer. `-D` has no `INHERIT` scope — it must
   precede the subcommand.

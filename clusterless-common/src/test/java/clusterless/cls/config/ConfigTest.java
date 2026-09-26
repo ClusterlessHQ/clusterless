@@ -12,7 +12,12 @@ import clusterless.cls.json.JSONUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -86,5 +91,111 @@ public class ConfigTest {
         Assertions.assertEquals("a1", resultConfig.a);
         Assertions.assertEquals("b", resultConfig.b);
         Assertions.assertEquals("cp", resultConfig.c);
+    }
+
+    // kata 7fvz: the nearest-.clsconfig walk must terminate at the filesystem root when cwd is
+    // outside $HOME, and must honor a .clsconfig sitting in $HOME itself.
+
+    private static ConfigOptions options(Path home, Path local) {
+        return ConfigOptions.Builder.builder()
+                .withHomePath(home)
+                .withGlobalConfigPath(home.resolve(".cls"))
+                .withGlobalConfigName(Paths.get("config-test"))
+                .withLocalPath(local)
+                .withLocalConfigName(Paths.get(".clsconfig-test"))
+                .withConfigNamespace("test")
+                .withConfigClass(TestConfig.class)
+                .build();
+    }
+
+    private static Path dirs(Path path) throws IOException {
+        return Files.createDirectories(path);
+    }
+
+    private static void write(Path dir, String toml) throws IOException {
+        Files.writeString(dirs(dir).resolve(".clsconfig-test"), toml);
+    }
+
+    @Test
+    void outsideHomeDoesNotThrow(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        Path work = dirs(root.resolve("work"));
+
+        TestConfig config = Assertions.assertDoesNotThrow(() -> ConfigManager.<TestConfig>loadConfig(options(home, work)));
+
+        Assertions.assertNull(config.a);
+    }
+
+    @Test
+    void outsideHomeFindsAncestorConfig(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        Path cwd = dirs(root.resolve("work/x/y"));
+        write(root.resolve("work/x"), "a = \"x\"\n");
+
+        TestConfig config = ConfigManager.loadConfig(options(home, cwd));
+
+        Assertions.assertEquals("x", config.a);
+    }
+
+    @Test
+    void homeLocalConfigHonoredBelowHome(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        Path cwd = dirs(home.resolve("a/b"));
+        write(home, "a = \"home\"\n");
+
+        TestConfig config = ConfigManager.loadConfig(options(home, cwd));
+
+        Assertions.assertEquals("home", config.a);
+    }
+
+    @Test
+    void homeLocalConfigHonoredAtHome(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        write(home, "a = \"home\"\n");
+
+        TestConfig config = ConfigManager.loadConfig(options(home, home));
+
+        Assertions.assertEquals("home", config.a);
+    }
+
+    @Test
+    void nearestWinsFirstHitOnly(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        Path cwd = dirs(home.resolve("a/b"));
+        write(home, "a = \"home\"\nb = \"home\"\n");
+        write(home.resolve("a"), "a = \"near\"\n");
+
+        TestConfig config = ConfigManager.loadConfig(options(home, cwd));
+
+        Assertions.assertEquals("near", config.a);
+        Assertions.assertNull(config.b);
+    }
+
+    @Test
+    void walkStopsAtHome(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        Path cwd = dirs(home.resolve("a"));
+        write(root, "a = \"above\"\n");
+
+        TestConfig config = ConfigManager.loadConfig(options(home, cwd));
+
+        Assertions.assertNull(config.a);
+    }
+
+    @Test
+    void propertiesOverLocalOverGlobal(@TempDir Path root) throws IOException {
+        Path home = dirs(root.resolve("home"));
+        Path cwd = dirs(home.resolve("a"));
+        write(cwd, "a = \"local\"\nb = \"local\"\n");
+        Files.writeString(dirs(home.resolve(".cls")).resolve("config-test"), "a = \"global\"\nb = \"global\"\nc = \"global\"\n");
+
+        Properties properties = new Properties();
+        properties.setProperty("test.a", "prop");
+
+        TestConfig config = ConfigManager.loadConfig(properties, options(home, cwd));
+
+        Assertions.assertEquals("prop", config.a);
+        Assertions.assertEquals("local", config.b);
+        Assertions.assertEquals("global", config.c);
     }
 }
