@@ -65,8 +65,10 @@ design history.
   `version.properties`) goes on to the real-AWS scenarios, the jreleaser
   release (which overwrites the `wip-<major>` release), the Homebrew publish,
   and the Netlify docs deploy. Sub-wip branches (`wip-1.0-<topic>`) are
-  test-only; push `<branch>-scenarios` to run scenarios (us-east-2,
-  `scenario.yml`) without releasing.
+  test-only; to run the AWS scenarios on one without releasing, dispatch
+  `gh workflow run wip.yml --ref <branch> -f scenarios=true` (us-west-2,
+  after `check`), or push `<branch>-scenarios` (`scenario.yml`, us-east-2,
+  scenarios only).
 - **NEVER `git stash` in a worktree.** The stash stack lives in the shared
   common `.git` dir and is global across parallel flights; a pop can restore
   a foreign session's stash and make a red/green check report a false GREEN.
@@ -198,6 +200,16 @@ copied.
 None of the persisted formats carries a schema version, and readers are
 strict. Treat everything below as a wire contract; changing it needs an RDR
 and a migration story.
+
+`SynthIdentitySnapshotTest` (kernel module) pins the synthesized identity of
+the scenario projects and the bootstrap stack — stack names, logical ids and
+types, physical names, handlers, props env keys, export names — against
+`src/test/resources/snapshot/synth-identity.json`. A failure there is a
+deployed-resource replacement or orphan; regenerate with
+`CLS_SNAPSHOT_UPDATE=true` only for a deliberate change, and review the
+snapshot diff in the same commit. When a scenario changes, re-render its
+fixture under `snapshot/projects/` (jsonnet, stage `test`, account
+`000000000000`, region `us-west-2`).
 
 - **Stack names** `{stage}-{project}-{baseId}-{version}-{region}`
   (`Stacks`): grouped stack baseId `ResourceActivityBoundary` (from
@@ -346,7 +358,6 @@ and a migration story.
 - **External `io.clusterless:clusterless-commons-*`** (naming, `Ref`,
   `ScopedApp`/`ScopedStack`) must be upgraded in lockstep; its source lives
   in the sibling `commons` repo.
-- **CI actions** are on deprecated majors (`@v3`, `gradle-build-action@v2`).
 
 ### Declared-but-unwired scaffolding
 
@@ -390,8 +401,12 @@ without an RDR, and don't "fix" them piecemeal:
   command. Read both before concluding.
 - **Synth before deploy.** `cls verify` (`cdk synth`) or a `KernelTest`-style
   case shows the CloudFormation a change produces. For anything touching
-  names or construct ids, diff the synthesized template's logical ids and
-  physical names against `HEAD` — a changed id is a resource replacement.
+  names, construct ids, CDK, or dependency upgrades, run
+  `./gradlew :clusterless-substrate-aws-kernel:test --tests '*SynthIdentitySnapshotTest'`
+  — a changed id is a resource replacement.
+- **Run the AWS scenarios at milestones, not per commit.** Dispatch them on the
+  working branch after a runtime-affecting change lands (dependency layers,
+  CDK, Java) and before merging to the version branch.
 - **Probe, then delete.** For "what does CDK/jsii/Jackson actually do with
   X", write a throwaway test that logs the value, run it, ground-truth the
   assumption, and delete it before committing.
