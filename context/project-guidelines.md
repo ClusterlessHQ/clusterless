@@ -290,6 +290,14 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
   `null`); `StreamResultHandler` → `EventResultHandler` → `ArcEventHandler`
   (returns a map for Step Functions). Each stage logs and rethrows; each
   handler has an observer interface used for logging and test verification.
+- **AWS-owned event payloads are read tolerantly.** EventBridge/S3/scheduled
+  event models are generated from AWS schemas in the transform module
+  (`src/main/json/*.json`, openapi-generator) with
+  `@JsonIgnoreProperties(ignoreUnknown = true)`: AWS adds fields without notice
+  (S3 "Object Created" gained `event-version`, and every infrequent put
+  listener failed until this was tolerated). This is the opposite of our own
+  persisted types, which stay strict. Any new AWS event model gets the same
+  generator option; `AWSEventCompatibilityTest` holds a current-shape sample.
 - **`*-model` modules hold props/payloads shared with constructs.** They must
   stay free of CDK and the Lambda runtime. (They do depend on
   `clusterless-substrate-aws-common`, hence the AWS SDK.)
