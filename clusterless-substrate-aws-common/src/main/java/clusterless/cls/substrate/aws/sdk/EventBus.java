@@ -16,6 +16,9 @@ import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.CreateEventBusRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
+import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
+
+import java.util.stream.Collectors;
 
 /**
  *
@@ -59,10 +62,26 @@ public class EventBus extends ClientBase<EventBridgeClient> {
                 .build();
 
         try (EventBridgeClient eventBridgeClient = createClient()) {
-            return new Response(eventBridgeClient.putEvents(request));
+            PutEventsResponse response = eventBridgeClient.putEvents(request);
+
+            // PutEvents reports rejected entries in-band with a successful http status
+            if (response.failedEntryCount() != null && response.failedEntryCount() > 0) {
+                return new Response(new IllegalStateException(failedEntriesMessage(eventBusName, response)));
+            }
+
+            return new Response(response);
         } catch (Exception exception) {
             return new Response(exception);
         }
+    }
+
+    private static String failedEntriesMessage(String eventBusName, PutEventsResponse response) {
+        String failures = response.entries().stream()
+                .filter(entry -> entry.errorCode() != null)
+                .map(entry -> "%s: %s".formatted(entry.errorCode(), entry.errorMessage()))
+                .collect(Collectors.joining(", "));
+
+        return "event bus: %s, rejected %d of %d events: %s".formatted(eventBusName, response.failedEntryCount(), response.entries().size(), failures);
     }
 
     public Response create(String eventBusName) {
