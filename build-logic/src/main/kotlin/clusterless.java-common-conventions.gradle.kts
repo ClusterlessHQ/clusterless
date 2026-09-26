@@ -167,17 +167,17 @@ dependencies {
         testImplementationAndTestFixture("org.mockito:mockito-core:5.24.0")
 
         // https://github.com/junit-pioneer/junit-pioneer/releases
-        val junitPioneer = "2.1.0"
+        val junitPioneer = "2.3.0"
         testImplementationAndTestFixture("org.junit-pioneer:junit-pioneer:$junitPioneer")
         testImplementationAndTestFixture("org.junit-pioneer:junit-pioneer-jackson:$junitPioneer")
 
         // https://github.com/hosuaby/inject-resources
-        val injectResources = "0.3.3"
+        val injectResources = "1.0.0"
         testImplementationAndTestFixture("io.hosuaby:inject-resources-core:$injectResources")
         testImplementationAndTestFixture("io.hosuaby:inject-resources-junit-jupiter:$injectResources")
 
         // https://github.com/webcompere/system-stubs
-        val systemStubs = "2.1.3"
+        val systemStubs = "2.1.8"
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-core:$systemStubs")
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-jupiter:$systemStubs")
 
@@ -194,12 +194,15 @@ dependencies {
     }
 }
 
+// https://github.com/junit-team/junit-framework/releases
+val junitJupiter = "5.14.4"
+
 testing {
     suites {
         // Configure the built-in test suite
         val test by getting(JvmTestSuite::class) {
             // Use JUnit Jupiter test framework
-            useJUnitJupiter("5.9.1")
+            useJUnitJupiter(junitJupiter)
             dependencies {
                 implementation("org.junit-pioneer:junit-pioneer") {
                     capabilities {
@@ -216,6 +219,7 @@ testing {
         }
 
         val integrationTest by registering(JvmTestSuite::class) {
+            useJUnitJupiter(junitJupiter)
             dependencies {
                 implementation(project())
                 implementation("org.testcontainers:testcontainers")
