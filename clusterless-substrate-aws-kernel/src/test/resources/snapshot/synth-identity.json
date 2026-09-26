@@ -223,10 +223,6 @@
         "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
           "Type" : "AWS::IAM::Role"
         },
-        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
-          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
-          "Type" : "AWS::IAM::Policy"
-        },
         "GlueDatabaseResourceClusterlessGlueTestDbA8AC5EBD" : {
           "DatabaseInput.Name" : "clusterless-glue-test-db",
           "Type" : "AWS::Glue::Database"
@@ -247,6 +243,10 @@
             "Ref" : "S3BucketResourceClusterlessGlueTest000000000000UsWest2D37D2FE0"
           },
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessGlueTest000000000000UsWest2NotificationsHandlerPolicy6FFB0B41" : {
+          "PolicyName" : "S3BucketResourceClusterlessGlueTest000000000000UsWest2NotificationsHandlerPolicy6FFB0B41",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3BucketResourceClusterlessGlueTest000000000000UsWest2Policy1FD7F2F1" : {
           "Type" : "AWS::S3::BucketPolicy"
@@ -586,10 +586,6 @@
         "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
           "Type" : "AWS::IAM::Role"
         },
-        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
-          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
-          "Type" : "AWS::IAM::Policy"
-        },
         "S3BucketResourceClusterlessChainTest000000000000UsWest23CAFA4BF" : {
           "BucketName" : "clusterless-chain-test-000000000000-us-west-2",
           "Type" : "AWS::S3::Bucket"
@@ -599,6 +595,10 @@
             "Ref" : "S3BucketResourceClusterlessChainTest000000000000UsWest23CAFA4BF"
           },
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessChainTest000000000000UsWest2NotificationsHandlerPolicyCFA74260" : {
+          "PolicyName" : "S3BucketResourceClusterlessChainTest000000000000UsWest2NotificationsHandlerPolicyCFA74260",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3BucketResourceClusterlessChainTest000000000000UsWest2Policy7E9E09CD" : {
           "Type" : "AWS::S3::BucketPolicy"
@@ -746,10 +746,6 @@
         "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
           "Type" : "AWS::IAM::Role"
         },
-        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
-          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
-          "Type" : "AWS::IAM::Policy"
-        },
         "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest253EA279C" : {
           "BucketName" : "clusterless-freq-filter-bndry-test-000000000000-us-west-2",
           "Type" : "AWS::S3::Bucket"
@@ -759,6 +755,10 @@
             "Ref" : "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest253EA279C"
           },
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest2NotificationsHandlerPolicyEA405742" : {
+          "PolicyName" : "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest2NotificationsHandlerPolicyEA405742",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3BucketResourceClusterlessFreqFilterBndryTest000000000000UsWest2Policy61169171" : {
           "Type" : "AWS::S3::BucketPolicy"
@@ -787,6 +787,10 @@
         "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsF2DDBF45" : {
           "BucketName" : "clusterless-freq-filter-bndry-test-000000000000-us-west-2",
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsHandlerPolicy3E5CD209" : {
+          "PolicyName" : "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsHandlerPolicy3E5CD209",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3PutListenerBoundaryFrequentFreqPutLstnrListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt1A10A1471EB30A54" : {
           "FunctionName" : {
@@ -917,10 +921,6 @@
         "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
           "Type" : "AWS::IAM::Role"
         },
-        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
-          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
-          "Type" : "AWS::IAM::Policy"
-        },
         "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2B1978CA2" : {
           "BucketName" : "clusterless-freq-filter-copy-test-000000000000-us-west-2",
           "Type" : "AWS::S3::Bucket"
@@ -930,6 +930,10 @@
             "Ref" : "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2B1978CA2"
           },
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2NotificationsHandlerPolicy41DF4D0C" : {
+          "PolicyName" : "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2NotificationsHandlerPolicy41DF4D0C",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3BucketResourceClusterlessFreqFilterCopyTest000000000000UsWest2Policy7DC23691" : {
           "Type" : "AWS::S3::BucketPolicy"
@@ -958,6 +962,10 @@
         "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsF2DDBF45" : {
           "BucketName" : "clusterless-freq-filter-copy-test-000000000000-us-west-2",
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsHandlerPolicy3E5CD209" : {
+          "PolicyName" : "S3PutListenerBoundaryFrequentFreqPutLstnrListenBucketNotificationsHandlerPolicy3E5CD209",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3PutListenerBoundaryFrequentFreqPutLstnrListenerEventAllowEventRuleResourceActivityBoundaryS3PutListenerBoundaryFrequentFreqPutLstnrFreqPutLstnrInt1A10A1471EB30A54" : {
           "FunctionName" : {
@@ -1088,10 +1096,6 @@
         "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC" : {
           "Type" : "AWS::IAM::Role"
         },
-        "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36" : {
-          "PolicyName" : "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
-          "Type" : "AWS::IAM::Policy"
-        },
         "S3BucketResourceClusterlessSimpleTest000000000000UsWest2454CD0FB" : {
           "BucketName" : "clusterless-simple-test-000000000000-us-west-2",
           "Type" : "AWS::S3::Bucket"
@@ -1101,6 +1105,10 @@
             "Ref" : "S3BucketResourceClusterlessSimpleTest000000000000UsWest2454CD0FB"
           },
           "Type" : "Custom::S3BucketNotifications"
+        },
+        "S3BucketResourceClusterlessSimpleTest000000000000UsWest2NotificationsHandlerPolicy7630F335" : {
+          "PolicyName" : "S3BucketResourceClusterlessSimpleTest000000000000UsWest2NotificationsHandlerPolicy7630F335",
+          "Type" : "AWS::IAM::Policy"
         },
         "S3BucketResourceClusterlessSimpleTest000000000000UsWest2PolicyABBC4CFD" : {
           "Type" : "AWS::S3::BucketPolicy"

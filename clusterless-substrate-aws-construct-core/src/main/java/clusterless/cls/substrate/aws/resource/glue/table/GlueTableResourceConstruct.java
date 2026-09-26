@@ -58,7 +58,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
                 .database(database)
                 .tableName(model().tableName())
                 .description(model().description())
-                .bucket(tableLocation)
+                .storage(S3TableStorage.fromBucket(tableLocation))
                 .s3Prefix(URIs.asKeyPath(model.pathURI()))
                 .columns(columnsFrom(model.schema().columns()))
                 .partitionKeys(columnsFrom(model.schema().partitions()))
@@ -121,10 +121,7 @@ public class GlueTableResourceConstruct extends ResourceConstruct<GlueTableResou
                 .stream()
                 .map(column -> Column.builder()
                         .name(column.name())
-                        .type(Type.builder()
-                                .inputString(column.type())
-                                .isPrimitive(true)
-                                .build())
+                        .type(Schema.custom(column.type(), true))
                         .comment(column.comment())
                         .build()).toList();
     }

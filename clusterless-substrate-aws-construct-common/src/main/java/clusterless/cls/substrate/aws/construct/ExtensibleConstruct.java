@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awscdk.services.glue.alpha.ITable;
-import software.amazon.awscdk.services.glue.alpha.Table;
+import software.amazon.awscdk.services.glue.alpha.TableBase;
 import software.amazon.awscdk.services.glue.alpha.TableAttributes;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.IBucket;
@@ -84,7 +84,7 @@ public class ExtensibleConstruct<E extends Extensible> extends ManagedConstruct 
 
     @NotNull
     protected ITable getTableFor(String baseId, String tableName) {
-        return tables.computeIfAbsent(tableName, k -> Table.fromTableAttributes(this, baseId, TableAttributes.builder()
+        return tables.computeIfAbsent(tableName, k -> TableBase.fromTableAttributes(this, baseId, TableAttributes.builder()
                 .tableName(k)
                 .build())
         );
