@@ -317,8 +317,9 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 - **Dependency versions live in one place:** the `constraints {}` block of
   `build-logic/…/clusterless.java-common-conventions.gradle.kts`. Modules
   declare dependencies unversioned. Exceptions pinned inline: CDK
-  (`construct-common/build.gradle.kts`, glue-alpha pinned to the same
-  version), the scenario module's Conductor/Spring Boot, and plugin versions.
+  (`construct-common/build.gradle.kts`; Glue uses the stable
+  `aws-cdk-lib` `aws-glue` L2s, no alpha module), the scenario module's
+  Conductor/Spring Boot, and plugin versions.
 - **Verify ladder, cheapest first:**
   - `./gradlew compileJava compileTestJava` — compile (transform module
     generates OpenAPI models first).
@@ -516,8 +517,8 @@ without an RDR, and don't "fix" them piecemeal:
 - **Adding a dependency:** a constraint in the conventions plugin (use
   `implementationAndTestFixture` if fixtures need it) + the unversioned
   declaration in the module.
-- **Bumping CDK:** `construct-common/build.gradle.kts` (lib + glue-alpha
-  together) and the `npm aws-cdk@` version in both workflows; synth-diff
+- **Bumping CDK:** `construct-common/build.gradle.kts` (`aws-cdk-lib`)
+  and the `npm aws-cdk@` version in both workflows; synth-diff
   before landing.
 - **Adding a field to a persisted type:** see *Identity and persisted
   formats* — add read-tolerance first or ship CLI + lambdas together, and
