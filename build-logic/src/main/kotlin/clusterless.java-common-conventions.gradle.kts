@@ -194,7 +194,7 @@ dependencies {
 }
 
 // https://github.com/junit-team/junit-framework/releases
-val junitJupiter = "5.14.4"
+val junitJupiter = "6.1.3"
 
 testing {
     suites {
