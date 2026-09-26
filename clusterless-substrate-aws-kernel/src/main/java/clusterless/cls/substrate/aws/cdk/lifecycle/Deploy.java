@@ -43,7 +43,7 @@ public class Deploy extends BaseCDKCommand implements Callable<Integer> {
             return exitCode;
         }
 
-        return Metadata.pushDeployablesMetadata(processExec.getOutputPath(), commandOptions.dryRun());
+        return Metadata.pushDeployablesMetadata(processExec.profile(), processExec.getOutputPath(), commandOptions.dryRun());
     }
 
 }

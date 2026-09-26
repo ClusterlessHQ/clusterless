@@ -109,12 +109,19 @@ public class Metadata {
         return result.isPresent() ? 1 : 0;
     }
 
-    public static int pushDeployablesMetadata(String outputPath, boolean dryRun) {
-        return deployablesMetadata(outputPath, dryRun, Metadata::pushDeployablesMetadata);
+    /**
+     * Runs in the parent process after {@code cdk deploy}; the profile must come from the
+     * command, since CLS_CDK_PROFILE is only set on the cdk synth child's environment.
+     */
+    public static int pushDeployablesMetadata(String profile, String outputPath, boolean dryRun) {
+        return deployablesMetadata(outputPath, dryRun, (deployables, arcsMeta) -> pushDeployablesMetadata(S3::new, profile, deployables, arcsMeta));
     }
 
-    public static int removeDeployablesMetadata(String outputPath, boolean dryRun) {
-        return deployablesMetadata(outputPath, dryRun, Metadata::removeDeployablesMetadata);
+    /**
+     * Runs in the parent process after {@code cdk destroy}; see {@link #pushDeployablesMetadata(String, String, boolean)}.
+     */
+    public static int removeDeployablesMetadata(String profile, String outputPath, boolean dryRun) {
+        return deployablesMetadata(outputPath, dryRun, (deployables, arcsMeta) -> removeDeployablesMetadata(S3::new, profile, deployables, arcsMeta));
     }
 
     protected static int deployablesMetadata(String outputPath, boolean dryRun, BiFunction<List<Deployable>, List<ArcMeta>, Integer> f) {
@@ -152,16 +159,14 @@ public class Metadata {
         return f.apply(deployables, arcsMeta);
     }
 
-    public static int pushDeployablesMetadata(List<Deployable> deployables, List<ArcMeta> arcsMeta) {
-        String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
-
+    static int pushDeployablesMetadata(BiFunction<String, String, S3> s3For, String profile, List<Deployable> deployables, List<ArcMeta> arcsMeta) {
         for (Deployable deployable : deployables) {
             List<URI> materials = new ArrayList<>();
 
             Placement placement = deployable.placement();
             Project project = deployable.project();
 
-            S3 s3 = new S3(profile, placement.region());
+            S3 s3 = s3For.apply(profile, placement.region());
 
             URI metaURI = ProjectURI.builder()
                     .withPlacement(placement)
@@ -248,14 +253,12 @@ public class Metadata {
         return 0;
     }
 
-    public static int removeDeployablesMetadata(List<Deployable> deployables, List<ArcMeta> arcsMeta) {
-        String profile = System.getenv().get(CDKProcessExec.CLS_CDK_PROFILE);
-
+    static int removeDeployablesMetadata(BiFunction<String, String, S3> s3For, String profile, List<Deployable> deployables, List<ArcMeta> arcsMeta) {
         for (Deployable deployable : deployables) {
             Placement placement = deployable.placement();
             Project project = deployable.project();
 
-            S3 s3 = new S3(profile, placement.region());
+            S3 s3 = s3For.apply(profile, placement.region());
 
             URI uri = ProjectMaterialsURI.builder()
                     .withPlacement(placement)

@@ -44,6 +44,6 @@ public class Destroy extends BaseCDKCommand implements Callable<Integer> {
             return exitCode;
         }
 
-        return Metadata.removeDeployablesMetadata(processExec.getOutputPath(), commandOptions.dryRun());
+        return Metadata.removeDeployablesMetadata(processExec.profile(), processExec.getOutputPath(), commandOptions.dryRun());
     }
 }
