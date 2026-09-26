@@ -13,7 +13,52 @@ on:
       - '**.template'
       - '**.hbs'
 jobs:
-  run-all-tests-and-release:
+  # every wip-* branch (e.g. wip-1.0-aug) runs the unit and integration tests
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.publish.outputs.publish }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+
+      - name: Install CDK
+        run: npm install -g aws-cdk@2.1100.0
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Setup Env
+        run: echo "${{ vars.GRADLE_PROPERTIES }}" > gradle.properties
+
+      # only the version branch (wip-<clusterless.release.major>) publishes; it is the
+      # same branch jreleaser releases from (versionBranch in the common conventions)
+      - name: Resolve Publish Branch
+        id: publish
+        run: |
+          major=$(sed -n 's/^clusterless\.release\.major=//p' version.properties)
+          if [ "${GITHUB_REF_NAME}" = "wip-${major}" ]; then publish=true; else publish=false; fi
+          echo "branch=${GITHUB_REF_NAME} release-branch=wip-${major} publish=${publish}"
+          echo "publish=${publish}" >> "$GITHUB_OUTPUT"
+
+      - name: Run Tests
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+        run: |
+          ./gradlew --no-daemon --info --stacktrace check
+
+  # only the version branch runs the AWS scenarios, then releases and deploys docs
+  scenarios-and-release:
+    needs: test
+    if: needs.test.outputs.publish == 'true'
     concurrency: scenarios-us-west-2
     runs-on: ubuntu-latest
 
@@ -36,12 +81,6 @@ jobs:
 
       - name: Setup Env
         run: echo "${{ vars.GRADLE_PROPERTIES }}" > gradle.properties
-
-      - name: Run Tests
-        env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-        run: |
-          ./gradlew --no-daemon --info --stacktrace check
 
       - name: Run Scenarios
         env:
