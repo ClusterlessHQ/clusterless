@@ -116,13 +116,18 @@ while read -r local_ref local_sha _remote_ref remote_sha; do
 
 		# Report which shape hit so the fix is obvious without re-reading
 		# the commit.
+		#
+		# Here-strings, not `printf | grep -q`: under pipefail, grep -q exits
+		# on the first match while printf is still writing a message larger
+		# than the pipe buffer (~64 KiB); printf dies of SIGPIPE (141), the
+		# pipeline reports failure, and the trailer passes unflagged.
 		msg=$(git log -1 --pretty='%B' "$sha")
 		trailer=""
-		if printf '%s\n' "$msg" | grep -Eiq '^[[:space:]]*Co-Authored-By[[:space:]]*:'; then
+		if grep -Eiq '^[[:space:]]*Co-Authored-By[[:space:]]*:' <<<"$msg"; then
 			trailer="Co-Authored-By"
-		elif printf '%s\n' "$msg" | grep -Eiq '^[[:space:]]*Claude-[A-Za-z0-9_-]+[[:space:]]*:'; then
+		elif grep -Eiq '^[[:space:]]*Claude-[A-Za-z0-9_-]+[[:space:]]*:' <<<"$msg"; then
 			trailer="Claude-*"
-		elif printf '%s\n' "$msg" | grep -Eiq 'Generated with .*Claude Code|claude\.ai/code'; then
+		elif grep -Eiq 'Generated with .*Claude Code|claude\.ai/code' <<<"$msg"; then
 			trailer="Claude Code link"
 		fi
 
@@ -162,11 +167,15 @@ Co-Authored-By trailers, Claude-* trailers (Claude-Session and friends), or
 "Generated with Claude Code" / claude.ai/code links. Authorship is the
 Author header alone.
 
-Rewrite the named commits before pushing, e.g. to strip them across a range:
+Rewrite the named commits before pushing. To strip them across a range and
+re-sign every rewritten commit (amend honors commit.gpgsign; filter-branch
+does not sign, so the reference-transaction hook refuses its result):
 
-    git filter-branch -f --msg-filter \
-      'grep -Eiv "^[[:space:]]*(Co-Authored-By|Claude-[A-Za-z0-9_-]+)[[:space:]]*:|Generated with .*Claude Code|claude\.ai/code"' \
-      <base>..HEAD
+    git rebase <base> \
+      --exec 'git log -1 --format=%B | grep -Eiv "^[[:space:]]*(Co-Authored-By|Claude-[A-Za-z0-9_-]+)[[:space:]]*:|Generated with .*Claude Code|claude\.ai/code" | git commit --amend --allow-empty --no-verify -F -'
+
+Verify with:
+    git log --pretty='%h %G? %s' <base>..HEAD
 
 Bypass (not recommended — published attribution requires a force-push to
 remove):
