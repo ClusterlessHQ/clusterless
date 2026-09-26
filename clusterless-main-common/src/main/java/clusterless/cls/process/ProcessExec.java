@@ -11,6 +11,7 @@ package clusterless.cls.process;
 import clusterless.cls.config.Configuration;
 import clusterless.cls.json.JSONUtil;
 import clusterless.cls.startup.Startup;
+import clusterless.cls.util.ExitCodeException;
 import io.github.resilience4j.core.IntervalFunction;
 import io.github.resilience4j.core.StopWatch;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
@@ -18,8 +19,10 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Supplier;
@@ -30,6 +33,13 @@ public abstract class ProcessExec {
     protected Supplier<Boolean> retry = () -> false;
     protected Supplier<Integer> verbosity = () -> 0;
     private int retries = 3;
+
+    /**
+     * The command this mixin is mixed into, so user output (the dry-run plan) goes through
+     * picocli's out stream; null when not used as a mixin.
+     */
+    @CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
+    private CommandLine.Model.CommandSpec mixee;
 
     public ProcessExec() {
     }
@@ -51,6 +61,14 @@ public abstract class ProcessExec {
 
     public boolean retry() {
         return retry.get();
+    }
+
+    protected PrintWriter out() {
+        if (mixee != null && mixee.commandLine() != null) {
+            return mixee.commandLine().getOut();
+        }
+
+        return new PrintWriter(System.out, true);
     }
 
     public int executeProcess(String... args) {
@@ -80,7 +98,8 @@ public abstract class ProcessExec {
             return process.executeCheckedSupplier(() -> process(environment, args));
         } catch (MaxRetriesExceededException e) {
             LOG.error("failed to execute command: {} after {} retries, duration: {}", args, retries, stopWatch.stop(), e);
-            return 1;
+            // logging is off at the default verbosity, so report the failure through the exception handler
+            throw new ExitCodeException(String.format("failed to execute command: %s after %d retries, rerun with -v for details", args.get(0), retries), e, 1);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -99,6 +118,10 @@ public abstract class ProcessExec {
 
         if (dryRun()) {
             LOG.warn("dry run, not executing command: {}", args);
+            // the plan is the output of a dry run, so it is printed regardless of verbosity
+            PrintWriter out = out();
+            out.println("dry run: " + String.join(" ", args));
+            out.flush();
             return 0;
         }
 

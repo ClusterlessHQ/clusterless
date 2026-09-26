@@ -94,8 +94,10 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
         }
 
         if (destroyBootstrap && exitCode != 0) {
-            LOG.error("unable to destroy bootstrap clusterless, see logs for details");
-            throw new ExitCodeException("unable to destroy bootstrap clusterless, see logs for details", exitCode);
+            // logging is off at the default verbosity, so point at -v rather than at the logs
+            String message = "unable to destroy bootstrap clusterless, rerun with -v for details";
+            LOG.error(message);
+            throw new ExitCodeException(message, exitCode);
         }
 
         if (destroyBootstrap) {

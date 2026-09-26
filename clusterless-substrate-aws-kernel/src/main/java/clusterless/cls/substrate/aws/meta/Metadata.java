@@ -18,6 +18,7 @@ import clusterless.cls.substrate.uri.ArcURI;
 import clusterless.cls.substrate.uri.DatasetURI;
 import clusterless.cls.substrate.uri.ProjectMaterialsURI;
 import clusterless.cls.substrate.uri.ProjectURI;
+import clusterless.cls.util.ExitCodeException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -36,8 +37,16 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * Failures are thrown as {@link ExitCodeException} so they reach the user on stderr at any
+ * verbosity; logging is off by default, so a failure reported only through the log is silent.
+ */
 public class Metadata {
     private static final Logger LOG = LoggerFactory.getLogger(Metadata.class);
+
+    private static RuntimeException failure(String message, Throwable cause) {
+        return new ExitCodeException(message, cause, 1);
+    }
 
     public static void writeBootstrapMetaLocal(BootstrapMeta bootstrapMeta) {
         writeMetaLocal(bootstrapMeta, Metadata::createBootstrapMetaPath);
@@ -103,10 +112,10 @@ public class Metadata {
 
         LOG.info("putting metadata in: {}", metaURI);
 
-        Optional<Throwable> result = s3.put(metaURI, "application/json", bootstrapMeta)
-                .isSuccessOrLog(r -> String.format("unable to upload bootstrap metadata to: %s, %s", metaURI, r.errorMessage()));
+        s3.put(metaURI, "application/json", bootstrapMeta)
+                .isSuccessOrThrow(r -> String.format("unable to upload bootstrap metadata to: %s, %s", metaURI, r.errorMessage()), Metadata::failure);
 
-        return result.isPresent() ? 1 : 0;
+        return 0;
     }
 
     /**
@@ -139,8 +148,8 @@ public class Metadata {
             deployables = JSONUtil.readAsObject(projectMetaPath, new TypeReference<>() {
             });
         } catch (IOException e) {
-            LOG.info("unable to read metadata from: {}", projectMetaPath.toAbsolutePath(), e);
-            return 1;
+            LOG.error("unable to read metadata from: {}", projectMetaPath.toAbsolutePath(), e);
+            throw failure("unable to read deploy metadata from: " + projectMetaPath.toAbsolutePath(), e);
         }
 
         Path arcMetaPath = createArcMetaPath(Paths.get(outputPath));
@@ -152,8 +161,8 @@ public class Metadata {
             arcsMeta = JSONUtil.readAsObject(arcMetaPath, new TypeReference<>() {
             });
         } catch (IOException e) {
-            LOG.info("unable to read metadata from: {}", arcMetaPath.toAbsolutePath(), e);
-            return 1;
+            LOG.error("unable to read metadata from: {}", arcMetaPath.toAbsolutePath(), e);
+            throw failure("unable to read deploy metadata from: " + arcMetaPath.toAbsolutePath(), e);
         }
 
         return f.apply(deployables, arcsMeta);
@@ -177,12 +186,8 @@ public class Metadata {
             materials.add(metaURI);
             LOG.info("putting metadata in: {}", metaURI);
 
-            Optional<Throwable> result = s3.put(metaURI, "application/json", deployable)
-                    .isSuccessOrLog(r -> String.format("unable to upload project metadata to: %s, %s", metaURI, r.errorMessage()));
-
-            if (result.isPresent()) {
-                return 1;
-            }
+            s3.put(metaURI, "application/json", deployable)
+                    .isSuccessOrThrow(r -> String.format("unable to upload project metadata to: %s, %s", metaURI, r.errorMessage()), Metadata::failure);
 
             List<SinkDataset> sinks = new LinkedList<>();
 
@@ -201,12 +206,8 @@ public class Metadata {
                         .filter(m -> m.project().equals(project))
                         .filter(m -> m.arc().name().equals(arc.name())).findFirst();
 
-                result = s3.put(arcURI, "application/json", arcMeta.orElseThrow(() -> new IllegalStateException("arc deploy metadata not found")))
-                        .isSuccessOrLog(r -> String.format("unable to upload arc metadata to: %s, %s", arcURI, r.errorMessage()));
-
-                if (result.isPresent()) {
-                    return 1;
-                }
+                s3.put(arcURI, "application/json", arcMeta.orElseThrow(() -> new IllegalStateException("arc deploy metadata not found")))
+                        .isSuccessOrThrow(r -> String.format("unable to upload arc metadata to: %s, %s", arcURI, r.errorMessage()), Metadata::failure);
 
                 sinks.addAll(arc.sinks().values());
             }
@@ -226,12 +227,8 @@ public class Metadata {
                 materials.add(datasetURI);
                 LOG.info("putting metadata in: {}", datasetURI);
 
-                result = s3.put(datasetURI, "application/json", new OwnedDataset(project, sinkDataset))
-                        .isSuccessOrLog(r -> String.format("unable to upload dataset metadata to: %s, %s", datasetURI, r.errorMessage()));
-
-                if (result.isPresent()) {
-                    return 1;
-                }
+                s3.put(datasetURI, "application/json", new OwnedDataset(project, sinkDataset))
+                        .isSuccessOrThrow(r -> String.format("unable to upload dataset metadata to: %s, %s", datasetURI, r.errorMessage()), Metadata::failure);
             }
 
             URI materialsURI = ProjectMaterialsURI.builder()
@@ -242,12 +239,8 @@ public class Metadata {
 
             LOG.info("putting metadata in: {}", materialsURI);
 
-            Optional<Throwable> materialsResults = s3.put(materialsURI, "application/json", materials)
-                    .isSuccessOrLog(r -> String.format("unable to upload materials metadata to: %s, %s", metaURI, r.errorMessage()));
-
-            if (materialsResults.isPresent()) {
-                return 1;
-            }
+            s3.put(materialsURI, "application/json", materials)
+                    .isSuccessOrThrow(r -> String.format("unable to upload materials metadata to: %s, %s", materialsURI, r.errorMessage()), Metadata::failure);
         }
 
         return 0;
@@ -278,21 +271,32 @@ public class Metadata {
             List<URI> materials = JSONUtil.readAsObjectSafe(response.asInputStream(), new TypeReference<>() {
             });
 
-            boolean failed = false;
+            // attempt every removal before reporting, so one failure does not strand the rest
+            List<URI> failed = new LinkedList<>();
+            Throwable cause = null;
             for (URI material : materials) {
                 LOG.info("removing metadata in: {}", material);
 
                 Optional<Throwable> result = s3.remove(material)
                         .isSuccessOrLog(r -> String.format("unable to remove material metadata to: %s, %s", material, r.errorMessage()));
 
-                failed |= result.isPresent();
+                if (result.isPresent()) {
+                    failed.add(material);
+                    cause = cause == null ? result.get() : cause;
+                }
             }
 
             Optional<Throwable> result = s3.remove(uri)
                     .isSuccessOrLog(r -> String.format("unable to remove materials metadata to: %s, %s", uri, r.errorMessage()));
 
-            if (result.isPresent() || failed) {
-                return 1;
+            if (result.isPresent()) {
+                failed.add(uri);
+                cause = cause == null ? result.get() : cause;
+            }
+
+            if (!failed.isEmpty()) {
+                String reason = cause == null ? null : cause.getMessage();
+                throw failure(String.format("unable to remove project metadata: %s, %s", failed, reason), cause);
             }
         }
 
