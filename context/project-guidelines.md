@@ -311,7 +311,7 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 
 ### Build and test
 
-- **Toolchain:** Gradle wrapper 8.14.5 (checksum-pinned), Java 17 toolchain (foojay resolver),
+- **Toolchain:** Gradle wrapper 9.8.0 (checksum-pinned), Java 17 toolchain (foojay resolver),
   Node.js (CDK's jsii runs Node even for in-JVM synth tests). First build
   needs network.
 - **Dependency versions live in one place:** the `constraints {}` block of
@@ -355,9 +355,16 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 
 - **Java 17 appears in three places** — toolchain, CI, and Lambda
   `Runtime.JAVA_17` (`Functions`). Move them together.
-- **Gradle 9 blockers:** eager cross-project task
-  lookups (`tasks.getByPath`/`findByPath`) and `project.ext` reads in build
-  scripts break configuration cache / isolated projects.
+- **On Gradle 9; watch Gradle 10.** Remaining configuration-cache /
+  isolated-projects hazards: eager cross-project task lookups
+  (`tasks.getByPath`/`findByPath`) and `project.ext` reads — capture values
+  at configuration time, never read `project` inside task actions. Use
+  `create`/`named`/`register`, not the `by creating`/`by getting` delegates,
+  and `providers.gradleProperty*`, not `project.properties`. jreleaser 1.26
+  still calls `Project.getProperties` internally (Gradle 10 deprecation, not
+  ours). Scenario jsonnet is rendered by sjsonnet's CLI via `JavaExec`
+  (`jsonnet*` tasks) because the sjsonnet Gradle plugin uses the convention
+  API Gradle 9 removed.
 - **Jackson typed wire format:** `__type` class names in lambda env vars mean
   package renames and a Jackson 3 migration change the deployed contract.
 - **CDK feature flags are not applied** (no `cdk.json`;
