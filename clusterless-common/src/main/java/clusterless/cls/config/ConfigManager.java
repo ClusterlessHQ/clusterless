@@ -57,7 +57,7 @@ public class ConfigManager {
         final TomlMapper mapper = new TomlMapper();
 
         {
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         }
 
         final ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();

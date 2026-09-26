@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -50,6 +51,13 @@ public class JSONUtil {
                 .configure(WRITE_DURATIONS_AS_TIMESTAMPS, false);
     }
 
+    // MapperFeatures can only be set on a builder; mirrors createObjectMapper()
+    private static JsonMapper.Builder jsonMapperBuilder() {
+        return JsonMapper.builder()
+                .addModules(modules)
+                .disable(WRITE_DATES_AS_TIMESTAMPS, WRITE_DURATIONS_AS_TIMESTAMPS);
+    }
+
     private static JavaPropsMapper createPropertiesMapper() {
         return (JavaPropsMapper) new JavaPropsMapper()
                 .registerModules(modules)
@@ -68,14 +76,15 @@ public class JSONUtil {
     public static final JavaPropsMapper PROPERTIES_MAPPER = createPropertiesMapper();
 
     public static final ObjectMapper OBJECT_MAPPER_NO_NULL = createObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
     public static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer();
 
     public static final ObjectWriter OBJECT_WRITER_PRETTY = OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
 
 
-    public static final ObjectWriter OBJECT_REQUIRED_WRITER_PRETTY = createObjectMapper()
+    public static final ObjectWriter OBJECT_REQUIRED_WRITER_PRETTY = jsonMapperBuilder()
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+            .build()
             .writerWithDefaultPrettyPrinter()
             .withView(Views.Required.class);
 
