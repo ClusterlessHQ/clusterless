@@ -31,7 +31,8 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
     }
 
     // pro disabled in favor of mocking glue apis in the tests
-    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:3.0.2");
+    // 3.0.2 ignored SQS ReceiveMessage MessageSystemAttributeNames (used by SQS::get), dropping SentTimestamp
+    static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:3.8.1");
 
     @Container
     static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
@@ -62,8 +63,8 @@ public abstract class LocalStackBase extends LambdaHandlerTestBase {
             .set("AWS_GLUE_ENDPOINT", localstack.getEndpoint().toString())
             .set("AWS_SQS_ENDPOINT", localstack.getEndpoint().toString())
             .set("AWS_CLOUDWATCHLOGS_ENDPOINT", localstack.getEndpoint().toString())
-            // the pinned localstack 3.0.2 fails on the sdk's default (2.30+) flexible checksums
-            // with a 500; send and validate them only where an api requires it
+            // localstack 3.0.2 failed on the sdk's default (2.30+) flexible checksums with a 500;
+            // send and validate them only where an api requires it
             .set("AWS_REQUEST_CHECKSUM_CALCULATION", "WHEN_REQUIRED")
             .set("AWS_RESPONSE_CHECKSUM_VALIDATION", "WHEN_REQUIRED");
 

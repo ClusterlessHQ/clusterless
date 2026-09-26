@@ -82,7 +82,7 @@ public class SQS extends ClientBase<SqsClient> {
     public Response get(String queueUrl, int waitTimeSeconds) {
         ReceiveMessageRequest request = ReceiveMessageRequest.builder()
                 .waitTimeSeconds(waitTimeSeconds)
-                .attributeNamesWithStrings(SENT_TIMESTAMP.toString())
+                .messageSystemAttributeNames(SENT_TIMESTAMP)
                 .maxNumberOfMessages(10) // the maximum allowed by SQS
                 .queueUrl(queueUrl)
                 .build();
