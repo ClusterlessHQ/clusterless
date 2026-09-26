@@ -20,8 +20,8 @@ public class Versions {
     public static String clsVersion() {
         Properties properties = new Properties();
 
-        // version.properties is only written into clusterless-main's resources; absent when run
-        // from an ide, a classes dir, or the docs generator
+        // version.properties is only generated into clusterless-main's resources by its
+        // writeVersionProperties task; absent when run from an ide, a classes dir, or the docs generator
         try (InputStream inputStream = resourceAsStream()) {
             if (inputStream == null) {
                 return WIP;

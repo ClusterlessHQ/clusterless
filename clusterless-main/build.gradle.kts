@@ -32,11 +32,19 @@ val awsKernelInstall = tasks.getByPath(":clusterless-substrate-aws-kernel:instal
 
 tasks.getAt("installDist").dependsOn(awsKernelInstall)
 
-tasks.named<ProcessResources>("processResources") {
-    doFirst {
-        file(layout.buildDirectory.file("resources/main/version.properties"))
-            .writeText("clusterless.release.full=${version}")
-    }
+// version.properties is read by clusterless-common Versions.clsVersion(). The version is a declared
+// input so the file is regenerated when it changes, and it lives in its own resource srcDir; writing
+// it into processResources' own output lets the copy go stale or be deleted by the output cleanup.
+// The srcDir must be mapped from the task provider so processResources depends on the task.
+val clsReleaseFull = version.toString()
+
+val writeVersionProperties = tasks.register<WriteProperties>("writeVersionProperties") {
+    destinationFile.set(layout.buildDirectory.file("generated/resources/version/version.properties"))
+    property("clusterless.release.full", clsReleaseFull)
+}
+
+sourceSets.main {
+    resources.srcDir(writeVersionProperties.map { it.destinationFile.get().asFile.parentFile })
 }
 
 val versionBranch = project.ext["versionBranch"].toString()
