@@ -362,8 +362,13 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 - **CDK feature flags are not applied** (no `cdk.json`; the shipped
   `etc/context.json` is unused). Enabling recommended flags can change
   logical ids — `cdk diff` against a deployed stack before adopting any.
-- **Pinned/obsolete test infra:** LocalStack image 3.0.2, AWS SDK v1 as a
-  Testcontainers workaround, `mockito-inline`, Testcontainers 1.x.
+- **LocalStack stays pinned at `localstack/localstack:3.0.2` — do not bump
+  it.** Since 2026-03-23 every current LocalStack image requires an account
+  auth token and the free plan is non-commercial only (no Glue); pinned prior
+  tags still run without a token. Replacing it with moto server is deferred
+  until the modernization is stable (kata 6eta).
+- **Pinned/obsolete test infra:** AWS SDK v1 as a Testcontainers
+  workaround, `mockito-inline`, Testcontainers 1.x.
 - **Scenario module is end-of-life stack** (Spring Boot 2.7, Conductor 3.14,
   Nashorn, slf4j 1.7 pins) and blocks logging/Java upgrades there.
 - **External `io.clusterless:clusterless-commons-*`** (naming, `Ref`,
