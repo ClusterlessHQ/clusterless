@@ -38,6 +38,7 @@ import picocli.CommandLine;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -135,7 +136,8 @@ public class Main extends Startup implements Callable<Integer> {
         LOG.info("available: {}", substrates.keySet());
 
         int result = 0;
-        for (String declaredProvider : declaredProviders) {
+        // one entry per project file declares a provider; each provider already reads every file
+        for (String declaredProvider : new LinkedHashSet<>(declaredProviders)) {
             SubstrateProvider substrateProvider = substrates.get(declaredProvider);
 
             if (substrateProvider == null) {
