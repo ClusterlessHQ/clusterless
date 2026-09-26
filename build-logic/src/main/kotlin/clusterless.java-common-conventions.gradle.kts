@@ -154,11 +154,11 @@ dependencies {
         implementationAndTestFixture("software.amazon.awssdk:sfn:$awsSdk")
 
         // https://github.com/aws/aws-lambda-java-libs
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.2.3")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-events:3.11.3")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-serialization:1.1.4")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-log4j2:1.6.0")
-        implementationAndTestFixture("com.amazonaws:aws-lambda-java-tests:1.1.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-core:1.4.0")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-events:3.16.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-serialization:1.4.1")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-log4j2:1.6.5")
+        implementationAndTestFixture("com.amazonaws:aws-lambda-java-tests:1.1.2")
 
         implementationAndTestFixture("javax.annotation:javax.annotation-api:1.3.2")
 
