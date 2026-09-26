@@ -17,3 +17,4 @@ _*
 .worktrees/
 .roborev.toml
 .kata.toml
+.run-ship/
