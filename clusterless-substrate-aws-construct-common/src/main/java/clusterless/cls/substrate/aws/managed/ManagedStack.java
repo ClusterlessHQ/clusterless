@@ -14,8 +14,6 @@ import clusterless.commons.naming.Label;
 import clusterless.commons.naming.Ref;
 import clusterless.commons.substrate.aws.cdk.scoped.ScopedStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 
 
@@ -48,20 +46,6 @@ public class ManagedStack extends ScopedStack implements Managed {
 
     public Deployable deployable() {
         return deployable;
-    }
-
-    @Override
-    public void addDependency(@NotNull Stack target, @Nullable String reason) {
-        if (target != this) {
-            super.addDependency(target, reason);
-        }
-    }
-
-    @Override
-    public void addDependency(@NotNull Stack target) {
-        if (target != this) {
-            super.addDependency(target);
-        }
     }
 
     @Override

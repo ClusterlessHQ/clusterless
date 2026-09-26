@@ -133,7 +133,7 @@ public class Lifecycle {
             ArcStack stack = new ArcStack(configurations, resolver, managedApp, deployable, arc);
 
             // force dependency on prior stacks, but not prior arcs
-            priorStacks.forEach(stack::addDependency);
+            priorStacks.forEach(stack::addStackDependency);
 
             // todo: lookup all referenced datasets and retrieve their bucket names
             ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable, stack);
@@ -170,7 +170,7 @@ public class Lifecycle {
         ManagedStack stack = new ManagedStack(managedApp, deployable, Label.concat(includable));
 
         // make the new stack dependent on the prior stacks so order is retained during deployment
-        managedApp.stacks().forEach(stack::addDependency);
+        managedApp.stacks().forEach(stack::addStackDependency);
 
         ManagedComponentContext context = new ManagedComponentContext(configurations, resolver, managedApp, deployable, stack);
 
