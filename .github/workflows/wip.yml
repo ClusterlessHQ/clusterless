@@ -2,6 +2,11 @@ name: Clusterless Wip Build
 run-name: "Push: from ${{ github.actor }}"
 on:
   workflow_dispatch:
+    inputs:
+      scenarios:
+        description: 'Run the AWS scenarios on this branch (release still requires the version branch)'
+        type: boolean
+        default: false
   push:
     branches:
       - 'wip-*'
@@ -55,10 +60,11 @@ jobs:
         run: |
           ./gradlew --no-daemon --info --stacktrace check
 
-  # only the version branch runs the AWS scenarios, then releases and deploys docs
+  # the version branch always runs the AWS scenarios, then releases and deploys docs;
+  # any other wip branch runs the scenarios only when dispatched with scenarios=true
   scenarios-and-release:
     needs: test
-    if: needs.test.outputs.publish == 'true'
+    if: needs.test.outputs.publish == 'true' || inputs.scenarios
     concurrency: scenarios-us-west-2
     runs-on: ubuntu-latest
 
@@ -101,6 +107,7 @@ jobs:
           retention-days: 5
 
       - name: Release
+        if: needs.test.outputs.publish == 'true'
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
@@ -111,5 +118,6 @@ jobs:
           ./gradlew --no-daemon --info --stacktrace release
 
       - name: Trigger Netlify Doc Deploy
+        if: needs.test.outputs.publish == 'true'
         run: |
           curl -X POST -d '{}' https://api.netlify.com/build_hooks/67fe72e7760e879248fa36c4
