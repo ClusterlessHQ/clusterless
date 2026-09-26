@@ -199,7 +199,7 @@ val junitJupiter = "5.14.4"
 testing {
     suites {
         // Configure the built-in test suite
-        val test by getting(JvmTestSuite::class) {
+        val test = named<JvmTestSuite>("test") {
             // Use JUnit Jupiter test framework
             useJUnitJupiter(junitJupiter)
             dependencies {
@@ -217,7 +217,7 @@ testing {
             }
         }
 
-        val integrationTest by registering(JvmTestSuite::class) {
+        register<JvmTestSuite>("integrationTest") {
             useJUnitJupiter(junitJupiter)
             dependencies {
                 implementation(project())
@@ -237,7 +237,7 @@ testing {
     }
 }
 
-val integrationTestImplementation by configurations.getting {
+configurations.named("integrationTestImplementation") {
     extendsFrom(configurations.testImplementation.get())
 }
 
