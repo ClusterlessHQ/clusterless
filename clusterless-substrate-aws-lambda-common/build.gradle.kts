@@ -57,5 +57,4 @@ dependencies {
     testFixturesImplementation("io.hosuaby:inject-resources-junit-jupiter")
     testFixturesImplementation("uk.org.webcompere:system-stubs-core")
     testFixturesImplementation("uk.org.webcompere:system-stubs-jupiter")
-    testFixturesImplementation("org.mockito:mockito-inline")
 }

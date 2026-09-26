@@ -164,7 +164,7 @@ dependencies {
 
         implementationAndTestFixture("io.github.resilience4j:resilience4j-retry:2.1.0")
 
-        testImplementationAndTestFixture("org.mockito:mockito-core:5.7.0")
+        testImplementationAndTestFixture("org.mockito:mockito-core:5.24.0")
 
         // https://github.com/junit-pioneer/junit-pioneer/releases
         val junitPioneer = "2.1.0"
@@ -180,7 +180,6 @@ dependencies {
         val systemStubs = "2.1.3"
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-core:$systemStubs")
         testImplementationAndTestFixture("uk.org.webcompere:system-stubs-jupiter:$systemStubs")
-        testImplementationAndTestFixture("org.mockito:mockito-inline:5.1.1")
 
         // https://mvnrepository.com/artifact/org.testcontainers
         val testContainers = "1.21.4"
@@ -212,7 +211,7 @@ testing {
                 implementation("io.hosuaby:inject-resources-junit-jupiter")
                 implementation("uk.org.webcompere:system-stubs-core")
                 implementation("uk.org.webcompere:system-stubs-jupiter")
-                implementation("org.mockito:mockito-inline")
+                implementation("org.mockito:mockito-core")
             }
         }
 
