@@ -9,3 +9,11 @@ workspace
 cdk.out
 gradle.properties
 _*
+.kata.local.toml
+# roborev snapshots
+/.roborev/
+.codex
+.agents/
+.worktrees/
+.roborev.toml
+.kata.toml
