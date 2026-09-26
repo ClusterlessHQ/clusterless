@@ -131,7 +131,7 @@ dependencies {
         implementationAndTestFixture("com.google.guava:guava:33.4.0-jre")
 
         // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-        val jackson = "2.18.2"
+        val jackson = "2.22.3"
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-core:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.core:jackson-databind:$jackson")
         implementationAndTestFixture("com.fasterxml.jackson.datatype:jackson-datatype-joda:$jackson")
