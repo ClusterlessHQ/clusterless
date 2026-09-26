@@ -8,7 +8,6 @@
 
 plugins {
     id("clusterless.java-application-conventions")
-    id("io.github.chklauser.sjsonnet") version "1.0.0"
 }
 
 dependencies {
@@ -103,25 +102,48 @@ idea {
     }
 }
 
-sjsonnet {
-    create("scenarios") {
-        indent.set(2)
-        sources.from(file("src/main/cls/scenarios"))
-            .filter { f -> f.extension == "jsonnet" }
-        externalVariables.putAll(
-            properties.filter { p -> p.key.startsWith("scenario.") }.toMap()
+// scenarios are rendered with the sjsonnet cli directly; the sjsonnet gradle plugin
+// relies on the convention api that gradle 9 removed
+val jsonnet = configurations.create("jsonnet")
+
+dependencies {
+    jsonnet("com.databricks:sjsonnet_2.13:0.4.9")
+}
+
+val scenarioSources = layout.projectDirectory.dir("src/main/cls/scenarios")
+val scenarioOutputs = layout.buildDirectory.dir("generated/resources/scenarios/jsonnet")
+val scenarioVariables = providers.gradlePropertiesPrefixedBy("scenario.").get().toSortedMap()
+
+val jsonnetScenariosGenerate = tasks.register("jsonnetScenariosGenerate")
+
+scenarioSources.asFileTree.matching { include("**/*.jsonnet") }.files.sorted().forEach { source ->
+    val relative = source.relativeTo(scenarioSources.asFile).path
+    val target = scenarioOutputs.map { it.file(relative.removeSuffix(".jsonnet") + ".json") }
+
+    val render = tasks.register<JavaExec>("jsonnet" + relative.replace(Regex("[^A-Za-z0-9]"), "_")) {
+        classpath = jsonnet
+        mainClass.set("sjsonnet.SjsonnetMain")
+        inputs.dir(source.parentFile) // imports resolve relative to the scenario directory
+        inputs.property("variables", scenarioVariables)
+        outputs.file(target)
+        doFirst { target.get().asFile.parentFile.mkdirs() }
+        args(
+            listOf("--indent", "2", "--jpath", source.parentFile.absolutePath) +
+                scenarioVariables.flatMap { listOf("--ext-str", "${it.key}=${it.value}") } +
+                listOf("--output-file", target.get().asFile.absolutePath, source.absolutePath)
         )
     }
+
+    jsonnetScenariosGenerate.configure { dependsOn(render) }
 }
 
 val copyScenarios = tasks.register<Copy>("copyScenarios") {
-    val jsonnet = tasks.named("jsonnetScenariosGenerate")
-    dependsOn.add(jsonnet)
+    dependsOn(jsonnetScenariosGenerate)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from("src/main/cls/scenarios") {
         exclude("**/*.jsonnet")
     }
-    from(jsonnet)
+    from(scenarioOutputs)
     into(layout.buildDirectory.dir("scenarios"))
 }
 
