@@ -310,7 +310,7 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 
 ### Build and test
 
-- **Toolchain:** Gradle wrapper 8.12, Java 17 toolchain (foojay resolver),
+- **Toolchain:** Gradle wrapper 8.14.5 (checksum-pinned), Java 17 toolchain (foojay resolver),
   Node.js (CDK's jsii runs Node even for in-JVM synth tests). First build
   needs network.
 - **Dependency versions live in one place:** the `constraints {}` block of
@@ -354,7 +354,7 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
 
 - **Java 17 appears in three places** — toolchain, CI, and Lambda
   `Runtime.JAVA_17` (`Functions`). Move them together.
-- **Gradle 9 blockers:** foojay-resolver 0.4.0; eager cross-project task
+- **Gradle 9 blockers:** eager cross-project task
   lookups (`tasks.getByPath`/`findByPath`) and `project.ext` reads in build
   scripts break configuration cache / isolated projects.
 - **Jackson typed wire format:** `__type` class names in lambda env vars mean
@@ -367,8 +367,6 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
   auth token and the free plan is non-commercial only (no Glue); pinned prior
   tags still run without a token. Replacing it with moto server is deferred
   until the modernization is stable (kata 6eta).
-- **Pinned/obsolete test infra:** AWS SDK v1 as a Testcontainers
-  workaround, `mockito-inline`, Testcontainers 1.x.
 - **Scenario module is end-of-life stack** (Spring Boot 2.7, Conductor 3.14,
   Nashorn, slf4j 1.7 pins) and blocks logging/Java upgrades there.
 - **External `io.clusterless:clusterless-commons-*`** (naming, `Ref`,
