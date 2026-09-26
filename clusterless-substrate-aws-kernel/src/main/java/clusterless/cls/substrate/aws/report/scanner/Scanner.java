@@ -12,7 +12,6 @@ import clusterless.cls.model.HasDisplay;
 import clusterless.cls.model.State;
 import clusterless.cls.substrate.aws.report.StatusRecord;
 import clusterless.cls.substrate.aws.report.StatusSummaryRecord;
-import clusterless.cls.substrate.aws.sdk.ClientBase;
 import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.StateURI;
 import clusterless.cls.util.Moment;
@@ -79,27 +78,37 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
 
     protected abstract StateURI<?, ?> createStateURIFrom(Rec record);
 
+    /**
+     * Creates the S3 client wrapper used for listing, called from the constructor as well as {@link #scan()},
+     * so overrides must not depend on subclass state.
+     */
+    protected S3 createS3(int maxKeys) {
+        return new S3(profile, maxKeys);
+    }
+
+    /**
+     * The returned stream holds an S3 client until closed; consume it in try-with-resources. A listing failure
+     * throws while the stream is consumed, naming the listed path and the cause.
+     */
     public Stream<StatusRec> scan() {
-        S3 s3 = new S3(profile);
+        S3 s3 = createS3(S3.DEFAULT_MAX_KEYS);
         LOG.info("using profile: {}", profile);
 
         URI path = stateURI.uriPath();
         // since no state information is associated, the lot id is inclusive as the next actual key is the object
         URI startInclusive = stateURI.withLot(startLotInclusive).uriPath();
         URI endExclusive = stateURI.withLot(endLotExclusive).uriPath();
-        final ClientBase<?>.Response[] response = new ClientBase.Response[]{null};
 
         LOG.info("scanning earliest inclusive: {}, latest exclusive: {}", startInclusive, endExclusive);
         S3.Responses responses = s3.listObjectsIterable(path, startInclusive);
 
-        Stream<String> resultStream = s3.listChildrenStream(responses, endExclusive, objectName(), r -> response[0] = r);
+        Stream<String> resultStream = s3.listChildrenStream(responses, path, endExclusive, objectName());
 
         try {
             return parseUriStreamIntoStatusRec(resultStream);
-        } finally {
-            if (response[0] != null) {
-                response[0].isSuccessOrThrow(e -> new RuntimeException("unable to list objects at: " + path, e));
-            }
+        } catch (RuntimeException exception) {
+            resultStream.close();
+            throw exception;
         }
     }
 
@@ -115,13 +124,12 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
 
     protected TemporalUnit findTemporalKeyFor(StateURI<?, ?> stateURI) {
         // discover interval
-        S3 s3 = new S3(profile, 1);
+        S3 s3 = createS3(1);
         S3.Response response = s3.listPaths(stateURI.uriPath());
 
-        if (!response.isSuccess()) {
-            LOG.info("no arc states found: {}", stateURI);
-            throw new IllegalStateException("no arc states found: " + stateURI);
-        }
+        // IllegalStateException means nothing to report and callers skip the record, so a failed listing
+        // must throw something else
+        response.isSuccessOrThrow(r -> "unable to list states at: " + stateURI + ": " + s3.error(r), RuntimeException::new);
 
         List<String> paths = s3.listChildren(response);
 
@@ -142,7 +150,9 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
 
         StatusSummaryRec summaryRecord = createSummaryRecord(count);
 
-        scan().forEach(summaryRecord::addStateRecord);
+        try (Stream<StatusRec> stream = scan()) {
+            stream.forEach(summaryRecord::addStateRecord);
+        }
 
         return summaryRecord;
     }

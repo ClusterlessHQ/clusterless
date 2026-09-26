@@ -11,7 +11,6 @@ package clusterless.cls.substrate.aws.sdk;
 import clusterless.cls.json.JSONUtil;
 import clusterless.cls.util.Tuple2;
 import clusterless.cls.util.URIs;
-import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -25,6 +24,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -43,7 +43,9 @@ public class S3 extends ClientBase<S3Client> {
         return URIs.create("s3", bucket, key);
     }
 
-    private int maxKeys = 1000;
+    public static final int DEFAULT_MAX_KEYS = 1000;
+
+    private int maxKeys = DEFAULT_MAX_KEYS;
 
     public S3() {
     }
@@ -411,7 +413,7 @@ public class S3 extends ClientBase<S3Client> {
                 @NotNull
                 @Override
                 public Iterator<Response> iterator() {
-                    return Iterables.transform(awsResponse, Response::new).iterator();
+                    return responseIterator(awsResponse.iterator());
                 }
             };
         } catch (Exception exception) {
@@ -426,23 +428,62 @@ public class S3 extends ClientBase<S3Client> {
         }
     }
 
-    public Stream<String> listChildrenStream(Iterable<Response> responses, URI endExclusive, String objectName, Consumer<ClientBase<S3Client>.Response> handler) {
+    /**
+     * The paginator fetches each page inside {@link Iterator#next()}, so a failed page would otherwise escape
+     * as a bare SDK exception. Failures are returned as a failed {@link Response} and end the iteration.
+     */
+    @NotNull
+    private Iterator<Response> responseIterator(Iterator<ListObjectsV2Response> pages) {
+        return new Iterator<>() {
+            private boolean failed = false;
+
+            @Override
+            public boolean hasNext() {
+                return !failed && pages.hasNext();
+            }
+
+            @Override
+            public Response next() {
+                if (failed) {
+                    throw new NoSuchElementException();
+                }
+
+                try {
+                    return new Response(pages.next());
+                } catch (NoSuchElementException exception) {
+                    throw exception;
+                } catch (Exception exception) {
+                    failed = true;
+                    return new Response(exception);
+                }
+            }
+        };
+    }
+
+    /**
+     * Streams the object keys ending with {@code objectName} and ordered before {@code endExclusive}.
+     * <p>
+     * A failed page throws, naming the listed {@code path} and the cause, so a listing failure never reads as
+     * fewer results. Close the returned stream to release the client held by {@code responses}.
+     */
+    public Stream<String> listChildrenStream(Iterable<Response> responses, URI path, URI endExclusive, String objectName) {
         String end = URIs.asKey(endExclusive);
-        return StreamSupport.stream(responses.spliterator(), false)
-                .takeWhile(r -> handle(r, handler))
+        Stream<String> stream = StreamSupport.stream(responses.spliterator(), false)
+                .map(response -> requireSuccess(response, path))
                 .flatMap(this::listChildrenStream)
                 .filter(key -> key.endsWith(objectName)) // only return objects, that directories
                 .takeWhile(key -> !key.startsWith(end));
-    }
 
-    private boolean handle(Response r, Consumer<ClientBase<S3Client>.Response> handler) {
-        if (r.isSuccess()) {
-            return true;
+        if (responses instanceof ClientBase<?>.Responses closeable) {
+            stream = stream.onClose(closeable::close);
         }
 
-        handler.accept(r);
+        return stream;
+    }
 
-        return false;
+    private Response requireSuccess(Response response, URI path) {
+        response.isSuccessOrThrow(r -> "unable to list objects at: " + path + ": " + error(r), RuntimeException::new);
+        return response;
     }
 
     public List<String> listChildren(Response response) {

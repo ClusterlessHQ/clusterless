@@ -138,15 +138,17 @@ public class ArcExec implements Callable<Integer> {
 
             SinkDataset sink = locatedDataset.orElseThrow().dataset();
 
-            Stream<ArcStatusRecord> scanStream = arcStatusScanner.scan();
+            try (Stream<ArcStatusRecord> scanStream = arcStatusScanner.scan()) {
+                scanStream
+                        .forEach(arcStatusRecord -> {
+                            Moment moment = IntervalUnitParser.convert(arcStatusRecord.lotId);
+                            ManifestScanner manifestScanner = new ManifestScanner(arcStatusScanner.profile(), new DatasetRecord(record.placement, sourceDataset), moment, moment);
 
-            scanStream
-                    .forEach(arcStatusRecord -> {
-                        Moment moment = IntervalUnitParser.convert(arcStatusRecord.lotId);
-                        ManifestScanner manifestScanner = new ManifestScanner(arcStatusScanner.profile(), new DatasetRecord(record.placement, sourceDataset), moment, moment);
-
-                        manifestScanner.scan().forEach(statusRecord -> execStepFunction(printer, stepFunction, arcStatusRecord, sink, statusRecord.uri(), arcMeta, placement));
-                    });
+                            try (Stream<DatasetStatusRecord> manifestStream = manifestScanner.scan()) {
+                                manifestStream.forEach(statusRecord -> execStepFunction(printer, stepFunction, arcStatusRecord, sink, statusRecord.uri(), arcMeta, placement));
+                            }
+                        });
+            }
         }
     }
 
