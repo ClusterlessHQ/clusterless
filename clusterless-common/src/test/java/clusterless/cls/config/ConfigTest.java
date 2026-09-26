@@ -18,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -65,6 +67,28 @@ public class ConfigTest {
         Assertions.assertEquals("a1", resultConfig.a);
         Assertions.assertEquals("b", resultConfig.b);
         Assertions.assertEquals("c", resultConfig.c);
+    }
+
+    static class MapConfig extends Configuration {
+        String a;
+        String b;
+        Map<String, String> m = new LinkedHashMap<>();
+
+        @Override
+        public String name() {
+            return "map";
+        }
+    }
+
+    // the persisted TOML config omits null fields and null map content
+    @Test
+    void tomlWriterOmitsNulls() {
+        MapConfig config = new MapConfig();
+        config.a = "a1";
+        config.m.put("k", "v");
+        config.m.put("n", null);
+
+        Assertions.assertEquals("a = 'a1'\nm.k = 'v'\n", ConfigManager.toString(config));
     }
 
     @Test
