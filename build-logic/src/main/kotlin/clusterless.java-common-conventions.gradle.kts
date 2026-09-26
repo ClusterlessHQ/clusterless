@@ -127,7 +127,7 @@ dependencies {
         implementation("org.apache.logging.log4j:log4j-web:$log4j")
         implementation("org.apache.logging.log4j:log4j-layout-template-json:$log4j")
 
-        implementationAndTestFixture("com.jayway.jsonpath:json-path:2.10.0")
+        implementationAndTestFixture("com.jayway.jsonpath:json-path:3.0.0")
         implementationAndTestFixture("com.google.guava:guava:33.7.1-jre")
 
         // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
