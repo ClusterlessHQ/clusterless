@@ -372,15 +372,17 @@ fixture under `snapshot/projects/` (jsonnet, stage `test`, account
   `clusterless-substrate-aws-kernel/src/main/cdk/context.json`, shipped as
   `etc/context.json` in the distribution, is unused). Enabling recommended flags can change
   logical ids — `cdk diff` against a deployed stack before adopting any.
-- **LocalStack stays pinned at `localstack/localstack:3.0.2` — do not bump
-  it.** Since 2026-03-23 every current LocalStack image requires an account
-  auth token and the free plan is non-commercial only (no Glue); pinned prior
-  tags still run without a token. Replacing it with moto server is deferred
-  until the modernization is stable (kata 6eta). 3.0.2 predates the AWS SDK's
-  default flexible checksums (2.30+) and answers S3 puts carrying them with a
-  500, so `LocalStackBase` sets `AWS_REQUEST_CHECKSUM_CALCULATION` /
-  `AWS_RESPONSE_CHECKSUM_VALIDATION=WHEN_REQUIRED` — a test-only setting;
-  production keeps the SDK defaults.
+- **LocalStack stays pinned at `localstack/localstack:3.8.1` — the 3.x
+  community line; never move to the `2026.x` images.** Since 2026-03-23 every
+  current LocalStack image requires an account auth token and the free plan is
+  non-commercial only (no Glue); prior tags still run without a token. 3.8.1
+  replaced 3.0.2 because 3.0.2 ignores SQS `MessageSystemAttributeNames`
+  (dropping `SentTimestamp`). `LocalStackBase` also sets
+  `AWS_REQUEST_CHECKSUM_CALCULATION` / `AWS_RESPONSE_CHECKSUM_VALIDATION=WHEN_REQUIRED`
+  (test-only; 3.0.2 answered the SDK's default flexible checksums with a 500).
+  Replacing LocalStack with moto server is deferred until the modernization is
+  stable (kata 6eta). Changing the pinned tag is a user decision, not a
+  flight's.
 - **Scenario module is end-of-life stack** (Spring Boot 2.7, Conductor 3.14,
   Nashorn, slf4j 1.7 pins) and blocks logging/Java upgrades there.
 - **External `io.clusterless:clusterless-commons-*`** (naming, `Ref`,
