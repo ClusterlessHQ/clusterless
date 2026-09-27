@@ -10,7 +10,6 @@ package clusterless.cls.substrate.aws.report;
 
 import clusterless.cls.command.report.DatasetsCommandOptions;
 import clusterless.cls.substrate.aws.report.reporter.Reporter;
-import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.DatasetURI;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
@@ -50,29 +49,23 @@ public class Datasets extends Reports implements Callable<Integer> {
 
     @NotNull
     public Stream<DatasetRecord> listAllDatasets(Predicate<DatasetRecord> datasetRecordPredicate) {
-        S3 s3 = new S3(commandOptions.profile());
+        String profile = commandOptions.profile();
 
         return listAllDatasets(commandOptions)
-                .map(r -> Map.entry(r.placement, listAllDatasetKeys(s3, r)))
+                .map(r -> Map.entry(r.placement, listAllDatasetKeys(profile, r)))
                 .flatMap(e -> e.getValue().stream().map(a -> Map.entry(e.getKey(), DatasetURI.parse("/" + a))))
                 .map(e -> new DatasetRecord(e.getKey(), e.getValue().dataset()))
                 .filter(datasetRecordPredicate);
     }
 
-    private static List<String> listAllDatasetKeys(S3 s3, DatasetRecord datasetRecord) {
+    private List<String> listAllDatasetKeys(String profile, DatasetRecord datasetRecord) {
         URI uri = DatasetURI.builder()
                 .withPlacement(datasetRecord.placement())
                 .withDataset(datasetRecord.dataset())
                 .build()
                 .uriPrefix();
 
-        S3.Response response = s3.listObjects(uri);
-
-        response.isSuccessOrThrowRuntime(
-                r -> String.format("unable to list projects in: %s, %s", uri, r.errorMessage())
-        );
-
-        return s3.listChildren(response);
+        return s3For.apply(profile, datasetRecord.placement().region()).listAllChildren(uri);
     }
 
 }

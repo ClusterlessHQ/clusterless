@@ -63,6 +63,11 @@ public class S3 extends ClientBase<S3Client> {
         super(profile, region);
     }
 
+    public S3(String profile, String region, int maxKeys) {
+        super(profile, region);
+        this.maxKeys = maxKeys;
+    }
+
     @NotNull
     protected String getEndpointEnvVar() {
         return "AWS_S3_ENDPOINT";
@@ -468,9 +473,7 @@ public class S3 extends ClientBase<S3Client> {
      */
     public Stream<String> listChildrenStream(Iterable<Response> responses, URI path, URI endExclusive, String objectName) {
         String end = URIs.asKey(endExclusive);
-        Stream<String> stream = StreamSupport.stream(responses.spliterator(), false)
-                .map(response -> requireSuccess(response, path))
-                .flatMap(this::listChildrenStream)
+        Stream<String> stream = listChildrenStream(responses, path)
                 .filter(key -> key.endsWith(objectName)) // only return objects, that directories
                 .takeWhile(key -> !key.startsWith(end));
 
@@ -479,6 +482,24 @@ public class S3 extends ClientBase<S3Client> {
         }
 
         return stream;
+    }
+
+    /**
+     * Lists every object key under {@code path}, reading every page before returning.
+     * <p>
+     * A failed page throws, naming {@code path} and the cause, so a listing failure never reads as fewer
+     * results. The client is released before returning.
+     */
+    public List<String> listAllChildren(URI path) {
+        try (Responses responses = listIterable(path, null, null)) {
+            return listChildrenStream(responses, path).toList();
+        }
+    }
+
+    private Stream<String> listChildrenStream(Iterable<Response> responses, URI path) {
+        return StreamSupport.stream(responses.spliterator(), false)
+                .map(response -> requireSuccess(response, path))
+                .flatMap(this::listChildrenStream);
     }
 
     private Response requireSuccess(Response response, URI path) {

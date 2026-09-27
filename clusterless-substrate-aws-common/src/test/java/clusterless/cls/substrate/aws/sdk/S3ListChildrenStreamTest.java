@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +32,8 @@ import static org.mockito.Mockito.*;
 /**
  * A listing page that fails mid-stream must fail the stream with the listed path and the
  * cause, not end it early or escape as a bare SDK exception; consuming the stream in
- * try-with-resources must release the client the paginator holds.
+ * try-with-resources must release the client the paginator holds. An eager listing must
+ * read every page, not a single 1000-key page.
  */
 public class S3ListChildrenStreamTest {
     static final URI PATH = URI.create("s3://bucket/arcs/arc=arc1/");
@@ -124,5 +126,48 @@ public class S3ListChildrenStreamTest {
                 "arcs/arc=arc1/lot=2/running.arc",
                 "arcs/arc=arc1/lot=3/complete.arc"
         ), keys);
+    }
+
+    @Test
+    void listAllChildrenReadsEveryPage() {
+        String[] firstPage = IntStream.range(0, S3.DEFAULT_MAX_KEYS)
+                .mapToObj(i -> "arcs/arc=arc1/lot=%04d/complete.arc".formatted(i))
+                .toArray(String[]::new);
+
+        when(client.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(page(true, firstPage))
+                .thenReturn(page(false, "arcs/arc=arc1/lot=a", "arcs/arc=arc1/lot=b", "arcs/arc=arc1/lot=c", "arcs/arc=arc1/lot=d", "arcs/arc=arc1/lot=e"));
+
+        List<String> keys = s3.listAllChildren(PATH);
+
+        Assertions.assertEquals(S3.DEFAULT_MAX_KEYS + 5, keys.size());
+        Assertions.assertEquals("arcs/arc=arc1/lot=e", keys.get(keys.size() - 1));
+        verify(client, times(2)).listObjectsV2(any(ListObjectsV2Request.class));
+        verify(client).close();
+    }
+
+    @Test
+    void listAllChildrenFailedPageThrowsWithPathAndCause() {
+        when(client.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(page(true, "arcs/arc=arc1/lot=1/complete.arc"))
+                .thenThrow(accessDenied());
+
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> s3.listAllChildren(PATH));
+
+        Assertions.assertTrue(exception.getMessage().contains(PATH.toString()), exception.getMessage());
+        Assertions.assertTrue(exception.getMessage().contains("Access Denied"), exception.getMessage());
+        Assertions.assertInstanceOf(S3Exception.class, exception.getCause());
+        verify(client).close();
+    }
+
+    @Test
+    void listAllChildrenPaginatorFailureThrowsWithPath() {
+        when(client.listObjectsV2Paginator(any(ListObjectsV2Request.class))).thenThrow(accessDenied());
+
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> s3.listAllChildren(PATH));
+
+        Assertions.assertTrue(exception.getMessage().contains(PATH.toString()), exception.getMessage());
+        Assertions.assertInstanceOf(S3Exception.class, exception.getCause());
+        verify(client).close();
     }
 }

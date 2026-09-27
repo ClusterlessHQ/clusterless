@@ -79,11 +79,12 @@ public abstract class Scanner<Rec extends HasDisplay, StatusRec extends StatusRe
     protected abstract StateURI<?, ?> createStateURIFrom(Rec record);
 
     /**
-     * Creates the S3 client wrapper used for listing, called from the constructor as well as {@link #scan()},
-     * so overrides must not depend on subclass state.
+     * Creates the S3 client wrapper used for listing, in the region of the record's placement. Called from the
+     * constructor, after {@link #stateURI} is set, as well as {@link #scan()}, so overrides must not depend on
+     * subclass state.
      */
     protected S3 createS3(int maxKeys) {
-        return new S3(profile, maxKeys);
+        return new S3(profile, stateURI.placement().region(), maxKeys);
     }
 
     /**

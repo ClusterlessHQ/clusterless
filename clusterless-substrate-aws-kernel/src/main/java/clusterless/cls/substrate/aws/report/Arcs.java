@@ -11,7 +11,6 @@ package clusterless.cls.substrate.aws.report;
 import clusterless.cls.command.entity.ArcsCommandOptions;
 import clusterless.cls.model.deploy.Project;
 import clusterless.cls.substrate.aws.report.reporter.Reporter;
-import clusterless.cls.substrate.aws.sdk.S3;
 import clusterless.cls.substrate.uri.ArcURI;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -63,13 +62,13 @@ public class Arcs extends Reports implements Callable<Integer> {
 
     @NotNull
     public Stream<ArcRecord> listAllArcs(Predicate<ArcRecord> arcRecordPredicate) {
-        S3 s3 = new S3(commandOptions.profile());
+        String profile = commandOptions.profile();
 
         Predicate<Project> sorted = projectFilter(commandOptions);
 
         return listAllProjects(commandOptions)
                 .filter(r -> sorted.test(r.project))
-                .map(r -> Map.entry(r.placement, listAllArcKeys(s3, r)))
+                .map(r -> Map.entry(r.placement, listAllArcKeys(profile, r)))
                 .flatMap(e -> e.getValue().stream().map(a -> Map.entry(e.getKey(), ArcURI.parse("/" + a))))
                 .map(e -> new ArcRecord(e.getKey(), e.getValue().project(), e.getValue().arcName()))
                 .filter(arcRecordPredicate)
@@ -93,19 +92,13 @@ public class Arcs extends Reports implements Callable<Integer> {
         return sorted::contains;
     }
 
-    private static List<String> listAllArcKeys(S3 s3, ProjectRecord projectRecord) {
+    private List<String> listAllArcKeys(String profile, ProjectRecord projectRecord) {
         URI uri = ArcURI.builder()
                 .withPlacement(projectRecord.placement)
                 .withProject(projectRecord.project)
                 .build()
                 .uriPrefix();
 
-        S3.Response response = s3.listObjects(uri);
-
-        response.isSuccessOrThrowRuntime(
-                r -> String.format("unable to list projects in: %s, %s", uri, r.errorMessage())
-        );
-
-        return s3.listChildren(response);
+        return s3For.apply(profile, projectRecord.placement.region()).listAllChildren(uri);
     }
 }

@@ -70,7 +70,7 @@ public class ArcExec implements Callable<Integer> {
             return Optional.ofNullable(arcStatePredicate);
         };
 
-        String profile = arcsCommand.commandOptions.profile();
+        String profile = arcExecCommandOptions.profile();
         Moment earliest = arcExecCommandOptions.earliest();
         Moment latest = arcExecCommandOptions.latest();
         List<String> lots = arcExecCommandOptions.lots();
@@ -88,9 +88,6 @@ public class ArcExec implements Callable<Integer> {
             throw new IllegalArgumentException("either a lot or range must be provided");
         }
 
-        ArcReader arcReader = new ArcReader();
-        StepFunction stepFunction = new StepFunction(profile);
-
         for (Tuple2<Moment, Moment> range : ranges) {
             Moment currentEarliest = range.get_1();
             Moment currentLatest = range.get_2();
@@ -104,19 +101,24 @@ public class ArcExec implements Callable<Integer> {
             }
 
             for (ArcStatusScanner arcStatusScanner : arcStatusScanners) {
-                handleScanner(printer, arcStatusScanner, arcReader, stepFunction);
+                handleScanner(printer, arcStatusScanner, profile);
             }
         }
 
         return 0;
     }
 
-    private void handleScanner(Printer printer, ArcStatusScanner arcStatusScanner, ArcReader arcReader, StepFunction stepFunction) {
+    private void handleScanner(Printer printer, ArcStatusScanner arcStatusScanner, String profile) {
         ArcRecord record = arcStatusScanner.record();
 
         // do the exec
         // must target the step function directly
         Placement placement = record.placement();
+
+        // arcs may span placements, so the metadata and step function clients take each placement's region
+        ArcReader arcReader = new ArcReader(profile, placement.region());
+        StepFunction stepFunction = new StepFunction(profile, placement.region());
+
         Project project = record.project();
         String arcName = record.name();
         ArcURI arcURI = ArcURI.builder()
@@ -131,7 +133,7 @@ public class ArcExec implements Callable<Integer> {
 
         List<SourceDataset> datasets = findSourceDatasetsFor(arcMeta, sourceNames);
 
-        RemoteDatasetOwnerLookup datasetOwnerLookup = DatasetLookup.getRemoteDatasetOwnerLookup(arcExecCommandOptions.profile());
+        RemoteDatasetOwnerLookup datasetOwnerLookup = DatasetLookup.getRemoteDatasetOwnerLookup(profile);
 
         for (SourceDataset sourceDataset : datasets) {
             Optional<OwnedDataset> locatedDataset = datasetOwnerLookup.lookup(placement, sourceDataset);

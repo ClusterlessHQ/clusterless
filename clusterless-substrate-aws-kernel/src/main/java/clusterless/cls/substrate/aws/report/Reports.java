@@ -25,10 +25,17 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 public class Reports extends CommonCommand {
     private static final Logger LOG = LoggerFactory.getLogger(Reports.class);
+
+    /**
+     * Creates the S3 client for a profile and a placement's region; bootstrap buckets live in their placement's
+     * region, and the SDK does not follow a cross-region redirect. Replaced by tests.
+     */
+    BiFunction<String, String, S3> s3For = S3::new;
 
     @NotNull
     protected Stream<ProjectRecord> listAllProjects(CommonCommandOptions commandOptions) {
@@ -51,21 +58,13 @@ public class Reports extends CommonCommand {
         return records;
     }
 
-    protected static List<String> listAllProjectKeysFor(String profile, Placement placement) {
-        S3 s3 = new S3(profile);
-
+    protected List<String> listAllProjectKeysFor(String profile, Placement placement) {
         URI uri = ProjectURI.builder()
                 .withPlacement(placement)
                 .build()
                 .uriPrefix();
 
-        S3.Response response = s3.listObjects(uri);
-
-        response.isSuccessOrThrowRuntime(
-                r -> String.format("unable to list projects in: %s, %s", uri, r.errorMessage())
-        );
-
-        return s3.listChildren(response);
+        return s3For.apply(profile, placement.region()).listAllChildren(uri);
     }
 
     @NotNull
@@ -89,21 +88,13 @@ public class Reports extends CommonCommand {
         return records;
     }
 
-    protected static List<String> listAllDatasetKeysFor(String profile, Placement placement) {
-        S3 s3 = new S3(profile);
-
+    protected List<String> listAllDatasetKeysFor(String profile, Placement placement) {
         URI uri = DatasetURI.builder()
                 .withPlacement(placement)
                 .build()
                 .uriPrefix();
 
-        S3.Response response = s3.listObjects(uri);
-
-        response.isSuccessOrThrowRuntime(
-                r -> String.format("unable to list datasets in: %s, %s", uri, r.errorMessage())
-        );
-
-        return s3.listChildren(response);
+        return s3For.apply(profile, placement.region()).listAllChildren(uri);
     }
 
     protected List<Placement> listAllPlacements(String profile) {

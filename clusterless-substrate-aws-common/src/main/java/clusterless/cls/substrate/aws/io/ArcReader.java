@@ -14,4 +14,8 @@ public class ArcReader extends MetaReader<ArcMeta> {
     public ArcReader() {
         super(ArcMeta.class);
     }
+
+    public ArcReader(String profile, String region) {
+        super(ArcMeta.class, profile, region);
+    }
 }

@@ -17,11 +17,26 @@ import java.io.UncheckedIOException;
 import java.net.URI;
 
 public class MetaReader<T> {
-    protected final S3 s3 = new S3();
+    protected final S3 s3;
     protected final ObjectReader reader;
 
+    /**
+     * Resolves profile and region from the environment, as inside a lambda.
+     */
     public MetaReader(Class<T> type) {
-        reader = JSONUtil.objectReaderFor(type);
+        this(type, new S3());
+    }
+
+    /**
+     * Uses the given profile and region, falling back to the environment when null, as from the CLI.
+     */
+    public MetaReader(Class<T> type, String profile, String region) {
+        this(type, new S3(profile, region));
+    }
+
+    private MetaReader(Class<T> type, S3 s3) {
+        this.s3 = s3;
+        this.reader = JSONUtil.objectReaderFor(type);
     }
 
     public T retrieve(URI manifest) {
