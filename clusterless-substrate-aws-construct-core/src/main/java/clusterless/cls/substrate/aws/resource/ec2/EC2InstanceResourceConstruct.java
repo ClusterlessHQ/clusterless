@@ -13,6 +13,7 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
 import clusterless.cls.substrate.aws.resources.Vpcs;
 import clusterless.cls.substrate.aws.util.TagsUtil;
 import clusterless.commons.naming.Label;
+import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.ArnComponents;
 import software.amazon.awscdk.Stack;
@@ -53,11 +54,12 @@ public class EC2InstanceResourceConstruct extends ResourceConstruct<EC2InstanceR
                 .vpcSubnets(SubnetSelection.builder().subnetType(SubnetType.PUBLIC).build())
                 .associatePublicIpAddress(true)
                 .allowAllOutbound(true) // the created security group has no ingress rules
-                .requireImdsv2(true)
                 .ssmSessionPermissions(true)
                 // a shutdown from the host stops it, keeping its volume, so it can sleep without aws credentials
                 .instanceInitiatedShutdownBehavior(InstanceInitiatedShutdownBehavior.STOP)
                 .build());
+
+        requireImdsv2();
 
         if (!model().readableParameters().isEmpty()) {
             List<String> parameterArns = model().readableParameters().stream()
@@ -91,6 +93,27 @@ public class EC2InstanceResourceConstruct extends ResourceConstruct<EC2InstanceR
         }
 
         return model;
+    }
+
+    /**
+     * In place of the instance's requireImdsv2, whose launch template is named for the construct
+     * path alone, which every project and stage shares, so two instances of one name in a region
+     * would collide on it.
+     */
+    private void requireImdsv2() {
+        CfnLaunchTemplate launchTemplate = CfnLaunchTemplate.Builder.create(this, id(model().instanceName() + "-launch-template"))
+                .launchTemplateName(ResourceNames.regionUniqueScopedName(this, model().instanceName() + "-imdsv2"))
+                .launchTemplateData(CfnLaunchTemplate.LaunchTemplateDataProperty.builder()
+                        .metadataOptions(CfnLaunchTemplate.MetadataOptionsProperty.builder()
+                                .httpTokens("required")
+                                .build())
+                        .build())
+                .build();
+
+        ((CfnInstance) instance.getInstance()).setLaunchTemplate(CfnInstance.LaunchTemplateSpecificationProperty.builder()
+                .launchTemplateName(launchTemplate.getLaunchTemplateName())
+                .version(launchTemplate.getAttrLatestVersionNumber()) // also orders the template first
+                .build());
     }
 
     private IMachineImage machineImage(String image) {

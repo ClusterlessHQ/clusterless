@@ -77,8 +77,13 @@ public class EC2InstanceResourceSynthTest {
         // from the ssm parameter, resolved by cloudformation at deploy
         template.hasParameter("*", Match.objectLike(Map.of("Default", EC2InstanceResource.UBUNTU_LTS_AMD64)));
 
+        // named for the stage, project and version, not the construct path every project shares
+        template.resourceCountIs("AWS::EC2::LaunchTemplate", 1);
         template.hasResourceProperties("AWS::EC2::LaunchTemplate", Match.objectLike(Map.of(
+                "LaunchTemplateName", "TEST-lab-lab0-imdsv2-20261023-00",
                 "LaunchTemplateData", Match.objectLike(Map.of("MetadataOptions", Map.of("HttpTokens", "required"))))));
+        template.hasResourceProperties("AWS::EC2::Instance", Match.objectLike(Map.of(
+                "LaunchTemplate", Match.objectLike(Map.of("LaunchTemplateName", "TEST-lab-lab0-imdsv2-20261023-00")))));
 
         template.hasResourceProperties("AWS::EC2::SecurityGroup", Match.objectLike(Map.of("SecurityGroupIngress", Match.absent())));
         template.resourceCountIs("AWS::EC2::SecurityGroupIngress", 0);
