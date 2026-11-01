@@ -29,6 +29,11 @@ public class DeployCommandOptions extends ProjectCommandOptions {
             arity = "0..1"
     )
     Optional<Boolean> approve;
+    @CommandLine.Option(
+            names = "--bootstrap",
+            description = "Bootstrap any placement that is not yet bootstrapped before deploying."
+    )
+    private boolean bootstrap = false;
 
     public boolean retry() {
         return retry;
@@ -36,5 +41,9 @@ public class DeployCommandOptions extends ProjectCommandOptions {
 
     public Optional<Boolean> approve() {
         return approve;
+    }
+
+    public boolean bootstrap() {
+        return bootstrap;
     }
 }
