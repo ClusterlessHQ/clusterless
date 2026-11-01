@@ -123,6 +123,23 @@ public class CDKProcessExec extends ProcessExec {
         }
     }
 
+    /**
+     * Returns a copy with the same cdk, kernel, localstack, profile, dry run, retry, and verbosity settings that
+     * places its cloud assembly in a new temp directory, so a second cdk app run, like a bootstrap before a deploy,
+     * does not share this instance's output path.
+     */
+    public CDKProcessExec withTempOutput() {
+        CDKProcessExec copy = new CDKProcessExec(dryRun, retry, verbosity, profile);
+
+        copy.cdk = cdk;
+        copy.cdkApp = cdkApp;
+        copy.useLocalStackHost = useLocalStackHost;
+        copy.output = output;
+        copy.useTempOutput = Optional.of(true);
+
+        return copy;
+    }
+
     private String getCKDBinary() {
         if (useLocalStackHost.isPresent()) {
             return "cdklocal";

@@ -68,6 +68,37 @@ class CLITest {
         assertTrue(result.err().contains(COMPONENT_LOG), result.err());
     }
 
+    @Test
+    void deployHelpListsBootstrap() throws Exception {
+        Result result = cls("help", "deploy");
+
+        assertEquals(0, result.exitCode(), result.err());
+        assertTrue(result.out().contains("--bootstrap"), result.out());
+    }
+
+    @Test
+    void deployBootstrapDryRunPlansTheDeployOnly() throws Exception {
+        Path project = tempDir.resolve("project.json");
+
+        Files.writeString(project, """
+                {
+                  "project": { "name": "TestProject", "version": "20230101-00" },
+                  "placement": { "stage": "prod", "provider": "aws", "account": "000000000000", "region": "us-east-2" },
+                  "resources": [
+                    { "type": "aws:core:s3Bucket", "name": "bucket", "bucketName": "sample-bucket" }
+                  ]
+                }
+                """);
+
+        // both parsers must accept the shared option; a dry run makes no AWS calls, so nothing is bootstrapped
+        Result result = cls("deploy", "--bootstrap", "--dry-run", "-p", project.toString());
+
+        assertEquals(0, result.exitCode(), result.err());
+        assertTrue(result.out().contains(" deploy --all"), result.out());
+        assertFalse(result.out().contains(" bootstrap "), result.out());
+        assertEquals("", result.err());
+    }
+
     private Result cls(String... args) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
         command.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());

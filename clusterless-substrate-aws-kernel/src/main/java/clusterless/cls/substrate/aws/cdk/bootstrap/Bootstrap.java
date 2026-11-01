@@ -9,6 +9,8 @@
 package clusterless.cls.substrate.aws.cdk.bootstrap;
 
 import clusterless.cls.command.BootstrapCommandOptions;
+import clusterless.cls.config.CommonConfig;
+import clusterless.cls.substrate.aws.AwsConfig;
 import clusterless.cls.substrate.aws.cdk.BaseCDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKCommand;
 import clusterless.cls.substrate.aws.cdk.CDKProcessExec;
@@ -62,6 +64,57 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
         String region = prompt(commandOptions.region(), "Enter region to bootstrap: ");
         String stage = prompt(commandOptions.stage(), "Enter stage to bootstrap (hit enter for none): ");
 
+        if (System.getenv("CLS_SYNTH_ONLY") != null) {
+            synth();
+            return 0;
+        }
+
+        processExec.setUseTempOutput(true);
+
+        if (!destroyBootstrap) {
+            List<String> approvals = getRequireDeployApproval(commandOptions.approve().orElse(null));
+            return deployBootstrap(processExec, getCommonConfig(), getProviderConfig(), approvals, account, region, stage, commandOptions.dryRun());
+        }
+
+        List<String> kernelArgs = kernelArgs(account, region, stage);
+
+        LOG.info("executing kernel with: {}", kernelArgs);
+
+        List<String> approvals = getRequireDestroyApproval(commandOptions.approve().orElse(null));
+
+        int exitCode = processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), CDKCommand.DESTROY, approvals, "bootstrap", kernelArgs);
+
+        if (exitCode != 0) {
+            // logging is off at the default verbosity, so point at -v rather than at the logs
+            String message = "unable to destroy bootstrap clusterless, rerun with -v for details";
+            LOG.error(message);
+            throw new ExitCodeException(message, exitCode);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Deploys the bootstrap stack for the given placement and pushes its metadata. Shared by {@code cls bootstrap}
+     * and {@code cls deploy --bootstrap}.
+     */
+    public static int deployBootstrap(CDKProcessExec processExec, CommonConfig commonConfig, AwsConfig awsConfig, List<String> approvals, String account, String region, String stage, boolean dryRun) {
+        List<String> kernelArgs = kernelArgs(account, region, stage);
+
+        LOG.info("executing kernel with: {}", kernelArgs);
+
+        int exitCode = processExec.executeCDKApp(commonConfig, awsConfig, CDKCommand.DEPLOY, approvals, "bootstrap", kernelArgs);
+
+        if (exitCode != 0) {
+            String message = String.format("unable to bootstrap clusterless, confirm the AWS cdk has been bootstrapped in the target account/region, try: cdk bootstrap aws://%s/%s", account, region);
+            LOG.error(message);
+            throw new ExitCodeException(message, exitCode);
+        }
+
+        return Metadata.pushBootstrapMetadata(processExec.profile(), region, processExec.getOutputPath(), dryRun);
+    }
+
+    private static List<String> kernelArgs(String account, String region, String stage) {
         List<String> args = Lists.list(OrderedSafeMaps.of(
                 "--account",
                 account,
@@ -71,40 +124,7 @@ public class Bootstrap extends BaseCDKCommand implements Callable<Integer> {
                 Strings.emptyToNull(stage)
         ));
 
-        if (System.getenv("CLS_SYNTH_ONLY") != null) {
-            synth();
-            return 0;
-        }
-
-        List<String> kernelArgs = Lists.concat(List.of("--synth"), args);
-
-        LOG.info("executing kernel with: {}", kernelArgs);
-
-        processExec.setUseTempOutput(true);
-
-        CDKCommand cdkCommand = destroyBootstrap ? CDKCommand.DESTROY : CDKCommand.DEPLOY;
-        List<String> approvals = destroyBootstrap ? getRequireDestroyApproval(commandOptions.approve().orElse(null)) : getRequireDeployApproval(commandOptions.approve().orElse(null));
-
-        int exitCode = processExec.executeCDKApp(getCommonConfig(), getProviderConfig(), cdkCommand, approvals, "bootstrap", kernelArgs);
-
-        if (!destroyBootstrap && exitCode != 0) {
-            String message = String.format("unable to bootstrap clusterless, confirm the AWS cdk has been bootstrapped in the target account/region, try: cdk bootstrap aws://%s/%s", account, region);
-            LOG.error(message);
-            throw new ExitCodeException(message, exitCode);
-        }
-
-        if (destroyBootstrap && exitCode != 0) {
-            // logging is off at the default verbosity, so point at -v rather than at the logs
-            String message = "unable to destroy bootstrap clusterless, rerun with -v for details";
-            LOG.error(message);
-            throw new ExitCodeException(message, exitCode);
-        }
-
-        if (destroyBootstrap) {
-            return 0;
-        }
-
-        return Metadata.pushBootstrapMetadata(commandOptions.profile(), region, processExec.getOutputPath(), commandOptions.dryRun());
+        return Lists.concat(List.of("--synth"), args);
     }
 
     private Integer synth() {
