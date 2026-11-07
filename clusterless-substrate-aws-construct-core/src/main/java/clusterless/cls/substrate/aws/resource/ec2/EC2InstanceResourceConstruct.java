@@ -16,11 +16,13 @@ import clusterless.commons.naming.Label;
 import clusterless.commons.substrate.aws.cdk.naming.ResourceNames;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.ArnComponents;
+import software.amazon.awscdk.CfnTag;
 import software.amazon.awscdk.CustomResource;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.ec2.*;
 import software.amazon.awscdk.services.iam.PolicyStatement;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -143,7 +145,12 @@ public class EC2InstanceResourceConstruct extends ResourceConstruct<EC2InstanceR
                                     .instanceInterruptionBehavior("stop")
                                     .validUntil(SPOT_VALID_UNTIL)
                                     .build())
-                            .build());
+                            .build())
+                    // so a request can be found once its instance is gone, see SpotRequestCanceller
+                    .tagSpecifications(List.of(CfnLaunchTemplate.TagSpecificationProperty.builder()
+                            .resourceType("spot-instances-request")
+                            .tags(spotRequestTags())
+                            .build()));
 
             cfnInstance.addPropertyDeletionOverride("InstanceType");
         }
@@ -168,15 +175,44 @@ public class EC2InstanceResourceConstruct extends ResourceConstruct<EC2InstanceR
      * Its physical id is the instance id, so a replacement instance yields a new one, and
      * cloudformation deletes the old, cancelling the replaced instance's request. Should the old
      * instance be terminated first, the delete also terminates what its reopened request launched.
+     * <p>
+     * The instance depends on the provider, so a provider that fails to deploy fails before the
+     * instance launches, not after, when the rollback would terminate it with no one to cancel its
+     * request.
      */
     private void cancelSpotRequestOnDelete() {
-        String serviceToken = SpotRequestCanceller.serviceToken(this);
+        SpotRequestCanceller canceller = SpotRequestCanceller.of(this);
+
+        instance.getNode().addDependency(canceller);
 
         constructWithinHandler(() -> CustomResource.Builder.create(this, id(model().instanceName() + "-spot-request"))
                 .resourceType(SpotRequestCanceller.RESOURCE_TYPE)
-                .serviceToken(serviceToken)
-                .properties(Map.of("InstanceId", instance.getInstanceId()))
+                .serviceToken(canceller.serviceToken())
+                .properties(Map.of(
+                        "InstanceId", instance.getInstanceId(),
+                        "RequestTagKey", SpotRequestCanceller.REQUEST_TAG_KEY,
+                        "RequestTagValue", spotRequestTagValue()))
                 .build());
+    }
+
+    private List<CfnTag> spotRequestTags() {
+        Map<String, String> tags = new LinkedHashMap<>();
+
+        tags.put("Name", model().instanceName());
+        tags.putAll(model().tags());
+        tags.put(SpotRequestCanceller.REQUEST_TAG_KEY, spotRequestTagValue());
+
+        return tags.entrySet().stream()
+                .map(e -> CfnTag.builder().key(e.getKey()).value(e.getValue()).build())
+                .toList();
+    }
+
+    /**
+     * Unique in the region for the stage, project, version and instance, so another stack's
+     * requests never match.
+     */
+    private String spotRequestTagValue() {
+        return ResourceNames.regionUniqueScopedName(this, model().instanceName());
     }
 
     private IMachineImage machineImage(String image) {

@@ -118,7 +118,8 @@ public class EC2InstanceResourceSynthTest {
                   "name": "lab",
                   "instanceName": "lab-0",
                   "instanceType": "m7i.4xlarge",
-                  "useSpot": true
+                  "useSpot": true,
+                  "tags": {"role": "lab"}
                 }
                 """;
 
@@ -135,7 +136,14 @@ public class EC2InstanceResourceSynthTest {
                                 "SpotOptions", Map.of(
                                         "SpotInstanceType", "persistent",
                                         "InstanceInterruptionBehavior", "stop",
-                                        "ValidUntil", "2099-12-31T23:59:59Z")))))));
+                                        "ValidUntil", "2099-12-31T23:59:59Z")),
+                        // the request can be found by tag once its instance is gone
+                        "TagSpecifications", List.of(Map.of(
+                                "ResourceType", "spot-instances-request",
+                                "Tags", List.of(
+                                        Map.of("Key", "Name", "Value", "lab-0"),
+                                        Map.of("Key", "role", "Value", "lab"),
+                                        Map.of("Key", "cls:ec2-instance", "Value", "TEST-lab-lab0-20261023-00")))))))));
 
         template.hasResourceProperties("AWS::EC2::Instance", Match.objectLike(Map.of(
                 "InstanceType", Match.absent(),
@@ -146,7 +154,16 @@ public class EC2InstanceResourceSynthTest {
 
         template.resourceCountIs("Custom::SpotInstanceRequest", 1);
         template.hasResourceProperties("Custom::SpotInstanceRequest", Match.objectLike(Map.of(
-                "InstanceId", Map.of("Ref", instanceId))));
+                "InstanceId", Map.of("Ref", instanceId),
+                "RequestTagKey", "cls:ec2-instance",
+                "RequestTagValue", "TEST-lab-lab0-20261023-00")));
+
+        // the provider deploys before the instance launches, and is deleted after it terminates
+        String handlerId = template.findResources("AWS::Lambda::Function", Match.objectLike(Map.of(
+                "Properties", Match.objectLike(Map.of("Code", Map.of("ZipFile", Match.stringLikeRegexp("CancelSpotInstanceRequestsCommand")))))))
+                .keySet().iterator().next();
+        template.hasResource("AWS::EC2::Instance", Match.objectLike(Map.of(
+                "DependsOn", Match.arrayWith(List.of(handlerId)))));
 
         // the handler, inline, and the calls its role may make
         template.hasResourceProperties("AWS::Lambda::Function", Match.objectLike(Map.of(
@@ -155,9 +172,10 @@ public class EC2InstanceResourceSynthTest {
         Object describe = Match.objectLike(Map.of("Action", List.of("ec2:DescribeInstances", "ec2:DescribeSpotInstanceRequests"), "Resource", "*"));
         Object cancel = Match.objectLike(Map.of("Action", "ec2:CancelSpotInstanceRequests", "Resource", arn("spot-instances-request")));
         Object terminate = Match.objectLike(Map.of("Action", "ec2:TerminateInstances", "Resource", arn("instance")));
+        Object stackStatus = Match.objectLike(Map.of("Action", "cloudformation:DescribeStacks", "Resource", Map.of("Ref", "AWS::StackId")));
 
         template.hasResourceProperties("AWS::IAM::Policy", Match.objectLike(Map.of(
-                "PolicyDocument", Match.objectLike(Map.of("Statement", Match.arrayWith(List.of(describe, cancel, terminate)))))));
+                "PolicyDocument", Match.objectLike(Map.of("Statement", Match.arrayWith(List.of(describe, cancel, terminate, stackStatus)))))));
     }
 
     @Test

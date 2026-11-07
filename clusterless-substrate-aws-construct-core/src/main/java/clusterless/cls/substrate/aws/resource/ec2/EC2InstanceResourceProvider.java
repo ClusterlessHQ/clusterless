@@ -63,7 +63,9 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
                     A shutdown from within still stops the instance, and its root volume is kept
                     while it is stopped. Destroying the project, or replacing the instance, cancels
                     its Spot request, so EC2 launches no instance outside the stack. Do not
-                    terminate the instance by hand, its request would launch another.
+                    terminate the instance by hand: its request launches another, which is
+                    terminated only when the project is destroyed or the instance next replaced.
+                    The request is tagged cls:ec2-instance, so it can be found.
                     Turning it on or off replaces the instance.
 
                 availabilityZone: an availability zone of the bootstrap VPC, e.g. us-east-2b

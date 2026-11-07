@@ -27,20 +27,30 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The custom resource provider, one per stack, that cancels an ec2Instance's persistent Spot request
- * when the instance leaves the stack, see spot-request-canceller.js.
+ * The custom resource provider, one per stack, that keeps an ec2Instance's persistent Spot requests
+ * from outliving its instances, see spot-request-canceller.js.
  * <p>
+ * Terminating an instance launched by a persistent request reopens the request, and EC2 launches
+ * another instance outside the stack. Each request is tagged at launch for the ec2Instance, so:
+ * <ul>
+ * <li>a delete cancels the deleted instance's request, then terminates what the request launched</li>
+ * <li>a delete while the stack is deleted, or a create rolled back, cancels every tagged request,
+ * as for an instance terminated by hand too long ago to be described</li>
+ * <li>a create or update cancels the tagged requests of no current or replaced instance, those a
+ * rollback left before this resource existed or changed; it never fails, failing would roll back</li>
+ * </ul>
  * Lifecycle glue for one resource, calling only the lambda runtime's aws sdk, so it is inline here
  * rather than packaged with the clusterless lambdas.
  */
 class SpotRequestCanceller extends Construct {
     static final String ID = "SpotRequestCanceller";
     static final String RESOURCE_TYPE = "Custom::SpotInstanceRequest";
+    static final String REQUEST_TAG_KEY = "cls:ec2-instance";
     static final String HANDLER = "spot-request-canceller.js";
 
     private final Provider provider;
 
-    static String serviceToken(@NotNull Construct scope) {
+    static SpotRequestCanceller of(@NotNull Construct scope) {
         Stack stack = Stack.of(scope);
         SpotRequestCanceller canceller = (SpotRequestCanceller) stack.getNode().tryFindChild(ID);
 
@@ -48,7 +58,7 @@ class SpotRequestCanceller extends Construct {
             canceller = new SpotRequestCanceller(stack);
         }
 
-        return canceller.provider.getServiceToken();
+        return canceller;
     }
 
     private SpotRequestCanceller(@NotNull Stack stack) {
@@ -78,9 +88,19 @@ class SpotRequestCanceller extends Construct {
                 .resources(List.of(arn(stack, "instance")))
                 .build());
 
+        // whether the stack is leaving, so every tagged request goes with it
+        handler.addToRolePolicy(PolicyStatement.Builder.create()
+                .actions(List.of("cloudformation:DescribeStacks"))
+                .resources(List.of(stack.getStackId()))
+                .build());
+
         provider = Provider.Builder.create(this, "Provider")
                 .onEventHandler(handler)
                 .build();
+    }
+
+    String serviceToken() {
+        return provider.getServiceToken();
     }
 
     private static String arn(Stack stack, String resource) {

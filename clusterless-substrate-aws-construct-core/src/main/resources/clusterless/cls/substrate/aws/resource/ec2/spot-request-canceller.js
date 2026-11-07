@@ -1,64 +1,105 @@
-// Cancels the persistent Spot request behind an aws:core:ec2Instance when the instance leaves the
-// stack, and terminates any instance the request launched outside it. Run inline by the cdk custom
-// resource provider framework, which answers cloudformation; uses only the runtime's aws sdk.
-//
-// The physical id is the instance id, so a replaced instance's resource is deleted with the old
-// id's properties. Create and update make no calls, so neither can fail and leave a rollback with
-// no request id to cancel.
-const {
-  EC2Client,
-  DescribeInstancesCommand,
-  CancelSpotInstanceRequestsCommand,
-  DescribeSpotInstanceRequestsCommand,
-  TerminateInstancesCommand,
-} = require('@aws-sdk/client-ec2');
+// Keeps the persistent Spot requests of an aws:core:ec2Instance from outliving its instances, see
+// SpotRequestCanceller.java. Inline behind the cdk provider framework, using only the runtime's sdk.
+const ec2sdk = require('@aws-sdk/client-ec2');
+const { CloudFormationClient, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
 
-const ec2 = new EC2Client({});
+const ec2 = new ec2sdk.EC2Client({});
+const cfn = new CloudFormationClient({});
+
+const LIVE = ['pending', 'running', 'stopping', 'stopped'];
+const UNCANCELLED = ['open', 'active', 'disabled'];
+const LEAVING = ['DELETE_IN_PROGRESS', 'ROLLBACK_IN_PROGRESS'];
 
 exports.handler = async (event) => {
-  const instanceId = event.ResourceProperties.InstanceId;
+  const props = event.ResourceProperties;
+  const tag = { Key: props.RequestTagKey, Value: props.RequestTagValue };
 
   if (event.RequestType !== 'Delete') {
-    return { PhysicalResourceId: instanceId };
+    const keep = [props.InstanceId, event.OldResourceProperties?.InstanceId].filter(Boolean);
+
+    try {
+      await sweep(tag, keep);
+    } catch (error) {
+      // a failed create or update rolls back, which is how a request is left behind
+      console.log('sweep failed, left for the next deploy', error);
+    }
+
+    return { PhysicalResourceId: props.InstanceId };
   }
 
-  const requestIds = await spotRequestIds(instanceId);
+  const own = (await describe([props.InstanceId])).map((i) => i.SpotInstanceRequestId).filter(Boolean);
 
-  if (requestIds.length === 0) {
-    return {};
-  }
+  await cancel(own, [props.InstanceId]);
 
-  // once cancelled, a request launches nothing more
-  await ec2.send(new CancelSpotInstanceRequestsCommand({ SpotInstanceRequestIds: requestIds }));
-
-  // a request reopened by an earlier termination may already have launched another instance
-  const { SpotInstanceRequests = [] } = await ec2.send(new DescribeSpotInstanceRequestsCommand({ SpotInstanceRequestIds: requestIds }));
-  const strays = SpotInstanceRequests
-    .map((request) => request.InstanceId)
-    .filter((id) => id && id !== instanceId);
-
-  if (strays.length > 0) {
-    console.log(`terminating instances launched outside the stack: ${strays.join(', ')}`);
-    await ec2.send(new TerminateInstancesCommand({ InstanceIds: strays }));
+  if (LEAVING.includes(await stackStatus(event.StackId))) {
+    await sweep(tag, []);
   }
 
   return {};
 };
 
-async function spotRequestIds(instanceId) {
-  try {
-    const { Reservations = [] } = await ec2.send(new DescribeInstancesCommand({ InstanceIds: [instanceId] }));
+// cancels the tagged requests of no instance in keep, keep[0] being the current instance
+async function sweep(tag, keep) {
+  const instances = await describe(keep);
 
-    return Reservations
-      .flatMap((reservation) => reservation.Instances ?? [])
-      .map((instance) => instance.SpotInstanceRequestId)
-      .filter(Boolean);
-  } catch (error) {
-    // terminated long enough ago to no longer be described, there is nothing left to find
-    if (error.name === 'InvalidInstanceID.NotFound') {
-      return [];
-    }
-
-    throw error;
+  if (keep.length > 0 && !instances.some((i) => i.InstanceId === keep[0] && i.SpotInstanceRequestId)) {
+    console.log(`no spot request found for ${keep[0]}, not sweeping`);
+    return;
   }
+
+  const kept = instances.map((i) => i.SpotInstanceRequestId).filter(Boolean);
+  const tagged = await requests([{ Name: `tag:${tag.Key}`, Values: [tag.Value] }, { Name: 'state', Values: UNCANCELLED }]);
+  const orphans = tagged
+    .filter((r) => !kept.includes(r.SpotInstanceRequestId) && !keep.includes(r.InstanceId))
+    .map((r) => r.SpotInstanceRequestId);
+
+  if (orphans.length > 0) {
+    console.log(`cancelling requests of no instance in the stack: ${orphans.join(', ')}`);
+    await cancel(orphans, keep);
+  }
+}
+
+// once cancelled a request launches nothing more, then terminates what it already launched
+async function cancel(requestIds, keep) {
+  if (requestIds.length === 0) {
+    return;
+  }
+
+  const byId = { Name: 'spot-instance-request-id', Values: requestIds };
+  const uncancelled = (await requests([byId, { Name: 'state', Values: UNCANCELLED }])).map((r) => r.SpotInstanceRequestId);
+
+  if (uncancelled.length > 0) {
+    await ec2.send(new ec2sdk.CancelSpotInstanceRequestsCommand({ SpotInstanceRequestIds: uncancelled }));
+  }
+
+  const launched = (await requests([byId])).map((r) => r.InstanceId).filter((id) => id && !keep.includes(id));
+  const strays = (await describe(launched)).filter((i) => LIVE.includes(i.State.Name)).map((i) => i.InstanceId);
+
+  if (strays.length > 0) {
+    console.log(`terminating instances launched outside the stack: ${strays.join(', ')}`);
+    await ec2.send(new ec2sdk.TerminateInstancesCommand({ InstanceIds: strays }));
+  }
+}
+
+// filters, unlike ids, do not fail on an instance or request no longer described
+async function describe(instanceIds) {
+  if (instanceIds.length === 0) {
+    return [];
+  }
+
+  const { Reservations = [] } = await ec2.send(new ec2sdk.DescribeInstancesCommand({ Filters: [{ Name: 'instance-id', Values: instanceIds }] }));
+
+  return Reservations.flatMap((r) => r.Instances ?? []);
+}
+
+async function requests(filters) {
+  const { SpotInstanceRequests = [] } = await ec2.send(new ec2sdk.DescribeSpotInstanceRequestsCommand({ Filters: filters }));
+
+  return SpotInstanceRequests;
+}
+
+async function stackStatus(stackId) {
+  const { Stacks = [] } = await cfn.send(new DescribeStacksCommand({ StackName: stackId }));
+
+  return Stacks[0]?.StackStatus;
 }
