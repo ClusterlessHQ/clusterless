@@ -167,7 +167,8 @@ public class EC2InstanceResourceSynthTest {
 
         // the handler, inline, and the calls its role may make
         template.hasResourceProperties("AWS::Lambda::Function", Match.objectLike(Map.of(
-                "Code", Map.of("ZipFile", Match.stringLikeRegexp("CancelSpotInstanceRequestsCommand")))));
+                "Code", Map.of("ZipFile", Match.stringLikeRegexp("CancelSpotInstanceRequestsCommand")),
+                "MemorySize", 256)));
 
         Object describe = Match.objectLike(Map.of("Action", List.of("ec2:DescribeInstances", "ec2:DescribeSpotInstanceRequests"), "Resource", "*"));
         Object cancel = Match.objectLike(Map.of("Action", "ec2:CancelSpotInstanceRequests", "Resource", arn("spot-instances-request")));

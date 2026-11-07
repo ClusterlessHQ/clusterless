@@ -68,6 +68,9 @@ class SpotRequestCanceller extends Construct {
                 .runtime(Runtime.NODEJS_24_X)
                 .handler("index.handler")
                 .code(Code.fromInline(source()))
+                // loading the ec2 and cloudformation clients peaked at 127 of the default 128 MB,
+                // and a create that fails rolls back, leaving the request this exists to cancel
+                .memorySize(256)
                 .timeout(Duration.minutes(1))
                 .build();
 
