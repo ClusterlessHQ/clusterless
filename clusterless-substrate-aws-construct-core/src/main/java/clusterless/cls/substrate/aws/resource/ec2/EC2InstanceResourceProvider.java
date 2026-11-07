@@ -49,6 +49,28 @@ import clusterless.cls.substrate.aws.managed.ManagedComponentContext;
                 rootVolumeSize: the root volume size in GiB
                     Defaults to 100.
 
+                useSpot: true or false
+                    Run the instance as a persistent Spot Instance, which EC2 stops, rather than
+                    terminates, when it needs the capacity back. Defaults to false (On-Demand).
+                    In return for the lower price:
+                        a start needs Spot capacity for the instance type in the instance's
+                        availability zone, without it the instance stays stopped
+                        EC2 may stop a running instance with two minutes' notice, and only EC2
+                        starts it again, once capacity returns
+                        changing instanceType replaces the instance
+                        a deploy that restarts the instance, as a userData change does, fails
+                        while EC2 holds the instance stopped or has no capacity for it
+                    A shutdown from within still stops the instance, and its root volume is kept
+                    while it is stopped. Destroying the project, or replacing the instance, cancels
+                    its Spot request, so EC2 launches no instance outside the stack. Do not
+                    terminate the instance by hand, its request would launch another.
+                    Turning it on or off replaces the instance.
+
+                availabilityZone: an availability zone of the bootstrap VPC, e.g. us-east-2b
+                    Defaults to the zone of the first bootstrap subnet. Spread Spot instances
+                    across zones so a capacity shortage in one zone does not keep them all
+                    stopped. Changing it replaces the instance.
+
                 userData: [ "command", ... ]
                     Shell commands run as root on first boot.
 

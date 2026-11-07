@@ -33,6 +33,8 @@ public class EC2InstanceResource extends Resource {
     private String machineImage = UBUNTU_LTS_AMD64;
     private String rootDeviceName = "/dev/sda1";
     private int rootVolumeSize = 100;
+    private boolean useSpot = false;
+    private String availabilityZone;
     private List<String> userData = new ArrayList<>();
     private List<String> readableParameters = new ArrayList<>();
     private Map<String, String> tags = new LinkedHashMap<>();
@@ -58,6 +60,14 @@ public class EC2InstanceResource extends Resource {
 
     public int rootVolumeSize() {
         return rootVolumeSize;
+    }
+
+    public boolean useSpot() {
+        return useSpot;
+    }
+
+    public String availabilityZone() {
+        return availabilityZone;
     }
 
     public List<String> userData() {

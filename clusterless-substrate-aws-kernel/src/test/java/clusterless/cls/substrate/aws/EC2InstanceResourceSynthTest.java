@@ -78,10 +78,13 @@ public class EC2InstanceResourceSynthTest {
         template.hasParameter("*", Match.objectLike(Map.of("Default", EC2InstanceResource.UBUNTU_LTS_AMD64)));
 
         // named for the stage, project and version, not the construct path every project shares
+        // on demand, the launch template carries only imdsv2, as before spot was supported,
+        // so deployed instances are not replaced
         template.resourceCountIs("AWS::EC2::LaunchTemplate", 1);
         template.hasResourceProperties("AWS::EC2::LaunchTemplate", Match.objectLike(Map.of(
                 "LaunchTemplateName", "TEST-lab-lab0-imdsv2-20261023-00",
-                "LaunchTemplateData", Match.objectLike(Map.of("MetadataOptions", Map.of("HttpTokens", "required"))))));
+                "LaunchTemplateData", Match.exact(Map.of("MetadataOptions", Map.of("HttpTokens", "required"))))));
+        template.resourceCountIs("Custom::SpotInstanceRequest", 0);
         template.hasResourceProperties("AWS::EC2::Instance", Match.objectLike(Map.of(
                 "LaunchTemplate", Match.objectLike(Map.of("LaunchTemplateName", "TEST-lab-lab0-imdsv2-20261023-00")))));
 
@@ -105,6 +108,109 @@ public class EC2InstanceResourceSynthTest {
                 "PolicyDocument", Match.objectLike(Map.of("Statement", Match.arrayWith(List.of(readParameter)))))));
 
         Assertions.assertEquals(List.of("ref:aws:id:test:lab:20261023-00:core:ec2-instance:lab"), exportNames(template));
+    }
+
+    @Test
+    void spot() throws IOException {
+        String resource = """
+                {
+                  "type": "aws:core:ec2Instance",
+                  "name": "lab",
+                  "instanceName": "lab-0",
+                  "instanceType": "m7i.4xlarge",
+                  "useSpot": true
+                }
+                """;
+
+        Template template = synth(resource);
+
+        // the type moves to the launch template, so a change replaces the instance, EC2 cannot change a spot instance's type
+        template.hasResourceProperties("AWS::EC2::LaunchTemplate", Match.objectLike(Map.of(
+                "LaunchTemplateName", "TEST-lab-lab0-imdsv2-20261023-00",
+                "LaunchTemplateData", Match.exact(Map.of(
+                        "InstanceType", "m7i.4xlarge",
+                        "MetadataOptions", Map.of("HttpTokens", "required"),
+                        "InstanceMarketOptions", Map.of(
+                                "MarketType", "spot",
+                                "SpotOptions", Map.of(
+                                        "SpotInstanceType", "persistent",
+                                        "InstanceInterruptionBehavior", "stop",
+                                        "ValidUntil", "2099-12-31T23:59:59Z")))))));
+
+        template.hasResourceProperties("AWS::EC2::Instance", Match.objectLike(Map.of(
+                "InstanceType", Match.absent(),
+                "InstanceInitiatedShutdownBehavior", "stop")));
+
+        // cancels the request on delete, which depends on the instance through its id
+        String instanceId = template.findResources("AWS::EC2::Instance").keySet().iterator().next();
+
+        template.resourceCountIs("Custom::SpotInstanceRequest", 1);
+        template.hasResourceProperties("Custom::SpotInstanceRequest", Match.objectLike(Map.of(
+                "InstanceId", Map.of("Ref", instanceId))));
+
+        // the handler, inline, and the calls its role may make
+        template.hasResourceProperties("AWS::Lambda::Function", Match.objectLike(Map.of(
+                "Code", Map.of("ZipFile", Match.stringLikeRegexp("CancelSpotInstanceRequestsCommand")))));
+
+        Object describe = Match.objectLike(Map.of("Action", List.of("ec2:DescribeInstances", "ec2:DescribeSpotInstanceRequests"), "Resource", "*"));
+        Object cancel = Match.objectLike(Map.of("Action", "ec2:CancelSpotInstanceRequests", "Resource", arn("spot-instances-request")));
+        Object terminate = Match.objectLike(Map.of("Action", "ec2:TerminateInstances", "Resource", arn("instance")));
+
+        template.hasResourceProperties("AWS::IAM::Policy", Match.objectLike(Map.of(
+                "PolicyDocument", Match.objectLike(Map.of("Statement", Match.arrayWith(List.of(describe, cancel, terminate)))))));
+    }
+
+    @Test
+    void spotProviderPerStack() throws IOException {
+        Path project = projects.resolve("project.json");
+
+        Files.writeString(project, """
+                {
+                  "project": {"name": "Lab", "version": "20261023-00"},
+                  "placement": {"stage": "test", "provider": "aws", "account": "000000000000", "region": "us-west-2"},
+                  "resources": [
+                    {"type": "aws:core:ec2Instance", "name": "lab0", "instanceName": "lab-0", "instanceType": "m7i.4xlarge", "useSpot": true},
+                    {"type": "aws:core:ec2Instance", "name": "lab1", "instanceName": "lab-1", "instanceType": "m7i.4xlarge", "useSpot": true}
+                  ]
+                }
+                """);
+
+        Template template = template(project);
+
+        template.resourceCountIs("Custom::SpotInstanceRequest", 2);
+        template.resourcePropertiesCountIs("AWS::Lambda::Function", Match.objectLike(Map.of(
+                "Code", Map.of("ZipFile", Match.stringLikeRegexp("CancelSpotInstanceRequestsCommand")))), 1);
+    }
+
+    @Test
+    void rejectsBlankAvailabilityZone() {
+        Throwable thrown = Assertions.assertThrows(RuntimeException.class, () -> synth("""
+                {
+                  "type": "aws:core:ec2Instance",
+                  "name": "lab",
+                  "instanceName": "lab-0",
+                  "instanceType": "m7i.4xlarge",
+                  "availabilityZone": ""
+                }
+                """));
+
+        Assertions.assertTrue(messages(thrown).contains("availabilityZone may be omitted but not blank"), messages(thrown));
+    }
+
+    @Test
+    void availabilityZone() throws IOException {
+        // the vpc lookup has no context here, so cdk provides its dummy vpc and its zones
+        Template template = synth("""
+                {
+                  "type": "aws:core:ec2Instance",
+                  "name": "lab",
+                  "instanceName": "lab-0",
+                  "instanceType": "m7i.4xlarge",
+                  "availabilityZone": "dummy1b"
+                }
+                """);
+
+        template.hasResourceProperties("AWS::EC2::Instance", Match.objectLike(Map.of("AvailabilityZone", "dummy1b")));
     }
 
     @Test
@@ -161,6 +267,10 @@ public class EC2InstanceResourceSynthTest {
                 }
                 """.formatted(resource));
 
+        return template(project);
+    }
+
+    private Template template(Path project) throws IOException {
         CloudAssembly assembly = SynthSupport.synthProject(project.toFile(), configHome);
 
         List<CloudFormationStackArtifact> stacks = assembly.getStacks();
@@ -178,6 +288,12 @@ public class EC2InstanceResourceSynthTest {
                 .filter(Map.class::isInstance)
                 .map(export -> String.valueOf(((Map<?, ?>) export).get("Name")))
                 .toList();
+    }
+
+    // {"Fn::Join": ["", ["arn:", {"Ref": "AWS::Partition"}, ":ec2:us-west-2:000000000000:<resource>/*"]]}
+    private static Object arn(String resource) {
+        return Match.objectLike(Map.of(
+                "Fn::Join", Match.arrayWith(List.of(Match.arrayWith(List.of(":ec2:us-west-2:000000000000:" + resource + "/*"))))));
     }
 
     private static String messages(Throwable thrown) {
